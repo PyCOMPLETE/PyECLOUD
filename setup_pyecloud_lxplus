@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+source /afs/cern.ch/work/k/kli/public/venv_py27_slc6/bin/activate
+which python
+
+rm *.so
+make local
+
+./cythonize
+
+cd klulib/KLUsuite_source
+./compile_klu
+
+cd ..
+rm *.so
+./cythonize
