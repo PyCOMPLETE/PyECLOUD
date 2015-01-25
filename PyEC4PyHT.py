@@ -184,7 +184,7 @@ class Ecloud(object):
 			import dynamics_Boris_multipole as dynmul
 			dynamics=dynmul.pusher_Boris_multipole(Dt=Dt, N_sub_steps=N_sub_steps, B_multip = B_multip)   
 		else:
-			raise ValueError("""track_method should be 'Boris' - others are not implemented in the PyHEADTAIL module""")
+			raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyHEADTAIL module""")
 			   
 
 			
