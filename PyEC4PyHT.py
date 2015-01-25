@@ -66,11 +66,11 @@ import dynamics_strong_B_generalized as dyngen
 import MP_system as MPs
 import space_charge_class as scc
 import impact_management_class as imc
-#import pyecloud_saver as pysav
+
 import gas_ionization_class as gic
 import gen_photoemission_class as gpc
 
-#import parse_beam_file as pbf
+
 
 import numpy as np
 from scipy.constants import c, e
@@ -139,21 +139,7 @@ class Ecloud(object):
 		
 		spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver = sparse_solver)
 		
-		#~ sec_beams_list=[]
-		#~ if flag_presence_sec_beams:
-			#~ N_sec_beams = len(sec_b_par_list)
-			#~ for ii in xrange(N_sec_beams):
-				#~ print 'Initialize secondary beam %d/%d'%(ii+1, N_sec_beams)
-				#~ sb_par = sec_b_par_list[ii]
-				#~ sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.beam_field_file,lam_th,
-					 #~ b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz,t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=Dt, t_end=t_end,
-					 #~ beam_long_prof_file=sb_par.beam_long_prof_file, Dh_beam_field=sb_par.Dh_beam_field, chamb=chamb,  sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
-					 #~ x_beam_pos = sb_par.x_beam_pos, y_beam_pos = sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
-					 #~ flag_secodary_beam = True, t_primary_beam = beamtim.t,
-					 #~ Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file = (progress_path+('_mapgen_sec_%d'%ii))))
-		
-		
-		
+
 		if switch_model==0 or switch_model=='ECLOUD':
 			sey_mod=SEY_model_ECLOUD(Emax,del_max,R0)
 		elif switch_model==1 or switch_model=='ACC_LOW':
