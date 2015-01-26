@@ -295,6 +295,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
                  x_beam_pos = b_par.x_beam_pos, y_beam_pos = b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
                  Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file = (progress_path+'_mapgen'))
     
+    if sparse_solver=='klu':
+		print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
+		sparse_solver='PyKLU'
+		
     spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver = sparse_solver)
     
     sec_beams_list=[]
