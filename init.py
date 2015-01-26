@@ -80,7 +80,7 @@ import parse_beam_file as pbf
 qe=1.602176565e-19;
 c=299792458.;
 
-def read_parameter_files():
+def read_parameter_files(pyecl_input_folder='./'):
     switch_model=0
     simulation_param_file='simulation_parameters.input'
     
@@ -175,20 +175,20 @@ def read_parameter_files():
     B_multip = []
     
     
-    f=open(simulation_param_file)
+    f=open(pyecl_input_folder+'/'+simulation_param_file)
     exec(f.read())
     f.close()  
     
     
-    f=open(machine_param_file)
+    f=open(pyecl_input_folder+'/'+machine_param_file)
     exec(f.read())
     f.close() 
     
-    f=open(secondary_emission_parameters_file)
+    f=open(pyecl_input_folder+'/'+secondary_emission_parameters_file)
     exec(f.read())
     f.close()  
     
-    b_par = pbf.beam_descr_from_fil(beam_parameters_file, betafx, Dx, betafy, Dy)
+    b_par = pbf.beam_descr_from_fil(pyecl_input_folder+'/'+beam_parameters_file, betafx, Dx, betafy, Dy)
     
     flag_presence_sec_beams = False
     if len(secondary_beams_file_list)>0:
@@ -197,7 +197,7 @@ def read_parameter_files():
     sec_b_par_list=[]
     if flag_presence_sec_beams:
         for sec_b_file in secondary_beams_file_list:
-            sec_b_par_list.append(pbf.beam_descr_from_fil(sec_b_file, betafx, Dx, betafy, Dy))
+            sec_b_par_list.append(pbf.beam_descr_from_fil(pyecl_input_folder+'/'+sec_b_file, betafx, Dx, betafy, Dy))
         
     if B==-1:
         B   = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen) 
@@ -230,7 +230,7 @@ def read_parameter_files():
 
 
 
-def read_input_files_and_init_components():
+def read_input_files_and_init_components(pyecl_input_folder='./'):
     
     b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
@@ -252,7 +252,7 @@ def read_input_files_and_init_components():
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip= \
-    read_parameter_files()
+    read_parameter_files(pyecl_input_folder)
     
       
 

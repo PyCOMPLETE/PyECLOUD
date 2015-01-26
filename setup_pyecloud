@@ -1,0 +1,10 @@
+#!/bin/bash
+
+which python
+
+rm *.so
+make all
+
+./cythonize
+
+
