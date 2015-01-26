@@ -1,3 +1,5 @@
+all:local
+
 cern:
 	/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/f2py -m rhocompute -c compute_rho.f
 	/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/f2py -m int_field_for -c interp_field_for.f
