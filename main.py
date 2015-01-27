@@ -54,10 +54,13 @@
 #for compatibility with old PyECLOUD versions
 
 try:
-	from buildup_simulation import run_buildup_simulation
+	from buildup_simulation import BuildupSimulation
 	print 'Imported from local folder'
 except ImportError:
-	from PyECLOUD.buildup_simulation import run_buildup_simulation
+	from PyECLOUD.buildup_simulation import BuildupSimulation
 	print 'Imported from PyECLOUD folder'
 
-run_buildup_simulation()
+from PyECLOUD.buildup_simulation import BuildupSimulation
+
+sim = BuildupSimulation()
+sim.run()
