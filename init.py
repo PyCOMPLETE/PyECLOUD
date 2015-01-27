@@ -275,13 +275,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
         
     if chamb_type=='ellip':
         chamb=ellip_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file)
-    elif chamb_type=='polyg':
+    elif chamb_type=='polyg' or chamb_type=='polyg_cython':
+        try:
+			import geom_impact_poly_fast_impact as gipfi
+			chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+										 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+        except ImportError as error:
+			print 'Got ImportError exception', err
+			print 'Falling back to numpy implementation'
+			chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+				 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)  
+    elif chamb_type=='polyg_numpy':
         chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-                         flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
-    elif chamb_type=='polyg_cython':
-        import geom_impact_poly_fast_impact as gipfi
-        chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-                                     flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)                             
+                         flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)                                                               
     else:
         raise ValueError('Chamber type not recognized (choose: ellip/polyg)')
     
