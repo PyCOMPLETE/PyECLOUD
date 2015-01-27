@@ -85,11 +85,6 @@ class space_charge:
 		self.Dt_sc = Dt_sc
 		self.t_last_recom=0.;
 		
-		self.rho = self.PyPICobj.rho
-		self.phi = self.PyPICobj.phi
-		self.efx = self.PyPICobj.efx
-		self.efy = self.PyPICobj.efy
-		
 		self.U_sc_eV_stp = 0.
 		
 
@@ -98,7 +93,23 @@ class space_charge:
 
 		print 'Done space charge init.'
 		
-                        
+    @property
+    def rho(self):
+		return self.PyPICobj.rho
+		
+    @property
+    def phi(self):
+		return self.PyPICobj.phi
+		
+    @property
+    def efx(self):
+    	return self.PyPICobj.efx
+		
+    @property
+    def efy(self):
+		return self.PyPICobj.efy
+	
+                       
     #@profile
     def recompute_spchg_efield(self, MP_e, t_curr=None):
         
