@@ -62,9 +62,13 @@ class polyg_cham_geom_object:
                  flag_verbose_file=False, flag_verbose_stdout=False):
         
         
-        print 'Using fast polygon'
+        print 'Polygonal chamber - cython implementation'
         
-        dict_chm=sio.loadmat(filename_chm)
+        if type(filename_chm)==str:
+			dict_chm=sio.loadmat(filename_chm)
+        else:
+			dict_chm=filename_chm
+			
         Vx=squeeze(dict_chm['Vx'])
         Vy=squeeze(dict_chm['Vy'])
         cx=float(squeeze(dict_chm['x_sem_ellip_insc']))

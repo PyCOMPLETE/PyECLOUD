@@ -58,7 +58,13 @@ import scipy.io as sio
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey, 
                  flag_verbose_file=False, flag_verbose_stdout=False):
-        dict_chm=sio.loadmat(filename_chm)
+        
+        print 'Polygonal chamber - numpy implementation'
+        
+        if type(filename_chm)==str:
+			dict_chm=sio.loadmat(filename_chm)
+        else:
+			dict_chm=filename_chm
         Vx=squeeze(dict_chm['Vx'])
         Vy=squeeze(dict_chm['Vy'])
         cx=float(squeeze(dict_chm['x_sem_ellip_insc']))
