@@ -287,9 +287,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
 				 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)  
     elif chamb_type=='polyg_numpy':
         chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-                         flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)                                                               
+                         flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+    elif chamb_type=='rect':
+        import geom_impact_rect_fast_impact as girfi
+        chamb =  girfi.rect_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)                                                                                     
     else:
-        raise ValueError('Chamber type not recognized (choose: ellip/polyg)')
+        raise ValueError('Chamber type not recognized (choose: ellip/rect/polyg)')
     
     
     MP_e=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
