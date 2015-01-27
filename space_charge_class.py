@@ -56,17 +56,23 @@ na = lambda x:np.array([x])
 
 class space_charge:
     #@profile
-    def __init__(self,chamb, Dh, Dt_sc=None, sparse_solver = 'scipy_slu'):
+    def __init__(self,chamb, Dh, Dt_sc=None, PyPICmode = 'FiniteDifferences_ShortleyWeller' ,sparse_solver = 'scipy_slu'):
         
 		print 'Start space charge init.'
 		
-		import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
-		
-		self.PyPICobj = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
-		
-		#To be replaced by a property to make it general (fro PyPIC modules not having xn, yn)
-		self.xn = self.PyPICobj.xn
-		self.yn = self.PyPICobj.yn
+		if PyPICmode == 'FiniteDifferences_ShortleyWeller':
+			import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
+			self.PyPICobj = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
+			
+			#To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
+			self.xn = self.PyPICobj.xn
+			self.yn = self.PyPICobj.yn
+		elif PyPICmode == 'FiniteDifferences_Staircase':
+			import PyPIC.FiniteDifferences_Staircase_SquareGrid as PIC_FDSQ
+			self.PyPICobj = PIC_FDSQ.FiniteDifferences_Staircase_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
+			#To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
+			self.xn = self.PyPICobj.xn
+			self.yn = self.PyPICobj.yn
 			
 		self.Dh=self.PyPICobj.Dh
 		self.xg = self.PyPICobj.xg
