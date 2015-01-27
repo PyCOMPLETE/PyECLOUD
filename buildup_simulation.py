@@ -54,97 +54,129 @@
 
 import init as init
 
-def run_buildup_simulation(pyecl_input_folder='./'):
 
-	######
-	print 'PyECLOUD Version 4.13'
+class BuildupSimulation(object):
+	def __init__(self, pyecl_input_folder='./'):
 
-	beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
-			gas_ion_flag, resgasion, t_ion, \
-			spacech_ele,t_sc_ON, photoem_flag, phemiss,\
-			flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components()
+		print 'PyECLOUD Version 4.13'
+		beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
+				gas_ion_flag, resgasion, t_ion, \
+				spacech_ele,t_sc_ON, photoem_flag, phemiss,\
+				flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components()
+		
+		self.beamtim = beamtim
+		self.MP_e = MP_e
+		self.dynamics = dynamics
+		self.impact_man = impact_man
+		self.pyeclsaver = pyeclsaver
+		self.gas_ion_flag = gas_ion_flag
+		self.resgasion = resgasion
+		self.t_ion = t_ion
+		self.spacech_ele = spacech_ele
+		self.t_sc_ON = t_sc_ON
+		self.photoem_flag = photoem_flag
+		self.phemiss = phemiss
+		self.flag_presence_sec_beams = flag_presence_sec_beams
+		self.sec_beams_list = sec_beams_list
+				
+	def run(self):
+		
+		beamtim = self.beamtim
+		MP_e = self.MP_e
+		dynamics = self.dynamics
+		impact_man = self.impact_man
+		pyeclsaver = self.pyeclsaver
+		gas_ion_flag = self.gas_ion_flag
+		resgasion = self.resgasion
+		t_ion = self.t_ion
+		spacech_ele = self.spacech_ele
+		t_sc_ON = self.t_sc_ON
+		photoem_flag = self.photoem_flag
+		phemiss = self.phemiss
+		flag_presence_sec_beams = self.flag_presence_sec_beams
+		sec_beams_list = self.sec_beams_list
+		
+		print 'Start timestep iter'
+
+		## simulation
+		while not beamtim.end_simulation():
 			
-
-	print 'Start timestep iter'
-
-	## simulation
-	while not beamtim.end_simulation():
-		
-		beamtim.next_time_step()
-		
-		if flag_presence_sec_beams:
-			for sec_beam in sec_beams_list:
-				sec_beam.next_time_step()
-		
-		
-		## compute beam electric field (main and secondary beams)
-		Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
-		
-		if flag_presence_sec_beams:
-			for sec_beam in sec_beams_list:
-				Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(MP_e)
-				Ex_n_beam+=Ex_n_secbeam
-				Ey_n_beam+=Ey_n_secbeam
-		
-		## compute electron space charge electric field
-		Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-		
-		## Total electric field
-		Ex_n=Ex_sc_n+Ex_n_beam;
-		Ey_n=Ey_sc_n+Ey_n_beam;
+			beamtim.next_time_step()
 			
-		## save position before motion step
-		old_pos=MP_e.get_positions()
-		
-		## motion
-		MP_e = dynamics.step(MP_e, Ex_n, Ey_n);
-		
-		## impacts: backtracking and secondary emission
-		MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
-	 
-		
-		## gas ionization (main and secondary beams)
-		if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
-			MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt,beamtim.sigmax, beamtim.sigmay, 
-									x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
 			if flag_presence_sec_beams:
 				for sec_beam in sec_beams_list:
-					MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt,sec_beam.sigmax, sec_beam.sigmay, 
-									x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
+					sec_beam.next_time_step()
 			
-					
+			
+			## compute beam electric field (main and secondary beams)
+			Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
+			
+			if flag_presence_sec_beams:
+				for sec_beam in sec_beams_list:
+					Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(MP_e)
+					Ex_n_beam+=Ex_n_secbeam
+					Ey_n_beam+=Ey_n_secbeam
+			
+			## compute electron space charge electric field
+			Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+			
+			## Total electric field
+			Ex_n=Ex_sc_n+Ex_n_beam;
+			Ey_n=Ey_sc_n+Ey_n_beam;
+				
+			## save position before motion step
+			old_pos=MP_e.get_positions()
+			
+			## motion
+			MP_e = dynamics.step(MP_e, Ex_n, Ey_n);
+			
+			## impacts: backtracking and secondary emission
+			MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 		 
-		## photoemission (main and secondary beams)  
-		if(photoem_flag==1):
-			lam_curr_phem = beamtim.lam_t_curr
-			if flag_presence_sec_beams:
-				for sec_beam in sec_beams_list:
-					lam_curr_phem += sec_beam.lam_t_curr
-			MP_e = phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
+			
+			## gas ionization (main and secondary beams)
+			if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
+				MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt,beamtim.sigmax, beamtim.sigmay, 
+										x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
+				if flag_presence_sec_beams:
+					for sec_beam in sec_beams_list:
+						MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt,sec_beam.sigmax, sec_beam.sigmay, 
+										x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
+				
+						
+			 
+			## photoemission (main and secondary beams)  
+			if(photoem_flag==1):
+				lam_curr_phem = beamtim.lam_t_curr
+				if flag_presence_sec_beams:
+					for sec_beam in sec_beams_list:
+						lam_curr_phem += sec_beam.lam_t_curr
+				MP_e = phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
+				
+			## Compute space charge field
+			if (beamtim.tt_curr>t_sc_ON):
+				spacech_ele.recompute_spchg_efield(MP_e, t_curr=beamtim.tt_curr)
+				
 			
-		## Compute space charge field
-		if (beamtim.tt_curr>t_sc_ON):
-			spacech_ele.recompute_spchg_efield(MP_e, t_curr=beamtim.tt_curr)
+			## savings
+			impact_man = pyeclsaver.witness(MP_e, beamtim, spacech_ele, impact_man, dynamics,gas_ion_flag,
+											resgasion,t_ion,t_sc_ON, photoem_flag, phemiss,
+											flag_presence_sec_beams,sec_beams_list)
 			
-		
-		## savings
-		impact_man = pyeclsaver.witness(MP_e, beamtim, spacech_ele, impact_man, dynamics,gas_ion_flag,
-										resgasion,t_ion,t_sc_ON, photoem_flag, phemiss,
-										flag_presence_sec_beams,sec_beams_list)
-		
-		
-		## every bunch passage
-		if beamtim.flag_new_bunch_pass:
+			
+			## every bunch passage
+			if beamtim.flag_new_bunch_pass:
 
-			## clean
-			MP_e.clean_small_MPs()
+				## clean
+				MP_e.clean_small_MPs()
+				
+				## regeneration
+				MP_e.check_for_regeneration()
+				
+				## soft regeneration
+				MP_e.check_for_soft_regeneration()        
+				
+				print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
 			
-			## regeneration
-			MP_e.check_for_regeneration()
-			
-			## soft regeneration
-			MP_e.check_for_soft_regeneration()        
-			
-			print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
-		
+
