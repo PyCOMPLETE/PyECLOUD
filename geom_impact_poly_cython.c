@@ -741,7 +741,7 @@ typedef __pyx_t_5numpy_float_t __pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBL
  */
 typedef __pyx_t_5numpy_int_t __pyx_t_8PyECLOUD_23geom_impact_poly_cython_INT_t;
 
-/* "PyECLOUD/geom_impact_poly_cython.pyx":72
+/* "PyECLOUD/geom_impact_poly_cython.pyx":77
  * 
  * 
  * ctypedef np.int8_t INT8_t             # <<<<<<<<<<<<<<
@@ -1836,23 +1836,19 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
   int __pyx_t_26;
   int __pyx_t_27;
   double __pyx_t_28;
-  double __pyx_t_29;
+  int __pyx_t_29;
   int __pyx_t_30;
   int __pyx_t_31;
-  int __pyx_t_32;
+  long __pyx_t_32;
   int __pyx_t_33;
-  int __pyx_t_34;
+  long __pyx_t_34;
   int __pyx_t_35;
-  int __pyx_t_36;
-  long __pyx_t_37;
+  double __pyx_t_36;
+  int __pyx_t_37;
   int __pyx_t_38;
-  long __pyx_t_39;
+  int __pyx_t_39;
   int __pyx_t_40;
   int __pyx_t_41;
-  int __pyx_t_42;
-  int __pyx_t_43;
-  int __pyx_t_44;
-  int __pyx_t_45;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -2301,7 +2297,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
  * 		for ii in xrange(N_edg):
  * 			den = (Nx[ii]*(x_out_curr-x_in_curr)+Ny[ii]*(y_out_curr-y_in_curr))             # <<<<<<<<<<<<<<
  * 			if den == 0.:
- * 				t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
+ * 				# it is the case when the normal is perpendicular to the impacting segment
  */
       __pyx_t_21 = __pyx_v_ii;
       __pyx_t_22 = __pyx_v_ii;
@@ -2311,52 +2307,36 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
  * 		for ii in xrange(N_edg):
  * 			den = (Nx[ii]*(x_out_curr-x_in_curr)+Ny[ii]*(y_out_curr-y_in_curr))
  * 			if den == 0.:             # <<<<<<<<<<<<<<
- * 				t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
- * 			else:
+ * 				# it is the case when the normal is perpendicular to the impacting segment
+ * 				# the case case segment overlapping the edge is not possible (this would not allow Pin inside and Pout outside - a point on the edge is condidered outside)
  */
       __pyx_t_23 = ((__pyx_v_den == 0.) != 0);
       if (__pyx_t_23) {
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":46
- * 			den = (Nx[ii]*(x_out_curr-x_in_curr)+Ny[ii]*(y_out_curr-y_in_curr))
- * 			if den == 0.:
- * 				t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))             # <<<<<<<<<<<<<<
- * 			else:
- * 				t_ii = (Nx[ii]*(Vx[ii]-x_in_curr)+Ny[ii]*(Vy[ii]-y_in_curr)) / den
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":49
+ * 				# the case case segment overlapping the edge is not possible (this would not allow Pin inside and Pout outside - a point on the edge is condidered outside)
+ * 				# the only case left is segment parallel to tue edge => no intersection
+ * 				t_ii  = -2.             # <<<<<<<<<<<<<<
+ * 				#old
+ * 				#t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
  */
-        __pyx_t_24 = __pyx_v_ii;
-        __pyx_t_25 = __pyx_v_ii;
-        __pyx_t_26 = __pyx_v_ii;
-        __pyx_t_27 = __pyx_v_ii;
-        __pyx_t_28 = ((((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_24)) ))) - __pyx_v_x_in_curr) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_25)) ))) - __pyx_v_x_in_curr)) + (((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_26)) ))) - __pyx_v_y_in_curr) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_27)) ))) - __pyx_v_y_in_curr)));
-        __pyx_t_29 = (((__pyx_v_x_out_curr - __pyx_v_x_in_curr) * (__pyx_v_x_out_curr - __pyx_v_x_in_curr)) + ((__pyx_v_y_out_curr - __pyx_v_y_in_curr) * (__pyx_v_y_out_curr - __pyx_v_y_in_curr)));
-        if (unlikely(__pyx_t_29 == 0)) {
-          #ifdef WITH_THREAD
-          PyGILState_STATE __pyx_gilstate_save = PyGILState_Ensure();
-          #endif
-          PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          #ifdef WITH_THREAD
-          PyGILState_Release(__pyx_gilstate_save);
-          #endif
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-        }
-        __pyx_v_t_ii = sqrt((__pyx_t_28 / __pyx_t_29));
+        __pyx_v_t_ii = -2.;
         goto __pyx_L7;
       }
       /*else*/ {
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":48
- * 				t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":53
+ * 				#t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
  * 			else:
  * 				t_ii = (Nx[ii]*(Vx[ii]-x_in_curr)+Ny[ii]*(Vy[ii]-y_in_curr)) / den             # <<<<<<<<<<<<<<
  * 
  * 			if t_ii>=0. and t_ii<t_min_curr:
  */
-        __pyx_t_30 = __pyx_v_ii;
-        __pyx_t_31 = __pyx_v_ii;
-        __pyx_t_32 = __pyx_v_ii;
-        __pyx_t_33 = __pyx_v_ii;
-        __pyx_t_29 = (((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Nx.data) + __pyx_t_30)) ))) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_31)) ))) - __pyx_v_x_in_curr)) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Ny.data) + __pyx_t_32)) ))) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_33)) ))) - __pyx_v_y_in_curr)));
+        __pyx_t_24 = __pyx_v_ii;
+        __pyx_t_25 = __pyx_v_ii;
+        __pyx_t_26 = __pyx_v_ii;
+        __pyx_t_27 = __pyx_v_ii;
+        __pyx_t_28 = (((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Nx.data) + __pyx_t_24)) ))) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_25)) ))) - __pyx_v_x_in_curr)) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Ny.data) + __pyx_t_26)) ))) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_27)) ))) - __pyx_v_y_in_curr)));
         if (unlikely(__pyx_v_den == 0)) {
           #ifdef WITH_THREAD
           PyGILState_STATE __pyx_gilstate_save = PyGILState_Ensure();
@@ -2365,33 +2345,33 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
           #ifdef WITH_THREAD
           PyGILState_Release(__pyx_gilstate_save);
           #endif
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
-        __pyx_v_t_ii = (__pyx_t_29 / __pyx_v_den);
+        __pyx_v_t_ii = (__pyx_t_28 / __pyx_v_den);
       }
       __pyx_L7:;
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":50
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":55
  * 				t_ii = (Nx[ii]*(Vx[ii]-x_in_curr)+Ny[ii]*(Vy[ii]-y_in_curr)) / den
  * 
  * 			if t_ii>=0. and t_ii<t_min_curr:             # <<<<<<<<<<<<<<
  * 				t_min_curr=t_ii
  * 				fould_curr = True
  */
-      __pyx_t_34 = ((__pyx_v_t_ii >= 0.) != 0);
-      if (__pyx_t_34) {
+      __pyx_t_29 = ((__pyx_v_t_ii >= 0.) != 0);
+      if (__pyx_t_29) {
         goto __pyx_L10_next_and;
       } else {
-        __pyx_t_23 = __pyx_t_34;
+        __pyx_t_23 = __pyx_t_29;
         goto __pyx_L9_bool_binop_done;
       }
       __pyx_L10_next_and:;
-      __pyx_t_34 = ((__pyx_v_t_ii < __pyx_v_t_min_curr) != 0);
-      __pyx_t_23 = __pyx_t_34;
+      __pyx_t_29 = ((__pyx_v_t_ii < __pyx_v_t_min_curr) != 0);
+      __pyx_t_23 = __pyx_t_29;
       __pyx_L9_bool_binop_done:;
       if (__pyx_t_23) {
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":51
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":56
  * 
  * 			if t_ii>=0. and t_ii<t_min_curr:
  * 				t_min_curr=t_ii             # <<<<<<<<<<<<<<
@@ -2400,7 +2380,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
  */
         __pyx_v_t_min_curr = __pyx_v_t_ii;
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":52
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":57
  * 			if t_ii>=0. and t_ii<t_min_curr:
  * 				t_min_curr=t_ii
  * 				fould_curr = True             # <<<<<<<<<<<<<<
@@ -2409,7 +2389,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
  */
         __pyx_v_fould_curr = 1;
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":53
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":58
  * 				t_min_curr=t_ii
  * 				fould_curr = True
  * 				i_found_curr = ii             # <<<<<<<<<<<<<<
@@ -2420,7 +2400,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
         goto __pyx_L8;
       }
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":54
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":59
  * 				fould_curr = True
  * 				i_found_curr = ii
  * 			elif t_ii==t_min_curr:             # <<<<<<<<<<<<<<
@@ -2430,38 +2410,38 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
       __pyx_t_23 = ((__pyx_v_t_ii == __pyx_v_t_min_curr) != 0);
       if (__pyx_t_23) {
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":55
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":60
  * 				i_found_curr = ii
  * 			elif t_ii==t_min_curr:
  * 				t_border=((y_out_curr-y_in_curr)*(x_in_curr-Vx[ii])+(x_in_curr-x_out_curr)*(y_in_curr-Vy[ii])) / \             # <<<<<<<<<<<<<<
  * 					 ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
  * 				if t_border>=0. and t_border<=1.:
  */
-        __pyx_t_35 = __pyx_v_ii;
-        __pyx_t_36 = __pyx_v_ii;
-        __pyx_t_29 = (((__pyx_v_y_out_curr - __pyx_v_y_in_curr) * (__pyx_v_x_in_curr - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_35)) ))))) + ((__pyx_v_x_in_curr - __pyx_v_x_out_curr) * (__pyx_v_y_in_curr - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_36)) ))))));
+        __pyx_t_30 = __pyx_v_ii;
+        __pyx_t_31 = __pyx_v_ii;
+        __pyx_t_28 = (((__pyx_v_y_out_curr - __pyx_v_y_in_curr) * (__pyx_v_x_in_curr - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_30)) ))))) + ((__pyx_v_x_in_curr - __pyx_v_x_out_curr) * (__pyx_v_y_in_curr - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_31)) ))))));
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":56
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":61
  * 			elif t_ii==t_min_curr:
  * 				t_border=((y_out_curr-y_in_curr)*(x_in_curr-Vx[ii])+(x_in_curr-x_out_curr)*(y_in_curr-Vy[ii])) / \
  * 					 ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))             # <<<<<<<<<<<<<<
  * 				if t_border>=0. and t_border<=1.:
  * 					i_found_curr = ii
  */
-        __pyx_t_37 = (__pyx_v_ii + 1);
-        __pyx_t_38 = __pyx_v_ii;
-        __pyx_t_39 = (__pyx_v_ii + 1);
-        __pyx_t_40 = __pyx_v_ii;
-        __pyx_t_28 = (((__pyx_v_y_out_curr - __pyx_v_y_in_curr) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_37)) ))) - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_38)) ))))) + ((__pyx_v_x_in_curr - __pyx_v_x_out_curr) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_39)) ))) - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_40)) ))))));
+        __pyx_t_32 = (__pyx_v_ii + 1);
+        __pyx_t_33 = __pyx_v_ii;
+        __pyx_t_34 = (__pyx_v_ii + 1);
+        __pyx_t_35 = __pyx_v_ii;
+        __pyx_t_36 = (((__pyx_v_y_out_curr - __pyx_v_y_in_curr) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_32)) ))) - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vx.data) + __pyx_t_33)) ))))) + ((__pyx_v_x_in_curr - __pyx_v_x_out_curr) * ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_34)) ))) - (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Vy.data) + __pyx_t_35)) ))))));
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":55
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":60
  * 				i_found_curr = ii
  * 			elif t_ii==t_min_curr:
  * 				t_border=((y_out_curr-y_in_curr)*(x_in_curr-Vx[ii])+(x_in_curr-x_out_curr)*(y_in_curr-Vy[ii])) / \             # <<<<<<<<<<<<<<
  * 					 ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
  * 				if t_border>=0. and t_border<=1.:
  */
-        if (unlikely(__pyx_t_28 == 0)) {
+        if (unlikely(__pyx_t_36 == 0)) {
           #ifdef WITH_THREAD
           PyGILState_STATE __pyx_gilstate_save = PyGILState_Ensure();
           #endif
@@ -2469,31 +2449,31 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
           #ifdef WITH_THREAD
           PyGILState_Release(__pyx_gilstate_save);
           #endif
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 60; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
-        __pyx_v_t_border = (__pyx_t_29 / __pyx_t_28);
+        __pyx_v_t_border = (__pyx_t_28 / __pyx_t_36);
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":57
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":62
  * 				t_border=((y_out_curr-y_in_curr)*(x_in_curr-Vx[ii])+(x_in_curr-x_out_curr)*(y_in_curr-Vy[ii])) / \
  * 					 ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
  * 				if t_border>=0. and t_border<=1.:             # <<<<<<<<<<<<<<
  * 					i_found_curr = ii
  * 
  */
-        __pyx_t_34 = ((__pyx_v_t_border >= 0.) != 0);
-        if (__pyx_t_34) {
+        __pyx_t_29 = ((__pyx_v_t_border >= 0.) != 0);
+        if (__pyx_t_29) {
           goto __pyx_L13_next_and;
         } else {
-          __pyx_t_23 = __pyx_t_34;
+          __pyx_t_23 = __pyx_t_29;
           goto __pyx_L12_bool_binop_done;
         }
         __pyx_L13_next_and:;
-        __pyx_t_34 = ((__pyx_v_t_border <= 1.) != 0);
-        __pyx_t_23 = __pyx_t_34;
+        __pyx_t_29 = ((__pyx_v_t_border <= 1.) != 0);
+        __pyx_t_23 = __pyx_t_29;
         __pyx_L12_bool_binop_done:;
         if (__pyx_t_23) {
 
-          /* "PyECLOUD/geom_impact_poly_cython.pyx":58
+          /* "PyECLOUD/geom_impact_poly_cython.pyx":63
  * 					 ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
  * 				if t_border>=0. and t_border<=1.:
  * 					i_found_curr = ii             # <<<<<<<<<<<<<<
@@ -2509,7 +2489,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
       __pyx_L8:;
     }
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":60
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":65
  * 					i_found_curr = ii
  * 
  * 		t_min_curr=resc_fac*t_min_curr;             # <<<<<<<<<<<<<<
@@ -2518,7 +2498,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
  */
     __pyx_v_t_min_curr = (__pyx_v_resc_fac * __pyx_v_t_min_curr);
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":61
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":66
  * 
  * 		t_min_curr=resc_fac*t_min_curr;
  * 		x_int[i_imp]=t_min_curr*x_out_curr+(1.-t_min_curr)*x_in_curr;             # <<<<<<<<<<<<<<
@@ -2528,7 +2508,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
     __pyx_t_19 = __pyx_v_i_imp;
     *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_x_int.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_x_int.diminfo[0].strides) = ((__pyx_v_t_min_curr * __pyx_v_x_out_curr) + ((1. - __pyx_v_t_min_curr) * __pyx_v_x_in_curr));
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":62
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":67
  * 		t_min_curr=resc_fac*t_min_curr;
  * 		x_int[i_imp]=t_min_curr*x_out_curr+(1.-t_min_curr)*x_in_curr;
  * 		y_int[i_imp]=t_min_curr*y_out_curr+(1.-t_min_curr)*y_in_curr;             # <<<<<<<<<<<<<<
@@ -2538,17 +2518,17 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
     __pyx_t_20 = __pyx_v_i_imp;
     *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_y_int.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_y_int.diminfo[0].strides) = ((__pyx_v_t_min_curr * __pyx_v_y_out_curr) + ((1. - __pyx_v_t_min_curr) * __pyx_v_y_in_curr));
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":63
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":68
  * 		x_int[i_imp]=t_min_curr*x_out_curr+(1.-t_min_curr)*x_in_curr;
  * 		y_int[i_imp]=t_min_curr*y_out_curr+(1.-t_min_curr)*y_in_curr;
  * 		z_int[i_imp]=0             # <<<<<<<<<<<<<<
  * 
  * 		if i_found_curr>=0:
  */
-    __pyx_t_41 = __pyx_v_i_imp;
-    *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_z_int.rcbuffer->pybuffer.buf, __pyx_t_41, __pyx_pybuffernd_z_int.diminfo[0].strides) = 0.0;
+    __pyx_t_37 = __pyx_v_i_imp;
+    *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_z_int.rcbuffer->pybuffer.buf, __pyx_t_37, __pyx_pybuffernd_z_int.diminfo[0].strides) = 0.0;
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":65
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":70
  * 		z_int[i_imp]=0
  * 
  * 		if i_found_curr>=0:             # <<<<<<<<<<<<<<
@@ -2558,33 +2538,33 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
     __pyx_t_23 = ((__pyx_v_i_found_curr >= 0) != 0);
     if (__pyx_t_23) {
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":66
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":71
  * 
  * 		if i_found_curr>=0:
  * 			Nx_int[i_imp] = Nx[i_found_curr]             # <<<<<<<<<<<<<<
  * 			Ny_int[i_imp] = Ny[i_found_curr]
  * 
  */
-      __pyx_t_42 = __pyx_v_i_found_curr;
-      __pyx_t_43 = __pyx_v_i_imp;
-      *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Nx_int.rcbuffer->pybuffer.buf, __pyx_t_43, __pyx_pybuffernd_Nx_int.diminfo[0].strides) = (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Nx.data) + __pyx_t_42)) )));
+      __pyx_t_38 = __pyx_v_i_found_curr;
+      __pyx_t_39 = __pyx_v_i_imp;
+      *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Nx_int.rcbuffer->pybuffer.buf, __pyx_t_39, __pyx_pybuffernd_Nx_int.diminfo[0].strides) = (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Nx.data) + __pyx_t_38)) )));
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":67
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":72
  * 		if i_found_curr>=0:
  * 			Nx_int[i_imp] = Nx[i_found_curr]
  * 			Ny_int[i_imp] = Ny[i_found_curr]             # <<<<<<<<<<<<<<
  * 
  * 	return  x_int,y_int,z_int,Nx_int,Ny_int, i_found
  */
-      __pyx_t_44 = __pyx_v_i_found_curr;
-      __pyx_t_45 = __pyx_v_i_imp;
-      *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Ny_int.rcbuffer->pybuffer.buf, __pyx_t_45, __pyx_pybuffernd_Ny_int.diminfo[0].strides) = (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Ny.data) + __pyx_t_44)) )));
+      __pyx_t_40 = __pyx_v_i_found_curr;
+      __pyx_t_41 = __pyx_v_i_imp;
+      *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Ny_int.rcbuffer->pybuffer.buf, __pyx_t_41, __pyx_pybuffernd_Ny_int.diminfo[0].strides) = (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_Ny.data) + __pyx_t_40)) )));
       goto __pyx_L14;
     }
     __pyx_L14:;
   }
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":69
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":74
  * 			Ny_int[i_imp] = Ny[i_found_curr]
  * 
  * 	return  x_int,y_int,z_int,Nx_int,Ny_int, i_found             # <<<<<<<<<<<<<<
@@ -2592,7 +2572,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_no
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = PyTuple_New(6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_New(6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(((PyObject *)__pyx_v_x_int));
   PyTuple_SET_ITEM(__pyx_t_6, 0, ((PyObject *)__pyx_v_x_int));
@@ -2859,7 +2839,7 @@ static PyObject *__pyx_pf_8PyECLOUD_23geom_impact_poly_cython_impact_point_and_n
   return __pyx_r;
 }
 
-/* "PyECLOUD/geom_impact_poly_cython.pyx":75
+/* "PyECLOUD/geom_impact_poly_cython.pyx":80
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):             # <<<<<<<<<<<<<<
@@ -2937,74 +2917,74 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
   __pyx_pybuffernd_Vy.rcbuffer = &__pyx_pybuffer_Vy;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_x_mp.diminfo[0].strides = __pyx_pybuffernd_x_mp.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x_mp.diminfo[0].shape = __pyx_pybuffernd_x_mp.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_y_mp.diminfo[0].strides = __pyx_pybuffernd_y_mp.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_mp.diminfo[0].shape = __pyx_pybuffernd_y_mp.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vx.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vx, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vx.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vx, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_Vx.diminfo[0].strides = __pyx_pybuffernd_Vx.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_Vx.diminfo[0].shape = __pyx_pybuffernd_Vx.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vy.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vy, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vy.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vy, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_Vy.diminfo[0].strides = __pyx_pybuffernd_Vy.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_Vy.diminfo[0].shape = __pyx_pybuffernd_Vy.rcbuffer->pybuffer.shape[0];
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":77
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":82
  * cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):
  * 
  * 	cdef int N_mp = len(x_mp)             # <<<<<<<<<<<<<<
  * 	cdef np.ndarray[INT_t] flag_outside_vec
  * 	cdef int i_mp
  */
-  __pyx_t_1 = PyObject_Length(((PyObject *)__pyx_v_x_mp)); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_Length(((PyObject *)__pyx_v_x_mp)); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_N_mp = __pyx_t_1;
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":85
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":90
  * 
  * 
  * 	flag_outside_vec = np.zeros((N_mp,),dtype=np.int)             # <<<<<<<<<<<<<<
  * 
  * #~ 	with nogil, parallel():
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_N_mp); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_N_mp); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_int); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_int); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -3020,13 +3000,13 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
       }
     }
     __pyx_pybuffernd_flag_outside_vec.diminfo[0].strides = __pyx_pybuffernd_flag_outside_vec.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_flag_outside_vec.diminfo[0].shape = __pyx_pybuffernd_flag_outside_vec.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_7 = 0;
   __pyx_v_flag_outside_vec = ((PyArrayObject *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":89
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":94
  * #~ 	with nogil, parallel():
  * #~ 	for i_mp in prange(N_mp):
  * 	for i_mp in xrange(N_mp):             # <<<<<<<<<<<<<<
@@ -3037,7 +3017,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
   for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_8; __pyx_t_12+=1) {
     __pyx_v_i_mp = __pyx_t_12;
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":90
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":95
  * #~ 	for i_mp in prange(N_mp):
  * 	for i_mp in xrange(N_mp):
  * 		x_curr = x_mp[i_mp]             # <<<<<<<<<<<<<<
@@ -3047,7 +3027,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
     __pyx_t_13 = __pyx_v_i_mp;
     __pyx_v_x_curr = (*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_x_mp.rcbuffer->pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_x_mp.diminfo[0].strides));
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":91
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":96
  * 	for i_mp in xrange(N_mp):
  * 		x_curr = x_mp[i_mp]
  * 		y_curr = y_mp[i_mp]             # <<<<<<<<<<<<<<
@@ -3057,7 +3037,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
     __pyx_t_14 = __pyx_v_i_mp;
     __pyx_v_y_curr = (*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_y_mp.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_y_mp.diminfo[0].strides));
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":92
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":97
  * 		x_curr = x_mp[i_mp]
  * 		y_curr = y_mp[i_mp]
  * 		flag_inside_curr = (((x_curr/cx)**2 + (y_curr/cy)**2)<=1.)             # <<<<<<<<<<<<<<
@@ -3072,7 +3052,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
       #ifdef WITH_THREAD
       PyGILState_Release(__pyx_gilstate_save);
       #endif
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     if (unlikely(__pyx_v_cy == 0)) {
       #ifdef WITH_THREAD
@@ -3082,11 +3062,11 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
       #ifdef WITH_THREAD
       PyGILState_Release(__pyx_gilstate_save);
       #endif
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_v_flag_inside_curr = ((pow((__pyx_v_x_curr / __pyx_v_cx), 2.0) + pow((__pyx_v_y_curr / __pyx_v_cy), 2.0)) <= 1.);
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":95
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":100
  * 		#print 1, flag_inside_curr
  * 
  * 		if flag_inside_curr==0:             # <<<<<<<<<<<<<<
@@ -3096,7 +3076,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
     __pyx_t_15 = ((__pyx_v_flag_inside_curr == 0) != 0);
     if (__pyx_t_15) {
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":96
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":101
  * 
  * 		if flag_inside_curr==0:
  * 			flag_inside_curr=1             # <<<<<<<<<<<<<<
@@ -3105,7 +3085,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
  */
       __pyx_v_flag_inside_curr = 1;
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":97
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":102
  * 		if flag_inside_curr==0:
  * 			flag_inside_curr=1
  * 			ii = 0             # <<<<<<<<<<<<<<
@@ -3114,7 +3094,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
  */
       __pyx_v_ii = 0;
 
-      /* "PyECLOUD/geom_impact_poly_cython.pyx":98
+      /* "PyECLOUD/geom_impact_poly_cython.pyx":103
  * 			flag_inside_curr=1
  * 			ii = 0
  * 			while flag_inside_curr==1 and ii<N_edg:             # <<<<<<<<<<<<<<
@@ -3135,7 +3115,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
         __pyx_L8_bool_binop_done:;
         if (!__pyx_t_15) break;
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":99
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":104
  * 			ii = 0
  * 			while flag_inside_curr==1 and ii<N_edg:
  * 				flag_inside_curr=(((y_curr-Vy[ii])*(Vx[ii+1]-Vx[ii])-(x_curr-Vx[ii])*(Vy[ii+1]-Vy[ii]))>0.)             # <<<<<<<<<<<<<<
@@ -3150,7 +3130,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
         __pyx_t_22 = __pyx_v_ii;
         __pyx_v_flag_inside_curr = ((((__pyx_v_y_curr - (*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Vy.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_Vy.diminfo[0].strides))) * ((*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Vx.rcbuffer->pybuffer.buf, __pyx_t_18, __pyx_pybuffernd_Vx.diminfo[0].strides)) - (*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Vx.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_Vx.diminfo[0].strides)))) - ((__pyx_v_x_curr - (*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Vx.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_Vx.diminfo[0].strides))) * ((*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Vy.rcbuffer->pybuffer.buf, __pyx_t_21, __pyx_pybuffernd_Vy.diminfo[0].strides)) - (*__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t *, __pyx_pybuffernd_Vy.rcbuffer->pybuffer.buf, __pyx_t_22, __pyx_pybuffernd_Vy.diminfo[0].strides))))) > 0.);
 
-        /* "PyECLOUD/geom_impact_poly_cython.pyx":100
+        /* "PyECLOUD/geom_impact_poly_cython.pyx":105
  * 			while flag_inside_curr==1 and ii<N_edg:
  * 				flag_inside_curr=(((y_curr-Vy[ii])*(Vx[ii+1]-Vx[ii])-(x_curr-Vx[ii])*(Vy[ii+1]-Vy[ii]))>0.)
  * 				ii = ii +1             # <<<<<<<<<<<<<<
@@ -3163,7 +3143,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
     }
     __pyx_L5:;
 
-    /* "PyECLOUD/geom_impact_poly_cython.pyx":102
+    /* "PyECLOUD/geom_impact_poly_cython.pyx":107
  * 				ii = ii +1
  * 
  * 		flag_outside_vec[i_mp] = not(flag_inside_curr)             # <<<<<<<<<<<<<<
@@ -3174,7 +3154,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
     *__Pyx_BufPtrStrided1d(__pyx_t_8PyECLOUD_23geom_impact_poly_cython_INT_t *, __pyx_pybuffernd_flag_outside_vec.rcbuffer->pybuffer.buf, __pyx_t_23, __pyx_pybuffernd_flag_outside_vec.diminfo[0].strides) = (!(__pyx_v_flag_inside_curr != 0));
   }
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":104
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":109
  * 		flag_outside_vec[i_mp] = not(flag_inside_curr)
  * 
  * 	return np.bool_(flag_outside_vec)             # <<<<<<<<<<<<<<
@@ -3182,9 +3162,9 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_bool); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_bool); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -3198,16 +3178,16 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_flag_outside_vec)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_flag_outside_vec)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_flag_outside_vec));
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, ((PyObject *)__pyx_v_flag_outside_vec));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_flag_outside_vec));
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
@@ -3216,7 +3196,7 @@ static PyObject *__pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(PyArrayO
   __pyx_t_6 = 0;
   goto __pyx_L0;
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":75
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":80
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):             # <<<<<<<<<<<<<<
@@ -3296,36 +3276,36 @@ static PyObject *__pyx_pw_8PyECLOUD_23geom_impact_poly_cython_3is_outside(PyObje
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y_mp)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_Vx)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_Vy)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_cx)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  5:
         if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_cy)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 5); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 5); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  6:
         if (likely((values[6] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_N_edg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 6); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, 6); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "is_outside") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "is_outside") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 7) {
       goto __pyx_L5_argtuple_error;
@@ -3342,22 +3322,22 @@ static PyObject *__pyx_pw_8PyECLOUD_23geom_impact_poly_cython_3is_outside(PyObje
     __pyx_v_y_mp = ((PyArrayObject *)values[1]);
     __pyx_v_Vx = ((PyArrayObject *)values[2]);
     __pyx_v_Vy = ((PyArrayObject *)values[3]);
-    __pyx_v_cx = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_cx == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_cy = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_cy == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_N_edg = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_N_edg == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_cx = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_cx == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_cy = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_cy == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_N_edg = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_N_edg == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("is_outside", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyECLOUD.geom_impact_poly_cython.is_outside", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_mp), __pyx_ptype_5numpy_ndarray, 1, "x_mp", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y_mp), __pyx_ptype_5numpy_ndarray, 1, "y_mp", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_Vx), __pyx_ptype_5numpy_ndarray, 1, "Vx", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_Vy), __pyx_ptype_5numpy_ndarray, 1, "Vy", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x_mp), __pyx_ptype_5numpy_ndarray, 1, "x_mp", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y_mp), __pyx_ptype_5numpy_ndarray, 1, "y_mp", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_Vx), __pyx_ptype_5numpy_ndarray, 1, "Vx", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_Vy), __pyx_ptype_5numpy_ndarray, 1, "Vy", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_8PyECLOUD_23geom_impact_poly_cython_2is_outside(__pyx_self, __pyx_v_x_mp, __pyx_v_y_mp, __pyx_v_Vx, __pyx_v_Vy, __pyx_v_cx, __pyx_v_cy, __pyx_v_N_edg);
 
   /* function exit code */
@@ -3403,26 +3383,26 @@ static PyObject *__pyx_pf_8PyECLOUD_23geom_impact_poly_cython_2is_outside(CYTHON
   __pyx_pybuffernd_Vy.rcbuffer = &__pyx_pybuffer_Vy;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_x_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_x_mp.diminfo[0].strides = __pyx_pybuffernd_x_mp.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x_mp.diminfo[0].shape = __pyx_pybuffernd_x_mp.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_mp.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_mp, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_y_mp.diminfo[0].strides = __pyx_pybuffernd_y_mp.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_mp.diminfo[0].shape = __pyx_pybuffernd_y_mp.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vx.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vx, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vx.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vx, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_Vx.diminfo[0].strides = __pyx_pybuffernd_Vx.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_Vx.diminfo[0].shape = __pyx_pybuffernd_Vx.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vy.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vy, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_Vy.rcbuffer->pybuffer, (PyObject*)__pyx_v_Vy, &__Pyx_TypeInfo_nn___pyx_t_8PyECLOUD_23geom_impact_poly_cython_DOUBLE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_Vy.diminfo[0].strides = __pyx_pybuffernd_Vy.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_Vy.diminfo[0].shape = __pyx_pybuffernd_Vy.rcbuffer->pybuffer.shape[0];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(__pyx_v_x_mp, __pyx_v_y_mp, __pyx_v_Vx, __pyx_v_Vy, __pyx_v_cx, __pyx_v_cy, __pyx_v_N_edg, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_8PyECLOUD_23geom_impact_poly_cython_is_outside(__pyx_v_x_mp, __pyx_v_y_mp, __pyx_v_Vx, __pyx_v_Vy, __pyx_v_cx, __pyx_v_cy, __pyx_v_N_edg, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -17318,7 +17298,7 @@ PyMODINIT_FUNC PyInit_geom_impact_poly_cython(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "PyECLOUD/geom_impact_poly_cython.pyx":75
+  /* "PyECLOUD/geom_impact_poly_cython.pyx":80
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):             # <<<<<<<<<<<<<<
