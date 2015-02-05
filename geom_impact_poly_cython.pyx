@@ -43,7 +43,12 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
 		for ii in xrange(N_edg):
 			den = (Nx[ii]*(x_out_curr-x_in_curr)+Ny[ii]*(y_out_curr-y_in_curr))
 			if den == 0.:
-				t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
+				# it is the case when the normal is perpendicular to the impacting segment
+				# the case case segment overlapping the edge is not possible (this would not allow Pin inside and Pout outside - a point on the edge is condidered outside)
+				# the only case left is segment parallel to tue edge => no intersection
+				t_ii  = -2.
+				#old
+				#t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
 			else:
 				t_ii = (Nx[ii]*(Vx[ii]-x_in_curr)+Ny[ii]*(Vy[ii]-y_in_curr)) / den
 							 
