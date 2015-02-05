@@ -63,7 +63,6 @@ class space_charge:
 		if PyPICmode == 'FiniteDifferences_ShortleyWeller':
 			import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
 			self.PyPICobj = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
-			
 			#To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
 			self.xn = self.PyPICobj.xn
 			self.yn = self.PyPICobj.yn
@@ -73,6 +72,24 @@ class space_charge:
 			#To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
 			self.xn = self.PyPICobj.xn
 			self.yn = self.PyPICobj.yn
+		elif PyPICmode == 'FFT_PEC_Boundary':
+			if chamb.chamb_type != 'rect':
+				raise ValueError('''PyPICmode = 'FFT_PEC_Boundary' can be used only if chamb_type = 'rect' ''' )
+			import PyPIC.FFT_PEC_Boundary_SquareGrid as PIC_FFT_PEC
+			self.PyPICobj = PIC_FFT_PEC.FFT_PEC_Boundary_SquareGrid(x_aper = chamb.x_aper, y_aper = chamb.y_aper, Dh = Dh)
+			#To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
+			self.xn = None #not implemented in this mode (for now)
+			self.yn = None #not implemented in this mode (for now)	
+		elif PyPICmode == 'FFT_OpenBoundary':
+			if chamb.chamb_type != 'rect':
+				raise ValueError('''PyPICmode = 'FFT_OpenBoundary' can be used only if chamb_type = 'rect' ''' )
+			import PyPIC.FFT_OpenBoundary_SquareGrid as PIC_FFT_Open
+			self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary_SquareGrid(x_aper = chamb.x_aper, y_aper = chamb.y_aper, Dh = Dh)
+			#To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
+			self.xn = None #not implemented in this mode (for now)
+			self.yn = None #not implemented in this mode (for now)	
+		else:
+			raise ValueError('PyPICmode not racognized')	
 			
 		self.Dh=self.PyPICobj.Dh
 		self.xg = self.PyPICobj.xg
