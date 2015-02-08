@@ -447,3 +447,21 @@ class MP_system:
             
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
+
+
+    def add_from_file(self, filename_MPs):
+		
+		import scipy.io as sio
+            		
+		dict_MP_init = sio.loadmat('MP_state_init.mat')
+		Nint_new_MP = int(dict_MP_init['N_mp'])
+		
+		self.x_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['x_mp'])
+		self.y_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['y_mp'])
+		self.z_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['z_mp'])
+		self.vx_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vx_mp'])
+		self.vy_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
+		self.vz_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
+		self.nel_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['nel_mp'])
+		
+		self.N_mp=int(self.N_mp+Nint_new_MP);

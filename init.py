@@ -170,6 +170,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     y_max_hist_det=None
     Dx_hist_det=None
     
+    filename_init_MP_state = None
+    
     sparse_solver = 'scipy_slu'
     
     B_multip = []
@@ -225,7 +227,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, PyPICmode
+    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
+    PyPICmode, filename_init_MP_state
 
 
 
@@ -253,7 +256,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, PyPICmode= \
+    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, \
+    PyPICmode, filename_init_MP_state = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -391,8 +395,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     if init_unif_flag==1:
         MP_e.add_uniform_MP_distrib(Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif)
         
-
         
+    if filename_init_MP_state!=-1 and filename_init_MP_state is not None:
+        print "Adding inital electrons from: %s"%filename_init_MP_state
+        MP_e.add_from_file(filename_init_MP_state)
+
+    
     return beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
         gas_ion_flag, resgasion, t_ion, \
         spacech_ele,t_sc_ON, photoem_flag, phemiss,\
