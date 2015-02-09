@@ -53,7 +53,7 @@
 
 
 from geom_impact_ellip import ellip_cham_geom_object
-from geom_impact_poly import polyg_cham_geom_object
+import geom_impact_poly as gip
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
@@ -111,9 +111,10 @@ class Ecloud(object):
 		N_mp_soft_regen, N_mp_after_soft_regen,\
 		flag_verbose_file, flag_verbose_stdout,\
 		flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-		x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip = \
+		x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
+		PyPICmode, filename_init_MP_state = \
 		read_parameter_files_pyhdtl(pyecl_input_folder)
-		print filename_chm
+		
 		
 		#pyeclsaver=pysav.pyecloud_saver(logfile_path)
        
@@ -124,11 +125,25 @@ class Ecloud(object):
 			
 		if chamb_type=='ellip':
 			chamb=ellip_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file)
-		elif chamb_type=='polyg':
-			chamb=polyg_cham_geom_object(filename_chm, flag_non_unif_sey, flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+		elif chamb_type=='polyg' or chamb_type=='polyg_cython':
+			try:
+				import geom_impact_poly_fast_impact as gipfi
+				chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+											 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+			except ImportError as error:
+				print 'Got ImportError exception', err
+				print 'Falling back to numpy implementation'
+				chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+					 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)  
+		elif chamb_type=='polyg_numpy':
+			chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+							 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+		elif chamb_type=='rect':
+			import geom_impact_rect_fast_impact as girfi
+			chamb =  girfi.rect_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)                                                                                     
 		else:
-			raise ValueError('Chamber type not recognized (choose: ellip/polyg)')
-		
+			raise ValueError('Chamber type not recognized (choose: ellip/rect/polyg)')
+ 		
 		
 		MP_e=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
 						   N_mp_regen_low, N_mp_regen, N_mp_after_regen,
@@ -137,7 +152,11 @@ class Ecloud(object):
 		
 	
 		
-		spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver = sparse_solver)
+		if sparse_solver=='klu':
+			print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
+			sparse_solver='PyKLU'
+		
+		spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
 		
 
 		if switch_model==0 or switch_model=='ECLOUD':
@@ -177,6 +196,11 @@ class Ecloud(object):
 		if init_unif_flag==1:
 			MP_e.add_uniform_MP_distrib(Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif)
 			
+		if filename_init_MP_state!=-1 and filename_init_MP_state is not None:
+			print "Adding inital electrons from: %s"%filename_init_MP_state
+			MP_e.add_from_file(filename_init_MP_state)
+		
+		
 		spacech_ele.flag_decimate = False
 			
 		self.MP_e = MP_e
@@ -453,6 +477,10 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     
     B_multip = []
     
+    PyPICmode = 'FiniteDifferences_ShortleyWeller'
+    
+    filename_init_MP_state = None
+    
     f=open(simulation_param_file)
     exec(f.read())
     f.close()  
@@ -481,7 +509,6 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
         B   = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen) 
         
     
-    
     return b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
     Emax, del_max, R0, E_th, sigmafit, mufit,\
@@ -501,7 +528,8 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip 		
+    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
+    PyPICmode, filename_init_MP_state 		
 			
     
 		
