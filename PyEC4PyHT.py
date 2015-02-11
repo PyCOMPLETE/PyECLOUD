@@ -408,7 +408,7 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     
     init_unif_flag = 0
     Nel_init_unif = None
-    E_init_unif = None
+    E_init_unif = 0.
     x_max_init_unif = None
     x_min_init_unif = None
     y_max_init_unif = None
@@ -497,7 +497,7 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     # uniform initial density
     init_unif_edens_flag = 0
     init_unif_edens = None
-    E_init_unif_edens= None
+    E_init_unif_edens= 0.
     x_max_init_unif_edens = None
     x_min_init_unif_edens = None
     y_max_init_unif_edens = None

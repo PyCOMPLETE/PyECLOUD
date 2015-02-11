@@ -92,7 +92,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     init_unif_flag = 0
     Nel_init_unif = None
-    E_init_unif = None
+    E_init_unif = 0.
     x_max_init_unif = None
     x_min_init_unif = None
     y_max_init_unif = None
