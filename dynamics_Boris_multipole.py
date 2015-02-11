@@ -68,7 +68,13 @@ class pusher_Boris_multipole():
         print "Tracker: Boris multipole"
         
         self.N_sub_steps = N_sub_steps
-        self.Dtt = Dt / float(N_sub_steps)
+        self.Dt = Dt
+        
+        if Dt is None or N_sub_steps is None:
+             self.Dtt = None
+        else:
+            self.Dtt = Dt / float(N_sub_steps)
+        
         self.B_multip = array(B_multip)
         
         if len(self.B_multip)==0:
