@@ -178,6 +178,16 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     PyPICmode = 'FiniteDifferences_ShortleyWeller'
     
+    # uniform initial density
+    init_unif_edens_flag = 0
+    init_unif_edens = None
+    E_init_unif_edens= None
+    x_max_init_unif_edens = None
+    x_min_init_unif_edens = None
+    y_max_init_unif_edens = None
+    y_min_init_unif_edens = None
+
+    
     
     f=open(pyecl_input_folder+'/'+simulation_param_file)
     exec(f.read())
@@ -228,7 +238,9 @@ def read_parameter_files(pyecl_input_folder='./'):
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
-    PyPICmode, filename_init_MP_state
+    PyPICmode, filename_init_MP_state,\
+    init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens
 
 
 
@@ -257,7 +269,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, \
-    PyPICmode, filename_init_MP_state = \
+    PyPICmode, filename_init_MP_state,\
+    init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -393,7 +407,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
 
         
     if init_unif_flag==1:
+        print "Adding inital %.2e electrons to the initial distribution"%Nel_init_unif
         MP_e.add_uniform_MP_distrib(Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif)
+            
+    
+    if init_unif_edens_flag==1:
+        print "Adding inital %.2e electrons/m^3 to the initial distribution"%init_unif_edens
+        MP_e.add_uniform_ele_density(n_ele=init_unif_edens, E_init=E_init_unif_edens, 
+        x_max=x_max_init_unif_edens, x_min=x_min_init_unif_edens, 
+        y_max=y_max_init_unif_edens, y_min=y_min_init_unif_edens)
         
         
     if filename_init_MP_state!=-1 and filename_init_MP_state is not None:

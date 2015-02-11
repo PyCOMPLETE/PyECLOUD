@@ -404,11 +404,7 @@ class MP_system:
             print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
         
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
-                
-                            
-            
-           
-           
+
             me=9.10938291e-31;
             qe=1.602176565e-19;
             
@@ -444,7 +440,54 @@ class MP_system:
                 
                 self.N_mp=int(self.N_mp+Nint_new_MP);
                 
-            
+                
+                
+    def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
+
+		if x_max is None:
+			x_max = self.chamb.x_aper
+
+		if x_min is None:
+			x_min = -self.chamb.x_aper	
+			
+		if y_max is None:
+			y_max = self.chamb.y_aper
+
+		if y_min is None:
+			y_min = -self.chamb.y_aper	
+
+		me=9.10938291e-31;
+		qe=1.602176565e-19;
+
+		v0=-np.sqrt(2.*(E_init/3.)*qe/me);
+
+
+
+		N_new_MP=n_ele*(x_max-x_min)*(y_max-y_min)/self.nel_mp_ref;
+		Nint_new_MP=np.floor(N_new_MP);
+		rest=N_new_MP-Nint_new_MP;
+		Nint_new_MP=Nint_new_MP+int(rand()<rest);
+
+		if Nint_new_MP>0:
+				  
+			x_temp=(x_max-x_min)*rand(Nint_new_MP)+x_min
+			y_temp=(y_max-y_min)*rand(Nint_new_MP)+y_min
+			
+			flag_keep = ~self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+			x_temp = x_temp[flag_keep]
+			y_temp = y_temp[flag_keep]
+			Nint_new_MP = len(x_temp)
+
+			self.x_mp[self.N_mp:self.N_mp+Nint_new_MP]=x_temp;#Be careful to the indexing when translating to python
+			self.y_mp[self.N_mp:self.N_mp+Nint_new_MP]=y_temp;
+			self.z_mp[self.N_mp:self.N_mp+Nint_new_MP]=0.;#randn(Nint_new_MP,1);
+			self.vx_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);#if you note a towards down polarization look here
+			self.vy_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);
+			self.vz_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);
+			self.nel_mp[self.N_mp:self.N_mp+Nint_new_MP]=self.nel_mp_ref;
+			
+			self.N_mp=int(self.N_mp+Nint_new_MP);        
+    
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
 
