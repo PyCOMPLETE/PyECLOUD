@@ -82,7 +82,7 @@ class MP_light(object):
 
 
 class Ecloud(object):
-	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False):
+	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False, **kwargs):
 		
 		
 		print 'PyECLOUD Version 4.14'
@@ -115,7 +115,11 @@ class Ecloud(object):
 		PyPICmode, filename_init_MP_state = \
 		read_parameter_files_pyhdtl(pyecl_input_folder)
 		
-		
+		for attr in kwargs.keys():
+			print 'Ecloud init. From kwargs: %s = %s'%(attr, repr(kwargs[attr]))
+			tmpattr = kwargs[attr]
+			exec('%s=tmpattr'%attr)
+				
 		#pyeclsaver=pysav.pyecloud_saver(logfile_path)
        
 		if switch_model=='ECLOUD_nunif':
