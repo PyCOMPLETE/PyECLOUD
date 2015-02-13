@@ -7,8 +7,8 @@
 #     
 #     This file is part of the code:
 #                                                                    		            
-#		           PyECLOUD Version 4.16a 
-#			   Versione Annalisa                   
+#		           PyECLOUD Version 4.16 
+#			                      
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
