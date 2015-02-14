@@ -60,7 +60,6 @@ except ImportError:
 	from PyECLOUD.buildup_simulation import BuildupSimulation
 	print 'Imported from PyECLOUD folder'
 
-from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim = BuildupSimulation()
 sim.run()
