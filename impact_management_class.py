@@ -112,6 +112,7 @@ class impact_management:
         
         if flag_seg:
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
+            self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float) 
             
         print 'Done impact man. init.'
             
@@ -130,6 +131,7 @@ class impact_management:
     def reset_hist_impact_seg(self):
         if self.flag_seg:
                 self.nel_hist_impact_seg=0*self.nel_hist_impact_seg
+                self.energ_eV_impact_seg=0*self.energ_eV_impact_seg
     
     def backtrack_and_second_emiss(self, old_pos, MP_e):
         
@@ -212,6 +214,8 @@ class impact_management:
                 
                 if flag_seg:
                     segi.update_seg_impact(i_found,nel_impact,self.nel_hist_impact_seg)
+                    segi.update_seg_impact(i_found,nel_impact*E_impact_eV,self.energ_eV_impact_seg)
+                    
                 
                 En_imp_hist=E_impact_eV.copy()
                 En_imp_hist[En_imp_hist>En_hist_max]=En_hist_max
