@@ -182,8 +182,8 @@ class pyecloud_saver:
         self.N_mp_ref_pass=np.zeros(beamtim.N_pass_tot+1) 
         
         if impact_man.flag_seg:
-            self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
-            self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+				self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+				self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
         else:
                 self.nel_hist_impact_seg=-1        
                 self.energ_eV_impact_seg=-1 

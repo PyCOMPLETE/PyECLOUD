@@ -309,7 +309,7 @@ class impact_management:
                 histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
                 
                 if flag_seg:
-                    segi.update_seg_impact(i_found,-nel_emit*E_emit_eV,self.energ_eV_impact_seg)
+						segi.update_seg_impact(i_found,-nel_emit*E_emit_eV,self.energ_eV_impact_seg)
                 
                 self.En_emit_last_step_eV=sum(E_emit_eV*nel_emit)
                 
@@ -323,7 +323,7 @@ class impact_management:
                     histf.compute_hist(x_emit,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
                     
                     if flag_seg:
-                       segi.update_seg_impact(i_found,wei,self.energ_eV_impact_seg)
+							segi.update_seg_impact(i_found,wei,self.energ_eV_impact_seg)
                     
                     self.En_emit_last_step_eV=self.En_emit_last_step_eV+sum(E_emit_eV*nel_emit)
                     
