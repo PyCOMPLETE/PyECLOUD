@@ -130,8 +130,11 @@ class impact_management:
         
     def reset_hist_impact_seg(self):
         if self.flag_seg:
-                self.nel_hist_impact_seg=0*self.nel_hist_impact_seg
-                self.energ_eV_impact_seg=0*self.energ_eV_impact_seg
+            self.nel_hist_impact_seg=0*self.nel_hist_impact_seg	
+
+    def reset_energ_impact_seg(self):
+        if self.flag_seg:
+            self.energ_eV_impact_seg=0*self.energ_eV_impact_seg
     
     def backtrack_and_second_emiss(self, old_pos, MP_e):
         
@@ -304,6 +307,10 @@ class impact_management:
                 v_emit_mod=sqrt(vx_emit*vx_emit+vy_emit*vy_emit+vz_emit*vz_emit);
                 E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod;
                 histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                
+                if flag_seg:
+                    segi.update_seg_impact(i_found,-nel_emit*E_emit_eV,self.energ_eV_impact_seg)
+                
                 self.En_emit_last_step_eV=sum(E_emit_eV*nel_emit)
                 
                 #subtract new macroparticles
@@ -314,6 +321,10 @@ class impact_management:
                     E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod;
                     wei=-nel_emit*E_emit_eV
                     histf.compute_hist(x_emit,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                    
+                    if flag_seg:
+                       segi.update_seg_impact(i_found,wei,self.energ_eV_impact_seg)
+                    
                     self.En_emit_last_step_eV=self.En_emit_last_step_eV+sum(E_emit_eV*nel_emit)
                     
                 

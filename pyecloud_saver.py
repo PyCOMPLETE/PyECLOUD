@@ -185,10 +185,10 @@ class pyecloud_saver:
             self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
             self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
         else:
-			self.nel_hist_impact_seg=-1        
-			self.energ_eV_impact_seg=-1 
-			
-			
+                self.nel_hist_impact_seg=-1        
+                self.energ_eV_impact_seg=-1 
+
+
         #logfile and progress file
         self.logfile_path=logfile_path
         self.progress_path=progress_path
@@ -441,6 +441,10 @@ class pyecloud_saver:
             if impact_man.flag_seg:
                 self.nel_hist_impact_seg[beamtim.pass_numb,:]=impact_man.nel_hist_impact_seg
                 impact_man.reset_hist_impact_seg()
+                
+            if impact_man.flag_seg:
+                self.energ_eV_impact_seg[beamtim.pass_numb,:]=impact_man.energ_eV_impact_seg
+                impact_man.reset_energ_impact_seg()
                 
             if self.flag_hist_det:
                 self.nel_hist_det[beamtim.pass_numb,:]=self.nel_hist_det_line
