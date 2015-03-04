@@ -494,9 +494,12 @@ class MP_system:
 
     def add_from_file(self, filename_MPs):
 		
-		import scipy.io as sio
-            		
-		dict_MP_init = sio.loadmat(filename_MPs)
+		if type(filename_MPs) is str:
+			import scipy.io as sio
+			dict_MP_init = sio.loadmat(filename_MPs)
+		else:
+			dict_MP_init = filename_MPs
+			
 		Nint_new_MP = int(dict_MP_init['N_mp'])
 		
 		self.x_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['x_mp'])
