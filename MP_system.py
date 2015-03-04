@@ -496,7 +496,7 @@ class MP_system:
 		
 		import scipy.io as sio
             		
-		dict_MP_init = sio.loadmat('MP_state_init.mat')
+		dict_MP_init = sio.loadmat(filename_MPs)
 		Nint_new_MP = int(dict_MP_init['N_mp'])
 		
 		self.x_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['x_mp'])
