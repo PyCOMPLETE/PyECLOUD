@@ -227,13 +227,13 @@ class Ecloud(object):
 		self.save_ele_MP_velocity = False
 		self.save_ele_MP_size = False
 		
-		self.init_x = self.MP_e.x_mp.copy()
-		self.init_y = self.MP_e.y_mp.copy()
-		self.init_z = self.MP_e.z_mp.copy()
-		self.init_vx = self.MP_e.vx_mp.copy()
-		self.init_vy = self.MP_e.vy_mp.copy()
-		self.init_vz = self.MP_e.vz_mp.copy()
-		self.init_nel = self.MP_e.nel_mp.copy()
+		self.init_x = self.MP_e.x_mp[:self.MP_e.N_mp].copy()
+		self.init_y = self.MP_e.y_mp[:self.MP_e.N_mp].copy()
+		self.init_z = self.MP_e.z_mp[:self.MP_e.N_mp].copy()
+		self.init_vx = self.MP_e.vx_mp[:self.MP_e.N_mp].copy()
+		self.init_vy = self.MP_e.vy_mp[:self.MP_e.N_mp].copy()
+		self.init_vz = self.MP_e.vz_mp[:self.MP_e.N_mp].copy()
+		self.init_nel = self.MP_e.nel_mp[:self.MP_e.N_mp].copy()
 		self.init_N_mp = self.MP_e.N_mp
 		
 		self.flag_clean_slices = flag_clean_slices
@@ -242,13 +242,13 @@ class Ecloud(object):
 	def track(self, beam):
 		
 		#reinitialize
-		self.MP_e.x_mp[:] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
-		self.MP_e.y_mp[:] = self.init_y
-		self.MP_e.z_mp[:] = self.init_z
-		self.MP_e.vx_mp[:] = self.init_vx
-		self.MP_e.vy_mp[:] = self.init_vy
-		self.MP_e.vz_mp[:] = self.init_vz
-		self.MP_e.nel_mp[:] = self.init_nel
+		self.MP_e.x_mp[:self.init_N_mp] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
+		self.MP_e.y_mp[:self.init_N_mp] = self.init_y
+		self.MP_e.z_mp[:self.init_N_mp] = self.init_z
+		self.MP_e.vx_mp[:self.init_N_mp] = self.init_vx
+		self.MP_e.vy_mp[:self.init_N_mp] = self.init_vy
+		self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
+		self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
 		self.MP_e.N_mp = self.init_N_mp
 		
 		MP_e = self.MP_e
