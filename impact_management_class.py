@@ -216,7 +216,7 @@ class impact_management:
                 histf.compute_hist(x_emit,nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
                 
                 if flag_seg:
-                    segi.update_seg_impact(i_found,nel_impact,self.nel_hist_impact_seg)
+                    segi.update_seg_impact(i_found,nel_impact,self.nel_hist_impact_seg)#riga incriminata???
                     segi.update_seg_impact(i_found,nel_impact*E_impact_eV,self.energ_eV_impact_seg)
                     
                 
