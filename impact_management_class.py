@@ -182,11 +182,12 @@ class impact_management:
             flag_impact=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
             
             Nimpact=sum(flag_impact);
-            
-        
-            
-            
-            if Nimpact>0:   
+
+            if Nimpact>0:  
+				
+                if flag_seg:
+					i_found_new_mp = 0*x_mp
+				 
                 # load segment endpoints
                 x_in=x_mp_old[flag_impact];y_in=y_mp_old[flag_impact];z_in=z_mp_old[flag_impact];
                 x_out=x_mp[flag_impact];y_out=y_mp[flag_impact];z_out=z_mp[flag_impact];
@@ -264,6 +265,9 @@ class impact_management:
                     vy_emit[flag_truesec]=v_true_sec_mod*\
                         (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec]);
                     vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true);
+                    
+
+						 
                 
                     flag_add=n_add>0;
                     n_add_step=sum(flag_add);
@@ -282,6 +286,10 @@ class impact_management:
                         x_mp[N_mp:(N_mp+n_add_step)]=x_emit[flag_add];
                         y_mp[N_mp:(N_mp+n_add_step)]=y_emit[flag_add];
                         z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add];
+                        
+                        if flag_seg:
+							i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
+                        
                         vx_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
                              (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add]);
                         vy_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
@@ -323,7 +331,7 @@ class impact_management:
                     histf.compute_hist(x_emit,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
                     
                     if flag_seg:
-                       segi.update_seg_impact(i_found,wei,self.energ_eV_impact_seg)
+                       segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp],wei,self.energ_eV_impact_seg)
                     
                     self.En_emit_last_step_eV=self.En_emit_last_step_eV+sum(E_emit_eV*nel_emit)
                     
