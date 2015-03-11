@@ -112,7 +112,7 @@ class ellip_cham_geom_object:
            
         t0[t0<1.e-2]=0;
         
-        flag_ident=(((x_in-x_out)*(x_in-x_out)+(y_in-y_out)*(y_in-y_out))/(y_in*y_in+y_out*y_out))<1e-5;
+        flag_ident=(((x_in-x_out)*(x_in-x_out)+(y_in-y_out)*(y_in-y_out))/(x_out*x_out+y_out*y_out))<1e-8;
         t0[flag_ident]=0;
         
        
