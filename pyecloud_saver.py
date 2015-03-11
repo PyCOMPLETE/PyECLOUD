@@ -182,10 +182,13 @@ class pyecloud_saver:
         self.N_mp_ref_pass=np.zeros(beamtim.N_pass_tot+1) 
         
         if impact_man.flag_seg:
-            self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+				self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+				self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
         else:
-            self.nel_hist_impact_seg=-1        
-        
+                self.nel_hist_impact_seg=-1        
+                self.energ_eV_impact_seg=-1 
+
+
         #logfile and progress file
         self.logfile_path=logfile_path
         self.progress_path=progress_path
@@ -439,6 +442,10 @@ class pyecloud_saver:
                 self.nel_hist_impact_seg[beamtim.pass_numb,:]=impact_man.nel_hist_impact_seg
                 impact_man.reset_hist_impact_seg()
                 
+            if impact_man.flag_seg:
+                self.energ_eV_impact_seg[beamtim.pass_numb,:]=impact_man.energ_eV_impact_seg
+                impact_man.reset_energ_impact_seg()
+                
             if self.flag_hist_det:
                 self.nel_hist_det[beamtim.pass_numb,:]=self.nel_hist_det_line
                 
@@ -456,6 +463,7 @@ class pyecloud_saver:
                                  'N_mp_impact_pass':self.N_mp_impact_pass, 'N_mp_corrected_pass':self.N_mp_corrected_pass, 'N_mp_pass':self.N_mp_pass,\
                                  'N_mp_time':self.N_mp_time,'N_mp_ref_pass':self.N_mp_ref_pass,\
                                  'nel_hist_impact_seg':self.nel_hist_impact_seg,\
+                                 'energ_eV_impact_seg':self.energ_eV_impact_seg,\
                                  't_sec_beams':self.t_sec_beams, 'sec_beam_profiles':self.sec_beam_profiles,\
                                  'el_dens_at_probes':self.el_dens_at_probes, 'x_el_dens_probes':self.x_el_dens_probes,\
                                  'y_el_dens_probes':self.y_el_dens_probes, 'r_el_dens_probes':self.r_el_dens_probes,\

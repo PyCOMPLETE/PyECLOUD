@@ -70,6 +70,7 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
 		if i_found_curr>=0:
 			Nx_int[i_imp] = Nx[i_found_curr]
 			Ny_int[i_imp] = Ny[i_found_curr]
+			i_found[i_imp] = i_found_curr
 				
 	return  x_int,y_int,z_int,Nx_int,Ny_int, i_found
         	
