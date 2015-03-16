@@ -51,11 +51,14 @@
 
 from numpy import sqrt, exp
 from numpy.random import rand
+import numpy as np
 
 def yield_fun2(E,costheta,Emax,del_max,R0):
     
     s=1.35;
     E0=150;
+    
+    
     del_max_tilde=del_max*exp(0.5*(1.-costheta));
     E_max_tilde=Emax*(1.+0.7*(1.-costheta));
 
@@ -65,8 +68,9 @@ def yield_fun2(E,costheta,Emax,del_max,R0):
     reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2.;
     
     delta=true_sec+reflected;
-    
-    ref_frac=reflected/delta;
+    ref_frac=0.*delta
+    mask_non_zero=(delta>0)
+    ref_frac[mask_non_zero]=reflected[mask_non_zero]/delta[mask_non_zero];
        
     return delta, ref_frac
 
