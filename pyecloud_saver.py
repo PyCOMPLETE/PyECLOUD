@@ -130,7 +130,7 @@ class pyecloud_saver:
         self.Nst_En_hist=int(round(Dt_En_hist/beamtim.Dt)) #number of steps per hist. line 
         self.N_En_hist=int(float(beamtim.Nt)/float(self.Nst_En_hist))+2    #hist size in time dimension   
         self.t_En_hist=np.zeros(self.N_En_hist,float)
-        self.En_hist=np.zeros((self.N_En_hist,impact_man.Nbin_En_hist),float)       #allocate histograms
+        self.En_hist=np.zeros((self.N_En_hist,impact_man.Nbin_En_hist),float) #allocate histograms
         self.i_En_hist=0
         
         #Space charge electrostatic energy
