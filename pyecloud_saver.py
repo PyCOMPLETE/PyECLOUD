@@ -97,9 +97,8 @@ class pyecloud_saver:
         self.En_emit_last_step_group_eV = 0
         
         # MP state saver init
-        if save_mp_state_time_file==-1:
-            self.flag_save_MP_state=False
-        else:
+        try:
+            save_mp_state_time_file[0] #check if iterable
             self.flag_save_MP_state=True
             if type(save_mp_state_time_file) is str:
                 dict_save_mp_state_time=sio.loadmat(save_mp_state_time_file)
@@ -109,6 +108,9 @@ class pyecloud_saver:
             
             self.N_obs=len(self.t_obs)
             self.i_obs=0
+        except TypeError: 
+            self.flag_save_MP_state=False       
+            
             
         # Simulation state saver init
         if save_simulation_state_time_file==-1:
