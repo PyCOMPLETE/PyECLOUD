@@ -24,7 +24,7 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
 	cdef np.ndarray[INT_t] i_found = np.zeros((N_impacts,),dtype=np.int)
 	
 	cdef int i_imp, ii, i_found_curr
-	cdef double t_min_curr, t_ii, t_border
+	cdef double t_min_curr, t_ii, t_border, t_border_min_curr
 	cdef int fould_curr
 	cdef double x_in_curr, y_in_curr, x_out_curr, y_out_curr, den
 	
@@ -41,27 +41,25 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
 		y_out_curr = y_out[i_imp]
 		
 		for ii in xrange(N_edg):
-			den = (Nx[ii]*(x_out_curr-x_in_curr)+Ny[ii]*(y_out_curr-y_in_curr))
+
+			den	= ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
 			if den == 0.:
-				# it is the case when the normal is perpendicular to the impacting segment
-				# the case case segment overlapping the edge is not possible (this would not allow Pin inside and Pout outside - a point on the edge is condidered outside)
+				# it is the case when the normal top the segment is perpendicular to the edge
+				# the case case overlapping the edge is not possible (this would not allow Pin inside and Pout outside - a point on the edge is condidered outside)
 				# the only case left is segment parallel to tue edge => no intersection
-				t_ii  = -2.
-				#old
-				#t_ii =  sqrt(((Vx[ii]-x_in_curr)*(Vx[ii]-x_in_curr) + (Vy[ii]-y_in_curr)*(Vy[ii]-y_in_curr) )/((x_out_curr-x_in_curr)*(x_out_curr-x_in_curr) + (y_out_curr-y_in_curr)*(y_out_curr-y_in_curr)))
+				t_border = -2.
 			else:
-				t_ii = (Nx[ii]*(Vx[ii]-x_in_curr)+Ny[ii]*(Vy[ii]-y_in_curr)) / den
-							 
-			if t_ii>=0. and t_ii<t_min_curr:
-				t_min_curr=t_ii
-				fould_curr = True
-				i_found_curr = ii
-			elif t_ii==t_min_curr:
-				t_border=((y_out_curr-y_in_curr)*(x_in_curr-Vx[ii])+(x_in_curr-x_out_curr)*(y_in_curr-Vy[ii])) / \
-					 ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
-				if t_border>=0. and t_border<=1.:
-					i_found_curr = ii
+				t_border=((y_out_curr-y_in_curr)*(x_in_curr-Vx[ii])+(x_in_curr-x_out_curr)*(y_in_curr-Vy[ii]))/den
+					 
 			
+			if t_border>=0. and t_border<=1.:
+				t_ii = (Nx[ii]*(Vx[ii]-x_in_curr)+Ny[ii]*(Vy[ii]-y_in_curr)) /(Nx[ii]*(x_out_curr-x_in_curr)+Ny[ii]*(y_out_curr-y_in_curr)) 
+				if t_ii>=0. and t_ii<t_min_curr:
+					t_min_curr=t_ii
+					fould_curr = True
+					i_found_curr = ii								 
+		
+		
 		t_min_curr=resc_fac*t_min_curr;
 		x_int[i_imp]=t_min_curr*x_out_curr+(1.-t_min_curr)*x_in_curr;
 		y_int[i_imp]=t_min_curr*y_out_curr+(1.-t_min_curr)*y_in_curr;
