@@ -1,4 +1,5 @@
 geom_impact_poly_cython.c
+boris_cython.c
 *.beam
 logfile.txt
 *.input
