@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 4.23                     
+#                   PyECLOUD Version 4.23 nonconvex test                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
