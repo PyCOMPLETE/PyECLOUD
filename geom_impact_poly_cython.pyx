@@ -106,6 +106,45 @@ cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarra
 		flag_outside_vec[i_mp] = not(flag_inside_curr)
 			 
 	return np.bool_(flag_outside_vec)
+	
+	
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef is_outside_nonconvex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):
+
+	cdef int N_mp = len(x_mp)
+	cdef np.ndarray[INT_t] flag_outside_vec 
+	cdef int i_mp
+	cdef int  ii, jj
+	cdef int flag_inside_curr
+	cdef double x_curr, y_curr
+
+	
+	flag_outside_vec = np.zeros((N_mp,),dtype=np.int)
+	
+
+	for i_mp in xrange(N_mp):
+		x_curr = x_mp[i_mp]
+		y_curr = y_mp[i_mp]
+		flag_inside_curr = (((x_curr/cx)**2 + (y_curr/cy)**2)<=1.)
+		#print 1, flag_inside_curr
+		
+		if flag_inside_curr==0:
+			ii = 0
+			jj = N_edg-1
+			while ii < N_edg:
+				if  ((Vy[ii]>y_curr) != (Vy[jj]>y_curr)): 
+					if (x_curr < (Vx[jj]-Vx[ii]) * (y_curr-Vy[ii]) / (Vy[jj]-Vy[ii]) + Vx[ii]) :
+						flag_inside_curr= not(flag_inside_curr);
+       
+				jj = ii
+				ii += 1   
+
+		
+		flag_outside_vec[i_mp] = not(flag_inside_curr)
+
+	return np.bool_(flag_outside_vec)	
 
 
 

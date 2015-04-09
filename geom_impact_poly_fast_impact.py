@@ -132,7 +132,8 @@ class polyg_cham_geom_object:
     #@profile
     
     def is_outside(self, x_mp, y_mp):
-		return gipc.is_outside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
+		#~ return gipc.is_outside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
+		return gipc.is_outside_nonconvex(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
     
     #~ def is_outside(self, x_mp, y_mp):
         #~ 
