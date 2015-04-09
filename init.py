@@ -186,6 +186,9 @@ def read_parameter_files(pyecl_input_folder='./'):
     x_min_init_unif_edens = None
     y_max_init_unif_edens = None
     y_min_init_unif_edens = None
+    
+    
+    flag_assume_convex = True
 
     
     
@@ -240,7 +243,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex
 
 
 
@@ -271,7 +274,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, \
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens = \
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -294,18 +297,14 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     if chamb_type=='ellip':
         chamb=ellip_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file)
     elif chamb_type=='polyg' or chamb_type=='polyg_cython':
-        #~ try:
+
 		import geom_impact_poly_fast_impact as gipfi
 		chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-									 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
-        #~ except ImportError as error:
-			#~ print 'Got ImportError exception', err
-			#~ print 'Falling back to numpy implementation'
-			#~ chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-				 #~ flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)  
+									 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout, flag_assume_convex=flag_assume_convex)
     elif chamb_type=='polyg_numpy':
-        chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-                         flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+		raise ValueError("chamb_type='polyg_numpy' not supported anymore")
+        #~ chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+                         #~ flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
     elif chamb_type=='rect':
         import geom_impact_rect_fast_impact as girfi
         chamb =  girfi.rect_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)                                                                                     
