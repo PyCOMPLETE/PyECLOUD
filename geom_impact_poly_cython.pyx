@@ -76,7 +76,7 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
 ctypedef np.int8_t INT8_t
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):
+cpdef is_outside_convex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarray[DOUBLE_t] Vx, np.ndarray[DOUBLE_t] Vy, double cx, double cy, int N_edg):
 
 	cdef int N_mp = len(x_mp)
 	cdef np.ndarray[INT_t] flag_outside_vec 
@@ -84,6 +84,8 @@ cpdef is_outside(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np.ndarra
 	cdef int  ii
 	cdef int flag_inside_curr
 	cdef double x_curr, y_curr
+
+	#print 'Convex'
 
 	
 	flag_outside_vec = np.zeros((N_mp,),dtype=np.int)
@@ -119,6 +121,8 @@ cpdef is_outside_nonconvex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp,
 	cdef int  ii, jj
 	cdef int flag_inside_curr
 	cdef double x_curr, y_curr
+	
+	#print 'NON convex'
 
 	
 	flag_outside_vec = np.zeros((N_mp,),dtype=np.int)

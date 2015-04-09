@@ -54,12 +54,13 @@
 from numpy import squeeze, array,diff, max, sum, sqrt,\
                   logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
 import scipy.io as sio
+import numpy as np
 
 import geom_impact_poly_cython as gipc
 
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey, 
-                 flag_verbose_file=False, flag_verbose_stdout=False):
+                 flag_verbose_file=False, flag_verbose_stdout=False, flag_assume_convex=True):
         
         
         print 'Polygonal chamber - cython implementation'
@@ -116,42 +117,29 @@ class polyg_cham_geom_object:
         self.flag_verbose_stdout = flag_verbose_stdout
         self.flag_verbose_file = flag_verbose_file
         
+        self.flag_assume_convex = flag_assume_convex
+        
         if self.flag_verbose_file:
             fbckt=open('bcktr_errors.txt','w')
             fbckt.write('kind,x_in,y_in,x_out, y_out\n')
             fbckt.close()
-
-#    def is_outside(self, x_mp, y_mp):
-#        N_pts=len(x_mp)
-#        flag_inside=array(N_pts*[True])
-#        for ii in xrange(self.N_edg):
-#            flag_inside[flag_inside]=((y_mp[flag_inside]-self.Vy[ii])*(self.Vx[ii+1]-self.Vx[ii])\
-#                                      -(x_mp[flag_inside]-self.Vx[ii])*(self.Vy[ii+1]-self.Vy[ii]))>0
-#
-#        return ~flag_inside
-    #@profile
-    
+          
+        if self.flag_assume_convex:
+			if not(self.is_convex()):
+				raise ValueError(\
+					'The polygon looks not convex!!!!\nIn this case you can use the general algorithm (probably slower) by setting:\nflag_assume_convex = False')       
+			self.cythonisoutside = gipc.is_outside_convex
+			print 'Assuming convex polygon'
+        else:
+			self.cythonisoutside = gipc.is_outside_nonconvex
+			print 'No assumption on the convexity of the polygon'    
+			
+			        
     def is_outside(self, x_mp, y_mp):
 		#~ return gipc.is_outside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
-		return gipc.is_outside_nonconvex(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
+		return self.cythonisoutside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
     
-    #~ def is_outside(self, x_mp, y_mp):
-        #~ 
-        #~ flag_outside=(((x_mp/self.cx)**2 + (y_mp/self.cy)**2)>1)
-        #~ #flag_outside=array([True]*len(x_mp))
-        #~ 
-        #~ if flag_outside.any():
-            #~ x_mp_chk=x_mp[flag_outside]  
-            #~ y_mp_chk=y_mp[flag_outside]
-            #~ N_pts=len(x_mp_chk)
-            #~ flag_inside_chk=array(N_pts*[True])
-            #~ for ii in xrange(self.N_edg):
-                #~ flag_inside_chk[flag_inside_chk]=((y_mp_chk[flag_inside_chk]-self.Vy[ii])*(self.Vx[ii+1]-self.Vx[ii])\
-                                          #~ -(x_mp_chk[flag_inside_chk]-self.Vx[ii])*(self.Vy[ii+1]-self.Vy[ii]))>0
-            #~ flag_outside[flag_outside]=~flag_inside_chk
-            #~ 
-        #~ return flag_outside
-    
+
     #@profile
     def impact_point_and_normal(self, x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=0.99, flag_robust=True):
         
@@ -276,4 +264,38 @@ class polyg_cham_geom_object:
         
         return  x_int,y_int,z_int,Nx_int,Ny_int, i_found
         
+    def is_convex(self):
+			# From:
+			# http://csharphelper.com/blog/2014/07/determine-whether-a-polygon-is-convex-in-c/
+			
+			# For each set of three adjacent points A, B, C,
+			# find the cross product AB x BC. If the sign of
+			# all the cross products is the same, the angles
+			# are all positive or negative (depending on the
+			# order in which we visit them) so the polygon
+			# is convex.
+			got_negative = False;
+			got_positive = False;
+			num_points = self.N_edg;
+			for A in xrange(num_points):
 
+				B = np.mod((A + 1),num_points);
+				C = np.mod((B + 1), num_points);
+
+				BAx = self.Vx[A] - self.Vx[B];
+				BAy = self.Vy[A] - self.Vy[B];
+				BCx = self.Vx[C] - self.Vx[B];
+				BCy = self.Vy[C] - self.Vy[B];
+				
+				cross_product = (BAx * BCy - BAy * BCx)
+				
+				if (cross_product < 0):
+					got_negative = True;
+				elif (cross_product > 0):
+					got_positive = True;
+				if (got_negative and got_positive):
+					return False
+
+
+			# If we got this far, the polygon is convex.
+			return True
