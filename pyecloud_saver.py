@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 4.23 nonconvex test                     
+#                   PyECLOUD Version 4.24                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -68,7 +68,7 @@ class pyecloud_saver:
 		self.logfile_path = logfile_path
 		print 'Starting pyecloud_saver init.'
 		flog=open(self.logfile_path,'w')
-		flog.write('PyECLOUD Version 4.23 nonconvex test\n')
+		flog.write('PyECLOUD Version 4.24\n')
 		timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 		flog.write('Simulation started on %s\n'%timestr)
 		flog.close()
