@@ -498,7 +498,7 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     y_max_init_unif_edens = None
     y_min_init_unif_edens = None
     
-    
+    flag_assume_convex = True    
     
     f=open(simulation_param_file)
     exec(f.read())
