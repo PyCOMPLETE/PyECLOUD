@@ -91,8 +91,6 @@ class space_charge:
 
 		flag_outside_n=chamb.is_outside(xn,yn)
 		flag_inside_n=~(flag_outside_n)
-		#flag_inside_n=(((xn/x_aper)**2 + (yn/y_aper)**2)<1);
-		#flag_outside_n= ~(flag_inside_n);
 
 		flag_outside_n_mat=np.reshape(flag_outside_n,(Nyg,Nxg),'F');
 		flag_outside_n_mat=flag_outside_n_mat.T
