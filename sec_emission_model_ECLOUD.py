@@ -53,11 +53,9 @@ from numpy import sqrt, exp
 from numpy.random import rand
 import numpy as np
 
-def yield_fun2(E,costheta,Emax,del_max,R0):
+def yield_fun2(E,costheta,Emax,del_max,R0,E0):
     
     s=1.35;
-    E0=150;
-    
     
     del_max_tilde=del_max*exp(0.5*(1.-costheta));
     E_max_tilde=Emax*(1.+0.7*(1.-costheta));
@@ -76,13 +74,14 @@ def yield_fun2(E,costheta,Emax,del_max,R0):
 
 
 class SEY_model_ECLOUD:
-    def __init__(self, Emax,del_max,R0):
+    def __init__(self, Emax,del_max,R0,E0=150.):
             self.Emax = Emax
             self.del_max = del_max
             self.R0 = R0
+            self.E0 = E0
             
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0);
+            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
             flag_elast=(rand(len(ref_frac))<ref_frac);
             flag_truesec=~(flag_elast);
             nel_emit=nel_impact*yiel;

@@ -53,11 +53,9 @@ from numpy import sqrt, exp, take
 from numpy.random import rand
 import numpy as np
 
-def yield_fun2(E,costheta,Emax,del_max,R0):
+def yield_fun2(E,costheta,Emax,del_max,R0,E0):
     
     s=1.35;
-    E0=150;
-    
     
     del_max_tilde=del_max*exp(0.5*(1.-costheta));
     E_max_tilde=Emax*(1.+0.7*(1.-costheta));
@@ -76,7 +74,7 @@ def yield_fun2(E,costheta,Emax,del_max,R0):
 
 
 class SEY_model_ECLOUD_non_unif:
-    def __init__(self, chamb, Emax,del_max,R0):
+    def __init__(self, chamb, Emax,del_max,R0,E0=150.):
             if chamb.chamb_type!='polyg':
                 raise ValueError("""ECLOUD_nunif can be used only with chamb_type='polyg'!!!""") 
             
@@ -88,6 +86,8 @@ class SEY_model_ECLOUD_non_unif:
             self.R0_segments[chamb.R0_segments<0.]=R0
             self.Emax_segments[chamb.Emax_segments<0.]=Emax
             
+            self.E0=E0
+            
             
             
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
@@ -98,7 +98,7 @@ class SEY_model_ECLOUD_non_unif:
             R0_mp = take(self.R0_segments, i_impact)
             
                     
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp);
+            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp, E0=self.E0);
             flag_elast=(rand(len(ref_frac))<ref_frac);
             flag_truesec=~(flag_elast);
             nel_emit=nel_impact*yiel;

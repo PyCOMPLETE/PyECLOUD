@@ -189,6 +189,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     
     flag_assume_convex = True
+    
+    E0 = None
 
     
     
@@ -243,7 +245,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0
 
 
 
@@ -274,7 +276,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, \
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex = \
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0 = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -343,15 +345,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
                  Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file = (progress_path+('_mapgen_sec_%d'%ii))))
     
     
-    
+    if E0 is not None:
+		kwargs = {'E0':E0}
+    else: #If E0 is not provided use default value for each object
+		kwargs = {}
+		
     if switch_model==0 or switch_model=='ECLOUD':
-        sey_mod=SEY_model_ECLOUD(Emax,del_max,R0)
+        sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':
-        sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0)
+        sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0,**kwargs)
     elif switch_model=='ECLOUD_nunif':
-        sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax,del_max,R0)
+        sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax,del_max,R0,**kwargs)
     elif switch_model=='cos_low_ene':
-        sey_mod=SEY_model_cos_le(Emax,del_max,R0)
+        sey_mod=SEY_model_cos_le(Emax,del_max,R0,**kwargs)
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
 
