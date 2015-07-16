@@ -64,7 +64,6 @@ def yield_fun2(E,costheta,Emax,del_max,R0,E0):
     true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
     reflected=0.*true_sec
     mask_ref=E<E0
-    #reflected[mask_ref]=R0*(1.-(E[mask_ref]/E0)**2.);
     reflected[mask_ref]=R0*(cos(0.5*pi*E[mask_ref]/E0)**2.);
     
     delta=true_sec+reflected;
