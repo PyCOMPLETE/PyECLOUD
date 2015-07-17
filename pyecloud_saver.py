@@ -283,10 +283,11 @@ class pyecloud_saver:
                 if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
                     filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
                     
-                    temp_luobj = spacech_ele.luobj
+                    temp_luobj = spacech_ele.PyPICobj.luobj
                     spacech_ele.luobj=None
+                    spacech_ele.PyPICobj.luobj=None
                     
-                    dynamics.get_B=None
+                    #~ dynamics.get_B=None
                     
                     dict_state = {
                     'beamtim':beamtim,
@@ -308,7 +309,7 @@ class pyecloud_saver:
                     with open(filename_simulation_state, 'wb') as fid:
                         pickle.dump(dict_state, fid)
                     
-                    spacech_ele.luobj = temp_luobj 
+                    spacech_ele.PyPICobj.luobj = temp_luobj 
                     
                     print 'Save simulation state on ' + filename_simulation_state
                     self.i_obs_sim=self.i_obs_sim+1
