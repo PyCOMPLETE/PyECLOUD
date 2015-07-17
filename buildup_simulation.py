@@ -53,6 +53,7 @@
 
 
 import init as init
+import pickle
 
 
 class BuildupSimulation(object):
@@ -180,3 +181,33 @@ class BuildupSimulation(object):
 				print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
 			
 
+	def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'):
+
+		print 'Realoading state from file: %s...'% filename_simulation_state 
+		
+		with open(filename_simulation_state, 'rb') as fid:
+			dict_state = pickle.load(fid)
+		
+		self.beamtim = dict_state['beamtim']
+		self.MP_e = dict_state['MP_e']
+		self.dynamics = dict_state['dynamics']
+		self.impact_man = dict_state['impact_man']
+
+		self.gas_ion_flag = dict_state['gas_ion_flag']
+		self.resgasion = dict_state['resgasion']
+		self.t_ion = dict_state['t_ion']
+		self.spacech_ele = dict_state['spacech_ele']
+		self.t_sc_ON = dict_state['t_sc_ON']
+		self.photoem_flag = dict_state['photoem_flag']
+		self.phemiss = dict_state['phemiss']
+		self.flag_presence_sec_beams = dict_state['flag_presence_sec_beams']
+		self.sec_beams_list = dict_state['sec_beams_list']
+		
+		if force_disable_save_simulation_state:
+			self.pyeclsaver.flag_save_simulation_state = False
+			
+		self.pyeclsaver.filen_main_outp = filen_main_outp
+		
+		print 'Restoring PyPIC LU object...'
+		self.spacech_ele.PyPICobj.build_sparse_solver()
+		print 'Done reload.'
