@@ -139,21 +139,15 @@ class pyecloud_saver:
         
         #rho video
         self.flag_video=(flag_movie==1)
-        if self.flag_video:
-            if not os.path.exists('rho_video'):
-                os.makedirs('rho_video')
-            self.rho_video=[]
-            self.t_video=[]
-            
-        # efield video
+        self.rho_video=None
+        self.t_video=None
+		
+        #efield video
         self.flag_sc_video=(flag_sc_movie==1)
-        if self.flag_sc_video:
-            if not os.path.exists('efield_video'):
-                os.makedirs('efield_video')
-            self.efx_video=[]
-            self.efy_video=[]
-            self.t_efield_video=[]
-            
+        self.efx_video=None
+        self.efy_video=None
+        self.t_efield_video=None
+        
         #step by step data
         self.r_center=r_center
         self.Nel_time=0.*self.t_dec;
@@ -328,41 +322,48 @@ class pyecloud_saver:
         
         #save rho video
         if self.flag_video:
+            if not os.path.exists('rho_video'):
+                os.makedirs('rho_video')
+            if self.rho_video is None:
+				self.rho_video=[]
+				self.t_video=[]
             if spacech_ele.flag_recomputed_sc:
                 self.rho_video.append(spacech_ele.rho)
                 self.t_video.append(beamtim.tt_curr)  
-            
             if beamtim.flag_new_bunch_pass:
-                if self.flag_video:
-                    self.rho_video=np.array(self.rho_video)
-                    self.t_video=np.array(self.t_video)
-                    filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
-                    print 'Saving %s'%filename_rho
-                    sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
-                    print 'Done'
-                    self.rho_video=[]
-                    self.t_video=[]
+				self.rho_video=np.array(self.rho_video)
+				self.t_video=np.array(self.t_video)
+				filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
+				print 'Saving %s'%filename_rho
+				sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
+				print 'Done'
+				self.rho_video=[]
+				self.t_video=[]
          
         #save efield video
         if self.flag_sc_video:
-            if spacech_ele.flag_recomputed_sc:
-                self.efx_video.append(spacech_ele.efx)
-                self.efy_video.append(spacech_ele.efy)
-                self.t_efield_video.append(beamtim.tt_curr)  
-            
-            if beamtim.flag_new_bunch_pass:
-                if self.t_efield_video:
-                    self.efx_video=np.array(self.efx_video)
-                    self.efy_video=np.array(self.efy_video)
-                    self.t_efield_video=np.array(self.t_efield_video)
-                    filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
-                    print 'Saving %s'%filename_efield
-                    sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
-                                              'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
-                    print 'Done'
-                    self.efx_video=[]
-                    self.efy_video=[]
-                    self.t_efield_video=[]
+			if not os.path.exists('efield_video'):
+				os.makedirs('efield_video')
+			if self.efx_video is None:
+				self.efx_video=[]
+				self.efy_video=[]
+				self.t_efield_video=[]
+			if spacech_ele.flag_recomputed_sc:
+				self.efx_video.append(spacech_ele.efx)
+				self.efy_video.append(spacech_ele.efy)
+				self.t_efield_video.append(beamtim.tt_curr)  
+			if beamtim.flag_new_bunch_pass:
+				self.efx_video=np.array(self.efx_video)
+				self.efy_video=np.array(self.efy_video)
+				self.t_efield_video=np.array(self.t_efield_video)
+				filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
+				print 'Saving %s'%filename_efield
+				sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
+										  'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
+				print 'Done'
+				self.efx_video=[]
+				self.efy_video=[]
+				self.t_efield_video=[]
                     
                     
         #save step by step data

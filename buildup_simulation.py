@@ -80,7 +80,7 @@ class BuildupSimulation(object):
 		self.flag_presence_sec_beams = flag_presence_sec_beams
 		self.sec_beams_list = sec_beams_list
 				
-	def run(self):
+	def run(self, t_end_sim = None):
 		
 		beamtim = self.beamtim
 		MP_e = self.MP_e
@@ -179,7 +179,12 @@ class BuildupSimulation(object):
 				MP_e.check_for_soft_regeneration()        
 				
 				print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
-			
+				
+			## every bunch passage
+			if t_end_sim is not None:
+				if beamtim.tt_curr>	t_end_sim:
+					print 'Reached user defined t_end_sim --> Ending simulation'
+					break		
 
 	def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'):
 
