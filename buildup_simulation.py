@@ -9,7 +9,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 4.29                   
+#		           PyECLOUD Version 4.30                   
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -59,7 +59,7 @@ import pickle
 class BuildupSimulation(object):
 	def __init__(self, pyecl_input_folder='./'):
 
-		print 'PyECLOUD Version 4.29'
+		print 'PyECLOUD Version 4.30'
 		beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
 				gas_ion_flag, resgasion, t_ion, \
 				spacech_ele,t_sc_ON, photoem_flag, phemiss,\
