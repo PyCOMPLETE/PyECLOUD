@@ -306,13 +306,12 @@ class Ecloud(object):
 			MP_p.y_mp = beam.y[ix]
 			MP_p.nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz#they have to become cylinders
 			MP_p.N_mp = slices.n_macroparticles_per_slice[i]
-			#compute beam field (it assumes electrons!)
+			MP_p.charge = beam.charge
+			#compute beam field
 			spacech_ele.recompute_spchg_efield(MP_p)
 			#scatter to electrons
 			Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e)
-			# go to actual beam particles 
-			Ex_n_beam = -Ex_n_beam * beam.charge/e
-			Ey_n_beam = -Ey_n_beam * beam.charge/e
+
 			
 			
 			## compute electron field map
