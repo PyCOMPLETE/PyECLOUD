@@ -6,15 +6,14 @@
 void boris_c(int N_sub_steps, double Dtt, double* B_multip, 
 						  double* xn1, double* yn1,  double* zn1, 
 						  double* vxn1, double* vyn1, double* vzn1,
-						  double* Ex_n, double* Ey_n, int N_mp, int N_multipoles,
-						  double charge, double mass)
+						  double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
 							  
 	int p, m, isub;
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
 
-	double qm;
+	double me, qe, qm;
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
 	double vx_prime, vy_prime, vz_prime;
@@ -25,8 +24,9 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 	double x_to_m, y_to_m;
 	double B_mul_curr;
 		
-
-	qm=charge/mass; 
+	me=9.10938291e-31;
+	qe=1.602176565e-19;
+	qm=-qe/me; //is an electron
 
 	for(p=0; p<N_mp; p++)
 	{

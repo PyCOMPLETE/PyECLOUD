@@ -6,7 +6,7 @@ cimport numpy as np
 cpdef boris_step_multipole(N_sub_steps, Dtt, np.ndarray B_multip, 
 						   np.ndarray xn1, np.ndarray yn1, np.ndarray zn1, 
 						   np.ndarray vxn1, np.ndarray vyn1, np.ndarray vzn1, 
-						   np.ndarray Ex_n, np.ndarray Ey_n, charge, mass):
+						   np.ndarray Ex_n, np.ndarray Ey_n):
 	
 	
 	cdef double* B_multip_data = <double*>B_multip.data
@@ -22,6 +22,5 @@ cpdef boris_step_multipole(N_sub_steps, Dtt, np.ndarray B_multip,
 	boris_c(N_sub_steps, Dtt, B_multip_data, 
 		  xn1_data, yn1_data,  zn1_data, 
 		  vxn1_data, vyn1_data, vzn1_data,
-		  Ex_n_data, Ey_n_data, len(xn1), len(B_multip),
-		  charge, mass)
+		  Ex_n_data, Ey_n_data, len(xn1), len(B_multip))
 
