@@ -170,13 +170,19 @@ class Ecloud(object):
 			sey_mod=SEY_model_cos_le(Emax,del_max,R0)
 		elif switch_model=='flat_low_ene':
 			sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+		elif switch_model=='perfect_absorber':
+			sey_mod=None
 
 		
 		flag_seg = (flag_hist_impact_seg==1)
-		   
-		impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-					 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
-		
+		if switch_model=='perfect_absorber':
+			import perfect_absorber_class as pac
+			impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
+						 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+		else:
+			impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
+						 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+			
 
 		if track_method == 'Boris':
 			dynamics=dynB.pusher_Boris(Dt, B0x, B0y, B0z, \
