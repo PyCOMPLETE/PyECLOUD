@@ -60,7 +60,7 @@ import numpy as np
 
 
 
-class impact_management:
+class impact_management(object):
     def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False):
         
@@ -134,7 +134,7 @@ class impact_management:
     def reset_energ_impact_seg(self):
         if self.flag_seg:
             self.energ_eV_impact_seg=0*self.energ_eV_impact_seg
-    
+    #@profile
     def backtrack_and_second_emiss(self, old_pos, MP_e):
         
         self.Nel_impact_last_step=0.
@@ -171,9 +171,9 @@ class impact_management:
             thresh_low_energy = self.thresh_low_energy
             
             
-            me=9.10938291e-31;
-            qe=1.602176565e-19;
-            qm=qe/me;
+            me = MP_e.mass
+            qe = np.abs(MP_e.charge)
+            qm = qe/me;
         
             ## impact management
             N_mp_old=N_mp
