@@ -209,6 +209,8 @@ class Ecloud(object):
 			print "Adding inital electrons from: %s"%filename_init_MP_state
 			MP_e.add_from_file(filename_init_MP_state)
 		
+		self.N_tracks = 0
+		
 		spacech_ele.flag_decimate = False
 			
 		self.MP_e = MP_e
@@ -218,9 +220,13 @@ class Ecloud(object):
 		
 		self.save_ele_distributions_last_track = False
 		self.save_ele_potential_and_field = False
+		self.save_ele_potential = False
+		self.save_ele_field = False
 		self.save_ele_MP_position = False
 		self.save_ele_MP_velocity = False
 		self.save_ele_MP_size = False
+		
+		self.track_only_first_time = False
 		
 		self.init_x = self.MP_e.x_mp[:self.MP_e.N_mp].copy()
 		self.init_y = self.MP_e.y_mp[:self.MP_e.N_mp].copy()
@@ -235,6 +241,11 @@ class Ecloud(object):
 		
 #	@profile	
 	def track(self, beam):
+		
+		if self.track_only_first_time:
+			if self.N_tracks>0:
+				print 'Warning: Track skipped because track_only_first_time is True.'
+				return
 		
 		#reinitialize
 		self.MP_e.x_mp[:self.init_N_mp] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
@@ -255,7 +266,13 @@ class Ecloud(object):
 			self.rho_ele_last_track = []
 
 		if self.save_ele_potential_and_field:
+			self.save_ele_potential = True
+			self.save_ele_field = True
+			
+		if self.save_ele_potential:
 			self.phi_ele_last_track = []
+			
+		if self.save_ele_field:
 			self.Ex_ele_last_track = []
 			self.Ey_ele_last_track = []
 
@@ -346,8 +363,10 @@ class Ecloud(object):
 				self.rho_ele_last_track.append(spacech_ele.rho.copy())
 				#print 'Here'
 
-			if self.save_ele_potential_and_field:
+			if self.save_ele_potential:
 				self.phi_ele_last_track.append(spacech_ele.phi.copy())
+			
+			if self.save_ele_field:
 				self.Ex_ele_last_track.append(spacech_ele.efx.copy())
 				self.Ey_ele_last_track.append(spacech_ele.efy.copy())
 
@@ -368,8 +387,10 @@ class Ecloud(object):
 		if self.save_ele_distributions_last_track:
 			self.rho_ele_last_track = np.array(self.rho_ele_last_track[::-1])
 
-		if self.save_ele_potential_and_field:
+		if self.save_ele_potential:
 			self.phi_ele_last_track = np.array(self.phi_ele_last_track[::-1])
+			
+		if self.save_ele_field:	
 			self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
 			self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
 
@@ -386,9 +407,23 @@ class Ecloud(object):
 			
 		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
 				self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])
+				
+		self.N_tracks+=1
 			
-			
-		 
+	def replace_with_recorded_field_map(self):
+		
+		if self.track_only_first_time:
+			print 'Warning: replace_with_recorded_field_map resets track_only_first_time = False'
+			self.track_only_first_time=False
+		
+		from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
+		self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg, 
+		    Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, n_slices=self.slicer.n_slices, 
+		    z_cut=self.slicer.z_cuts, L_interaction=self.L_ecloud, flag_clean_slices = True)
+		
+		self._ecloud_track = self.track
+		
+		self.track = self.efieldmap.track
 			
 			
 def read_parameter_files_pyhdtl(pyecl_input_folder):
