@@ -416,15 +416,17 @@ class Ecloud(object):
 			print 'Warning: replace_with_recorded_field_map resets track_only_first_time = False'
 			self.track_only_first_time=False
 		
-		from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
-		self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg, 
-		    Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, n_slices=self.slicer.n_slices, 
-		    z_cut=self.slicer.z_cuts, L_interaction=self.L_ecloud, flag_clean_slices = True)
-		
-		self._ecloud_track = self.track
-		
-		self.track = self.efieldmap.track
+		if not hasattr(self, 'efieldmap'):
+			from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
+			self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg, 
+			    Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, n_slices=self.slicer.n_slices, 
+			    z_cut=self.slicer.z_cuts, L_interaction=self.L_ecloud, flag_clean_slices = True)
 			
+			self._ecloud_track = self.track
+			
+			self.track = self.efieldmap.track
+		else:
+			print 'Warning: efieldmap already exists. I do nothing.'	
 			
 def read_parameter_files_pyhdtl(pyecl_input_folder):
     switch_model=0
