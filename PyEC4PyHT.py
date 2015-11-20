@@ -410,7 +410,7 @@ class Ecloud(object):
 				
 		self.N_tracks+=1
 			
-	def replace_with_recorded_field_map(self):
+	def replace_with_recorded_field_map(self, delete_ecloud_data=True):
 		
 		if self.track_only_first_time:
 			print 'Warning: replace_with_recorded_field_map resets track_only_first_time = False'
@@ -425,8 +425,30 @@ class Ecloud(object):
 			self._ecloud_track = self.track
 			
 			self.track = self.efieldmap.track
+			
+			if delete_ecloud_data:
+				self.spacech_ele=None
+				self.Mp_e = None
+				self.init_nel = None
+				self.init_vx = None
+				self.init_vy = None
+				self.init_vz = None
+				self.init_x = None
+				self.init_y = None
+				self.init_z = None
+			
+			
 		else:
-			print 'Warning: efieldmap already exists. I do nothing.'	
+			print 'Warning: efieldmap already exists. I do nothing.'
+			
+	def track_once_and_replace_with_recorded_field_map(self, bunch, delete_ecloud_data=True):	
+		self.save_ele_field = True
+		self.track_only_first_time = True
+		self.track(bunch)
+		self.save_ele_field = False
+		self.track_only_first_time = False
+		self.replace_with_recorded_field_map(delete_ecloud_data=delete_ecloud_data)
+		
 			
 def read_parameter_files_pyhdtl(pyecl_input_folder):
     switch_model=0
