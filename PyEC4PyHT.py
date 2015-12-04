@@ -209,6 +209,14 @@ class Ecloud(object):
 			print "Adding inital electrons from: %s"%filename_init_MP_state
 			MP_e.add_from_file(filename_init_MP_state)
 		
+		
+		self.x_beam_offset = 0.
+		self.y_beam_offset = 0.	
+		if 'x_beam_offset' in kwargs.keys():
+			self.x_beam_offset = kwargs['x_beam_offset']
+		if 'y_beam_offset' in kwargs.keys():
+			self.y_beam_offset = kwargs['y_beam_offset']
+		
 		self.N_tracks = 0
 		
 		spacech_ele.flag_decimate = False
@@ -319,8 +327,8 @@ class Ecloud(object):
 
 			# beam field 
 			MP_p = MP_light()
-			MP_p.x_mp = beam.x[ix]
-			MP_p.y_mp = beam.y[ix]
+			MP_p.x_mp = beam.x[ix]+self.x_beam_offset
+			MP_p.y_mp = beam.y[ix]+self.y_beam_offset
 			MP_p.nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz#they have to become cylinders
 			MP_p.N_mp = slices.n_macroparticles_per_slice[i]
 			#compute beam field (it assumes electrons!)
