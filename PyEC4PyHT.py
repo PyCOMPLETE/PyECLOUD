@@ -73,7 +73,7 @@ import gen_photoemission_class as gpc
 
 
 import numpy as np
-from scipy.constants import c, e
+from scipy.constants import c, e, m_e
 
 
 class MP_light(object):
@@ -82,7 +82,7 @@ class MP_light(object):
 
 
 class Ecloud(object):
-	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False, **kwargs):
+	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', MP_e_mass=m_e, MP_e_charge=-e, flag_clean_slices=False, **kwargs):
 		
 		
 		print 'PyECLOUD Version 4.30'
@@ -149,7 +149,7 @@ class Ecloud(object):
 		MP_e=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
 						   N_mp_regen_low, N_mp_regen, N_mp_after_regen,
 						   Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb,
-						   N_mp_soft_regen=N_mp_soft_regen, N_mp_after_soft_regen=N_mp_after_soft_regen)
+						   N_mp_soft_regen=N_mp_soft_regen, N_mp_after_soft_regen=N_mp_after_soft_regen, charge=MP_e_charge, mass=MP_e_mass)
 		
 	
 		
@@ -214,6 +214,11 @@ class Ecloud(object):
 		if filename_init_MP_state!=-1 and filename_init_MP_state is not None:
 			print "Adding inital electrons from: %s"%filename_init_MP_state
 			MP_e.add_from_file(filename_init_MP_state)
+
+		if gas_ion_flag == 1:
+			gas_ionization = gic.residual_gas_ionization(unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion)
+			self.gas_ionization = gas_ionization
+		self.gas_ion_flag = gas_ion_flag
 		
 		spacech_ele.flag_decimate = False
 			
