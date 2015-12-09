@@ -111,12 +111,12 @@ class Ecloud_single_kick_per_bunch(Ecloud):
             beam.clean_slices()
         
         slices = beam.get_slices(self.slicer)
-        
+
         for i in xrange(slices.n_slices-1, -1, -1):
-                        
+
             # select particles in the bunch
             ix = slices.particle_indices_of_slice(i)
-            
+
             # slice size and time step
             dz = (slices.z_bins[i + 1] - slices.z_bins[i]) # in this case it is the bucket length
             dt = dz / (beam.beta * c)
@@ -133,6 +133,7 @@ class Ecloud_single_kick_per_bunch(Ecloud):
             
             if N_mp_bunch>0:
                 # beam field 
+                print 'Bunch', i
                 MP_p = MP_light()
                 MP_p.x_mp = beam.x[ix]
                 MP_p.y_mp = beam.y[ix]
