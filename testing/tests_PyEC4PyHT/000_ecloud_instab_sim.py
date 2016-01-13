@@ -1,5 +1,5 @@
 import sys, os
-BIN=os.path.expanduser('../')
+BIN=os.path.expanduser('../../../')
 sys.path.append(BIN)
 
 import numpy as np
@@ -18,12 +18,13 @@ N_MP_ele_init = 100000
 N_mp_max = N_MP_ele_init*4.
 
 # define the machine
-from SPS_custom import SPS
+from machines_for_testing import SPS
 machine = SPS(n_segments = n_segments, machine_configuration = 'Q26-injection')
 
 # compute sigma x and y
-sigma_x = np.sqrt(machine.beta_x[0]*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(machine.beta_y[0]*epsn_y/machine.betagamma)
+inj_optics = machine.transverse_map.get_injection_optics()
+sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 # define apertures and Dh_sc to simulate headtail conditions
 x_aper  = 20*sigma_x
