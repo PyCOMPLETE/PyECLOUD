@@ -20,14 +20,22 @@ class SPS(BasicSynchrotron):
 			V_RF		= 2e6
 			dphi_RF		= 0.
 			alpha		= 0.00192
+			beta_x 		= 42.
+			D_x 		= 0
+			beta_y 		= 42.
+			D_y 		= 0 
 		elif machine_configuration=='Q20-injection':
-			p0 		= 20e9 * e /c
+			p0 		= 26e9 * e /c
 			p_increment 	= 0.
 			accQ_x		= 20.13
 			accQ_y		= 20.18
 			V_RF		= 5.75e6
 			dphi_RF		= 0.
-			alpha		= 0.00308642			
+			alpha		= 0.00308642
+			beta_x 		= 54.6
+			D_x 		= 0
+			beta_y 		= 54.6
+			D_y 		= 0 			
 		else:
 			raise ValueError('machine_configuration not recognized!')
 			
@@ -37,14 +45,11 @@ class SPS(BasicSynchrotron):
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 			
 			n_segments = kwargs['n_segments']
-			circumference = 26658.8832
+			circumference = 1100*2*np.pi
 			
 			name = None
 			
-			beta_x 		= 92.7 
-			D_x 		= 0
-			beta_y 		= 93.2 
-			D_y 		= 0 
+
 			
 			alpha_x 	= None
 			alpha_y 	= None

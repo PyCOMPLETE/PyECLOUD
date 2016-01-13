@@ -1,20 +1,23 @@
 import sys, os
-BIN=os.path.expanduser('../')
+BIN=os.path.expanduser('../../../')
 sys.path.append(BIN)
 
 
 import numpy as np
 import pylab as pl
 import mystyle as ms
+import time
+
+show_movie = False
 
 
 filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_20150212_prb.dat'
 B_multip = [0.]
 N_kicks = 1
 
-#~ filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_20150212_prb.dat'
-#~ B_multip = [0.5]
-#~ N_kicks = 1
+filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_20150212_prb.dat'
+B_multip = [0.5]
+N_kicks = 1
 
 filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_3kicks_20150212_prb.dat'
 B_multip = [0.5]
@@ -39,21 +42,24 @@ ms.mystyle(fontsz=14)
 
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-from SPS_custom import SPS
-machine = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', Q_x=20., Q_y=20.)
+from machines_for_testing import SPS
+machine = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', accQ_x=20., accQ_y=20.)
+#machine.one_turn_map.remove(machine.longitudinal_map)
 
 
 # compute sigma x and y
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
-sigma_x = np.sqrt(machine.beta_x[0]*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(machine.beta_y[0]*epsn_y/machine.betagamma)
+inj_optics = machine.transverse_map.get_injection_optics()
+sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 # define apertures and Dh_sc to simulate headtail conditions
 x_aper  = 20*sigma_x
 y_aper  = 20*sigma_y
 Dh_sc = 2*x_aper/128/2
+if show_movie: Dh_sc*=2
 
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
@@ -79,8 +85,9 @@ ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer,
 				B_multip=B_multip)
 machine.install_after_each_transverse_segment(ecloud)
 
-#~ ecloud.save_ele_distributions_last_track = True
-#~ ecloud.save_ele_potential_and_field = True
+if show_movie:
+	ecloud.save_ele_distributions_last_track = True
+	ecloud.save_ele_potential_and_field = True
 				
 # generate a bunch 
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
@@ -103,7 +110,8 @@ rms_err_x_list = []
 rms_err_y_list = []
 for ii in xrange(N_turns-1):
 	# track
-	machine.track(bunch, verbose = True)
+	machine.track(bunch)#, verbose = True)
+	print 'Turn', ii
 
 	# id and momenta after track
 	id_after = bunch.id[bunch.id<=n_part_per_turn]
@@ -123,7 +131,7 @@ for ii in xrange(N_turns-1):
 	sp1 = pl.subplot(2,3,1)
 	pl.plot(z_after,  (100*np.abs((xp_after-xp_before)-(xp[ii+1, :]-xp[0, :]))/np.std(xp[ii+1, :]-xp[0, :])), '.r', markersize = 2)
 	pl.grid('on')
-	pl.ylabel('''rms_error($\Delta$x')/rms($\Delta$x') [%]''')
+	pl.ylabel('''error($\Delta$x')/$\Delta$x' [%]''')
 	pl.subplot(2,3,4, sharex=sp1)
 	pl.plot(z_after,  (xp[ii+1, :]-xp[0, :]), '.r', label='HT', markersize = 2)
 	pl.plot(z_after,  (xp_after-xp_before), '.b', label='PyHT', markersize = 2)
@@ -138,11 +146,11 @@ for ii in xrange(N_turns-1):
 	pl.ylabel('Occurrences')
 	pl.xlim(0,100)
 	rms_err_x = np.std(100*np.abs((xp_after-xp_before)-(xp[ii+1, :]-xp[0, :]))/np.std(xp[ii+1, :]-xp[0, :]))
-	
+
 	sp1 = pl.subplot(2,3,2)
 	pl.plot(z_after,  (100*np.abs((yp_after-yp_before)-(yp[ii+1, :]-yp[0, :]))/np.std(yp[ii+1, :]-yp[0, :])), '.r', markersize = 2)
 	pl.grid('on')
-	pl.ylabel('''rms_error($\Delta$y')/rms($\Delta$y') [%]''')
+	pl.ylabel('''error($\Delta$y')/$\Delta$y' [%]''')
 	pl.subplot(2,3,5, sharex=sp1)
 	pl.plot(z_after,  (yp[ii+1, :]-yp[0, :]), '.r', label='HT', markersize = 2)
 	pl.plot(z_after,  (yp_after-yp_before), '.b', label='PyHT', markersize = 2)
@@ -157,16 +165,18 @@ for ii in xrange(N_turns-1):
 	pl.xlabel('Error_y [%]')
 	pl.ylabel('Occurrences')
 	rms_err_y = np.std(100*np.abs((yp_after-yp_before)-(yp[ii+1, :]-yp[0, :]))/np.std(yp[ii+1, :]-yp[0, :]))
-	
-	
+
+
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(ii, rms_err_x, rms_err_y))
-	
+
 	pl.savefig(filename.split('_prb.dat')[0]+'_%02d.png'%ii, dpi=150)
-	
+
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
-
-	pl.show()
+	
+	pl.ion()
+	pl.draw()
+	time.sleep(1.)
 	
 pl.figure(1000)
 pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
@@ -179,9 +189,7 @@ pl.savefig(filename.split('_prb.dat')[0]+'_errors.png', dpi=200)
 pl.show()
 
 slices = bunch.get_slices(ecloud.slicer)
-show_movie = False
 if show_movie:
-    import time
     n_frames = ecloud.rho_ele_last_track.shape[0]
     pl.close(1)
     pl.figure(1, figsize=(8,8))
