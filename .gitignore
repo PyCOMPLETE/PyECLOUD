@@ -1,8 +1,8 @@
 geom_impact_poly_cython.c
 boris_cython.c
-*.beam
+#*.beam
 logfile.txt
-*.input
+#*.input
 *.mat
 *.html
 *.o
