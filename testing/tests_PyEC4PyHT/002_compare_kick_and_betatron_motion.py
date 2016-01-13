@@ -1,11 +1,12 @@
 import sys, os
-BIN=os.path.expanduser('../')
+BIN=os.path.expanduser('../../../')
 sys.path.append(BIN)
 
 
 import numpy as np
 import pylab as pl
 import mystyle as ms
+import time
 
 
 
@@ -32,16 +33,18 @@ ms.mystyle(fontsz=14)
 
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-from SPS_custom import SPS
-machine = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', Q_x=20.13, Q_y=20.18)
+from machines_for_testing import SPS
+machine = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', accQ_x=20.13, accQ_y=20.18)
+#machine.one_turn_map.remove(machine.longitudinal_map)
 
 
 # compute sigma x and y
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
-sigma_x = np.sqrt(machine.beta_x[0]*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(machine.beta_y[0]*epsn_y/machine.betagamma)
+inj_optics = machine.transverse_map.get_injection_optics()
+sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 # define apertures and Dh_sc to simulate headtail conditions
 x_aper  = 20*sigma_x
@@ -61,7 +64,7 @@ N_mp_max = N_MP_ele_init*4.
 nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.n_segments, slicer=slicer, 
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer, 
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
@@ -72,8 +75,6 @@ ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.n_segments, sli
 				B_multip=B_multip)
 machine.install_after_each_transverse_segment(ecloud)
 
-#~ ecloud.save_ele_distributions_last_track = True
-#~ ecloud.save_ele_potential_and_field = True
 				
 # generate a bunch 
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
@@ -105,7 +106,7 @@ for ii in xrange(N_turns-1):
 	z_before = z_after.copy()
 	yp_before = yp_after.copy()
 	
-	machine.track(bunch, verbose = True)
+	machine.track(bunch)#, verbose = True)
 
 	# id and momenta after track
 	id_after = bunch.id[bunch.id<=n_part_per_turn]
@@ -167,8 +168,10 @@ for ii in xrange(N_turns-1):
 	
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
-
-	pl.show()
+	
+	pl.ion()
+	time.sleep(1.)
+	pl.draw()
 	
 pl.figure(1000)
 pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
@@ -180,27 +183,6 @@ pl.legend()
 pl.savefig(filename.split('_prb.dat')[0]+'_errors.png', dpi=200)
 pl.show()
 
-slices = bunch.get_slices(ecloud.slicer)
-show_movie = False
-if show_movie:
-    import time
-    n_frames = ecloud.rho_ele_last_track.shape[0]
-    pl.close(1)
-    pl.figure(1, figsize=(8,8))
-    vmax = np.max(ecloud.rho_ele_last_track[:])
-    vmin = np.min(ecloud.rho_ele_last_track[:])
-    for ii in xrange(n_frames-1, 0, -1):
-        pl.subplot2grid((10,1),(0,0), rowspan=3)
-        pl.plot(slices.z_centers, np.float_(slices.n_macroparticles_per_slice)/np.max(slices.n_macroparticles_per_slice))
-        pl.xlabel('z [m]');pl.ylabel('Long. profile')
-        pl.axvline(x = slices.z_centers[ii], color='r')
-        pl.subplot2grid((10,1),(4,0), rowspan=6)
-        pl.pcolormesh(ecloud.spacech_ele.xg*1e3, ecloud.spacech_ele.yg*1e3, ecloud.rho_ele_last_track[ii,:,:].T, vmax=vmax, vmin=vmin)
-        pl.xlabel('x [mm]');pl.ylabel('y [mm]')
-        pl.axis('equal')
-        pl.subplots_adjust(hspace=.5)
-        pl.draw()
-        time.sleep(.2)
-        pl.show()
+
 
 
