@@ -1,5 +1,5 @@
 import sys, os
-BIN=os.path.expanduser('../')
+BIN=os.path.expanduser('../../../')
 sys.path.append(BIN)
 
 
@@ -12,7 +12,7 @@ B_multip = [0.]
 
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-from shortSPS import shortSPS
+from machines_for_testing  import shortSPS
 machine = shortSPS(n_segments = n_segments, machine_configuration = 'Q20-injection-like')
 
 # remove synchrotron motion
@@ -22,8 +22,9 @@ machine.one_turn_map.remove(machine.longitudinal_map)
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
-sigma_x = np.sqrt(machine.beta_x[0]*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(machine.beta_y[0]*epsn_y/machine.betagamma)
+inj_optics = machine.transverse_map.get_injection_optics()
+sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 
 				
@@ -51,7 +52,7 @@ N_mp_max = N_MP_ele_init*4.
 nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.n_segments, slicer=slicer, 
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer, 
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
@@ -104,7 +105,7 @@ for i in range(n_turns):
 print '\nDONE'
 
 from tune_analysis import tune_analysis
-qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(bunch_for_tracking, machine, x_i, xp_i, y_i, yp_i)
+qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(x_i, xp_i, y_i, yp_i)
 
 pl.close('all')
 pl.figure(1)

@@ -2,10 +2,10 @@ import numpy as np
 from PySUSSIX import Sussix
 import sys
 
-def tune_analysis(bunch, machine, x_i, xp_i, y_i, yp_i):
+def tune_analysis(x_i, xp_i, y_i, yp_i):
 		n_turns = x_i.shape[1]
 		macroparticlenumber = x_i.shape[0]
-
+		
 		qx_i = np.empty(macroparticlenumber)
 		qy_i = np.empty(macroparticlenumber)
 
@@ -35,9 +35,15 @@ def tune_analysis(bunch, machine, x_i, xp_i, y_i, yp_i):
 		yp_centroid = np.mean(yp_i, axis=0)
 		
 		#print x_centroid.shape
+		
+		spectrum_x_centroid = np.abs(np.fft.fft(x_centroid))[:n_turns/2]
+		tune_peak_x_centroid = np.float_(np.argmax(spectrum_x_centroid))/float(n_turns)
+
+		spectrumy_centroid = np.abs(np.fft.fft(x_centroid))[:n_turns/2]
+		tune_peak_y_centroid = np.float_(np.argmax(spectrumy_centroid))/float(n_turns)
 
 		SX = Sussix()
-		SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=machine.Q_x%1, tuney=machine.Q_y%1)
+		SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=tune_peak_x_centroid, tuney=tune_peak_y_centroid)
 		SX.sussix(x_centroid, xp_centroid,
 				  y_centroid, yp_centroid,
 				  x_centroid, xp_centroid) 
