@@ -12,7 +12,7 @@ build/
 scripts/
 *~
 .#*
-#*
+*sussix.inp
 .project
 .pydevproject
 *.h5
