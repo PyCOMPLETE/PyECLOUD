@@ -44,7 +44,7 @@ print 'Done!'
 
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-from shortSPS import shortSPS
+from machines_for_testing  import shortSPS
 machine = shortSPS(n_segments = n_segments, machine_configuration = 'Q20-injection-like')
 
 # remove synchrotron motion
@@ -57,12 +57,14 @@ qx_ht, qy_ht, qx_centroid_ht, qy_centroid_ht  = tune_analysis(None, machine, x[:
 			xp[:, :n_record].T, y[:, :n_record].T, yp[:, :n_record].T)
 
 
+
 # compute sigma x and y
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
-sigma_x = np.sqrt(machine.beta_x[0]*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(machine.beta_y[0]*epsn_y/machine.betagamma)
+inj_optics = machine.transverse_map.get_injection_optics()
+sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 
 				
@@ -119,7 +121,7 @@ yp_i = np.empty((n_record, n_turns))
 
 # track and store
 for i in range(n_turns):    
-    machine.track(bunch, verbose=True)
+    machine.track(bunch)#, verbose=True)
     
     print 'Turn', i
     sys.stdout.flush()
