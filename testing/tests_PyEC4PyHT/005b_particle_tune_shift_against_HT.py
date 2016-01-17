@@ -1,5 +1,5 @@
 import sys, os
-BIN=os.path.expanduser('../')
+BIN=os.path.expanduser('../../../')
 sys.path.append(BIN)
 
 
@@ -7,38 +7,10 @@ import numpy as np
 import pylab as pl
 import mystyle as ms
 
-
-#~ filename = 'headtail_for_test/test_protons/shortSPS_Q20_proton_check_tune_spread_prb.dat'
-#~ N_kicks = 5
-#~ n_segments = 5
-#~ B_multip = [0.]
-
-
-filename = 'headtail_for_test/test_protons/shortSPS_Q20_proton_check_tune_spread_dipole_prb.dat'
-N_kicks = 5
 n_segments = 5
 B_multip = [0.5]
-
-
-
-
 n_record = 1000
-
 n_part_per_turn = 5000
-
-print 'Loading HEADTAIL data...'
-appo = np.loadtxt(filename)
-
-parid = np.reshape(appo[:,0], (-1, n_part_per_turn))[::N_kicks,:]
-x = np.reshape(appo[:,1], (-1, n_part_per_turn))[::N_kicks,:]
-xp = np.reshape(appo[:,2], (-1, n_part_per_turn))[::N_kicks,:]
-y = np.reshape(appo[:,3], (-1, n_part_per_turn))[::N_kicks,:]
-yp =np.reshape(appo[:,4], (-1, n_part_per_turn))[::N_kicks,:]
-z = np.reshape(appo[:,5], (-1, n_part_per_turn))[::N_kicks,:]
-zp = np.reshape(appo[:,6], (-1, n_part_per_turn))[::N_kicks,:]
-n_turns = len(x[:,0])
-
-print 'Done!'
 
 
 
@@ -50,13 +22,23 @@ machine = shortSPS(n_segments = n_segments, machine_configuration = 'Q20-injecti
 # remove synchrotron motion
 machine.one_turn_map.remove(machine.longitudinal_map)
 
-# compute tunes from headtail data
-print 'Tune analysis for headtail...' 
-from tune_analysis import tune_analysis
-qx_ht, qy_ht, qx_centroid_ht, qy_centroid_ht  = tune_analysis(None, machine, x[:, :n_record].T,
-			xp[:, :n_record].T, y[:, :n_record].T, yp[:, :n_record].T)
 
+def dict_of_arrays_and_scalar_from_h5(filename):
+	import h5py
+	with h5py.File(filename, 'r') as fid:
+		f_dict = {}
+		for kk in fid.keys():
+			f_dict[kk] = np.array(fid[kk]).copy()
+			if f_dict[kk].shape == ():
+				f_dict[kk] = f_dict[kk].tolist()
+	return  f_dict
 
+dict_HT = dict_of_arrays_and_scalar_from_h5('footprint_HT.h5ref')
+
+qx_ht = dict_HT['qx_ht']
+qy_ht = dict_HT['qy_ht']
+qx_centroid_ht = dict_HT['qx_centroid_ht']
+qy_centroid_ht = dict_HT['qy_centroid_ht']
 
 # compute sigma x and y
 epsn_x = 2.5e-6
@@ -72,12 +54,13 @@ sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 # replace first particles with HEADTAIL ones
-bunch.x[:n_part_per_turn] = x[0,:]
-bunch.xp[:n_part_per_turn] = xp[0,:]
-bunch.y[:n_part_per_turn] = y[0,:]
-bunch.yp[:n_part_per_turn] = yp[0,:]
-bunch.z[:n_part_per_turn] = z[0,:]
-bunch.dp[:n_part_per_turn] =zp[0,:]
+bunch.x[:n_part_per_turn] = dict_HT['x0_HT']
+bunch.xp[:n_part_per_turn] = dict_HT['xp0_HT']
+bunch.y[:n_part_per_turn] = dict_HT['y0_HT']
+bunch.yp[:n_part_per_turn] = dict_HT['yp0_HT']
+bunch.z[:n_part_per_turn] = dict_HT['z0_HT']
+bunch.dp[:n_part_per_turn] = dict_HT['dp0_HT']
+n_turns= dict_HT['n_turns']
 
 
 # define apertures and Dh_sc to simulate headtail conditions
@@ -88,7 +71,7 @@ Dh_sc = 2*x_aper/128/2.
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
+slicer = UniformBinSlicer(n_slices = 64, z_cuts=(-3*bunch.sigma_z(), 3*bunch.sigma_z()))
 
 
 init_unif_edens_flag=1
@@ -99,7 +82,7 @@ N_mp_max = N_MP_ele_init*4.
 nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.n_segments, slicer=slicer, 
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer, 
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
@@ -108,6 +91,12 @@ ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.n_segments, sli
 				N_mp_max=N_mp_max,
 				nel_mp_ref_0=nel_mp_ref_0,
 				B_multip=B_multip)
+				
+# generate a bunch 
+bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000, 
+	intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
+ecloud.track_once_and_replace_with_recorded_field_map(bunch_for_map)
+				
 machine.install_after_each_transverse_segment(ecloud)
 
 
@@ -133,25 +122,23 @@ for i in range(n_turns):
 print '\nDONE'
 
 from tune_analysis import tune_analysis
-qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(bunch, machine, x_i, xp_i, y_i, yp_i)
+qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(x_i, xp_i, y_i, yp_i)
 
 pl.close('all')
 ms.mystyle(fontsz=14)
 pl.figure(1)
 sp1 = pl.subplot(2,1,1)
 pl.plot(np.mean(x_i, axis=0), '.-b', markersize=5, linewidth=2, label='PyHT')
-pl.plot(np.mean(x, axis=1),'.-r', markersize=5, linewidth=2, label='HT')
 pl.ylabel('<x>')
 pl.grid('on')
 ms.sciy()
 pl.legend(prop={'size':14})
 pl.subplot(2,1,2, sharex=sp1)
 pl.plot(np.mean(y_i, axis=0), '.-b', markersize=5, linewidth=2, label='PyHT')
-pl.plot(np.mean(y, axis=1),'.-r', markersize=5, linewidth=2, label='HT')
 pl.xlabel('Turn'); pl.ylabel('<y>')
 pl.grid('on')
 ms.sciy()
-pl.savefig(filename.split('_prb.dat')[0]+'_centroids.png', dpi=200)
+#pl.savefig(filename.split('_prb.dat')[0]+'_centroids.png', dpi=200)
 
 
 pl.figure(2)
@@ -162,21 +149,21 @@ pl.xlabel('$Q_x$');pl.ylabel('$Q_y$')
 pl.legend(prop={'size':14})
 pl.grid('on')
 pl.axis('equal')
-pl.savefig(filename.split('_prb.dat')[0]+'_footprint.png', dpi=200)
+#pl.savefig(filename.split('_prb.dat')[0]+'_footprint.png', dpi=200)
 
 
 pl.figure(3)
 pl.subplot(2,1,1)
 pl.plot(bunch.z[:n_record],np.abs(qx_i)-np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
-pl.plot(z[-1,:n_record].T,np.abs(qx_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
+pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qx_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
 pl.ylabel('$\Delta Q_x$')
 pl.grid('on')
 pl.legend(prop={'size':14})
 pl.subplot(2,1,2)
 pl.plot(bunch.z[:n_record],np.abs(qy_i)-np.modf(machine.Q_x)[0], '.', markersize=3)
-pl.plot(z[-1,:n_record].T,np.abs(qy_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3)
+pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qy_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3)
 pl.ylabel('$\Delta Q_y$')
 pl.xlabel('z [m]')
 pl.grid('on')
-pl.savefig(filename.split('_prb.dat')[0]+'_Q_vs_z.png', dpi=200)
+#pl.savefig(filename.split('_prb.dat')[0]+'_Q_vs_z.png', dpi=200)
 pl.show()

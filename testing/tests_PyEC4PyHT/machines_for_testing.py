@@ -45,7 +45,7 @@ class SPS(BasicSynchrotron):
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 			
 			n_segments = kwargs['n_segments']
-			circumference = 1100*2*np.pi
+			circumference = 1100*2*np.pi/6
 			
 			name = None
 			
