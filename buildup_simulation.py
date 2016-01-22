@@ -63,7 +63,7 @@ class BuildupSimulation(object):
 		beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
 				gas_ion_flag, resgasion, t_ion, \
 				spacech_ele,t_sc_ON, photoem_flag, phemiss,\
-				flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components()
+				flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder)
 		
 		self.beamtim = beamtim
 		self.MP_e = MP_e
