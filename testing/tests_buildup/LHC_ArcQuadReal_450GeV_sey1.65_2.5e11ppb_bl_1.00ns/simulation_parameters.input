@@ -4,9 +4,9 @@ machine_param_file='machine_parameters.input'
 secondary_emission_parameters_file='secondary_emission_parameters.input'
 beam_parameters_file='beam.beam' 
 
-logfile_path = '/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns/logfile.txt'
-progress_path = '/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/progress/200mhz799'
-stopfile = '/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/progress/stop'
+logfile_path = './logfile.txt'
+progress_path = './progress.txt'
+stopfile = 'stop'
 
 Dt = 1.000000e-11
 t_end=1e-9;       #s (no effect if log. profile is imported from file)
