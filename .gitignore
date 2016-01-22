@@ -3,7 +3,7 @@ boris_cython.c
 #*.beam
 logfile.txt
 #*.input
-*.mat
+#*.mat
 *.html
 *.o
 *.so
@@ -18,3 +18,5 @@ scripts/
 *.h5
 *.h5part
 .ipynb_checkpoints
+Pyecltest.mat
+
