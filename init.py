@@ -252,7 +252,7 @@ def read_parameter_files(pyecl_input_folder='./'):
 
 
 
-def read_input_files_and_init_components(pyecl_input_folder='./'):
+def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     
     b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
@@ -281,7 +281,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./'):
     
       
 
-
+    for attr in kwargs.keys():
+            print 'Ecloud init. From kwargs: %s = %s'%(attr, repr(kwargs[attr]))
+            tmpattr = kwargs[attr]
+            exec('%s=tmpattr'%attr)
     
 
 
