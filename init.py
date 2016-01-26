@@ -221,7 +221,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     if B==-1:
         B   = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen) 
         
-    
+    filen_main_outp = 'Pyecltest'
     
     return b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
@@ -245,7 +245,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
+    filen_main_outp
 
 
 
@@ -276,7 +277,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, \
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0 = \
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
+    filen_main_outp  = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -391,7 +393,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=dec_fac_secbeam_prof,
                  el_density_probes=el_density_probes, save_simulation_state_time_file = save_simulation_state_time_file,
                  x_min_hist_det=x_min_hist_det, x_max_hist_det=x_max_hist_det, y_min_hist_det=y_min_hist_det, y_max_hist_det=y_max_hist_det, 
-                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile)
+                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp)
                  
    
 
