@@ -1,6 +1,6 @@
 # secondary emission model
 Emax=332.;
-del_max = 1.600000
+del_max = 1.700000
 R0 = 0.7
 switch_model=0
 

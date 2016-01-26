@@ -1,24 +1,34 @@
+import sys, os
+BIN = os.path.expanduser("../../../")
+sys.path.append(BIN)
+
 import pylab as pl
 import numpy as np
 import pylab as pl
 from colorsys import hsv_to_rgb
 import os
-import myloadmat_to_obj as mlm
+import PyECLOUD.myloadmat_to_obj as mlm
 import matplotlib.gridspec as gridspec
-import mystyle as ms
+import PyECLOUD.mystyle as ms
 
 
 pl.close('all')
 
-ref_folder = '/home/annalisa/Desktop/PyECLOUD_devel_2/TEST_SPS_sey1.80_1000.0G'        	  # path of the reference folder (old simulation)
-curr_folder = '/home/annalisa/Desktop/PyECLOUD_devel_2/TEST_SPS_sey1.80_1000.0G'             # path of the current folder to check!!!
+sim_folder = 'LHC_ArcDipReal_450GeV_sey1.60_2.5e11ppb_bl_1.00ns'
 
-folder_plot = './comparison_figures2'
+ref_folder = sim_folder
+curr_folder = sim_folder
+
+folder_plot = sim_folder+'/comparison_plots'
+
+
 try:
 	os.mkdir(folder_plot)
 except OSError as err:
 	print 'Folder not created due to exception:'
 	print err
+	
+
 
 
 
@@ -187,7 +197,8 @@ for ii,k in enumerate(out_var_curr):
 		gs2.update(top=top, bottom=bottom)
 		pl.savefig(folder_plot+'/%s'%k, dpi=300)
 	
-	
+print 'Saved comparison plots in:'
+print folder_plot	
 		#~ #pl.show()	
 
 
