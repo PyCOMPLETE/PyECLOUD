@@ -275,30 +275,7 @@ class Ecloud(object):
 			
 			self._track_single_slice(beam, ix, dz)
 
-				
-		if self.save_ele_distributions_last_track:
-			self.rho_ele_last_track = np.array(self.rho_ele_last_track[::-1])
-
-		if self.save_ele_potential:
-			self.phi_ele_last_track = np.array(self.phi_ele_last_track[::-1])
-			
-		if self.save_ele_field:	
-			self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
-			self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
-
-		if self.save_ele_MP_position:
-			self.x_MP_last_track = np.array(self.x_MP_last_track[::-1])
-			self.y_MP_last_track = np.array(self.y_MP_last_track[::-1])
-
-		if self.save_ele_MP_velocity:
-			self.vx_MP_last_track = np.array(self.vx_MP_last_track[::-1])
-			self.vy_MP_last_track = np.array(self.vy_MP_last_track[::-1])
-
-		if self.save_ele_MP_size:
-			self.nel_MP_last_track = np.array(self.nel_MP_last_track[::-1])
-			
-		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-				self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])
+		self._finalize()
 				
 		self.N_tracks+=1
 			
@@ -470,7 +447,33 @@ class Ecloud(object):
 			
 		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
 			self.N_MP_last_track = []
-				
+
+
+	def _finalize(self):
+
+		if self.save_ele_distributions_last_track:
+			self.rho_ele_last_track = np.array(self.rho_ele_last_track[::-1])
+
+		if self.save_ele_potential:
+			self.phi_ele_last_track = np.array(self.phi_ele_last_track[::-1])
+			
+		if self.save_ele_field:	
+			self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
+			self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
+
+		if self.save_ele_MP_position:
+			self.x_MP_last_track = np.array(self.x_MP_last_track[::-1])
+			self.y_MP_last_track = np.array(self.y_MP_last_track[::-1])
+
+		if self.save_ele_MP_velocity:
+			self.vx_MP_last_track = np.array(self.vx_MP_last_track[::-1])
+			self.vy_MP_last_track = np.array(self.vy_MP_last_track[::-1])
+
+		if self.save_ele_MP_size:
+			self.nel_MP_last_track = np.array(self.nel_MP_last_track[::-1])
+			
+		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
+				self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])				
 			
 def read_parameter_files_pyhdtl(pyecl_input_folder):
     switch_model=0
