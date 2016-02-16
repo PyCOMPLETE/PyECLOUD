@@ -475,6 +475,29 @@ class Ecloud(object):
 		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
 				self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])				
 			
+	def _finalize_and_reinitialize(self):
+		self._finalize()
+		self._reinitialize()
+	
+	def _track_in_single_slice_mode(self, beam):
+		
+		if self.track_only_first_time:
+			raise NotImplementedError(
+						'Not implemented (yet) in slice-by-slice mode!')
+					
+		if hasattr(beam.particlenumber_per_mp, '__iter__'):
+			raise ValueError('ecloud module assumes same size for all beam MPs')
+
+		if self.flag_clean_slices:
+			raise ValueError(
+					'track cannot clean the slices in slice-by-slice mode! ')
+
+		dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']
+			
+		self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
+
+
+
 def read_parameter_files_pyhdtl(pyecl_input_folder):
     switch_model=0
     simulation_param_file=pyecl_input_folder+'/simulation_parameters.input'
