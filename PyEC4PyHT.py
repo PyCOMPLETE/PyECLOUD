@@ -82,7 +82,8 @@ class MP_light(object):
 
 
 class Ecloud(object):
-	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False, **kwargs):
+	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False,
+				slice_by_slice_mode=False, **kwargs):
 		
 		
 		print 'PyECLOUD Version 4.36'
@@ -246,6 +247,11 @@ class Ecloud(object):
 		self.init_N_mp = self.MP_e.N_mp
 		
 		self.flag_clean_slices = flag_clean_slices
+		
+		self.slice_by_slice_mode = slice_by_slice_mode
+		if self.slice_by_slice_mode:
+			self.track = self._track_in_single_slice_mode
+			self.finalize_and_reinitialize = self._finalize_and_reinitialize
 		
 #	@profile	
 	def track(self, beam):
