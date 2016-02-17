@@ -498,9 +498,9 @@ class Ecloud(object):
 			raise ValueError(
 					'track cannot clean the slices in slice-by-slice mode! ')
 
-		dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']
-			
-		self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
+		if beam.slice_info is not 'unsliced':
+			dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']	
+			self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
 
 
 
