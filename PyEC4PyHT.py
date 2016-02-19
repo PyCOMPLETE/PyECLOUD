@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 4.36                     
+#                   PyECLOUD Version 4.37                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -86,7 +86,7 @@ class Ecloud(object):
 				slice_by_slice_mode=False, **kwargs):
 		
 		
-		print 'PyECLOUD Version 4.36'
+		print 'PyECLOUD Version 4.37'
 		print 'PyHEADTAIL module'
 		print 'Initializing ecloud from folder: '+pyecl_input_folder
 		self.slicer = slicer
