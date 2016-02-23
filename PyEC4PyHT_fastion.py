@@ -141,7 +141,7 @@ class Ecloud_fastion(Ecloud):
             
             if N_mp_bunch > 0:
                 # beam field 
-                print 'Tracking bunch', i
+                # print 'Bunch', i
                 MP_p = MP_light()
                 MP_p.x_mp = beam.x[ix]
                 MP_p.y_mp = beam.y[ix]
@@ -155,34 +155,43 @@ class Ecloud_fastion(Ecloud):
                     dz_bunch = slices.slice_widths[i]
                     lambda_bunch = Np_bunch
                     dt_bunch = 1 / c
-                    MP_e = gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], sigmay=slices.sigma_y[i], 
-                                                x_beam_pos=slices.mean_x[i], y_beam_pos=slices.mean_y[i])
+                    MP_e = gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
+                                                    sigmay=slices.sigma_y[i], x_beam_pos=slices.mean_x[i], y_beam_pos=slices.mean_y[i])
+
+
                 # compute beam field
                 spacech_ele.recompute_spchg_efield(MP_p)
-                # scatter to electrons
+
+                # scatter beam field to electrons
                 Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e) # since we do not divide the charge by the dz, this is already integrated over the bucket length
+
+                # compute cloud field
+                spacech_ele.recompute_spchg_efield(MP_e) 
                 
-                # Kick electrons
+                # scatter cloud field to beam
+                Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p) 
+
+                # kick cloud particles
                 MP_e.vx_mp[:MP_e.N_mp] += Ex_n_beam * MP_e.charge / MP_e.mass / c
                 MP_e.vy_mp[:MP_e.N_mp] += Ey_n_beam * MP_e.charge / MP_e.mass / c
                 
                 # kick beam particles
                 fact_kick = beam.charge / (beam.mass * beam.beta * beam.beta * beam.gamma * c * c) * self.L_ecloud
-                # beam.xp[ix] += fact_kick * Ex_sc_p
-                # beam.yp[ix] += fact_kick * Ey_sc_p
+                beam.xp[ix] += fact_kick * Ex_sc_p
+                beam.yp[ix] += fact_kick * Ey_sc_p
             
-            
-            ## Total electric field on electrons
+
+            # Total electric field on electrons
             Ex_n = MP_e.vx_mp[:MP_e.N_mp] * 0.
             Ey_n = Ex_n
 
-            ## save position before motion step
+            # save position before motion step
             old_pos = MP_e.get_positions()
             
-            ## motion electrons
+            # motion electrons
             MP_e = dynamics.stepcustomDt(MP_e, Ex_n,Ey_n, Dt_substep=Dt_substep, N_sub_steps=N_sub_steps)
             
-            ## impacts: backtracking and secondary emission
+            # impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
             
 
@@ -231,3 +240,5 @@ class Ecloud_fastion(Ecloud):
 
         if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
             self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])
+
+        #print self.N_MP_last_track
