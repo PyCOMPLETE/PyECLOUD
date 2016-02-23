@@ -1,9 +1,10 @@
 geom_impact_poly_cython.c
 boris_cython.c
-*.beam
+#*.beam
 logfile.txt
-*.input
-*.mat
+*progress.txt
+#*.input
+#*.mat
 *.html
 *.o
 *.so
@@ -12,9 +13,11 @@ build/
 scripts/
 *~
 .#*
-#*
+*sussix.inp
 .project
 .pydevproject
 *.h5
 *.h5part
 .ipynb_checkpoints
+Pyecltest.mat
+

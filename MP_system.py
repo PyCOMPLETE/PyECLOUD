@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 4.30                     
+#                   PyECLOUD Version 4.37                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -404,6 +404,11 @@ class MP_system:
             print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
         
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
+        
+            if x_max==None: x_max = self.chamb.x_aper
+            if x_min==None: x_min = -self.chamb.x_aper 
+            if y_max==None: y_max = self.chamb.y_aper
+            if y_min==None: y_min = -self.chamb.y_aper           
             
             v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
             

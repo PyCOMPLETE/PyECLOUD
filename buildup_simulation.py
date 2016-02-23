@@ -9,7 +9,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 4.30                   
+#		           PyECLOUD Version 4.37                   
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -57,13 +57,14 @@ import pickle
 
 
 class BuildupSimulation(object):
-	def __init__(self, pyecl_input_folder='./'):
+	def __init__(self, pyecl_input_folder='./', **kwargs):
 
-		print 'PyECLOUD Version 4.30'
+		print 'PyECLOUD Version 4.37'
 		beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
 				gas_ion_flag, resgasion, t_ion, \
 				spacech_ele,t_sc_ON, photoem_flag, phemiss,\
-				flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components()
+				flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components(\
+															pyecl_input_folder=pyecl_input_folder, **kwargs)
 		
 		self.beamtim = beamtim
 		self.MP_e = MP_e
