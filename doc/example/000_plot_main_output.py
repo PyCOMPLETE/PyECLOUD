@@ -166,7 +166,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 #A |----------------------|
 #G |----------------------|
 #E |----------------------|
-			#SLICE
+            #SLICE
 
 #9.
 ifig+=1; pl.figure(ifig)
