@@ -20,4 +20,4 @@ scripts/
 *.h5part
 .ipynb_checkpoints
 Pyecltest.mat
-
+*.png
