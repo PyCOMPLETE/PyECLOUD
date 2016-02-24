@@ -1,0 +1,49 @@
+# MACHINE PARAMETERS
+
+chamb_type = 'ellip'
+
+x_aper = 1.800000e-02
+y_aper = 1.800000e-02
+
+filename_chm = None
+
+# Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [0., 4.445000e+02]
+
+betafx = 352.80
+betafy = 61.80
+
+
+# photoemission parameters
+photoem_flag = 1
+inv_CDF_refl_photoem_file = 'cos_sq_inv_CDF.mat'
+k_pe_st = 2e-04
+refl_frac = 1.000000e-01
+alimit = 10.*pi/180.
+e_pe_sigma = 5. #in eV
+e_pe_max = 7.   #in eV
+x0_refl = x_aper
+y0_refl = 0.
+out_radius = 1.05*max((x_aper,y_aper))
+
+
+
+# gas ionization parameters
+gas_ion_flag = 1
+P_nTorr = 10.;
+sigma_ion_MBarn = 2.;
+Temp_K = 300.;
+unif_frac= 0.1
+E_init_ion= 0.1;   #in eV
+
+# uniform initial distrib
+#init_unif_flag=1
+#Nel_init_unif=1e6
+#E_init_unif=0.01;   #in eV
+#x_max_init_unif =x_aper
+#x_min_init_unif =-x_aper
+#y_max_init_unif =y_aper
+#y_min_init_unif =-y_aper
+ 
