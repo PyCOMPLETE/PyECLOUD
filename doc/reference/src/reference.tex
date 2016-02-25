@@ -6,6 +6,9 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 
+\usepackage{placeins}
+
+
 \usepackage[english]{babel}
 \usepackage{booktabs}
 \usepackage{stfloats}
@@ -25,6 +28,8 @@
 %\usepackage[landscape]{geometry}
 
 \renewcommand{\vec}[1]{\mathbf{#1}}
+
+\setlength\parindent{0pt}
 
 \newcommand{\HRule}[1]{\hfill \rule{0.2\linewidth}{#1}}
 
@@ -186,7 +191,7 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{r\_center}&	[m] Radius of a circle around the (0, 0) point (center of the chamber) for the calculation of the local central density.\\ \hline
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum (spectrum) of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
-\textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum, larger energies are attributed to the last bin of the histogram.	\\ \hline
+\textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectru$N\_{\mathrm{pass}}$ larger energies are attributed to the last bin of the histogram.	\\ \hline
 \textbf{flag\_movie}&	(optional -- default=0)
 
 (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron density distribution at each space charge evaluation.\\ \hline
@@ -230,7 +235,7 @@ Decimation factor to decrease the number of points of the longitudinal beam prof
 \multicolumn{2}{p{.97\textwidth}}{\textbf{Chamber profile description}}
 \\ \hline
 \textbf{chamb\_type} & (optional -- default = `ellip') \newline
-Two possible settings:
+Possible settings:
 \begin{enumerate}
 \item chamb\_type = `ellip' for elliptical chamber profile.
 \item chamb\_type = `rect' for rectangular chamber profile.
@@ -479,6 +484,175 @@ Typically this feature is NOT enabled.\\ \hline
 \textbf{scrub\_en\_th}&	Minimum energy of scrubbing electrons (for scrubbing current estimations).\\
 \hline
 \end{longtable}
+
+
+\newpage
+
+\section{Output}
+The main PyECLOUD output is in a single~.mat file (by default called `Pyecltest.mat'). It can be opened in python, for example using the myloadmat\_to\_obj module in the main PyECLOUD folder.
+
+The file contains arrays of different shape. Defining $N\_{\mathrm{steps}}$ the number of time steps in the simulation, $N\_{\mathrm{pass}}$ the number of bunch passages and $N\_{\mathrm{bins}}$ the number of bins in the horizontal plane used to produce histograms, the main output variables have the following shapes: \newline
+
+Variables saved at each time step:
+\begin{itemize}
+\item t($N\_{\mathrm{steps}}$)
+\item En\_emit\_eV\_time($N\_{\mathrm{steps}}$)
+\item En\_imp\_eV\_time($N\_{\mathrm{steps}}$)
+\item En\_kin\_eV\_time($N\_{\mathrm{steps}}$)
+\item Nel\_emit\_time($N\_{\mathrm{steps}}$)
+\item Nel\_imp\_time($N\_{\mathrm{steps}}$)
+\item Nel\_timep($N\_{\mathrm{steps}}$)
+\item cen\_density($N\_{\mathrm{steps}}$)
+\item lam\_t\_array($N\_{\mathrm{steps}}$)
+\end{itemize}
+
+Variables saved at each bunch passage (and related axes):
+\begin{itemize}
+\item t\_hist($N\_{\mathrm{pass}}$)
+\item xg\_hist($N\_{\mathrm{bins}}$ )
+\item N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$)
+\item N\_mp\_impact\_pass($N\_{\mathrm{pass}}$)
+\item N\_mp\_pass($N\_{\mathrm{pass}}$)
+\item N\_mp\_ref\_pass($N\_{\mathrm{pass}}$)
+\item energ\_eV\_impact\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\item nel\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\item nel\_impact\_hist\_scrub($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\item nel\_impact\_hist\_tot($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\end{itemize}
+
+Example plots, for one of the simulations in the PyECLOUD test suite, are produced by the script:
+
+\hspace{1cm} doc/example/000\_plot\_main\_output.py
+
+and reported  in the following pages (with some description).
+
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig01.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig02.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig03.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig04.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig05.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig06.png}
+\end{center}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig07.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig08.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig09.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig10.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig11.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig12.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig13.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig14.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig15.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig16.png}
+\end{center}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig17.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig18.png}
+\end{center}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig19.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig20.png}
+\end{center}
+\end{figure}
+
 
 
 
