@@ -216,7 +216,7 @@ True/False toggles to save detailed information of pathological impacts in outpu
 Decimation factor to decrease the number of points of the longitudinal beam profile of secondary beams.\\ \hline
 \textbf{el\_density\_probes}& 	(optional -- default: no probes)
 
-(List of Python dictionaries) Probes for electron density evaluation. For each of them it is necessary to indicate the position (x,y) and radius of the circle(r\_obs).\\ \hline
+(List of Python dictionaries) Probes for electron density evaluation. For each of them it is necessary to indicate the position (x,y) and radius of the circle (r\_obs).\\ \hline
 \textbf{save\_simulation\_state\_time\_file}&	(optional -- default: no simulation state is saved)
 
 [s] List of instants at which the full simulation state is saved on file (pickle files). The list can also be provided as a .mat file.\\ \hline
@@ -242,7 +242,7 @@ Possible settings:
 \item chamb\_type = `polyg' or `polyg\_cython' for polygonal chamber profile.
 \end{enumerate}
 \\ \hline
-\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' the following input variables must be provided:}
+\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:}
 \\ \hline
 \textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile.
 \\ \hline
