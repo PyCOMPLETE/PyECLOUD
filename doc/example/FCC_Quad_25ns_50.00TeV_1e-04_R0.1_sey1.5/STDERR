@@ -1,4 +1,0 @@
-/afs/cern.ch/work/e/ebelli/workspace/PyECLOUD/geom_impact_ellip.py:92: RuntimeWarning: invalid value encountered in sqrt
-  a**2*b**2*x_outsq*y_insq) + b**2*x_insq -  \
-/afs/cern.ch/work/e/ebelli/workspace/PyECLOUD/geom_impact_ellip.py:95: RuntimeWarning: divide by zero encountered in divide
-  2*b**2*x_in__x_out + b**2*x_outsq);

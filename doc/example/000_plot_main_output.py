@@ -15,7 +15,7 @@ pl.close('all')
 ms.mystyle_arial(fontsz=16)
 dpiset = 200
 
-ob=mlo.myloadmat_to_obj('FCC_Quad_25ns_50.00TeV_1e-04_R0.1_sey1.5/Pyecltest_ref.mat')
+ob=mlo.myloadmat_to_obj('../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.60_2.5e11ppb_bl_1.00ns/Pyecltest_ref.mat')
 
 ifig = 0
 
@@ -25,7 +25,7 @@ ifig = 0
 
 #8.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.lam_t_array)
+pl.plot(ob.t, ob.lam_t_array, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('Beam profile [p/m]') 
 ms.scix(); pl.grid('on')
@@ -35,7 +35,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #6.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.Nel_timep)
+pl.plot(ob.t, ob.Nel_timep, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('Number of $e^-$ per unit length [$m^{-1}$]') 
 ms.scix(); pl.grid('on')
@@ -45,7 +45,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #5.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.Nel_imp_time)
+pl.plot(ob.t, ob.Nel_imp_time, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('Number of impacting $e^-$ per unit length [$m^{-1}$]') 
 ms.scix(); pl.grid('on')
@@ -55,7 +55,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #4.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.Nel_emit_time)
+pl.plot(ob.t, ob.Nel_emit_time, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('Number of emitted $e^-$ per unit length [$m^{-1}$]') 
 ms.scix(); pl.grid('on')
@@ -65,7 +65,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #2. 
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.En_imp_eV_time)
+pl.plot(ob.t, ob.En_imp_eV_time, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('Deposited electron energy [eV]') 
 ms.scix(); pl.grid('on')
@@ -75,7 +75,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #1. 
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.En_emit_eV_time)
+pl.plot(ob.t, ob.En_emit_eV_time, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('Emitted electron energy [eV]') 
 ms.scix(); pl.grid('on')
@@ -85,7 +85,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #3.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.En_kin_eV_time)
+pl.plot(ob.t, ob.En_kin_eV_time, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('$e^-$ kinetic energy [eV]') 
 ms.scix(); pl.grid('on')
@@ -95,7 +95,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #7.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.t, ob.cen_density)
+pl.plot(ob.t, ob.cen_density, linewidth=2)
 pl.xlabel('Time [s]')
 pl.ylabel('$e^-$ density [$m^{-3}$]')
 ms.scix(); pl.grid('on')
@@ -110,7 +110,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #15.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.N_mp_pass) 
+pl.plot(ob.N_mp_pass, linewidth=2) 
 pl.xlabel('Passage')
 pl.ylabel('Number of MP per unit length [$m^{-1}$]') 
 ms.scix(); ms.sciy(); pl.grid('on')
@@ -120,7 +120,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #16.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.N_mp_impact_pass) 
+pl.plot(ob.N_mp_impact_pass, linewidth=2) 
 pl.xlabel('Passage')
 pl.ylabel('Number of impacting MP per passage') 
 pl.grid('on');ms.sciy()
@@ -130,7 +130,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #17.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.N_mp_corrected_pass) 
+pl.plot(ob.N_mp_corrected_pass, linewidth=2)
 pl.xlabel('Passage')
 pl.ylabel('Number of corrected MP per passage') 
 pl.grid('on');ms.sciy()
@@ -140,7 +140,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #18.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.N_mp_ref_pass) 
+pl.plot(ob.N_mp_ref_pass, linewidth=2)
 pl.xlabel('Passage')
 pl.ylabel('Reference MP size') 
 pl.grid('on');ms.sciy()
@@ -170,7 +170,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #9.
 ifig+=1; pl.figure(ifig)
-pl.plot(np.sum(ob.nel_hist, axis=1)) #axis=1: sum w.r.t. columns
+pl.plot(np.sum(ob.nel_hist, axis=1), linewidth=2) #axis=1: sum w.r.t. columns
 pl.xlabel('Passage')
 pl.ylabel('Number of $e^-$ per unit length [$m^{-1}$]') 
 ms.scix(); pl.grid('on')
@@ -180,7 +180,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #10.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.xg_hist, np.sum(ob.nel_hist, axis=0)) #axis=0: sum w.r.t. rows
+pl.plot(ob.xg_hist, np.sum(ob.nel_hist, axis=0), linewidth=2) #axis=0: sum w.r.t. rows
 pl.xlabel('Chamber bin position [m]')
 pl.ylabel('Number of $e^-$ per bin') 
 ms.scix(); pl.grid('on')
@@ -190,7 +190,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #11.
 ifig+=1; pl.figure(ifig)
-pl.plot(np.sum(ob.nel_impact_hist_scrub, axis=1)) 
+pl.plot(np.sum(ob.nel_impact_hist_scrub, axis=1), linewidth=2) 
 pl.xlabel('Passage')
 pl.ylabel('Number of impacting scrubbing $e^-$')
 ms.scix(); pl.grid('on')
@@ -200,7 +200,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #12.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.xg_hist, np.sum(ob.nel_impact_hist_scrub, axis=0)) 
+pl.plot(ob.xg_hist, np.sum(ob.nel_impact_hist_scrub, axis=0), linewidth=2) 
 pl.xlabel('Chamber bin position [m]')
 pl.ylabel('Impacting scrubbing $e^-$ per bin')
 ms.scix(); pl.grid('on')
@@ -210,7 +210,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #13.
 ifig+=1; pl.figure(ifig)
-pl.plot(np.sum(ob.nel_impact_hist_tot, axis=1)) 
+pl.plot(np.sum(ob.nel_impact_hist_tot, axis=1), linewidth=2) 
 pl.xlabel('Passage')
 pl.ylabel('Number of impacting $e^-$ per unit length [$m^{-1}$]') 
 ms.scix(); pl.grid('on')
@@ -220,7 +220,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #14.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.xg_hist, np.sum(ob.nel_impact_hist_tot, axis=0)) 
+pl.plot(ob.xg_hist, np.sum(ob.nel_impact_hist_tot, axis=0), linewidth=2)
 pl.xlabel('Chamber bin position [m]')
 pl.ylabel('Impacting $e^-$ per bin')
 ms.scix(); pl.grid('on')
@@ -230,7 +230,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #19.
 ifig+=1; pl.figure(ifig)
-pl.plot(np.sum(ob.energ_eV_impact_hist, axis=1))
+pl.plot(np.sum(ob.energ_eV_impact_hist, axis=1), linewidth=2)
 pl.xlabel('Passage')
 pl.ylabel('Energy of impacting electrons [eV]') 
 pl.grid('on');ms.sciy()
@@ -240,22 +240,13 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #20.
 ifig+=1; pl.figure(ifig)
-pl.plot(ob.xg_hist, np.sum(ob.energ_eV_impact_hist, axis=0))
+pl.plot(ob.xg_hist, np.sum(ob.energ_eV_impact_hist, axis=0), linewidth=2)
 pl.xlabel('Position in the chamber [m]')
 pl.ylabel('Energy of impacting electrons[eV]') 
 pl.grid('on');ms.sciy(); ms.scix()
 pl.suptitle('Var. name: sum(energ_eV_impact_hist, axis=0)\nTotal energy of impacting electrons per passage [eV]')
 pl.subplots_adjust(top=.82, bottom=.14)
 pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
-
-
-
-
-
-
-
-
-
 
 
 pl.show()
