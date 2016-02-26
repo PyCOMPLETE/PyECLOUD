@@ -124,7 +124,7 @@ class Ecloud(object):
 			tmpattr = kwargs[attr]
 			exec('%s=tmpattr'%attr)
 				
-		#pyeclsaver=pysav.pyecloud_saver(logfile_path)
+		# pyeclsaver=pysav.pyecloud_saver(logfile_path)
        
 		if switch_model=='ECLOUD_nunif':
 			flag_non_unif_sey = 1
@@ -189,11 +189,11 @@ class Ecloud(object):
 		if track_method == 'Boris':
 			dynamics=dynB.pusher_Boris(Dt, B0x, B0y, B0z, \
 					 B_map_file, fact_Bmap,  Bz_map_file,N_sub_steps=N_sub_steps)
-		#~ elif track_method == 'StrongBdip':
-			#~ dynamics=dyndip.pusher_dipole_magnet(Dt,B)  
-		#~ elif track_method == 'StrongBgen':
-			#~ dynamics=dyngen.pusher_strong_B_generalized(Dt, B0x, B0y,  \
-					 #~ B_map_file, fact_Bmap, B_zero_thrhld) 
+		# elif track_method == 'StrongBdip':
+			# dynamics=dyndip.pusher_dipole_magnet(Dt,B)  
+		# elif track_method == 'StrongBgen':
+			# dynamics=dyngen.pusher_strong_B_generalized(Dt, B0x, B0y,  \
+					 # B_map_file, fact_Bmap, B_zero_thrhld) 
 		elif track_method == 'BorisMultipole':
 			import dynamics_Boris_multipole as dynmul
 			dynamics=dynmul.pusher_Boris_multipole(Dt=Dt, N_sub_steps=N_sub_steps, B_multip = B_multip)   
@@ -353,7 +353,7 @@ class Ecloud(object):
 			N_sub_steps=1
 			
 		Dt_substep = dt/N_sub_steps
-		#print Dt_substep, N_sub_steps, dt
+		# print Dt_substep, N_sub_steps, dt
 
 		# beam field 
 		MP_p = MP_light()
@@ -363,43 +363,44 @@ class Ecloud(object):
 		MP_p.N_mp = len(beam.x[ix])
 		MP_p.charge = beam.charge
 		
-		#compute beam field (it assumes electrons!)
+		# compute beam field
 		spacech_ele.recompute_spchg_efield(MP_p)
-		#scatter to electrons
+
+		# scatter to electrons
 		Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e)
 		
 		
 		
-		## compute electron field map
+		# compute electron field map
 		spacech_ele.recompute_spchg_efield(MP_e)
 		
-		## compute electron field on electrons
+		# compute electron field on electrons
 		Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
 		
-		## compute electron field on beam particles
+		# compute electron field on beam particles
 		Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 		
-		## Total electric field on electrons
+		# Total electric field on electrons
 		Ex_n=Ex_sc_n+Ex_n_beam;
 		Ey_n=Ey_sc_n+Ey_n_beam;
 			
-		## save position before motion step
+		# save position before motion step
 		old_pos=MP_e.get_positions()
 		
-		## motion electrons
+		# motion electrons
 		MP_e = dynamics.stepcustomDt(MP_e, Ex_n,Ey_n, Dt_substep=Dt_substep, N_sub_steps=N_sub_steps)
 		
-		## impacts: backtracking and secondary emission
+		# impacts: backtracking and secondary emission
 		MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 		
-		## kick beam particles
+		# kick beam particles
 		fact_kick = beam.charge/(beam.mass*beam.beta*beam.beta*beam.gamma*c*c)*self.L_ecloud
 		beam.xp[ix]+=fact_kick*Ex_sc_p
 		beam.yp[ix]+=fact_kick*Ey_sc_p
 		
 		if self.save_ele_distributions_last_track:
 			self.rho_ele_last_track.append(spacech_ele.rho.copy())
-			#print 'Here'
+			# print 'Here'
 
 		if self.save_ele_potential:
 			self.phi_ele_last_track.append(spacech_ele.phi.copy())
@@ -432,14 +433,6 @@ class Ecloud(object):
 		self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
 		self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
 		self.MP_e.N_mp = self.init_N_mp
-		
-		MP_e = self.MP_e
-		dynamics = self.dynamics
-		impact_man = self.impact_man
-		spacech_ele = self.spacech_ele
-
-        if self.gas_ion_flag:
-            gas_ionization = self.gas_ionization
 
 		if self.save_ele_distributions_last_track:
 			self.rho_ele_last_track = []
