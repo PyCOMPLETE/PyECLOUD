@@ -438,6 +438,9 @@ class Ecloud(object):
 		impact_man = self.impact_man
 		spacech_ele = self.spacech_ele
 
+        if self.gas_ion_flag:
+            gas_ionization = self.gas_ionization
+
 		if self.save_ele_distributions_last_track:
 			self.rho_ele_last_track = []
 
