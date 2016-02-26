@@ -69,6 +69,11 @@ class Ecloud_fastion(Ecloud):
         
         self._reinitialize()
 
+        MP_e = self.MP_e
+        dynamics = self.dynamics
+        impact_man = self.impact_man
+        spacech_ele = self.spacech_ele
+
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
             raise ValueError('ecloud module assumes same size for all beam MPs')
         
@@ -116,7 +121,7 @@ class Ecloud_fastion(Ecloud):
                     dz_bunch = slices.slice_widths[i]
                     lambda_bunch = Np_bunch
                     dt_bunch = 1 / c
-                    MP_e = gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
+                    MP_e = self.gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
                                                     sigmay=slices.sigma_y[i], x_beam_pos=slices.mean_x[i], y_beam_pos=slices.mean_y[i])
 
 
@@ -155,8 +160,7 @@ class Ecloud_fastion(Ecloud):
             # impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
             
-
-            
+                        
             if self.save_ele_distributions_last_track:
                 self.rho_ele_last_track.append(spacech_ele.rho.copy())
                 #print 'Here'
