@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 4.37                     
+#                   PyECLOUD Version 5.0.1                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -87,7 +87,7 @@ class Ecloud(object):
 
 		
 		
-		print 'PyECLOUD Version 4.37'
+		print 'PyECLOUD Version 5.0.1'
 		print 'PyHEADTAIL module'
 		print 'Initializing ecloud from folder: '+pyecl_input_folder
 		self.slicer = slicer
@@ -433,7 +433,6 @@ class Ecloud(object):
 		self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
 		self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
 		self.MP_e.N_mp = self.init_N_mp
-
 		if self.save_ele_distributions_last_track:
 			self.rho_ele_last_track = []
 

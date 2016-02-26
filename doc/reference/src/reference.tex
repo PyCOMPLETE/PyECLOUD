@@ -1,0 +1,675 @@
+
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage{placeins}
+
+
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{stfloats}
+\usepackage[T1]{fontenc}
+
+\usepackage{float}
+\restylefloat{table}
+
+\usepackage{longtable}
+
+\usepackage{xcolor,colortbl}
+
+\usepackage{mathpazo} % Palatino
+\usepackage{avant}           % Avant Garde
+
+\usepackage[margin=2cm]{geometry}
+%\usepackage[landscape]{geometry}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\setlength\parindent{0pt}
+
+\newcommand{\HRule}[1]{\hfill \rule{0.2\linewidth}{#1}}
+
+\definecolor{Gray}{gray}{0.90}
+
+\begin{document}
+
+
+\thispagestyle{empty} % Remove page numbering on this page
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\colorbox{Gray}{
+	\parbox[t]{1.0\linewidth}{
+		\centering \fontsize{50pt}{80pt}\selectfont % The first argument for fontsize is the font size of the text and the second is the line spacing - you may need to play with these for your particular title
+		\vspace*{0.7cm} % Space between the start of the title and the top of the grey box
+		
+		\hfill PyECLOUD \\
+		\hfill Reference \\
+		\hfill Manual\par
+		
+		\vspace*{0.7cm} % Space between the end of the title and the bottom of the grey box
+	}
+}
+
+%----------------------------------------------------------------------------------------
+
+\vfill % Space between the title box and author information
+
+%----------------------------------------------------------------------------------------
+%	AUTHOR NAME AND INFORMATION SECTION
+%----------------------------------------------------------------------------------------
+
+{\centering \large 
+\hfill Giovanni Iadarola \\
+\hfill Eleonora Belli, Lotta Mether,\\ 
+\hfill Annalisa Romano, Giovanni Rumolo\\
+\hfill CERN - Geneva, Switzerland
+
+\HRule{1pt}} % Horizontal line, thickness changed here
+
+%----------------------------------------------------------------------------------------
+
+\clearpage % Whitespace to the end of the page
+
+\newpage
+
+\section*{PyECLOUD reference manual}
+
+This document describes the main input and output parameters for the PyECLOUD code for the simulation of the electron cloud buildup in particle accelerators.
+
+\section{Input files}
+\subsection{Simulation parameters}
+
+\renewcommand*{\arraystretch}{1.4}
+\begin{longtable}
+{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead
+\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{ 
+\textbf{Other input filenames.} The following variables specify the names of the other three input files which define the physical model of the simulation.}\\
+\hline
+\textbf{machine\_param\_file} & Name of the machine parameter file.\\
+\hline
+\textbf{secondary\_emission\_parameters\_file} & Name of the secondary emission configuration file. \\
+\hline
+\textbf{beam\_parameters\_file} & Name of the beam parameter file (in case of a multiple beam simulation this is the master beam).\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}
+{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead
+\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Secondary beams} The code can simulate the EC buildup in the presence of more than one circulating beam. For this purpose a list of secondary beam files (one for each beam) has to be provided. 
+In the presence of secondary beams, the master beam determines the length of the simulation, the energy used for the calculation of the bending field, and the bunch spacing used for regeneration and saving purposes.
+}\\
+\hline
+\textbf{secondary\_beam\_file\_list} & (optional -- default = []) \newline List of names of secondary beam parameter files.\\
+\hline
+\end{longtable}
+
+\begin{longtable}
+{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead
+\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Log and progress files}
+}\\
+\hline
+\textbf{logfile\_path} &	Path of a text file that reports some synthetic information on the ongoing simulation (Passage number, number of MPs and number of electrons in the chamber).\\
+\hline
+\textbf{progress\_path} &	Path of a text file that reports the simulation progress in percent.\\
+\hline
+\end{longtable}
+
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead
+\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Time sampling} The simulated time interval is defined by the length of the beam profile (number of bunch passages) specified in the beam description.
+}\\
+\hline
+\textbf{Dt} & [s] Simulation time step. This input is not considered if beam profile is imported from file.\\
+\hline
+\textbf{t\_end} & [s] Extra time interval after the specified beam profile. 
+
+Only coasting beam present in this interval. The value of this variable can also be negative in order to stop the simulation before the end of the specified profile. \\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead
+\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Negligible beam linear density} }\\
+\hline
+\textbf{lam\_th} & [beam part/m] When the linear density of the beam is below this value, 
+primary electrons are not generated and beam forces on the electrons are neglected.\\
+\hline
+\end{longtable}
+
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{MP management settings}
+}\\ \hline
+\textbf{N\_mp\_max}&	Size of the arrays allocated to store the MP sizes, positions and velocities. MP regeneration settings must be set such that this number of MPs is never exceeded.\\ \hline
+\textbf{N\_mp\_regen}& 	MP regeneration threshold. When the total number of MPs exceeds N\_mp\_regen a regeneration of the set of MPs is applied and a new Nref is chosen in order to get a target number of MPs. The check is performed at each t=n*b\_spac with n an integer.\\ \hline 
+\textbf{N\_mp\_regen\_low}&	Lower MP regeneration threshold. When the total number of MPs becomes smaller than N\_mp\_regen\_low a regeneration of the set of MPs is applied and a new Nref is chosen in order to get a target number of MPs. The check is performed at each t=n*b\_spac with n an integer.\\ \hline
+\textbf{t\_ON\_regen\_low}&	For t< t\_ON\_regen\_low the lower MP regeneration check is not performed.\\ \hline
+\textbf{N\_mp\_after\_regen}&	Target number of MPs obtained after regeneration.\\ \hline
+\textbf{fact\_split}&	MP split factor; when secondary emission occurs, if the size of the emitted charge is smaller than fact\_split*Nref, the impacting MP is simply rescaled according to the SEY. Otherwise new MPs are generated in order to keep the MP size as close as possible to Nref.\\ \hline
+\textbf{fact\_clean}&	MP clean factor. MPs smaller than fact\_split*Nref are deleted from the MP set. This test is performed at each t=n*b\_spac with n an integer.\\ \hline
+\textbf{nel\_mp\_ref\_0}&	[e-/m] Initial MP size.\\ \hline
+\textbf{Nx\_regen, Ny\_regen, Nvx\_regen, Nvy\_regen, Nvz\_regen}&	Number of mesh points in each dimension for the generation of the uniform grid for the 5-D phase space used for the MP regeneration.\\ \hline
+\textbf{regen\_hist\_cut}&	Defines a threshold value for the phase space density, below which no electrons are generated.\\ \hline
+\textbf{N\_mp\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it) 
+
+Soft regeneration threshold. The check is performed at each t=n*b\_spac with n an integer. N\_mp\_soft\_regen should be smaller than N\_mp\_regen.\\ \hline
+\textbf{N\_mp\_after\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it) 
+
+Target number of MPs obtained after a soft regeneration.\\ 
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Space charge parameters}
+}\\ \hline
+\textbf{Dt\_sc}&	[s] Time step for the update of the electron space charge field map.\\ \hline
+\textbf{Dh\_sc }&		[m] Grid size for the space charge PIC solver.\\ \hline
+\textbf{t\_sc\_ON}& [s] Electron space charge forces are neglected for t<t\_sc\_ON -- normally t\_sc\_ON=0.\\ 
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Saving settings}
+}\\ \hline
+\textbf{Dx\_hist}& 	[m] Defines the binning for the saving of the horizontal histograms.\\ \hline
+\textbf{r\_center}&	[m] Radius of a circle around the (0, 0) point (center of the chamber) for the calculation of the local central density.\\ \hline
+\textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
+\textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
+\textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
+\textbf{flag\_movie}&	(optional -- default=0)
+
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron density distribution at each space charge evaluation.\\ \hline
+\textbf{flag\_sc\_movie}&	(optional-- default=0)
+
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron space charge electric field distribution at each space charge evaluation.\\ \hline
+\textbf{save\_mp\_state\_time\_file}&	(optional -- default: no MP state is saved)
+
+[s] List of instants at which MP positions and velocities are saved on file. The list can also be provided as a .mat file.\\ \hline
+\textbf{flag\_detailed\_MP\_info}&	(optional -- default=0)
+
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables save of MP number at each time step.\\ \hline
+\textbf{flag\_hist\_impact\_seg}&	(optional -- default=0)
+
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) If the chamber is a polygon, enables saving the number of electrons which impacts onto each segment of polygon.\\ \hline
+\textbf{flag\_verbose\_file, flag\_verbose\_stdout}&	(optional -- default=False)
+
+True/False toggles to save detailed information of pathological impacts in output file and stdout respectively.\\ \hline
+\textbf{dec\_fac\_secbeam\_prof}&
+	(optional -- default=1)
+	
+Decimation factor to decrease the number of points of the longitudinal beam profile of secondary beams.\\ \hline
+\textbf{el\_density\_probes}& 	(optional -- default: no probes)
+
+(List of Python dictionaries) Probes for electron density evaluation. For each of them it is necessary to indicate the position (x,y) and radius of the circle (r\_obs).\\ \hline
+\textbf{save\_simulation\_state\_time\_file}&	(optional -- default: no simulation state is saved)
+
+[s] List of instants at which the full simulation state is saved on file (pickle files). The list can also be provided as a .mat file.\\ \hline
+\textbf{x\_min\_hist\_det,  x\_max\_hist\_det,  y\_min\_hist\_det,  y\_max\_hist\_det,  Dx\_hist\_det}&	(optional -- default: no detailed histogram is saved)
+
+[m] Defines a region of the chamber where a detailed horizontal distribution histogram is saved (\_det stands for detailed). \\
+\hline
+\end{longtable}
+
+
+
+\newpage\subsection{Machine Parameters}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{\textbf{Chamber profile description}}
+\\ \hline
+\textbf{chamb\_type} & (optional -- default = `ellip') \newline
+Possible settings:
+\begin{enumerate}
+\item chamb\_type = `ellip' for elliptical chamber profile.
+\item chamb\_type = `rect' for rectangular chamber profile.
+\item chamb\_type = `polyg' or `polyg\_cython' for polygonal chamber profile.
+\end{enumerate}
+\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:}
+\\ \hline
+\textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile.
+\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:}
+\\ \hline
+\textbf{filename\_chamb} & Name of file containing horizontal and vertical vertexes of the chamber profile.
+\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{\textbf{Tracking and magnetic field} (the tracking algorithm has to be chosen according to the magnetic field conditions).}
+\\ \hline
+\textbf{track\_method} & (optional -- default = `StrongBdip')
+
+Possible settings:
+\begin{enumerate}
+\item track\_method = `StrongBdip' for vertical uniform magnetic field.
+\item track\_method = `StrongBgen' for a generic transverse magnetic field map.
+\item track\_method = `BorisMultipole' for arbitrary multipoles with Boris electron tracker.
+\end{enumerate}
+\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When track\_method = `StrongBdip' the following input variables must be provided:}
+\\ \hline
+\textbf{B} & [T] Value of the vertical uniform magnetic field. If B=-1 the magnetic field is calculated from the total length of the bending magnets (bm\_totlen) and from the beam energy.
+\\ \hline
+\textbf{bm\_totlen} & [m] Total length of dipoles inside the accelerator (it must be provided when B=-1).
+\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When track\_method = `StrongBgen' the following input variables must be provided:}
+\\ \hline
+\textbf{B\_map\_file} & Name of a .mat file containing the transverse field map.
+The case of a quadrupole magnet with unit gradient is embedded in the code and can be used setting: B\_map\_file = `analytic\_quadrupole\_unit\_grad'.
+\\ \hline
+\textbf{fact\_Bmap} &(optional -- default = 1.) \newline
+Scaling factor applied to the magnetic field map.
+\\ \hline
+\textbf{B0x, B0y} & (optional -- default = 0) \newline
+[T] Uniform transverse magnetic field added to the map.
+\\ \hline
+\textbf{B\_zero\_thrld} & [T] Value below which the local magnetic field is approximated with 0.
+\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When track\_method = `BorisMultipole' the following input variables must be provided:}\\ \hline
+\textbf{N\_sub\_steps} & Number of tracking sub-steps per time step.\\ \hline
+\textbf{B\_multip} & Magnetic momenta. For example: to simulate a dipole with B=8.3~T B\_multip = [8.3]; to simulate a quadrupole with gradient 12.~T/m set  B\_multip = [0., 12.].\\ 
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{\textbf{Optics parameters} (can be provided also in the beam parameter file(s) independently for the different beams) --- not needed if transverse beam size is directly defined in the beam parameter files.}
+\\ \hline
+\textbf{betafx, betafy} & [m] Horizontal and vertical beta functions at the simulation section.
+\\ \hline
+\textbf{Dx, Dy} & (optional -- default = 0) \newline
+[m] Horizontal and vertical dispersion functions at the simulation section.
+\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{\textbf{Residual gas ionization parameters} (if the following input parameters are omitted primary electron generation by residual gas ionization is not enabled).}
+\\ \hline
+\textbf{gas\_ion\_flag} & (optional -- default=0) \newline
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables primary electron generation by residual gas ionization.
+\\ \hline
+\textbf{P\_nTorr} & [nTorr] Pressure in the vacuum chamber.
+\\ \hline
+\textbf{sigma\_ion\_MBarn} & [MBarn] Ionization cross section of the residual gas.
+\\ \hline
+\textbf{Temp\_K 	[K]} & Temperature of the residual gas.
+\\ \hline
+\textbf{unif\_frac} & Fraction of primary electrons uniformly distributed inside the chamber. The remaining part is generated according to the transverse distribution of the beam.
+\\ \hline
+\textbf{E\_init\_ion} & [eV] Initial energy of the generated electrons.
+\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{\textbf{Photoemission parameters} (if the following input parameters are omitted primary electron generation by photoemission is not enabled).}
+\\ \hline
+\textbf{photoem\_flag} & (optional -- default=0) \newline
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables primary electron generation by photoemission.
+\\ \hline
+\textbf{inv\_CDF\_refl\_photoem\_file} & Name of a .mat file providing the inverse of the Cumulative Distribution Function (CDF) for the angular distribution of the reflected photons.
+If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have uniform angular distribution and no file needs to be provided. 
+\\ \hline
+\textbf{k\_pe\_st} & [m$^{-1}$] Number of photoelectrons to be generated per proton and per unit length.
+\\ \hline
+\textbf{refl\_frac} & Fraction of photoelectrons generated by reflected photons.
+\\ \hline
+\textbf{Alimit} & [rad] Extent of the angular (uniform) distribution of photoelectrons generated by non-reflected photons.
+\\ \hline
+\textbf{e\_pe\_sigma} & [eV] Width (1$\sigma$) of energy distribution (gaussian) of photoemitted electrons.
+\\ \hline
+\textbf{e\_pe\_max} & [eV]  Energy corresponding to the maximum of the energy distribution.
+\\ \hline
+\textbf{x0\_refl, y0\_refl} & [m] Impact of non-reflected photons.
+\\ \hline
+\textbf{out\_radius} & [m] Radius of a circle external to the chamber.
+\\ \hline
+\textbf{phem\_resc\_fact} & Rescaling factor on the position vector of the generated photoelectrons.
+\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{\textbf{Uniform initial distribution} Simulation starts with electrons uniformly distributed in the chamber (if the following input parameters are omitted this feature is not enabled).}
+\\ \hline
+\textbf{init\_unif\_flag} & (optional -- default=0) \newline
+(1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables uniform electron distribution at the beginning of the simulation.
+\\ \hline
+\textbf{Nel\_init\_unif} & Initial number of electrons. 
+\\ \hline
+\textbf{E\_init\_unif} & [eV] Initial energy of the generated electrons.
+\\ \hline
+\textbf{x\_max\_init\_unif, x\_min\_init\_unif, y\_max\_init\_unif, y\_min\_init\_unif} & [m] Edges of the region where the electrons are generated.
+\\
+\hline
+\end{longtable}
+
+
+\newpage\subsection{Beam parameters}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Basic definitions}
+}\\ \hline
+\textbf{m0}& 	(optional -- default=proton mass)
+
+[Kg] Mass of beam particles. \\ \hline
+\textbf{energy\_eV}& 	[eV] Total energy of the beam particles.\\ \hline
+\textbf{Dp\_p}& 	(optional -- default=0)
+
+Momentum spread (r.m.s.) of the beam. This parameter is not used if the transverse beam size is directly provided (vars. sigmax, sigmay).\\ \hline
+\textbf{nemittx, nemitty}& 	[m] Normalized transverse emittance of the beam. These parameters are not used if the transverse beam size is directly provided (vars. sigmax, sigmay).\\ \hline
+\textbf{x\_beam\_pos, y\_beam\_pos}& 	(optional -- default=0)
+
+[m] Transverse position of the beam within the vacuum chamber.\\ \hline
+\textbf{sigmax, sigmay}&	(optional -- default=-1)
+
+[m] Transverse geometrical beam size. If sigmax, sigmay=-1 the beam size is calculated through the energy, the normalized emittance, the dispersion and the momentum spread of the beam.\\
+\hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Transverse electric field of the beam}}\\ \hline
+\textbf{beam\_field\_file}&	Name of a .mat file containing the map of the transverse beam electric field.
+
+If beam\_field\_file = -1 or beam\_field\_file = `computeFD' the beam field map is computed using the embedded Finite Difference (FD) Poisson solver.
+
+If beam\_field\_file=`computeBE' the electric field is computed using the Bassetti-Erskine formula and the image terms for the elliptical boundary conditions (this option is available only when the chamber profile is elliptical).\\ \hline
+\textbf{save\_beam\_field\_file\_as}&	(optional -- default: the beam field map is not saved)
+
+Name of the file where the employed field map is saved.\\  \hline
+\multicolumn{2}{p{.97\textwidth}}{
+When beam\_field\_file = -1 or beam\_field\_file = `computeFD' the following parameter must be provided:}\\ \hline
+\textbf{Dh\_beam\_field}&	Grid size for the FD solver and for the saved field map.\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{
+When beam\_field\_file = `computeBE' the following parameters must be provided:}\\ \hline
+\textbf{Nx, Ny} & Number of points of the employed field map. \\ \hline
+\textbf{nimag} & 	Number of image terms.\\
+
+\hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Beam longitudinal profile}}\\ \hline
+\textbf{b\_spac}&	Bunch spacing. It is used to generate the beam profile when it is defined in the form of a bunched beam. It is also the time interval for cleaning and regeneration of the MP set, as well as for saving.\\ \hline
+\textbf{fact\_beam}&	Rescaling factor applied to the beam profile.\\ \hline
+\textbf{coast\_dens}&	[p/m] Coasting beam density added to the beam profile. \\ \hline
+\textbf{flag\_bunched\_beam}&	Two possible settings:
+\begin{enumerate}
+\item flag\_bunched\_beam = 0 the beam profile is loaded from file.
+\item flag\_bunched\_beam = 1 the beam profile is generated from a filling pattern.
+\end{enumerate}\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{
+When flag\_bunched\_beam = 1 the following parameters must be provided:}\\ \hline
+\textbf{sigmaz}&	[m] Bunch length (1$\sigma$). \\ \hline
+\textbf{t\_offs}&	[s] Delay in the longitudinal profile (n.b. if t\_offs=0 only half of the first bunch is simulated).\\ \hline
+\textbf{filling\_pattern\_file}&	Name of a file providing the intensities of the different bunches (zeros for empty slots). 
+The data can be provided also in form of a python list with no need to provide an input file, e.g. filling\_pattern\_file=4*(72*[1.]+8*[0.]).\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{
+When flag\_bunched\_beam = 0 the following parameter must be provided:}\\ \hline
+\textbf{beam\_long\_prof\_file}&	Name of a .mat file providing the longitudinal beam profile. This file will also define the time step used for the simulation.\\
+\hline
+\end{longtable}
+
+
+\newpage\subsection{Secondary emission parameters}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Choice of the model}}\\ \hline
+\textbf{switch\_model}&	(optional -- default=0) 
+
+Different secondary emission models:
+\begin{enumerate}
+\item switch\_model = 0 or `ECLOUD' for the model used in ECLOUD.
+\item switch\_model = `ACC\_LOW' for a more accurate treatment of low energy impacts.
+\item switch\_model = `ECLOUD\_nunif' for the model used in ECLOUD, with sey info in the chamber shape file.
+\item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
+\item switch\_model = `flat\_low\_ene' for flat low energy dependence.
+\end{enumerate}\\ 
+\hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Secondary Electron Yield} (parametrized as described in G. Iadarola's thesis).}\\ \hline
+\textbf{Emax}&	Energy corresponding to the maximum SEY.\\ \hline
+\textbf{del\_max}& Maximum of the SEY curve.\\ \hline
+\textbf{R0}& 	Weight of the reflected electron component.\\ \hline
+\textbf{E\_th}& 	Maximum energy for true secondary electrons.\\ \hline
+\textbf{sigmafit}& 	Sigma parameter of the lognormal distribution.\\ \hline
+\textbf{mufit}&Mu parameter of the lognormal distribution.\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Other parameters}}\\ \hline
+\textbf{switch\_no\_increase\_energy}&	switch\_no\_increase\_energy = 1 checks that the true secondaries do not have more energy than the corresponding impacting electrons.
+Typically this feature is NOT enabled.\\ \hline
+\textbf{thresh\_low\_energy}&	Maximum energy for which the energy check is performed.\\ \hline
+\textbf{scrub\_en\_th}&	Minimum energy of scrubbing electrons (for scrubbing current estimations).\\
+\hline
+\end{longtable}
+
+
+\newpage
+
+\section{Output}
+The main PyECLOUD output is in a single~.mat file (by default called `Pyecltest.mat'). It can be opened in python, for example using the myloadmat\_to\_obj module in the main PyECLOUD folder.
+
+The file contains arrays of different shape. Defining $N\_{\mathrm{steps}}$ the number of time steps in the simulation, $N\_{\mathrm{pass}}$ the number of bunch passages and $N\_{\mathrm{bins}}$ the number of bins in the horizontal plane used to produce histograms, the main output variables have the following shapes: \newline
+
+Variables saved at each time step:
+\begin{itemize}
+\item t($N\_{\mathrm{steps}}$)
+\item En\_emit\_eV\_time($N\_{\mathrm{steps}}$)
+\item En\_imp\_eV\_time($N\_{\mathrm{steps}}$)
+\item En\_kin\_eV\_time($N\_{\mathrm{steps}}$)
+\item Nel\_emit\_time($N\_{\mathrm{steps}}$)
+\item Nel\_imp\_time($N\_{\mathrm{steps}}$)
+\item Nel\_timep($N\_{\mathrm{steps}}$)
+\item cen\_density($N\_{\mathrm{steps}}$)
+\item lam\_t\_array($N\_{\mathrm{steps}}$)
+\end{itemize}
+
+Variables saved at each bunch passage (and related axes):
+\begin{itemize}
+\item t\_hist($N\_{\mathrm{pass}}$)
+\item xg\_hist($N\_{\mathrm{bins}}$ )
+\item N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$)
+\item N\_mp\_impact\_pass($N\_{\mathrm{pass}}$)
+\item N\_mp\_pass($N\_{\mathrm{pass}}$)
+\item N\_mp\_ref\_pass($N\_{\mathrm{pass}}$)
+\item energ\_eV\_impact\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\item nel\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\item nel\_impact\_hist\_scrub($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\item nel\_impact\_hist\_tot($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
+\end{itemize}
+
+Example plots, for one of the simulations in the PyECLOUD test suite, are produced by the script:
+
+\hspace{1cm} doc/example/000\_plot\_main\_output.py
+
+and reported  in the following pages (with some description).
+
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig01.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig02.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig03.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig04.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig05.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig06.png}
+\end{center}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig07.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig08.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig09.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig10.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig11.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig12.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig13.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig14.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig15.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig16.png}
+\end{center}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig17.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig18.png}
+\end{center}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig19.png}
+\end{center}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\includegraphics[trim = 0 0 0 0, clip, width=.95\textwidth]{../../example/fig20.png}
+\end{center}
+\end{figure}
+
+
+
+
+\end{document}
