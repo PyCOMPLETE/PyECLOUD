@@ -421,11 +421,6 @@ class Ecloud(object):
 		self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
 		self.MP_e.N_mp = self.init_N_mp
 		
-		MP_e = self.MP_e
-		dynamics = self.dynamics
-		impact_man = self.impact_man
-		spacech_ele = self.spacech_ele
-
 		if self.save_ele_distributions_last_track:
 			self.rho_ele_last_track = []
 
