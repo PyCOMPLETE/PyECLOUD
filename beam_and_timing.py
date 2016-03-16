@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.0.1                     
+#                   PyECLOUD Version 5.0.2                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -107,7 +107,7 @@ class beam_and_timing:
                     exec(f.read())
                     f.close()
             else:
-                ppb_vect = np.array(filling_pattern_file) 
+                ppb_vect = np.float_(np.array(filling_pattern_file)) 
                 
             if flag_secodary_beam:
                 t=t_primary_beam

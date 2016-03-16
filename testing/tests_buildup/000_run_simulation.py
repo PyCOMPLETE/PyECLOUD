@@ -17,5 +17,5 @@ sim.run()
 print ''
 print 'Test simulation done!'
 print 'To instpect the results you can run:'
-print '002_comparison_against_reference.py'
+print '001_comparison_against_reference.py'
 print ''

@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.0.1                     
+#                   PyECLOUD Version 5.0.2                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -86,7 +86,7 @@ class Ecloud(object):
 				slice_by_slice_mode=False, **kwargs):
 		
 		
-		print 'PyECLOUD Version 5.0.1'
+		print 'PyECLOUD Version 5.0.2'
 		print 'PyHEADTAIL module'
 		print 'Initializing ecloud from folder: '+pyecl_input_folder
 		self.slicer = slicer
@@ -295,7 +295,8 @@ class Ecloud(object):
 			from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
 			self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg, 
 			    Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, n_slices=self.slicer.n_slices, 
-			    z_cut=self.slicer.z_cuts, L_interaction=self.L_ecloud, flag_clean_slices = True)
+			    z_cut=self.slicer.z_cuts, L_interaction=self.L_ecloud, flag_clean_slices = True,
+			    x_beam_offset = self.x_beam_offset, y_beam_offset = self.y_beam_offset)
 			
 			self._ecloud_track = self.track
 			
