@@ -1,0 +1,27 @@
+# MACHINE PARAMETERS
+
+chamb_type = 'rectellip'
+
+x_aper = 0.02202
+y_aper = 0.02202
+
+filename_chm=[0.02202,0.01714,0.02202,0.02202]
+
+
+
+# Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [7.73260412467]
+betafx = 56.0370352951
+betafy = 149.887484509
+
+
+# uniform initial distrib
+init_unif_flag=1
+Nel_init_unif=1e8
+E_init_unif=0.01;   #in eV
+x_max_init_unif =x_aper
+x_min_init_unif =-x_aper
+y_max_init_unif =y_aper
+y_min_init_unif =-y_aper
