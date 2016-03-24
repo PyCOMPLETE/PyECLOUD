@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.0.2                      
+#		           PyECLOUD Version 5.0.2                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -55,12 +55,14 @@ import beam_and_timing as beatim
 
 
 from geom_impact_ellip import ellip_cham_geom_object
+from geom_impact_rectellip import rectellip_cham_geom_object
 
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
+from sec_emission_model_FromFile import SEY_model_FromFile 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
@@ -191,6 +193,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     flag_assume_convex = True
     
     E0 = None
+	
+    SEYFile=None
 
     
     
@@ -225,7 +229,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     return b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
-    Emax, del_max, R0, E_th, sigmafit, mufit,\
+    Emax, del_max, R0, E_th, sigmafit, mufit,SEYFile,\
     Dt, t_end, lam_th, t_ion, N_mp_max,\
     N_mp_regen, N_mp_after_regen, fact_split, fact_clean, nel_mp_ref_0,\
     Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen,regen_hist_cut,\
@@ -257,7 +261,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     
     b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
-    Emax, del_max, R0, E_th, sigmafit, mufit,\
+    Emax, del_max, R0, E_th, sigmafit, mufit,SEYFile,\
     Dt, t_end, lam_th, t_ion, N_mp_max,\
     N_mp_regen, N_mp_after_regen, fact_split, fact_clean, nel_mp_ref_0,\
     Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen,regen_hist_cut,\
@@ -303,6 +307,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         
     if chamb_type=='ellip':
         chamb=ellip_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file)
+    elif chamb_type=='rectellip':
+        chamb=rectellip_cham_geom_object(filename_chm)
     elif chamb_type=='polyg' or chamb_type=='polyg_cython':
 
 		import geom_impact_poly_fast_impact as gipfi
@@ -365,6 +371,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_cos_le(Emax,del_max,R0,**kwargs)
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+    elif switch_model=='FromFile':					
+        sey_mod=SEY_model_FromFile(SEYFile,pyecl_input_folder,**kwargs)	
 
     
     flag_seg = (flag_hist_impact_seg==1)

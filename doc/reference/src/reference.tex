@@ -251,6 +251,7 @@ Possible settings:
 \item chamb\_type = `ellip' for elliptical chamber profile.
 \item chamb\_type = `rect' for rectangular chamber profile.
 \item chamb\_type = `polyg' or `polyg\_cython' for polygonal chamber profile.
+\item chamb\_type = `rectellip' for rect-elliptical chamber profile.
 \end{enumerate}
 \\ \hline
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:}
@@ -260,6 +261,13 @@ Possible settings:
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:}
 \\ \hline
 \textbf{filename\_chamb} & Name of file containing horizontal and vertical vertexes of the chamber profile.
+\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `rectellip' the following input variables must be provided:}
+\\ \hline
+\textbf{filename\_chamb} & in format '[a,b,c,d]' - where a,b are parameters (semi-apertures) of the bounding rectangle and c,d  (semi-apertures) of the ellipse.
+\\ \hline
+\textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile. Used for generating of initial uniform distribution of macro-particles (should be same as c,d parameters)
+
 \\
 \hline
 \end{longtable}
@@ -472,6 +480,7 @@ Different secondary emission models:
 \item switch\_model = `ECLOUD\_nunif' for the model used in ECLOUD, with sey info in the chamber shape file.
 \item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
 \item switch\_model = `flat\_low\_ene' for flat low energy dependence.
+\item switch\_model = `FromFile' for the model loaded from the file (experimental data).
 \end{enumerate}\\ 
 \hline
 \end{longtable}
@@ -485,8 +494,11 @@ Different secondary emission models:
 \textbf{R0}& 	Weight of the reflected electron component.\\ \hline
 \textbf{E\_th}& 	Maximum energy for true secondary electrons.\\ \hline
 \textbf{sigmafit}& 	Sigma parameter of the lognormal distribution.\\ \hline
-\textbf{mufit}&Mu parameter of the lognormal distribution.\\
-\hline
+\textbf{mufit}&Mu parameter of the lognormal distribution.\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When switch\_model = `FromFile' the following input variables must be provided:}
+\\ \hline
+\textbf{SEYFile} & Name of the file with SEY data (the format of the file are three columns with parameters: Energy,Reflected Part and SEY .
+
 \end{longtable}
 
 
