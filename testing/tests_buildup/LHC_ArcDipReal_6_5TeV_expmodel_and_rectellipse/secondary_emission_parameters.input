@@ -1,0 +1,15 @@
+Emax=1.;
+SEYFile = 'ModelCu0Cmm2.txt'
+R0 = 1
+del_max=1
+switch_model='FromFile'
+
+# hilleret model for sec. emission
+E_th=35.;
+sigmafit =1.0828;
+mufit = 1.6636;
+
+switch_no_increase_energy=0
+thresh_low_energy=-1
+
+scrub_en_th=20.#eV
