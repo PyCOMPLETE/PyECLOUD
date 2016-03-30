@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.0.2                     
+#		           PyECLOUD Version 4.34                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -61,7 +61,7 @@ from operator import itemgetter
 
 
 class SEY_model_FromFile:
-    def __init__(self, FileName,pyecl_input_folder):
+    def __init__(self, FileName,pyecl_input_folder,RThetaDependance=True):
             self.FileName=FileName
             #The File Format:Energy[eV] Reflected Secondary
             #The Numbers Reflected and Secondary correspond to measured data by equation:
@@ -72,17 +72,11 @@ class SEY_model_FromFile:
             	ls=line.split()
             	Energy=float(ls[0])
             	Reflected=float(ls[1])
-            	Delta=float(ls[2])
-            	
-            	if Reflected == 1.:
-					Secondary = 0.
-            	else:
-					Secondary = (Delta-Reflected)/(1-Reflected)
-            	
+            	Secondary=float(ls[2])
             	Data.append([Energy,Reflected,Secondary])
-            	
             Data=sorted(Data, key=itemgetter(0))
             self.CreateInterpolationMap(np.array(Data))
+			self.RThetaDependance=RThetaDependance
             
             
             print 'Secondary emission model: FromFile:',FileName,' No. points:',self.N
@@ -138,16 +132,15 @@ class SEY_model_FromFile:
 		Secondary=self.GetS(E)*exp(0.5*(1.-costheta))
 
 		Reflected=self.GetR(E_impact_eV)
-		R=Reflected[Reflected<0]
 		
-		MaskTotal=(Reflected>=1)
-		One=np.ones(len(E))
-		n=One*2. #if set to 1 there is problem when costheta=0
-		n[~MaskTotal]=(1.+sqrt(Reflected[~MaskTotal]))/(1.-sqrt(Reflected[~MaskTotal]))
-		costhetat=sqrt(1.-(1.-costheta**2)/n**2)
-		R=0.5*(((costheta-n*costhetat)/(costheta+n*costhetat))**2+((costhetat-n*costheta)/(costhetat+n*costheta))**2)
-		#print costheta[R>1],costhetat[R>1],n[R>1]
-		Reflected[~MaskTotal]=R[~MaskTotal]
+		if self.RThetaDependance:
+			MaskTotal=(Reflected>=1)
+			One=np.ones(len(E))
+			n=One*2. #if set to 1 there is problem when costheta=0
+			n[~MaskTotal]=(1+sqrt(Reflected[~MaskTotal]))/(1-sqrt(Reflected[~MaskTotal]))
+			costhetat=sqrt(1-(1.-costheta**2)/n**2)
+			R=0.5*(((costheta-n*costhetat)/(costheta+n*costhetat))**2+((costhetat-n*costheta)/(costhetat+n*costheta))**2)		
+			Reflected[~MaskTotal]=R[~MaskTotal]
 		
 		Reflected[Reflected>1]=Reflected[Reflected>1]*0.+1.
 		
