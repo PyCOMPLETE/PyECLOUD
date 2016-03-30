@@ -72,8 +72,15 @@ class SEY_model_FromFile:
             	ls=line.split()
             	Energy=float(ls[0])
             	Reflected=float(ls[1])
-            	Secondary=float(ls[2])
+            	Delta=float(ls[2])
+            	
+            	if Reflected == 1.:
+					Secondary = 0.
+            	else:
+					Secondary = (Delta-Reflected)/(1-Reflected)
+            	
             	Data.append([Energy,Reflected,Secondary])
+            	
             Data=sorted(Data, key=itemgetter(0))
             self.CreateInterpolationMap(np.array(Data))
             
@@ -135,14 +142,14 @@ class SEY_model_FromFile:
 		
 		MaskTotal=(Reflected>=1)
 		One=np.ones(len(E))
-		n=One*2 #if set to 1 there is problem when costheta=0
-		n[~MaskTotal]=(1+sqrt(Reflected[~MaskTotal]))/(1-sqrt(Reflected[~MaskTotal]))
-		costhetat=sqrt(1-(1-costheta**2)/n**2)
+		n=One*2. #if set to 1 there is problem when costheta=0
+		n[~MaskTotal]=(1.+sqrt(Reflected[~MaskTotal]))/(1.-sqrt(Reflected[~MaskTotal]))
+		costhetat=sqrt(1.-(1.-costheta**2)/n**2)
 		R=0.5*(((costheta-n*costhetat)/(costheta+n*costhetat))**2+((costhetat-n*costheta)/(costhetat+n*costheta))**2)
 		#print costheta[R>1],costhetat[R>1],n[R>1]
 		Reflected[~MaskTotal]=R[~MaskTotal]
 		
-		Reflected[Reflected>1]=Reflected[Reflected>1]*0+1
+		Reflected[Reflected>1]=Reflected[Reflected>1]*0.+1.
 		
 		delta=Secondary*(One-Reflected)+Reflected
 		
