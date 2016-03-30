@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 4.34                     
+#		           PyECLOUD Version 5.0.2                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -72,11 +72,17 @@ class SEY_model_FromFile:
             	ls=line.split()
             	Energy=float(ls[0])
             	Reflected=float(ls[1])
-            	Secondary=float(ls[2])
+            	Delta=float(ls[2])
+            	
+            	if Reflected == 1.:
+					Secondary = 0.
+            	else:
+					Secondary = (Delta-Reflected)/(1-Reflected)
+            	
             	Data.append([Energy,Reflected,Secondary])
             Data=sorted(Data, key=itemgetter(0))
             self.CreateInterpolationMap(np.array(Data))
-			self.RThetaDependance=RThetaDependance
+            self.RThetaDependance=RThetaDependance
             
             
             print 'Secondary emission model: FromFile:',FileName,' No. points:',self.N
@@ -91,7 +97,7 @@ class SEY_model_FromFile:
         self.N=int(min(Data[Data.shape[0]-1,0]/DeltaE,100000)+1)	
         self.DeltaE=1.*Data[Data.shape[0]-1,0]/(self.N-1)
 		
-        Last=np.array([1,0])
+        
         self.InterpolationMap=np.zeros((self.N,2))
         j=0
         i=0
@@ -119,7 +125,7 @@ class SEY_model_FromFile:
         MaskOver=(i>self.N-2)
         i=np.minimum(i,self.N-2)
         Results=(self.InterpolationMap[i,1]*(self.DeltaE*(i+1)-E)+self.InterpolationMap[i+1,1]*(E-self.DeltaE*(i)))/self.DeltaE
-        Results[MaskOver]=((self.InterpolationMap[self.N-1,0])+0*Results)[MaskOver]
+        Results[MaskOver]=((self.InterpolationMap[self.N-1,1])+0*Results)[MaskOver]
         return Results
 	
 
@@ -132,10 +138,10 @@ class SEY_model_FromFile:
 		Secondary=self.GetS(E)*exp(0.5*(1.-costheta))
 
 		Reflected=self.GetR(E_impact_eV)
+		One=np.ones(len(E))
 		
 		if self.RThetaDependance:
-			MaskTotal=(Reflected>=1)
-			One=np.ones(len(E))
+			MaskTotal=(Reflected>=1)			
 			n=One*2. #if set to 1 there is problem when costheta=0
 			n[~MaskTotal]=(1+sqrt(Reflected[~MaskTotal]))/(1-sqrt(Reflected[~MaskTotal]))
 			costhetat=sqrt(1-(1.-costheta**2)/n**2)
@@ -145,6 +151,7 @@ class SEY_model_FromFile:
 		Reflected[Reflected>1]=Reflected[Reflected>1]*0.+1.
 		
 		delta=Secondary*(One-Reflected)+Reflected
+		#Backward compability:  delta=Secondary*(One-self.GetR(E))+Reflected
 		
 		ref_frac=0.*delta
 		mask_non_zero=(delta>0)
