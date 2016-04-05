@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.0.2                     
+#                   PyECLOUD Version 5.1.0                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -83,15 +83,18 @@ class MP_light(object):
 
 class Ecloud(object):
 	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False,
-				slice_by_slice_mode=False, **kwargs):
+				slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
 		
 		
-		print 'PyECLOUD Version 5.0.2'
+		print 'PyECLOUD Version 5.1.0'
 		print 'PyHEADTAIL module'
 		print 'Initializing ecloud from folder: '+pyecl_input_folder
 		self.slicer = slicer
 		self.Dt_ref = Dt_ref
 		self.L_ecloud = L_ecloud	
+		
+		self.pyecl_input_folder = pyecl_input_folder
+		self.kwargs = kwargs
 		
 		b_par, x_aper, y_aper, B,\
 		gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
@@ -158,7 +161,10 @@ class Ecloud(object):
 			print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
 			sparse_solver='PyKLU'
 		
-		spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
+		if space_charge_obj is not None:
+			spacech_ele = space_charge_obj
+		else:
+			spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
 		
 
 		if switch_model==0 or switch_model=='ECLOUD':
@@ -191,7 +197,7 @@ class Ecloud(object):
 			import dynamics_Boris_multipole as dynmul
 			dynamics=dynmul.pusher_Boris_multipole(Dt=Dt, N_sub_steps=N_sub_steps, B_multip = B_multip)   
 		else:
-			raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyHEADTAIL module""")
+			raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module""")
 			   
 
 		if init_unif_flag==1:
@@ -497,6 +503,12 @@ class Ecloud(object):
 		if beam.slice_info is not 'unsliced':
 			dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']	
 			self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
+			
+	def generate_twin_ecloud_with_shared_space_charge(self):
+		if hasattr(self, 'efieldmap'):
+			raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
+		return Ecloud(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder, self.flag_clean_slices,
+				self.slice_by_slice_mode, space_charge_obj=self.spacech_ele, **self.kwargs)
 
 
 
