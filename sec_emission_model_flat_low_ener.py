@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.0.2                     
+#		           PyECLOUD Version 5.1.1                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
