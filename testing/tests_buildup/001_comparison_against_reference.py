@@ -14,8 +14,9 @@ import PyECLOUD.mystyle as ms
 
 pl.close('all')
 
-sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.60_2.5e11ppb_bl_1.00ns'
-sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
+# sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
+# sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
+sim_folder = 'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization'
 
 ref_folder = sim_folder
 curr_folder = sim_folder
@@ -31,8 +32,8 @@ except OSError as err:
 	
 
 
-
-
+myfontsz = 14
+ms.mystyle_arial(fontsz=myfontsz)
 
 dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_ref.mat') # load dictionary of the reference simulation 
 dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest.mat')  # load dictionary of the current simulation   
@@ -62,7 +63,7 @@ for ii,k in enumerate(out_var_curr):
 		#Plot vector for the current simulation	
 		fig=pl.figure(ii)
 		pl.subplots_adjust(right=0.75)
-		pl.title(out_var_curr[ii],fontsize=10)
+		pl.title(out_var_curr[ii])
 		
 		pl.plot(dict_curr[k],'b', label='curr_sim')
 		print ii,k,'curr_sim'
@@ -81,9 +82,8 @@ for ii,k in enumerate(out_var_curr):
 			print '%s not  in reference'%k
 		
 		
-		
-		pl.tick_params(labelsize=7)		
-		pl.legend(prop={'size':7}, bbox_to_anchor=(1, 1),  loc='upper left')
+				
+		pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='upper left')
 		ms.sciy()
 		pl.savefig(folder_plot+'/%s'%k, dpi=300)
 
@@ -95,14 +95,14 @@ for ii,k in enumerate(out_var_curr):
 		
 		fig=pl.figure(ii)
 		pl.subplots_adjust(top=1.2)
-		pl.suptitle(out_var_curr[ii],fontsize=11)
+		pl.suptitle(out_var_curr[ii])
 		gs1 = gridspec.GridSpec(2, 1)
 		gs2 = gridspec.GridSpec(3, 1)
 		
 		
 		#Plot matrix for the current simulation
 		sp1 = fig.add_subplot(gs1[0])
-		sp1.set_title('curr_sim',fontsize=7)
+		sp1.set_title('curr_sim')
 		pl.pcolormesh(dict_curr[k])
 		pl.tick_params(labelsize=10)
 		cbar=pl.colorbar()
@@ -117,8 +117,8 @@ for ii,k in enumerate(out_var_curr):
 			#Plot number of e- for the reference passage	
 			sp3=fig.add_subplot(gs2[0])
 			sp3.plot(dict_curr[k][n_pass],'b', label='curr_sim')
-			sp3.legend(prop={'size':7},  loc='upper left')
-			sp3.set_title(' num pass equal to [%d]'%n_pass,fontsize=7)
+			sp3.legend(prop={'size':myfontsz},  loc='upper left')
+			sp3.set_title(' num pass equal to [%d]'%n_pass)
 			sp3.tick_params(labelsize=10)
 			ms.sciy()
 			
@@ -126,8 +126,8 @@ for ii,k in enumerate(out_var_curr):
 			#Plot number of e- for each slice
 			sp4=fig.add_subplot(gs2[1])
 			sp4.plot(np.sum(dict_curr[k], axis=0),'b', label='curr_sim')
-			sp4.legend(prop={'size':7},  loc='upper left')
-			sp4.set_title('e- per slice',fontsize=7)
+			sp4.legend(prop={'size':myfontsz},  loc='upper left')
+			sp4.set_title('e- per slice')
 			sp4.tick_params(labelsize=10)
 			ms.sciy()
 			
@@ -135,8 +135,8 @@ for ii,k in enumerate(out_var_curr):
 			#Plot number of e- for each passage
 			sp5=fig.add_subplot(gs2[2])
 			sp5.plot(np.sum(dict_curr[k], axis=1),'b', label='curr_sim')		
-			sp5.legend(prop={'size':7},  loc='upper right')
-			sp5.set_title('e- per passage',fontsize=7)
+			sp5.legend(prop={'size':myfontsz},  loc='upper right')
+			sp5.set_title('e- per passage')
 			sp5.tick_params(labelsize=10)
 			ms.sciy()
 			
@@ -152,7 +152,7 @@ for ii,k in enumerate(out_var_curr):
 			
 			#Plot matrix for the reference simulation	
 			sp2= fig.add_subplot(gs1[1])
-			sp2.set_title('ref_sim',fontsize=7)
+			sp2.set_title('ref_sim')
 			pl.pcolormesh(dict_ref[k])
 			cbar=pl.colorbar()
 			cbar.ax.tick_params(labelsize=10) 		
@@ -165,18 +165,18 @@ for ii,k in enumerate(out_var_curr):
 				
 				#Plot number of e- for the reference passage	
 				sp3.plot(dict_ref[k][n_pass],'r', label='ref_sim')
-				sp3.legend(prop={'size':7},  loc='upper left')
+				sp3.legend(prop={'size':myfontsz},  loc='upper left')
 				ms.sciy()
 				
 				
 				#Plot number of e- for each slice
 				sp4.plot(np.sum(dict_ref[k], axis=0),'r', label='ref_sim')
-				sp4.legend(prop={'size':7},  loc='upper left')
+				sp4.legend(prop={'size':myfontsz},  loc='upper left')
 				ms.sciy()
 				
 				#Plot number of e- for each passage 
 				sp5.plot(np.sum(dict_ref[k], axis=1),'r', label='ref_sim')
-				sp5.legend(prop={'size':7},  loc='upper right')
+				sp5.legend(prop={'size':myfontsz},  loc='upper right')
 				ms.sciy()
 
 				gs2.tight_layout(fig,rect=[0.45, 0, 1, 1], pad=1.08,h_pad=1.5)
