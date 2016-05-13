@@ -67,46 +67,12 @@ class Ecloud_fastion(Ecloud):
     # @profile	
     def track(self, beam):
         
-        # reinitialize
-        self.MP_e.x_mp[:self.init_N_mp] = self.init_x # it is a mutation and not a binding (and we have tested it :-))
-        self.MP_e.y_mp[:self.init_N_mp] = self.init_y
-        self.MP_e.z_mp[:self.init_N_mp] = self.init_z
-        self.MP_e.vx_mp[:self.init_N_mp] = self.init_vx
-        self.MP_e.vy_mp[:self.init_N_mp] = self.init_vy
-        self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
-        self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
-        self.MP_e.N_mp = self.init_N_mp
-        
+        self._reinitialize()
+
         MP_e = self.MP_e
         dynamics = self.dynamics
         impact_man = self.impact_man
         spacech_ele = self.spacech_ele
-
-        if self.gas_ion_flag:
-            gas_ionization = self.gas_ionization
-        
-        if self.save_ele_distributions_last_track:
-            self.rho_ele_last_track = []
-        
-        if self.save_ele_potential_and_field:
-            self.phi_ele_last_track = []
-            self.Ex_ele_last_track = []
-            self.Ey_ele_last_track = []
-        
-        if self.save_ele_MP_position:
-            self.x_MP_last_track = []
-            self.y_MP_last_track = []
-        
-        if self.save_ele_MP_velocity:
-            self.vx_MP_last_track = []
-            self.vy_MP_last_track = []
-        
-        if self.save_ele_MP_size:
-            self.nel_MP_last_track = []
-
-        if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-            self.N_MP_last_track = []
-            
 
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
             raise ValueError('ecloud module assumes same size for all beam MPs')
@@ -155,7 +121,7 @@ class Ecloud_fastion(Ecloud):
                     dz_bunch = slices.slice_widths[i]
                     lambda_bunch = Np_bunch
                     dt_bunch = 1 / c
-                    MP_e = gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
+                    MP_e = self.gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
                                                     sigmay=slices.sigma_y[i], x_beam_pos=slices.mean_x[i], y_beam_pos=slices.mean_y[i])
 
 
@@ -194,8 +160,7 @@ class Ecloud_fastion(Ecloud):
             # impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
             
-
-            
+                        
             if self.save_ele_distributions_last_track:
                 self.rho_ele_last_track.append(spacech_ele.rho.copy())
                 #print 'Here'
@@ -218,27 +183,9 @@ class Ecloud_fastion(Ecloud):
 
             if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
                 self.N_MP_last_track.append(MP_e.N_mp)
+                
 
-        if self.save_ele_distributions_last_track:
-            self.rho_ele_last_track = np.array(self.rho_ele_last_track[::-1])
-        
-        if self.save_ele_potential_and_field:
-            self.phi_ele_last_track = np.array(self.phi_ele_last_track[::-1])
-            self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
-            self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
-        
-        if self.save_ele_MP_position:
-            self.x_MP_last_track = np.array(self.x_MP_last_track[::-1])
-            self.y_MP_last_track = np.array(self.y_MP_last_track[::-1])
-        
-        if self.save_ele_MP_velocity:
-            self.vx_MP_last_track = np.array(self.vx_MP_last_track[::-1])
-            self.vy_MP_last_track = np.array(self.vy_MP_last_track[::-1])
-        
-        if self.save_ele_MP_size:
-            self.nel_MP_last_track = np.array(self.nel_MP_last_track[::-1])
+        self._finalize()
 
-        if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-            self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])
 
         #print self.N_MP_last_track
