@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.1.2                     
+#                   PyECLOUD Version 5.2.0                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -86,7 +86,7 @@ class Ecloud(object):
 				slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
 		
 		
-		print 'PyECLOUD Version 5.1.2'
+		print 'PyECLOUD Version 5.2.0'
 		print 'PyHEADTAIL module'
 		print 'Initializing ecloud from folder: '+pyecl_input_folder
 		self.slicer = slicer
@@ -223,6 +223,25 @@ class Ecloud(object):
 			self.x_beam_offset = kwargs['x_beam_offset']
 		if 'y_beam_offset' in kwargs.keys():
 			self.y_beam_offset = kwargs['y_beam_offset']
+			
+		# initialize proton density probes
+		self.save_ele_field_probes = False
+		self.x_probes = -1
+		self.y_probes = -1
+		self.Ex_ele_last_track_at_probes = -1
+		self.Ey_ele_last_track_at_probes = -1
+		if 'probes_position' in kwargs.keys():
+			self.save_ele_field_probes = True
+			self.probes_position = kwargs['probes_position']
+			self.N_probes = len(self.probes_position)
+			self.x_probes = []
+			self.y_probes = []
+			for ii_probe in xrange(self.N_probes):
+				self.x_probes.append(probes_position[ii_probe]['x'])
+				self.y_probes.append(probes_position[ii_probe]['y'])
+
+			self.x_probes = np.array(self.x_probes)
+			self.y_probes = np.array(self.y_probes)
 		
 		self.N_tracks = 0
 		
@@ -349,7 +368,8 @@ class Ecloud(object):
 			
 		Dt_substep = dt/N_sub_steps
 		#print Dt_substep, N_sub_steps, dt
-
+		
+				
 		# beam field 
 		MP_p = MP_light()
 		MP_p.x_mp = beam.x[ix]+self.x_beam_offset
@@ -371,7 +391,7 @@ class Ecloud(object):
 		## compute electron field on electrons
 		Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
 		
-		## compute electron field on beam particles
+		## compute electron field on beam particles 
 		Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 		
 		## Total electric field on electrons
@@ -416,6 +436,17 @@ class Ecloud(object):
 			
 		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
 			self.N_MP_last_track.append(MP_e.N_mp)
+			
+		if self.save_ele_field_probes:
+			MP_probes = MP_light()
+			MP_probes.x_mp = self.x_probes
+			MP_probes.y_mp = self.y_probes
+			MP_probes.nel_mp = self.x_probes*0.+1. #fictitious charge of 1 C
+			MP_probes.N_mp = len(self.x_probes)	
+			Ex_sc_probe, Ey_sc_probe = spacech_ele.get_sc_eletric_field(MP_probes)
+			
+			self.Ex_ele_last_track_at_probes.append(Ex_sc_probe.copy())
+			self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
 
 	def _reinitialize(self):
 		
@@ -440,8 +471,8 @@ class Ecloud(object):
 			
 		if self.save_ele_field:
 			self.Ex_ele_last_track = []
-			self.Ey_ele_last_track = []
-
+			self.Ey_ele_last_track = []		
+		
 		if self.save_ele_MP_position:
 			self.x_MP_last_track = []
 			self.y_MP_last_track = []
@@ -455,7 +486,10 @@ class Ecloud(object):
 			
 		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
 			self.N_MP_last_track = []
-
+			
+		if self.save_ele_field_probes:		
+			self.Ex_ele_last_track_at_probes = []
+			self.Ey_ele_last_track_at_probes = []
 
 	def _finalize(self):
 
@@ -467,8 +501,8 @@ class Ecloud(object):
 			
 		if self.save_ele_field:	
 			self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
-			self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
-
+			self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])	
+		
 		if self.save_ele_MP_position:
 			self.x_MP_last_track = np.array(self.x_MP_last_track[::-1])
 			self.y_MP_last_track = np.array(self.y_MP_last_track[::-1])
@@ -481,7 +515,11 @@ class Ecloud(object):
 			self.nel_MP_last_track = np.array(self.nel_MP_last_track[::-1])
 			
 		if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-				self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])				
+				self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])	
+						
+		if self.save_ele_field_probes:		
+			self.Ex_ele_last_track_at_probes = np.array(self.Ex_ele_last_track_at_probes[::-1])
+			self.Ey_ele_last_track_at_probes = np.array(self.Ey_ele_last_track_at_probes[::-1])					
 			
 	def _finalize_and_reinitialize(self):
 		self._finalize()
