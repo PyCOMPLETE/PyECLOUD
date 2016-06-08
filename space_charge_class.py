@@ -72,11 +72,11 @@ class space_charge:
             PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
             import PyPIC.MultiGrid as PIC_MG
             self.PyPICobj = PIC_MG.AddTelescopicGrids(pic_main = PyPICmain, f_telescope = f_telescope, target_grid = target_grid, 
-                                        N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
+                                        N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main, sparse_solver = sparse_solver)
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
             
-            #for now we hope we survive 
+            #for now we hope that we survive like this:
             self.PyPICobj.Dh = None
             self.PyPICobj.xg = None
             self.PyPICobj.Nxg = None
