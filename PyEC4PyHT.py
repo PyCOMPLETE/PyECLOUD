@@ -118,7 +118,8 @@ class Ecloud(object):
 		x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
 		PyPICmode, filename_init_MP_state,\
 		init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-		x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex = \
+		x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex,\
+		f_telescope, target_grid, N_nodes_discard, N_min_Dh_main = \
 		read_parameter_files_pyhdtl(pyecl_input_folder)
 		
 		for attr in kwargs.keys():
@@ -164,7 +165,8 @@ class Ecloud(object):
 		if space_charge_obj is not None:
 			spacech_ele = space_charge_obj
 		else:
-			spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
+			spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode, 
+                                f_telescope = f_telescope, target_grid = target_grid, N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
 		
 
 		if switch_model==0 or switch_model=='ECLOUD':
@@ -658,7 +660,15 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     y_min_init_unif_edens = None
     
     flag_assume_convex = True    
+
+
+    # multigrid parameters
+    f_telescope = None
+    target_grid = None 
+    N_nodes_discard = None
+    N_min_Dh_main = None
     
+        
     f=open(simulation_param_file)
     exec(f.read())
     f.close()  
@@ -709,7 +719,8 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex		
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex,\
+    f_telescope, target_grid, N_nodes_discard, N_min_Dh_main		
 			
     
 		
