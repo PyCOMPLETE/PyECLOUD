@@ -83,7 +83,7 @@ class MP_light(object):
 
 class Ecloud(object):
 	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False,
-				slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
+				slice_by_slice_mode=False, space_charge_obj=None, beam_monitor=None, **kwargs):
 		
 		
 		print 'PyECLOUD Version 5.1.2'
@@ -226,6 +226,8 @@ class Ecloud(object):
 			gas_ionization = gic.residual_gas_ionization(unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion)
 			self.gas_ionization = gas_ionization
 		self.gas_ion_flag = gas_ion_flag
+
+		self.beam_monitor = beam_monitor
 		
 		
 		self.x_beam_offset = 0.

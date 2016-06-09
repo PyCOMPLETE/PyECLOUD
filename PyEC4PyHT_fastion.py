@@ -52,7 +52,7 @@
 
 import numpy as np
 from scipy.constants import c
-
+import time
 from PyEC4PyHT import Ecloud
 from gas_ionization_class import residual_gas_ionization
 
@@ -64,9 +64,10 @@ class MP_light(object):
 
 class Ecloud_fastion(Ecloud):
 
-    # @profile	
+    #@profile	
     def track(self, beam):
-        
+
+        start_time = time.mktime(time.localtime())
         self._reinitialize()
 
         MP_e = self.MP_e
@@ -128,13 +129,13 @@ class Ecloud_fastion(Ecloud):
                 # compute beam field
                 spacech_ele.recompute_spchg_efield(MP_p)
 
-                # scatter beam field to electrons
+                # gather beam field to electrons
                 Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e) # since we do not divide the charge by the dz, this is already integrated over the bucket length
 
                 # compute cloud field
                 spacech_ele.recompute_spchg_efield(MP_e) 
                 
-                # scatter cloud field to beam
+                # gather cloud field to beam
                 Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p) 
 
                 # kick cloud particles
@@ -185,7 +186,11 @@ class Ecloud_fastion(Ecloud):
                 self.N_MP_last_track.append(MP_e.N_mp)
                 
 
+        if self.beam_monitor != None:
+            self.beam_monitor.dump(beam)
+
         self._finalize()
 
-
+        stop_time = time.mktime(time.localtime())
+        print 'Done track in ', (stop_time-start_time), 's'
         #print self.N_MP_last_track
