@@ -163,8 +163,6 @@ ms.sciy()
 
 gs1.tight_layout(fig, rect=[0.25, 0.6, 0.75, 0.98], pad=1.08, h_pad=.9)     #[left, bottom, right, top]
 gs2.tight_layout(fig, rect=[0, 0, 1, 0.65], pad=1.08, h_pad=.9)     #[left, bottom, right, top]
-    
-pl.savefig('1.png', dpi=300)
 
 
 
