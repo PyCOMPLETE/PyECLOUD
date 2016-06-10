@@ -25,7 +25,7 @@ sparse_solver = 'PyKLU'#'scipy_slu'
 
 # Define the machine
 #============================
-from LHC import LHC
+from machines_for_testing import LHC
 machine = LHC(machine_configuration=machine_configuration,
                         optics_mode='smooth', n_segments=n_segments, p0=p0_GeV*1e9*e/c)
 
@@ -55,7 +55,7 @@ probes_position = [{'x' : x_beam_offset, 'y': y_beam_offset+Dy_probe},
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT                        
 ecloud_singlegrid = PyEC4PyHT.Ecloud(
         L_ecloud=L_ecloud, slicer=slicer,
-        Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config',
+        Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config_LHC',
         chamb_type = 'polyg' ,
         filename_chm= 'LHC_chm_ver.mat', Dh_sc = .2*bunch.sigma_x(),
         init_unif_edens_flag=1,
@@ -70,7 +70,7 @@ ecloud_singlegrid = PyEC4PyHT.Ecloud(
         
 ecloud_multigrid = PyEC4PyHT.Ecloud(
         L_ecloud=L_ecloud, slicer=slicer,
-        Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config',
+        Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config_LHC',
         chamb_type = 'polyg' ,
         filename_chm= 'LHC_chm_ver.mat', Dh_sc=1e-3,
         init_unif_edens_flag=1,
