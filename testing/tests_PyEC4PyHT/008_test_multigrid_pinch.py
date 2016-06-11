@@ -10,7 +10,7 @@ import PyECLOUD.mystyle as ms
 
 n_segments =1
 machine_configuration = '6.5_TeV_collision_tunes'
-p0_GeV = 450
+p0_GeV = 2000
 
 z_cut = 2.5e-9*c
 n_slices = 150
