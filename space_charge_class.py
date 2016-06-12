@@ -76,15 +76,6 @@ class space_charge:
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
             
-            #for now we hope that we survive like this:
-            self.PyPICobj.Dh = None
-            self.PyPICobj.xg = None
-            self.PyPICobj.Nxg = None
-            self.PyPICobj.bias_x = None
-            self.PyPICobj.yg = None
-            self.PyPICobj.Nyg = None
-            self.PyPICobj.bias_y = None
-            
             
         elif PyPICmode == 'FiniteDifferences_Staircase':
             import PyPIC.FiniteDifferences_Staircase_SquareGrid as PIC_FDSQ
