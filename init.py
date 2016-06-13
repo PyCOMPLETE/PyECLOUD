@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.2.0                      
+#		           PyECLOUD Version 5.3.0                      
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -192,6 +192,11 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     E0 = None
 
+    # multigrid parameters
+    f_telescope = None
+    target_grid = None 
+    N_nodes_discard = None
+    N_min_Dh_main = None
     
     
     f=open(pyecl_input_folder+'/'+simulation_param_file)
@@ -246,8 +251,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
-    filen_main_outp
-
+    filen_main_outp,\
+    f_telescope, target_grid, N_nodes_discard, N_min_Dh_main
 
 
 
@@ -278,7 +283,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
-    filen_main_outp  = \
+    filen_main_outp,\
+    f_telescope, target_grid, N_nodes_discard, N_min_Dh_main = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -334,7 +340,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 		print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
 		sparse_solver='PyKLU'
 		
-    spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
+    spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode, 
+                        f_telescope = f_telescope, target_grid = target_grid, N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
     
     sec_beams_list=[]
     if flag_presence_sec_beams:
