@@ -51,7 +51,9 @@ probes_position = [{'x' : x_beam_offset, 'y': y_beam_offset+Dy_probe},
                     {'x' : x_beam_offset+(2*Dx_probe), 'y': y_beam_offset},
                     {'x' : x_beam_offset-(2*Dx_probe), 'y': y_beam_offset}]
                     
-                
+
+n_probes = len(probes_position)
+
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT                        
 ecloud_singlegrid = PyEC4PyHT.Ecloud(
         L_ecloud=L_ecloud, slicer=slicer,
@@ -144,21 +146,25 @@ sp1.grid('on')
 
 
 sp2 = fig.add_subplot(gs2[0])
-sp2.plot(slices.z_centers*1e2, ecloud_singlegrid.Ex_ele_last_track_at_probes, 'b.', markersize=6)
-sp2.plot(slices.z_centers*1e2, ecloud_multigrid.Ex_ele_last_track_at_probes, 'r.', markersize=6)
+sp2.plot(np.array(n_probes*list(slices.z_centers))*1e2, 
+    ecloud_singlegrid.Ex_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
+sp2.plot(np.array(n_probes*list(slices.z_centers))*1e2, 
+    ecloud_multigrid.Ex_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
 sp2.set_ylabel('Ex at probes [V/m]')
 sp2.set_xlabel('z [cm]')
 sp2.grid('on')
+sp2.legend(loc='best')
 ms.sciy()
 
 sp3 = fig.add_subplot(gs2[1])
-sp3.plot(slices.z_centers*1e2, ecloud_singlegrid.Ey_ele_last_track_at_probes, 'b.', markersize=6)
-sp3.plot(slices.z_centers*1e2, ecloud_multigrid.Ey_ele_last_track_at_probes, 'r.', markersize=6)
+sp3.plot(np.array(n_probes*list(slices.z_centers))*1e2, 
+    ecloud_singlegrid.Ey_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
+sp3.plot(np.array(n_probes*list(slices.z_centers))*1e2,
+    ecloud_multigrid.Ey_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
 
 sp3.set_ylabel('Ey at probes [V/m]')
 sp3.set_xlabel('z [cm]')
 sp3.grid('on')
-
 ms.sciy()
 
 gs1.tight_layout(fig, rect=[0.25, 0.6, 0.75, 0.98], pad=1.08, h_pad=.9)     #[left, bottom, right, top]
@@ -199,9 +205,9 @@ rho_singlegrid_matrix=np.reshape(rho_singlegrid_n,(len(y_grid_probes),len(x_grid
 
 #plot
 vmin = -7; vmax = -2
-pl.figure(2, figsize=(12, 6)).patch.set_facecolor('w')
-pl.subplots_adjust(hspace = 0.5, wspace = 0.3)
-sp1 = pl.subplot(2,2,1)
+pl.figure(2, figsize=(16, 9)).patch.set_facecolor('w')
+pl.subplots_adjust(hspace = 0.5, wspace = 0.3, left=.07, right=.95)
+sp1 = pl.subplot(2,3,1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, 
 	np.log10(np.sqrt(Ex_singlegrid_matrix**2+Ey_singlegrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
@@ -212,11 +218,12 @@ cb=pl.colorbar(); pl.axis('equal')
 cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('E [V/m]')
-pl.title('Singlegrid electric field')
+pl.title('Singlegrid electric field', y=1.08)
 sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
 sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
-sp2 = pl.subplot(2,2,2, sharex=sp1, sharey=sp1)
+
+sp2 = pl.subplot(2,3,4, sharex=sp1, sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, 
 	np.log10(np.sqrt(Ex_multigrid_matrix**2+Ey_multigrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
@@ -227,11 +234,43 @@ cb=pl.colorbar(); pl.axis('equal')
 cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('E [V/m]')
-pl.title('Multigrid electric field')
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
+pl.title('Multigrid electric field', y=1.08)
+sp2.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp2.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
-sp3 = pl.subplot(2,2,3, sharex=sp1, sharey=sp1)
+
+
+sp3 = pl.subplot(2,3,2)
+pl.pcolormesh(x_grid_probes, y_grid_probes, 
+	Ex_singlegrid_matrix.T)#, vmin=vmin, vmax=vmax)
+for ii in xrange(pic_multigrid.n_grids):
+    sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
+pl.xlabel('x [m]')
+pl.ylabel('y [m]')
+cb=pl.colorbar(); pl.axis('equal')
+cb.formatter.set_powerlimits((0, 0))
+cb.update_ticks()
+cb.set_label('E [V/m]')
+pl.title('Singlegrid electric field', y=1.08)
+sp3.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp3.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
+
+sp4 = pl.subplot(2,3,5, sharex=sp1, sharey=sp1)
+pl.pcolormesh(x_grid_probes, y_grid_probes, 
+	Ex_multigrid_matrix.T)#, vmin=vmin, vmax=vmax)
+for ii in xrange(pic_multigrid.n_grids):
+    sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
+pl.xlabel('x [m]')
+pl.ylabel('y [m]')
+cb=pl.colorbar(); pl.axis('equal')
+cb.formatter.set_powerlimits((0, 0))
+cb.update_ticks()
+cb.set_label('E [V/m]')
+pl.title('Multigrid electric field', y=1.08)
+sp4.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp4.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
+
+sp5 = pl.subplot(2,3,3, sharex=sp1, sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, rho_singlegrid_matrix.T)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -241,11 +280,11 @@ cb=pl.colorbar(); pl.axis('equal')
 cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('Rho')
-pl.title('Singlegrid distribution')
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
+pl.title('Singlegrid distribution', y=1.08)
+sp5.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp5.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
-sp4 = pl.subplot(2,2,4, sharex=sp1, sharey=sp1)
+sp6 = pl.subplot(2,3,6, sharex=sp1, sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, rho_multigrid_matrix.T)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -255,9 +294,9 @@ cb=pl.colorbar(); pl.axis('equal')
 cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('Rho')
-pl.title('Multigrid distribution')
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
+pl.title('Multigrid distribution', y=1.08)
+sp6.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp6.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
 
 
