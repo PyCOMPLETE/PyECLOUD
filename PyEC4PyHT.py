@@ -319,7 +319,7 @@ class Ecloud(object):
             self.track_only_first_time=False
         
         if not hasattr(self, 'efieldmap'):
-            from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
+            from Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
             self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg, 
                 Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud, 
                 slicer = self.slicer,
@@ -328,6 +328,8 @@ class Ecloud(object):
             self._ecloud_track = self.track
             
             self.track = self.efieldmap.track
+            
+            self.finalize_and_reinitialize = finalize_and_reinitialize
             
             if delete_ecloud_data:
                 self.spacech_ele=None
