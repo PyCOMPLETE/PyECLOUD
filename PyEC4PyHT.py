@@ -323,13 +323,14 @@ class Ecloud(object):
             self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg, 
                 Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud, 
                 slicer = self.slicer,
-                flag_clean_slices = True, x_beam_offset = self.x_beam_offset, y_beam_offset = self.y_beam_offset)
+                flag_clean_slices = True, 
+                x_beam_offset = self.x_beam_offset, y_beam_offset = self.y_beam_offset,
+                slice_by_slice_mode = self.slice_by_slice_mode)
             
             self._ecloud_track = self.track
             
             self.track = self.efieldmap.track
-            
-            self.finalize_and_reinitialize = finalize_and_reinitialize
+            self.finalize_and_reinitialize = self.efieldmap.finalize_and_reinitialize
             
             if delete_ecloud_data:
                 self.spacech_ele=None
@@ -349,7 +350,15 @@ class Ecloud(object):
     def track_once_and_replace_with_recorded_field_map(self, bunch, delete_ecloud_data=True):	
         self.save_ele_field = True
         self.track_only_first_time = True
-        self.track(bunch)
+        if self.slice_by_slice_mode:
+            if not hasattr(bunch, '__iter__'):
+                raise ValueError('A list of slices should be provided!')
+            self._reinitialize()
+            for slc in bunch:
+                self.track(slc)
+            self._finalize()
+        else:
+            self.track(bunch)
         self.save_ele_field = False
         self.track_only_first_time = False
         self.replace_with_recorded_field_map(delete_ecloud_data=delete_ecloud_data)
@@ -530,10 +539,6 @@ class Ecloud(object):
         self._reinitialize()
 
     def _track_in_single_slice_mode(self, beam):
-        
-        if self.track_only_first_time:
-            raise NotImplementedError(
-                        'Not implemented (yet) in slice-by-slice mode!')
                     
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
             raise ValueError('ecloud module assumes same size for all beam MPs')

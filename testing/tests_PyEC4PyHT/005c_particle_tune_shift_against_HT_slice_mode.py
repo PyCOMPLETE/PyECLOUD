@@ -108,9 +108,9 @@ machine.one_turn_map = new_one_turn_map
 bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000, 
 	intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
-
+slices_list_for_map = bunch.extract_slices(slicer)
 for ec in ecloud_list:
-    ec.track_once_and_replace_with_recorded_field_map(bunch_for_map)
+    ec.track_once_and_replace_with_recorded_field_map(slices_list_for_map)
 
 
 # prepare storage for particles cohordinates
@@ -121,13 +121,13 @@ yp_i = np.empty((n_record, n_turns))
 
 
 
-for ii in xrange(n_turns-1):
+for ii in xrange(n_turns):
     slices_list = bunch.extract_slices(slicer)
+
+    print 'Turn', ii
 
     for slice_obj in slices_list[::-1]:
         machine.track(slice_obj)#, verbose = True)
-    print 'Turn', ii
-
 
     bunch = sum(slices_list)
 
@@ -139,6 +139,7 @@ for ii in xrange(n_turns-1):
     id_after = bunch.id[bunch.id<=n_part_per_turn]
     x_after = bunch.x[bunch.id<=n_part_per_turn]
     y_after = bunch.y[bunch.id<=n_part_per_turn]
+    z_after = bunch.z[bunch.id<=n_part_per_turn]
     xp_after = bunch.xp[bunch.id<=n_part_per_turn]
     yp_after = bunch.yp[bunch.id<=n_part_per_turn]
 
@@ -147,29 +148,16 @@ for ii in xrange(n_turns-1):
     id_after = np.take(id_after, indsort)
     x_after = np.take(x_after, indsort)
     y_after = np.take(y_after, indsort)
+    z_after = np.take(z_after, indsort)
     xp_after = np.take(xp_after, indsort)
     yp_after = np.take(yp_after, indsort)
 
-    x_i[:,i] = x_after[:n_record]
-    xp_i[:,i] = xp_after[:n_record]
-    y_i[:,i] = y_after[:n_record]
-    yp_i[:,i] = yp_after[:n_record]
+    x_i[:,ii] = x_after[:n_record]
+    xp_i[:,ii] = xp_after[:n_record]
+    y_i[:,ii] = y_after[:n_record]
+    yp_i[:,ii] = yp_after[:n_record]
 
 
-
-
-# track and store
-for i in range(n_turns):    
-    machine.track(bunch)#, verbose=True)
-    
-    print 'Turn', i
-    sys.stdout.flush()
-    
-    x_i[:,i] = bunch.x[:n_record]
-    xp_i[:,i] = bunch.xp[:n_record]
-    y_i[:,i] = bunch.y[:n_record]
-    yp_i[:,i] = bunch.yp[:n_record]
-print '\nDONE'
 
 from tune_analysis import tune_analysis
 qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(x_i, xp_i, y_i, yp_i)
@@ -204,13 +192,13 @@ pl.axis('equal')
 
 pl.figure(3)
 pl.subplot(2,1,1)
-pl.plot(bunch.z[:n_record],np.abs(qx_i)-np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
+pl.plot(z_after[:n_record],np.abs(qx_i)-np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
 pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qx_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
 pl.ylabel('$\Delta Q_x$')
 pl.grid('on')
 pl.legend(prop={'size':14})
 pl.subplot(2,1,2)
-pl.plot(bunch.z[:n_record],np.abs(qy_i)-np.modf(machine.Q_x)[0], '.', markersize=3)
+pl.plot(z_after[:n_record],np.abs(qy_i)-np.modf(machine.Q_x)[0], '.', markersize=3)
 pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qy_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3)
 pl.ylabel('$\Delta Q_y$')
 pl.xlabel('z [m]')

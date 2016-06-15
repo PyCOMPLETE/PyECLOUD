@@ -10,7 +10,6 @@ class Transverse_Efield_map(object):
         	flag_clean_slices=False, wrt_slice_centroid=False,
         	x_beam_offset=0., y_beam_offset=0., slice_by_slice_mode=False):
 
-        print 'Here'
         self.slicer = slicer
         self.L_interaction = L_interaction
         self.flag_clean_slices = flag_clean_slices
