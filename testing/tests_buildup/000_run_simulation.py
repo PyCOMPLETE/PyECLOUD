@@ -1,5 +1,5 @@
 import sys, os
-BIN = os.path.expanduser("../../../")
+BIN = os.path.expanduser("../../../") #folder containing PyECLOUD, PyPIC, PyKLU
 sys.path.append(BIN)
 
 #ignore warnings 
