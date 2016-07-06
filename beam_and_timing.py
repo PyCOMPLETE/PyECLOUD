@@ -147,6 +147,8 @@ class beam_and_timing:
         lam_t_array=lam_t_array+coast_dens;
         
         N_pass_tot=t_inter/b_spac
+        
+        flag_PyPIC_state_mode = False
         if beam_field_file==-1 or beam_field_file=='computeFD':
             print 'No beam field file provided -> Calculate field using Poisson solver'
             
@@ -170,65 +172,98 @@ class beam_and_timing:
             print 'Done beam field computation.'
 
         elif beam_field_file=='computeBE':
-			
-			print 'No beam field file provided -> Calculate field using Bassetti Erskine formula'
-			
-			if chamb.chamb_type!='ellip':
-				raise ValueError('You can only use Bassetti Erskine formula with an elliptic chamber!')
-			if Nx==None or Ny==None or nimag==None:
-				raise ValueError('Nx, Ny and nimag MUST be provided for Bassetti Erskine formula!')
-			if x_beam_pos!=0. or y_beam_pos!=0.:
-				raise ValueError('x_beam_pos, y_beam_pos and MUST be 0 for Bassetti Erskine formula!')
-			
-			print "sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d"%(sigmax, sigmay, Nx, Ny, nimag)
-			
-			if progress_mapgen_file is not None:
-				fprog=open(progress_mapgen_file,'w')
-				fprog.write('Bassetti Erskine\n')
-				fprog.write("sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d\n"%(sigmax, sigmay, Nx, Ny, nimag))
-				fprog.close()
-			
-				
-			import BassErsk as BE
-			a=chamb.x_aper
-			b=chamb.y_aper
-			
-			xmax=a*1.02;
-			ymax=b*1.02;
-			xx=np.linspace(-xmax,xmax,Nx);
-			yy=np.linspace(-ymax,ymax,Ny);
-			
-			Ex=np.zeros((len(xx),len(yy)),dtype=complex);
-			Ey=np.zeros((len(xx),len(yy)),dtype=complex);
-			print 'Start beam field map generation.'
-			for ii in range(len(xx)):
+            
+            print 'No beam field file provided -> Calculate field using Bassetti Erskine formula'
+            
+            if chamb.chamb_type!='ellip':
+                raise ValueError('You can only use Bassetti Erskine formula with an elliptic chamber!')
+            if Nx==None or Ny==None or nimag==None:
+                raise ValueError('Nx, Ny and nimag MUST be provided for Bassetti Erskine formula!')
+            if x_beam_pos!=0. or y_beam_pos!=0.:
+                raise ValueError('x_beam_pos, y_beam_pos and MUST be 0 for Bassetti Erskine formula!')
+            
+            print "sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d"%(sigmax, sigmay, Nx, Ny, nimag)
+            
+            if progress_mapgen_file is not None:
+                fprog=open(progress_mapgen_file,'w')
+                fprog.write('Bassetti Erskine\n')
+                fprog.write("sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d\n"%(sigmax, sigmay, Nx, Ny, nimag))
+                fprog.close()
+            
+                
+            import BassErsk as BE
+            a=chamb.x_aper
+            b=chamb.y_aper
+            
+            xmax=a*1.02;
+            ymax=b*1.02;
+            xx=np.linspace(-xmax,xmax,Nx);
+            yy=np.linspace(-ymax,ymax,Ny);
+            
+            Ex=np.zeros((len(xx),len(yy)),dtype=complex);
+            Ey=np.zeros((len(xx),len(yy)),dtype=complex);
+            print 'Start beam field map generation.'
+            for ii in range(len(xx)):
 
-				if np.mod(ii, Nx/20)==0:
-					print ('Beam field map generation %.0f'%(float(ii)/ float(Nx)*100)+"""%""")
-					
-					if progress_mapgen_file is not None:
-						fprog=open(progress_mapgen_file,'a')
-						fprog.write(('Done %.0f'%(float(ii)/ float(Nx)*100)+"""%"""+'\n'))
-						fprog.close()
+                if np.mod(ii, Nx/20)==0:
+                    print ('Beam field map generation %.0f'%(float(ii)/ float(Nx)*100)+"""%""")
+                    
+                    if progress_mapgen_file is not None:
+                        fprog=open(progress_mapgen_file,'a')
+                        fprog.write(('Done %.0f'%(float(ii)/ float(Nx)*100)+"""%"""+'\n'))
+                        fprog.close()
 
-				for jj in range(len(yy)):
-					x=xx[ii];
-					y=yy[jj];
-					Ex_imag,Ey_imag  = BE.ImageTerms(x,y,a,b,0,0, nimag)
-					Ex_BE,Ey_BE      = BE.BassErsk(x,y,sigmax,sigmay)
-					Ex[ii,jj] = Ex_BE + Ex_imag
-					Ey[ii,jj] = Ey_BE + Ey_imag
-					Ex_beam=Ex.real
-					Ey_beam=Ey.real
-					xx_beam=xx
-					yy_beam=yy
-				#to do: 1 - log progress somehow 2 - save file and check 3 - check secondary beams 4 - check the beam is centered
-			if progress_mapgen_file is not None:
-				fprog=open(progress_mapgen_file,'a')
-				fprog.write('Done.\n')
-				fprog.close()
-			print 'Done beam field map generation.'					
-			
+                for jj in range(len(yy)):
+                    x=xx[ii];
+                    y=yy[jj];
+                    Ex_imag,Ey_imag  = BE.ImageTerms(x,y,a,b,0,0, nimag)
+                    Ex_BE,Ey_BE      = BE.BassErsk(x,y,sigmax,sigmay)
+                    Ex[ii,jj] = Ex_BE + Ex_imag
+                    Ey[ii,jj] = Ey_BE + Ey_imag
+                    Ex_beam=Ex.real
+                    Ey_beam=Ey.real
+                    xx_beam=xx
+                    yy_beam=yy
+                #to do: 1 - log progress somehow 2 - save file and check 3 - check secondary beams 4 - check the beam is centered
+            if progress_mapgen_file is not None:
+                fprog=open(progress_mapgen_file,'a')
+                fprog.write('Done.\n')
+                fprog.close()
+            print 'Done beam field map generation.'					
+        elif beam_field_file=='compute_FDSW_multigrid':
+            
+            f_telescope_beam = 0.8
+            target_grid_beam = {'x_min_target':-1.e-2, 'x_max_target':1.e-2,'y_min_target':-1.5e-2,'y_max_target':1.5e-2,'Dh_target':.1e-3}
+            N_nodes_discard_beam = 3.
+            N_min_Dh_main_beam = 10
+            
+            import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
+            PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh_beam_field, sparse_solver = 'PyKLU')
+            import PyPIC.MultiGrid as PIC_MG
+            PyPICobj = PIC_MG.AddTelescopicGrids(pic_main = PyPICmain, f_telescope = f_telescope_beam, target_grid = target_grid_beam, 
+                                        N_nodes_discard = N_nodes_discard_beam, N_min_Dh_main = N_min_Dh_main_beam, sparse_solver = 'PyKLU')
+            self.xn = None #not implemented in this mode (for now)
+            self.yn = None #not implemented in this mode (for now)
+            
+            # set rho
+            PyPICmain.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(PyPICmain.xn-x_beam_pos)**2/(2.*sigmax**2)-(PyPICmain.yn-y_beam_pos)**2/(2.*sigmay**2))
+            for pic_dual in PyPICobj.pic_list:
+                pic = pic_dual.pic_internal
+                pic.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(pic.xn-x_beam_pos)**2/(2.*sigmax**2)-(pic.yn-y_beam_pos)**2/(2.*sigmay**2))
+        
+            PyPICobj.solve()
+            
+            self.PyPIC_state = PyPICobj.get_state_object()
+            self.get_beam_eletric_field = self._get_beam_eletric_field_PyPICstate
+            
+            flag_PyPIC_state_mode = True
+            
+            del(PyPICobj)
+            
+            #~ import time 
+            #~ time.sleep(2)
+            #~ wurstel
+
         else:
             print 'Loading beam field map from file'
             dict_beam=sio.loadmat(beam_field_file)
@@ -240,14 +275,27 @@ class beam_and_timing:
         
         
         if save_beam_field_file_as is not None:
-                sio.savemat(save_beam_field_file_as,  {'xx':xx_beam,'yy':yy_beam,'Ex':Ex_beam,'Ey':Ey_beam,\
-                           'sigmax':sigmax,'sigmay':sigmay,\
-                           'x_aper':chamb.x_aper,'y_aper':chamb.y_aper},oned_as='row')
+            if flag_PyPIC_state_mode:
+                raise ValueError('You cannot save the field maps in multigrid mode! Sorry...')
+            sio.savemat(save_beam_field_file_as,  {'xx':xx_beam,'yy':yy_beam,'Ex':Ex_beam,'Ey':Ey_beam,\
+                       'sigmax':sigmax,'sigmay':sigmay,\
+                       'x_aper':chamb.x_aper,'y_aper':chamb.y_aper},oned_as='row')
         
-        xmin_beam=np.min(xx_beam);
-        ymin_beam=np.min(yy_beam);
-        dx_beam=xx_beam[1]-xx_beam[0];
-        dy_beam=yy_beam[1]-yy_beam[0];
+        if not flag_PyPIC_state_mode:
+
+            xmin_beam=np.min(xx_beam);
+            ymin_beam=np.min(yy_beam);
+            dx_beam=xx_beam[1]-xx_beam[0];
+            dy_beam=yy_beam[1]-yy_beam[0];
+            
+            self.Ex_beam = Ex_beam
+            self.Ey_beam = Ey_beam
+            self.xmin_beam = xmin_beam
+            self.ymin_beam = ymin_beam
+            self.dx_beam = dx_beam
+            self.dy_beam = dy_beam
+            self.xx_beam=xx_beam
+            self.yy_beam=yy_beam
         
         self.Nt=Nt
         self.b_spac=b_spac
@@ -256,12 +304,6 @@ class beam_and_timing:
         self.Dt=Dt
         self.N_pass_tot=N_pass_tot
         
-        self.Ex_beam = Ex_beam
-        self.Ey_beam = Ey_beam
-        self.xmin_beam = xmin_beam
-        self.ymin_beam = ymin_beam
-        self.dx_beam = dx_beam
-        self.dy_beam = dy_beam
         self.lam_th_beam_field = lam_th_beam_field
         
         self.ii_curr=-1
@@ -274,9 +316,6 @@ class beam_and_timing:
         self.sigmay = sigmay
         self.x_beam_pos = x_beam_pos
         self.y_beam_pos = y_beam_pos
-        
-        self.xx_beam=xx_beam
-        self.yy_beam=yy_beam
         
         self.flag_secodary_beam = flag_secodary_beam
         
@@ -310,5 +349,17 @@ class beam_and_timing:
             
         return Ex_n_beam, Ey_n_beam
     
+    def _get_beam_eletric_field_PyPICstate(self, MP_e):
+        
+        if (self.lam_t_curr>self.lam_th_beam_field) and (MP_e.N_mp>0):    
+            ## compute beam electric field
+            Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+            Ex_n_beam=qe*self.lam_t_curr*Ex_n_beam;
+            Ey_n_beam=qe*self.lam_t_curr*Ey_n_beam;
+        else:
+            Ex_n_beam=0.
+            Ey_n_beam=0.
+            
+        return Ex_n_beam, Ey_n_beam
     
         
