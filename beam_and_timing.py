@@ -242,8 +242,7 @@ class beam_and_timing:
             import PyPIC.MultiGrid as PIC_MG
             PyPICobj = PIC_MG.AddTelescopicGrids(pic_main = PyPICmain, f_telescope = f_telescope_beam, target_grid = target_grid_beam, 
                                         N_nodes_discard = N_nodes_discard_beam, N_min_Dh_main = N_min_Dh_main_beam, sparse_solver = 'PyKLU')
-            self.xn = None #not implemented in this mode (for now)
-            self.yn = None #not implemented in this mode (for now)
+
             
             # set rho
             PyPICmain.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(PyPICmain.xn-x_beam_pos)**2/(2.*sigmax**2)-(PyPICmain.yn-y_beam_pos)**2/(2.*sigmay**2))
@@ -260,10 +259,7 @@ class beam_and_timing:
             
             del(PyPICobj)
             
-            #~ import time 
-            #~ time.sleep(2)
-            #~ wurstel
-
+            
         else:
             print 'Loading beam field map from file'
             dict_beam=sio.loadmat(beam_field_file)
