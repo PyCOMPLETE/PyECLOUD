@@ -5,11 +5,8 @@ nemitty = nemittx   #m
 Dp_p = 0.000000e+00
 
 
-beam_field_file = 'computeFD'
+beam_field_file = 'compute_FDSW_multigrid'
 Dh_beam_field = 0.0001
-Nx = None
-Ny = None
-nimag = None
 
 
 b_spac   = 25e-9     #s (to be specified also if you load the profile from file - 
