@@ -84,7 +84,9 @@ def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
 class beam_and_timing:
     def __init__(self,flag_bunched_beam, fact_beam, coast_dens, beam_field_file, lam_th_beam_field,
                  b_spac=None, sigmaz=None,t_offs=None, filling_pattern_file=None, Dt=None, t_end=None,
-                 beam_long_prof_file=None, Dh_beam_field=None, chamb=None, sigmax=None, sigmay=None, 
+                 beam_long_prof_file=None, Dh_beam_field=None, f_telescope_beam = None, target_grid_beam = None, 
+                 N_nodes_discard_beam = None, N_min_Dh_main_beam = None, 
+                 chamb=None, sigmax=None, sigmay=None, 
                  x_beam_pos=0., y_beam_pos = 0., save_beam_field_file_as=None, 
                  flag_secodary_beam = False, t_primary_beam = None,
                  Nx=None, Ny=None, nimag=None,
@@ -232,11 +234,16 @@ class beam_and_timing:
             print 'Done beam field map generation.'					
         elif beam_field_file=='compute_FDSW_multigrid':
             
-            f_telescope_beam = 0.8
-            target_grid_beam = {'x_min_target':-1.e-2, 'x_max_target':1.e-2,'y_min_target':-1.5e-2,'y_max_target':1.5e-2,'Dh_target':.1e-3}
-            N_nodes_discard_beam = 3.
-            N_min_Dh_main_beam = 10
-            
+            if f_telescope_beam is None:
+                raise ValueError('Aspect ratio MUST be provided for multigrid beam field computation!')
+            if target_grid_beam is None:
+                raise ValueError('Target grid MUST be provided for multigrid beam field computation!')
+            if  N_nodes_discard_beam is None:
+                raise ValueError(' N_nodes_discard_beam MUST be provided for multigrid beam field computation!')   
+            if N_min_Dh_main_beam is None:
+                raise ValueError(' N_min_Dh_main_beam MUST be provided for multigrid beam field computation!')    
+                
+    
             import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
             PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh_beam_field, sparse_solver = 'PyKLU')
             import PyPIC.MultiGrid as PIC_MG

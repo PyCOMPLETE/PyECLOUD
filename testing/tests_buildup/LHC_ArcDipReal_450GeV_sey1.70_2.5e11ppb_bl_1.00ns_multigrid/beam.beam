@@ -7,6 +7,10 @@ Dp_p = 0.000000e+00
 
 beam_field_file = 'computeFD compute_FDSW_multigrid'.split()[-1]
 Dh_beam_field = 0.001
+f_telescope_beam = 0.8
+target_grid_beam = {'x_min_target':-1.e-2, 'x_max_target':1.e-2,'y_min_target':-1.5e-2,'y_max_target':1.5e-2,'Dh_target':.1e-3}
+N_nodes_discard_beam = 3.
+N_min_Dh_main_beam = 10
 
 
 b_spac   = 25e-9     #s (to be specified also if you load the profile from file - 
