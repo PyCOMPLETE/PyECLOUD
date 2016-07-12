@@ -233,7 +233,9 @@ class beam_and_timing:
                 fprog.close()
             print 'Done beam field map generation.'					
         elif beam_field_file=='compute_FDSW_multigrid':
-            
+			
+            if Dh_beam_field is None:
+                raise ValueError('Grid size Dh_beam_field MUST be provided for beam field computation!')
             if f_telescope_beam is None:
                 raise ValueError('Aspect ratio MUST be provided for multigrid beam field computation!')
             if target_grid_beam is None:
