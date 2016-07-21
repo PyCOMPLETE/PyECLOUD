@@ -260,11 +260,21 @@ class beam_and_timing:
 
             
             # set rho
-            PyPICmain.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(PyPICmain.xn-x_beam_pos)**2/(2.*sigmax**2)-(PyPICmain.yn-y_beam_pos)**2/(2.*sigmay**2))
+            # PyPICmain.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(PyPICmain.xn-x_beam_pos)**2/(2.*sigmax**2)-(PyPICmain.yn-y_beam_pos)**2/(2.*sigmay**2))
+            PyPICmain.rho = 1./(4.*Dh_beam_field**2)*(sspe.erf((PyPICmain.xn-x_beam_pos)/(np.sqrt(2)*sigmax) + Dh_beam_field/(2*np.sqrt(2)*sigmax))\
+                            - sspe.erf((PyPICmain.xn-x_beam_pos)/(np.sqrt(2)*sigmax) - Dh_beam_field/(2*np.sqrt(2)*sigmax)))\
+                            *(sspe.erf((PyPICmain.yn-y_beam_pos)/(np.sqrt(2)*sigmay) + Dh_beam_field/(2*np.sqrt(2)*sigmay))\
+                            - sspe.erf((PyPICmain.yn-y_beam_pos)/(np.sqrt(2)*sigmay) - Dh_beam_field/(2*np.sqrt(2)*sigmay))) 
             for pic_dual in PyPICobj.pic_list:
                 pic = pic_dual.pic_internal
-                pic.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(pic.xn-x_beam_pos)**2/(2.*sigmax**2)-(pic.yn-y_beam_pos)**2/(2.*sigmay**2))
-        
+                dh = pic_dual.pic_internal.Dh
+                #pic.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(pic.xn-x_beam_pos)**2/(2.*sigmax**2)-(pic.yn-y_beam_pos)**2/(2.*sigmay**2))
+                pic.rho = 1./(4.*dh**2)*(sspe.erf((pic.xn-x_beam_pos)/(np.sqrt(2)*sigmax) + dh/(2*np.sqrt(2)*sigmax))\
+                        - sspe.erf((pic.xn-x_beam_pos)/(np.sqrt(2)*sigmax) - dh/(2*np.sqrt(2)*sigmax)))\
+                        *(sspe.erf((pic.yn-y_beam_pos)/(np.sqrt(2)*sigmay) + dh/(2*np.sqrt(2)*sigmay))\
+                        - sspe.erf((pic.yn-y_beam_pos)/(np.sqrt(2)*sigmay) - dh/(2*np.sqrt(2)*sigmay)))
+                
+                
             PyPICobj.solve()
             
             self.PyPIC_state = PyPICobj.get_state_object()
