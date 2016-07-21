@@ -52,6 +52,7 @@
 
 import numpy as np
 import scipy.io as sio
+import scipy.special as sspe
 from numpy import array
 import int_field_for as iff
 
@@ -162,7 +163,12 @@ class beam_and_timing:
             scb = scc.space_charge(chamb, Dh_beam_field, Dt_sc=1.)
             
             print 'Computing beam charge density'
-            rho=1./(2.*pi*sigmax*sigmay)*exp(-(scb.xn-x_beam_pos)**2/(2.*sigmax**2)-(scb.yn-y_beam_pos)**2/(2.*sigmay**2))
+            #rho=1./(2.*pi*sigmax*sigmay)*exp(-(scb.xn-x_beam_pos)**2/(2.*sigmax**2)-(scb.yn-y_beam_pos)**2/(2.*sigmay**2))
+            
+            rho = 1./(4.*Dh_beam_field**2)*(sspe.erf((scb.xn-x_beam_pos)/(np.sqrt(2)*sigmax) + Dh_beam_field/(2*np.sqrt(2)*sigmax))\
+                       - sspe.erf((scb.xn-x_beam_pos)/(np.sqrt(2)*sigmax) - Dh_beam_field/(2*np.sqrt(2)*sigmax)))\
+                       *(sspe.erf((scb.yn-y_beam_pos)/(np.sqrt(2)*sigmay) + Dh_beam_field/(2*np.sqrt(2)*sigmay))\
+                       - sspe.erf((scb.yn-y_beam_pos)/(np.sqrt(2)*sigmay) - Dh_beam_field/(2*np.sqrt(2)*sigmay))) 
         
             scb.compute_spchg_efield_from_rho(rho, flag_verbose = True)
             
