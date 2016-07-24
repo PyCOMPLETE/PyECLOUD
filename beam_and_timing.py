@@ -285,7 +285,7 @@ class beam_and_timing:
         self.ii_curr+=1
         self.tt_curr=self.t[self.ii_curr]
         self.lam_t_curr=self.lam_t_array[self.ii_curr]
-        self.pass_numb=np.floor(self.tt_curr/self.b_spac);
+        self.pass_numb=int(np.floor(self.tt_curr/self.b_spac));
         self.flag_new_bunch_pass=(self.pass_numb>self._pass_numb_old)
         
         if self.flag_new_bunch_pass:
