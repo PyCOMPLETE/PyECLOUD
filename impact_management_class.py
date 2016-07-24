@@ -191,7 +191,7 @@ class impact_management:
             # detect impact
             self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
             
-            Nimpact=sum(self.flag_impact);
+            Nimpact=int(sum(self.flag_impact));
 
             if Nimpact>0:  
                 
@@ -256,7 +256,7 @@ class impact_management:
                     n_add=zeros(len(flag_truesec));
                     n_add[flag_truesec]=ceil(nel_emit[flag_truesec]/nel_mp_th)-1;
                     n_add[n_add<0]=0. #in case of underflow
-                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1);
+                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.);
                     
                     # replace old
                     #En_truesec_eV=hilleret_model( N_true_sec, sigmafit, mufit, E_th);
