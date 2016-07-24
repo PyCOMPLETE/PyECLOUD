@@ -199,7 +199,7 @@ class impact_management:
                     i_found_new_mp = 0*x_mp
                  
                 # load segment endpoints
-                x_in=x_mp_old[self.flag_impact];y_in=y_mp_old[self.flag_impact];z_in=z_mp_old[self.flag_impact];
+                x_in=x_mp_old[self.flag_impact[:N_mp_old]];y_in=y_mp_old[self.flag_impact[:N_mp_old]];z_in=z_mp_old[self.flag_impact[:N_mp_old]];
                 x_out=x_mp[self.flag_impact];y_out=y_mp[self.flag_impact];z_out=z_mp[self.flag_impact];
                 
                 # backtracking and surface normal generation
