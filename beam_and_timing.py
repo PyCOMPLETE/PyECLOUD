@@ -146,7 +146,7 @@ class beam_and_timing:
         lam_t_array=fact_beam*lam_t_array
         lam_t_array=lam_t_array+coast_dens;
         
-        N_pass_tot=t_inter/b_spac
+        N_pass_tot=int(np.ceil(t_inter/b_spac))
         if beam_field_file==-1 or beam_field_file=='computeFD':
             print 'No beam field file provided -> Calculate field using Poisson solver'
             
