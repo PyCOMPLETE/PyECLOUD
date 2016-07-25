@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.4.1                     
+#                   PyECLOUD Version 5.5.0                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -418,7 +418,7 @@ class MP_system:
             
             
             N_new_MP=DNel/self.nel_mp_ref;
-            Nint_new_MP=np.floor(N_new_MP);
+            Nint_new_MP=int(np.floor(N_new_MP));
             rest=N_new_MP-Nint_new_MP;
             Nint_new_MP=Nint_new_MP+int(rand()<rest);
             

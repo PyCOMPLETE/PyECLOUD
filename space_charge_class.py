@@ -8,7 +8,7 @@
 #     This file is part of the code:
 #                                                                      		    
 # 
-#		           PyECLOUD Version 5.4.1                     
+#		           PyECLOUD Version 5.5.0                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -75,7 +75,6 @@ class space_charge:
                                         N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main, sparse_solver = sparse_solver)
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
-            
             
         elif PyPICmode == 'FiniteDifferences_Staircase':
             import PyPIC.FiniteDifferences_Staircase_SquareGrid as PIC_FDSQ

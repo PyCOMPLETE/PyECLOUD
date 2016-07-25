@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.4.1                     
+#                  PyECLOUD Version 5.5.0                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -91,7 +91,7 @@ class impact_management:
         bias_x_hist=min(xg_hist);
         
         self.En_g_hist=linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
-        self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]               #hist. step
+        self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]     #hist. step
         
         
         
@@ -112,6 +112,8 @@ class impact_management:
         if flag_seg:
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float) 
+            
+        self.flag_impact = np.array([False]) #just a place holder
             
         print 'Done impact man. init.'
             
@@ -177,19 +179,28 @@ class impact_management:
         
             ## impact management
             N_mp_old=N_mp
-            # detect impact
-            flag_impact=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
             
-            Nimpact=sum(flag_impact);
+            # check flag_impact array has right size (if not regenerate it)
+            if len(self.flag_impact) != len(x_mp):
+                self.flag_impact = np.array(len(x_mp)*[False])
+                
+            # reset flag_impact array 
+            self.flag_impact[:] = False
+            
+            
+            # detect impact
+            self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
+            
+            Nimpact=int(sum(self.flag_impact));
 
             if Nimpact>0:  
-				
+                
                 if flag_seg:
-					i_found_new_mp = 0*x_mp
-				 
+                    i_found_new_mp = 0*x_mp
+                 
                 # load segment endpoints
-                x_in=x_mp_old[flag_impact];y_in=y_mp_old[flag_impact];z_in=z_mp_old[flag_impact];
-                x_out=x_mp[flag_impact];y_out=y_mp[flag_impact];z_out=z_mp[flag_impact];
+                x_in=x_mp_old[self.flag_impact[:N_mp_old]];y_in=y_mp_old[self.flag_impact[:N_mp_old]];z_in=z_mp_old[self.flag_impact[:N_mp_old]];
+                x_out=x_mp[self.flag_impact];y_out=y_mp[self.flag_impact];z_out=z_mp[self.flag_impact];
                 
                 # backtracking and surface normal generation
                 [x_emit,y_emit,z_emit,Norm_x,Norm_y, i_found]=\
@@ -197,9 +208,9 @@ class impact_management:
                     
                            
                 # load velocities and charges
-                vx_impact=vx_mp[flag_impact]; vy_impact=vy_mp[flag_impact];vz_impact=vz_mp[flag_impact];
+                vx_impact=vx_mp[self.flag_impact]; vy_impact=vy_mp[self.flag_impact];vz_impact=vz_mp[self.flag_impact];
                 vx_emit=zeros(len(vx_impact)); vy_emit=zeros(len(vy_impact));  vz_emit=zeros(len(vz_impact));   
-                nel_impact =nel_mp[flag_impact];
+                nel_impact =nel_mp[self.flag_impact];
                 
                 # compute impact velocities, energy and angle
                 v_impact_mod=sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact);
@@ -245,7 +256,7 @@ class impact_management:
                     n_add=zeros(len(flag_truesec));
                     n_add[flag_truesec]=ceil(nel_emit[flag_truesec]/nel_mp_th)-1;
                     n_add[n_add<0]=0. #in case of underflow
-                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1);
+                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.);
                     
                     # replace old
                     #En_truesec_eV=hilleret_model( N_true_sec, sigmafit, mufit, E_th);
@@ -265,8 +276,6 @@ class impact_management:
                         (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec]);
                     vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true);
                     
-
-						 
                 
                     flag_add=n_add>0;
                     n_add_step=sum(flag_add);
@@ -287,7 +296,7 @@ class impact_management:
                         z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add];
                         
                         if flag_seg:
-							i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
+                            i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
                         
                         vx_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
                              (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add]);
@@ -302,13 +311,13 @@ class impact_management:
                         n_add_step=sum(flag_add);
                     
                 
-                x_mp[flag_impact]=x_emit;
-                y_mp[flag_impact]=y_emit;
-                z_mp[flag_impact]=z_emit;
-                vx_mp[flag_impact]=vx_emit;
-                vy_mp[flag_impact]=vy_emit;
-                vz_mp[flag_impact]=vz_emit;
-                nel_mp[flag_impact]=nel_emit;
+                x_mp[self.flag_impact]=x_emit;
+                y_mp[self.flag_impact]=y_emit;
+                z_mp[self.flag_impact]=z_emit;
+                vx_mp[self.flag_impact]=vx_emit;
+                vy_mp[self.flag_impact]=vy_emit;
+                vz_mp[self.flag_impact]=vz_emit;
+                nel_mp[self.flag_impact]=nel_emit;
                 
                 #subtract replaced macroparticles
                 v_emit_mod=sqrt(vx_emit*vx_emit+vy_emit*vy_emit+vz_emit*vz_emit);

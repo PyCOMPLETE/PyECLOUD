@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.4.1                      
+#		           PyECLOUD Version 5.5.0                      
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -332,7 +332,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     
     beamtim=beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.beam_field_file,lam_th,
                  b_spac=b_par.b_spac, sigmaz=b_par.sigmaz,t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=Dt, t_end=t_end,
-                 beam_long_prof_file=b_par.beam_long_prof_file, Dh_beam_field=b_par.Dh_beam_field, chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
+                 beam_long_prof_file=b_par.beam_long_prof_file, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam = b_par.f_telescope_beam,
+                 target_grid_beam = b_par.target_grid_beam, N_nodes_discard_beam = b_par.N_nodes_discard_beam, N_min_Dh_main_beam = b_par.N_min_Dh_main_beam,
+                 chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                  x_beam_pos = b_par.x_beam_pos, y_beam_pos = b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
                  Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file = (progress_path+'_mapgen'))
     
@@ -351,7 +353,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
             sb_par = sec_b_par_list[ii]
             sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.beam_field_file,lam_th,
                  b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz,t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=Dt, t_end=t_end,
-                 beam_long_prof_file=sb_par.beam_long_prof_file, Dh_beam_field=sb_par.Dh_beam_field, chamb=chamb,  sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
+                 beam_long_prof_file=sb_par.beam_long_prof_file, Dh_beam_field=sb_par.Dh_beam_field, f_telescope_beam = sb_par.f_telescope_beam,
+                 target_grid_beam = sb_par.target_grid_beam, N_nodes_discard_beam = sb_par.N_nodes_discard_beam, N_min_Dh_main_beam = sb_par.N_min_Dh_main_beam,
+                 chamb=chamb,  sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
                  x_beam_pos = sb_par.x_beam_pos, y_beam_pos = sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
                  flag_secodary_beam = True, t_primary_beam = beamtim.t,
                  Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file = (progress_path+('_mapgen_sec_%d'%ii))))
