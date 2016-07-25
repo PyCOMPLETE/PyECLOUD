@@ -325,12 +325,6 @@ class beam_and_timing:
         self.Dt=Dt
         self.N_pass_tot=N_pass_tot
         
-        self.Ex_beam = Ex_beam
-        self.Ey_beam = Ey_beam
-        self.xmin_beam = xmin_beam
-        self.ymin_beam = ymin_beam
-        self.dx_beam = dx_beam
-        self.dy_beam = dy_beam
         self.lam_th_beam_field = lam_th_beam_field
         
         self.ii_curr=-1
@@ -343,9 +337,6 @@ class beam_and_timing:
         self.sigmay = sigmay
         self.x_beam_pos = x_beam_pos
         self.y_beam_pos = y_beam_pos
-        
-        self.xx_beam=xx_beam
-        self.yy_beam=yy_beam
         
         self.flag_secodary_beam = flag_secodary_beam
         
