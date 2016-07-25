@@ -194,6 +194,23 @@ Target number of MPs obtained after a soft regeneration.\\
 
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+	\hline\endfirsthead\hline\endhead
+	\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
+		\textbf{Multigrid parameters} 
+		
+		 To be used with PyPICmode = 'ShortleyWeller\_WithTelescopicGrids'
+	}\\
+	\hline
+	\textbf{f\_telescope}&	Magnification factor between grids (it must be always $0<f<1$).\\ \hline
+	\textbf{target\_grid}&		Target grid parameters. It is a dictionary containing: 'x\_min\_target', 'x\_max\_target', 'y\_min\_target', 'y\_max\_target' and 'Dh\_target'.
+\\ \hline
+	\textbf{N\_nodes\_discard}& Number of nodes at the edge of the internal grids which are discarded in the field interpolation (going to coarser grid). \\ \hline
+	\textbf{N\_min\_Dh\_main}& Minimum size of the first internal grid in the $\Delta h$ of the main grid. \\ 
+	\hline
+\end{longtable}
+
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Saving settings}
@@ -417,18 +434,25 @@ Momentum spread (r.m.s.) of the beam. This parameter is not used if the transver
 
 If beam\_field\_file = -1 or beam\_field\_file = `computeFD' the beam field map is computed using the embedded Finite Difference (FD) Poisson solver.
 
-If beam\_field\_file=`computeBE' the electric field is computed using the Bassetti-Erskine formula and the image terms for the elliptical boundary conditions (this option is available only when the chamber profile is elliptical).\\ \hline
+If beam\_field\_file=`computeBE' the electric field is computed using the Bassetti-Erskine formula and the image terms for the elliptical boundary conditions (this option is available only when the chamber profile is elliptical).
+
+If beam\_field\_file=`compute\_FDSW\_multigrid' the beam field map is computed using the embedded Finite Difference (FD) Poisson solver in the multigrid case. \\ \hline
 \textbf{save\_beam\_field\_file\_as}&	(optional -- default: the beam field map is not saved)
 
 Name of the file where the employed field map is saved.\\  \hline
 \multicolumn{2}{p{.97\textwidth}}{
-When beam\_field\_file = -1 or beam\_field\_file = `computeFD' the following parameter must be provided:}\\ \hline
+When beam\_field\_file = -1 or beam\_field\_file = 'computeFD' the following parameter must be provided:}\\ \hline
 \textbf{Dh\_beam\_field}&	Grid size for the FD solver and for the saved field map.\\ \hline
 \multicolumn{2}{p{.97\textwidth}}{
 When beam\_field\_file = `computeBE' the following parameters must be provided:}\\ \hline
 \textbf{Nx, Ny} & Number of points of the employed field map. \\ \hline
-\textbf{nimag} & 	Number of image terms.\\
-
+\textbf{nimag} & 	Number of image terms.\\ \hline\multicolumn{2}{p{.97\textwidth}}{
+	When beam\_field\_file = 'compute\_FDSW\_multigrid' the following parameters must be provided:}\\ \hline
+\textbf{Dh\_beam\_field}&	Grid size for the FD solver and for the saved field map.\\ \hline
+\textbf{f\_telescope\_beam}& Magnification factor between grids (it must be always $0<f<1$)	\\ \hline
+\textbf{target\_grid\_beam }& Target grid parameters. It is a dictionary containing: 'x\_min\_target', 'x\_max\_target', 'y\_min\_target', 'y\_max\_target' and 'Dh\_target'.	\\ \hline
+\textbf{N\_nodes\_discard\_beam}& Number of nodes at the edge of the internal grids which are discarded in the field interpolation (going to coarser grid).	\\ \hline
+\textbf{N\_min\_Dh\_main\_beam}& Minimum size of the first internal grid in the $\Delta h$ of the main grid.	\\ \hline
 \hline
 \end{longtable}
 
