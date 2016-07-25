@@ -29,7 +29,10 @@ class beam_descr_from_fil:
         nimag = None
         
         Dh_beam_field = None 
-        
+        f_telescope_beam = None	
+        target_grid_beam = None
+        N_nodes_discard_beam = None
+        N_min_Dh_main_beam = None 
         save_beam_field_file_as = None
         
         coast_dens = 0.
@@ -104,6 +107,10 @@ class beam_descr_from_fil:
         self.beam_long_prof_file = beam_long_prof_file
         
         self.Dh_beam_field = Dh_beam_field 
+        self.f_telescope_beam = f_telescope_beam
+        self.target_grid_beam = target_grid_beam
+        self.N_nodes_discard_beam = N_nodes_discard_beam
+        self.N_min_Dh_main_beam = N_min_Dh_main_beam
         
         self.save_beam_field_file_as = save_beam_field_file_as
         

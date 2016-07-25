@@ -76,7 +76,6 @@ class space_charge:
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
             
-            
         elif PyPICmode == 'FiniteDifferences_Staircase':
             import PyPIC.FiniteDifferences_Staircase_SquareGrid as PIC_FDSQ
             self.PyPICobj = PIC_FDSQ.FiniteDifferences_Staircase_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
