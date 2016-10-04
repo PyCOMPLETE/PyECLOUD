@@ -88,6 +88,11 @@ class photoemission:
         if y0_refl!=0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
         
+        x0_refl_np_arr = np.array([x0_refl])
+        y0_refl_np_arr = np.array([y0_refl])
+        if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
+            raise ValueError('x0_refl, y0_refl is outside of the chamber!')
+
         print 'Done photoemission init.'
 
     def generate(self, MP_e, lambda_t, Dt):
