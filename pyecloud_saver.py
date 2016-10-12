@@ -113,7 +113,7 @@ class pyecloud_saver:
             
             
         # Simulation state saver init
-        if save_simulation_state_time_file==-1:
+        if type(save_simulation_state_time_file) is int and save_simulation_state_time_file == -1:
             self.flag_save_simulation_state=False
         else:
             self.flag_save_simulation_state=True
