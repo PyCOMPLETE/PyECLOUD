@@ -53,7 +53,7 @@
 
 
 import init as init
-import pickle
+import cPickle
 
 
 class BuildupSimulation(object):
@@ -192,7 +192,7 @@ class BuildupSimulation(object):
 		print 'Realoading state from file: %s...'% filename_simulation_state 
 		
 		with open(filename_simulation_state, 'rb') as fid:
-			dict_state = pickle.load(fid)
+			dict_state = cPickle.load(fid)
 		
 		self.beamtim = dict_state['beamtim']
 		self.MP_e = dict_state['MP_e']

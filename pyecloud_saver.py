@@ -54,7 +54,7 @@ import scipy.io as sio
 import numpy as np
 import os
 import hist_for as histf
-import pickle
+import cPickle
 import time
 
 
@@ -113,7 +113,7 @@ class pyecloud_saver:
             
             
         # Simulation state saver init
-        if save_simulation_state_time_file==-1:
+        if type(save_simulation_state_time_file) is int and save_simulation_state_time_file == -1:
             self.flag_save_simulation_state=False
         else:
             self.flag_save_simulation_state=True
@@ -301,7 +301,8 @@ class pyecloud_saver:
         
 
                     with open(filename_simulation_state, 'wb') as fid:
-                        pickle.dump(dict_state, fid)
+                        # use best protocol available
+                        cPickle.dump(dict_state, fid, protocol=-1)
                     
                     spacech_ele.PyPICobj.luobj = temp_luobj 
                     
