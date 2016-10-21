@@ -74,6 +74,7 @@ class residual_gas_ionization:
         
         print 'Done res. gas ioniz. init.'
     
+    #@profile
     def generate(self, MP_e, lambda_t, Dt, sigmax, sigmay, x_beam_pos=0., y_beam_pos=0.):
 
         mass = MP_e.mass
