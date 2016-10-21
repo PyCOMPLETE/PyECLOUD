@@ -60,7 +60,6 @@ from boris_cython import boris_step_multipole
 
 
 
-  
 class pusher_Boris_multipole():
     
     def __init__(self, Dt, N_sub_steps=1, B_multip = []):
@@ -85,7 +84,7 @@ class pusher_Boris_multipole():
                    
         print "N_subst_init=%d"% self.N_sub_steps
         
-    #@profile
+
     def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
         
         
@@ -107,7 +106,7 @@ class pusher_Boris_multipole():
 					  Ex_n, Ey_n, MP_e.charge, MP_e.mass)
 
         return MP_e
-        
+
     def stepcustomDt(self, MP_e, Ex_n,Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
         
         if MP_e.N_mp>0:

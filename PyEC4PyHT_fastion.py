@@ -74,6 +74,8 @@ class Ecloud_fastion(Ecloud):
         dynamics = self.dynamics
         impact_man = self.impact_man
         spacech_ele = self.spacech_ele
+        MP_e_state = self.MP_e_field_state
+        MP_p_state = self.MP_p_field_state
 
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
             raise ValueError('ecloud module assumes same size for all beam MPs')
@@ -125,18 +127,16 @@ class Ecloud_fastion(Ecloud):
                     MP_e = self.gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
                                                     sigmay=slices.sigma_y[i], x_beam_pos=slices.mean_x[i], y_beam_pos=slices.mean_y[i])
 
+                # scatter fields
+                MP_e_state.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
+                MP_p_state.scatter(MP_p.x_mp[0:MP_p.N_mp],MP_p.y_mp[0:MP_p.N_mp],MP_p.nel_mp[0:MP_p.N_mp], charge = MP_p.charge)
 
-                # compute beam field
-                spacech_ele.recompute_spchg_efield(MP_p)
+                # solve fields
+                spacech_ele.PyPICobj.solve_states([MP_e_state, MP_p_state])
 
-                # gather beam field to electrons
-                Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e) # since we do not divide the charge by the dz, this is already integrated over the bucket length
-
-                # compute cloud field
-                spacech_ele.recompute_spchg_efield(MP_e) 
-                
-                # gather cloud field to beam
-                Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p) 
+                # gather fields
+                Ex_sc_p, Ey_sc_p = MP_e_state.gather(MP_p.x_mp[0:MP_p.N_mp],MP_p.y_mp[0:MP_p.N_mp])
+                Ex_n_beam, Ey_n_beam = MP_p_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])                
 
                 # kick cloud particles
                 MP_e.vx_mp[:MP_e.N_mp] += Ex_n_beam * MP_e.charge / MP_e.mass / c

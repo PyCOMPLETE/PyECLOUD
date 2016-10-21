@@ -83,7 +83,7 @@ class MP_light(object):
 
 class Ecloud(object):
 	def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False,
-				slice_by_slice_mode=False, space_charge_obj=None, beam_monitor=None, **kwargs):
+				slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
 		
 		
 		print 'PyECLOUD Version 5.1.2'
@@ -165,6 +165,9 @@ class Ecloud(object):
 			spacech_ele = space_charge_obj
 		else:
 			spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
+			
+		self.MP_e_field_state = spacech_ele.PyPICobj.get_state_object()
+		self.MP_p_field_state = spacech_ele.PyPICobj.get_state_object()
 		
 
 		if switch_model==0 or switch_model=='ECLOUD':
@@ -222,13 +225,6 @@ class Ecloud(object):
 			print "Adding inital electrons from: %s"%filename_init_MP_state
 			MP_e.add_from_file(filename_init_MP_state)
 
-		if gas_ion_flag == 1:
-			gas_ionization = gic.residual_gas_ionization(unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion)
-			self.gas_ionization = gas_ionization
-		self.gas_ion_flag = gas_ion_flag
-
-		self.beam_monitor = beam_monitor
-		
 		
 		self.x_beam_offset = 0.
 		self.y_beam_offset = 0.	
@@ -272,7 +268,7 @@ class Ecloud(object):
 			self.track = self._track_in_single_slice_mode
 			self.finalize_and_reinitialize = self._finalize_and_reinitialize
 		
-#	@profile	
+	#@profile	
 	def track(self, beam):
 		
 		if self.track_only_first_time:
