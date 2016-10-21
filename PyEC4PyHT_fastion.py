@@ -51,7 +51,7 @@
 #----------------------------------------------------------------------
 
 import numpy as np
-from scipy.constants import c
+from scipy.constants import c, e
 import time
 from PyEC4PyHT import Ecloud
 from gas_ionization_class import residual_gas_ionization
@@ -64,18 +64,36 @@ class MP_light(object):
 
 class Ecloud_fastion(Ecloud):
 
+    def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder = './', flag_clean_slices = False,
+                slice_by_slice_mode = False, space_charge_obj = None, beam_monitor = None, 
+                include_cloud_sc = False, **kwargs):
+
+
+        super(Ecloud_fastion, self).__init__(L_ecloud, slicer, Dt_ref, pyecl_input_folder = pyecl_input_folder, 
+                                                flag_clean_slices = flag_clean_slices, slice_by_slice_mode = slice_by_slice_mode, 
+                                                space_charge_obj = space_charge_obj, **kwargs)
+       
+        self.beam_monitor = beam_monitor
+        self.gas_ion_flag = kwargs['gas_ion_flag']
+        self.include_cloud_sc = include_cloud_sc
+
+
+        if self.gas_ion_flag == 1:
+            chamb = self.impact_man.chamb
+            gas_ionization = residual_gas_ionization(kwargs['unif_frac'], kwargs['P_nTorr'], kwargs['sigma_ion_MBarn'], 
+                                kwargs['Temp_K'], chamb, kwargs['E_init_ion'])
+            self.gas_ionization = gas_ionization
+        
+
+
+        
+
     #@profile	
     def track(self, beam):
 
         start_time = time.mktime(time.localtime())
+        
         self._reinitialize()
-
-        MP_e = self.MP_e
-        dynamics = self.dynamics
-        impact_man = self.impact_man
-        spacech_ele = self.spacech_ele
-        MP_e_state = self.MP_e_field_state
-        MP_p_state = self.MP_p_field_state
 
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
             raise ValueError('ecloud module assumes same size for all beam MPs')
@@ -96,8 +114,74 @@ class Ecloud_fastion(Ecloud):
             
             # slice size and time step
             dz = (slices.z_bins[i + 1] - slices.z_bins[i]) # in this case it is the bucket length
+
+            self._track_single_slice(beam, ix, dz)
+
+        if self.beam_monitor != None:
+            self.beam_monitor.dump(beam)
+
+        self._finalize()
+
+        stop_time = time.mktime(time.localtime())
+        print 'Done track in ', (stop_time-start_time), 's'
+
+
+    #@profile
+    def _track_in_single_slice_mode(self, beam):
+        
+        if self.track_only_first_time:
+            raise NotImplementedError(
+                        'Not implemented (yet) in slice-by-slice mode!')
+                    
+        if hasattr(beam.particlenumber_per_mp, '__iter__'):
+            raise ValueError('ecloud module assumes same size for all beam MPs')
+
+        if self.flag_clean_slices:
+            raise ValueError(
+                    'track cannot clean the slices in slice-by-slice mode! ')
+
+        if beam.slice_info is not 'unsliced': # and beam.macroparticlenumber > 0:
+            dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']   
+            self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
+
+
+    # def _track_in_single_slice_mode(self, beam):
+                    
+    #     if hasattr(beam.particlenumber_per_mp, '__iter__'):
+    #         raise ValueError('ecloud module assumes same size for all beam MPs')
+
+    #     if beam.slice_info is not 'unsliced':
+    #         dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']   
+    #         self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
+
+
+    def generate_twin_ecloud_with_shared_space_charge(self):
+        if hasattr(self, 'efieldmap'):
+            raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
+
+        gas_ionization = self.gas_ionization
+
+        return Ecloud_fastion(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder,  
+                flag_clean_slices = self.flag_clean_slices, slice_by_slice_mode = self.slice_by_slice_mode, 
+                space_charge_obj = self.spacech_ele, beam_monitor = self.beam_monitor, **self.kwargs)
+
+
+
+    #@profile   
+    def _track_single_slice(self, beam, ix, dz):
+
+        #pass
+        if len(ix) > 0:
+
+            MP_e = self.MP_e
+            dynamics = self.dynamics
+            impact_man = self.impact_man
+            spacech_ele = self.spacech_ele
+            MP_e_state = self.MP_e_field_state
+            MP_p_state = self.MP_p_field_state
+
             dt = dz / (beam.beta * c)
-            
+                
             # define substep
             if dt > self.Dt_ref:
                 N_sub_steps = int(np.round(dt / self.Dt_ref))
@@ -106,52 +190,59 @@ class Ecloud_fastion(Ecloud):
 
             Dt_substep = dt / N_sub_steps
             # print Dt_substep, N_sub_steps, dt
-            N_mp_bunch = slices.n_macroparticles_per_slice[i]
             
-            if N_mp_bunch > 0:
-                # beam field 
-                # print 'Bunch', i
-                MP_p = MP_light()
-                MP_p.x_mp = beam.x[ix]
-                MP_p.y_mp = beam.y[ix]
-                MP_p.nel_mp = beam.x[ix] * 0. + beam.particlenumber_per_mp
-                MP_p.N_mp = N_mp_bunch
-                MP_p.charge = beam.charge
+            # beam particles 
+            MP_p = MP_light()
+            MP_p.x_mp = beam.x[ix]
+            MP_p.y_mp = beam.y[ix]
+            MP_p.nel_mp = beam.x[ix] * 0. + beam.particlenumber_per_mp
+            MP_p.N_mp = len(beam.x[ix])
+            MP_p.charge = beam.charge
 
+            mean_x = np.mean(beam.x[ix])
+            mean_y = np.mean(beam.y[ix])
+            sigma_x = np.std(beam.x[ix])
+            sigma_y = np.std(beam.y[ix]) 
 
-                if self.gas_ion_flag == 1:
-                    Np_bunch = N_mp_bunch * slices.particlenumber_per_mp
-                    dz_bunch = slices.slice_widths[i]
-                    lambda_bunch = Np_bunch
-                    dt_bunch = 1 / c
-                    MP_e = self.gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=slices.sigma_x[i], 
-                                                    sigmay=slices.sigma_y[i], x_beam_pos=slices.mean_x[i], y_beam_pos=slices.mean_y[i])
+            if self.gas_ion_flag == 1:
+                Np_bunch = MP_p.N_mp * beam.particlenumber_per_mp
+                dz_bunch = dz
+                lambda_bunch = Np_bunch
+                dt_bunch = 1 / c
+                MP_e = self.gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=sigma_x, 
+                                                    sigmay=sigma_y, x_beam_pos=mean_x, y_beam_pos=mean_y)
+                self.gas_ion_flag = 0
 
-                # scatter fields
-                MP_e_state.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
-                MP_p_state.scatter(MP_p.x_mp[0:MP_p.N_mp],MP_p.y_mp[0:MP_p.N_mp],MP_p.nel_mp[0:MP_p.N_mp], charge = MP_p.charge)
+            # scatter fields
+            MP_e_state.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
+            MP_p_state.scatter(MP_p.x_mp[0:MP_p.N_mp],MP_p.y_mp[0:MP_p.N_mp],MP_p.nel_mp[0:MP_p.N_mp], charge = MP_p.charge)
 
-                # solve fields
-                spacech_ele.PyPICobj.solve_states([MP_e_state, MP_p_state])
+            # solve fields
+            spacech_ele.PyPICobj.solve_states([MP_e_state, MP_p_state])
 
-                # gather fields
-                Ex_sc_p, Ey_sc_p = MP_e_state.gather(MP_p.x_mp[0:MP_p.N_mp],MP_p.y_mp[0:MP_p.N_mp])
-                Ex_n_beam, Ey_n_beam = MP_p_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])                
+            # gather fields
+            Ex_sc_p, Ey_sc_p = MP_e_state.gather(MP_p.x_mp[0:MP_p.N_mp],MP_p.y_mp[0:MP_p.N_mp])
+            Ex_n_beam, Ey_n_beam = MP_p_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])                
 
-                # kick cloud particles
-                MP_e.vx_mp[:MP_e.N_mp] += Ex_n_beam * MP_e.charge / MP_e.mass / c
-                MP_e.vy_mp[:MP_e.N_mp] += Ey_n_beam * MP_e.charge / MP_e.mass / c
-                
-                # kick beam particles
-                fact_kick = beam.charge / (beam.mass * beam.beta * beam.beta * beam.gamma * c * c) * self.L_ecloud
-                beam.xp[ix] += fact_kick * Ex_sc_p
-                beam.yp[ix] += fact_kick * Ey_sc_p
+            # kick cloud particles
+            MP_e.vx_mp[:MP_e.N_mp] += Ex_n_beam * MP_e.charge / MP_e.mass / c
+            MP_e.vy_mp[:MP_e.N_mp] += Ey_n_beam * MP_e.charge / MP_e.mass / c
+            
+            # kick beam particles
+            fact_kick = beam.charge / (beam.mass * beam.beta * beam.beta * beam.gamma * c * c) * self.L_ecloud
+            beam.xp[ix] += fact_kick * Ex_sc_p
+            beam.yp[ix] += fact_kick * Ey_sc_p
             
 
             # Total electric field on electrons
-            Ex_n = MP_e.vx_mp[:MP_e.N_mp] * 0.
-            Ey_n = Ex_n
-
+            if self.include_cloud_sc:
+                Ex_sc_n, Ey_sc_n = MP_e_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+                Ex_n = Ex_sc_n
+                Ey_n = Ey_sc_n
+            else:
+                Ex_n = MP_e.vx_mp[:MP_e.N_mp] * 0.
+                Ey_n = Ex_n
+              
             # save position before motion step
             old_pos = MP_e.get_positions()
             
@@ -184,13 +275,6 @@ class Ecloud_fastion(Ecloud):
 
             if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
                 self.N_MP_last_track.append(MP_e.N_mp)
-                
-
-        if self.beam_monitor != None:
-            self.beam_monitor.dump(beam)
-
-        self._finalize()
-
-        stop_time = time.mktime(time.localtime())
-        print 'Done track in ', (stop_time-start_time), 's'
-        #print self.N_MP_last_track
+            
+        else:
+            pass
