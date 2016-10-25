@@ -64,9 +64,9 @@ class MP_light(object):
 
 class Ecloud_fastion(Ecloud):
 
-    def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder = './', flag_clean_slices = False,
-                slice_by_slice_mode = False, space_charge_obj = None, beam_monitor = None, 
-                include_cloud_sc = False, **kwargs):
+    def __init__(self, L_ecloud, slicer, Dt_ref, MP_e_mass, MP_e_charge, pyecl_input_folder = './', 
+                flag_clean_slices = False, slice_by_slice_mode = False, space_charge_obj = None, 
+                beam_monitor = None, include_cloud_sc = False, ionize_only_first_bunch = False, **kwargs):
 
 
         super(Ecloud_fastion, self).__init__(L_ecloud, slicer, Dt_ref, pyecl_input_folder = pyecl_input_folder, 
@@ -76,15 +76,16 @@ class Ecloud_fastion(Ecloud):
         self.beam_monitor = beam_monitor
         self.gas_ion_flag = kwargs['gas_ion_flag']
         self.include_cloud_sc = include_cloud_sc
+        self.ionize_only_first_bunch = ionize_only_first_bunch
 
+        self.MP_e_field_state = self.spacech_ele.PyPICobj.get_state_object()
+        self.MP_p_field_state = self.spacech_ele.PyPICobj.get_state_object()
 
         if self.gas_ion_flag == 1:
             chamb = self.impact_man.chamb
             gas_ionization = residual_gas_ionization(kwargs['unif_frac'], kwargs['P_nTorr'], kwargs['sigma_ion_MBarn'], 
                                 kwargs['Temp_K'], chamb, kwargs['E_init_ion'])
             self.gas_ionization = gas_ionization
-        
-
 
         
 
@@ -92,7 +93,12 @@ class Ecloud_fastion(Ecloud):
     def track(self, beam):
 
         start_time = time.mktime(time.localtime())
-        
+
+        if self.track_only_first_time:
+            if self.N_tracks>0:
+                print 'Warning: Track skipped because track_only_first_time is True.'
+                return
+                        
         self._reinitialize()
 
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
@@ -122,16 +128,14 @@ class Ecloud_fastion(Ecloud):
 
         self._finalize()
 
+        self.N_tracks+=1
+
         stop_time = time.mktime(time.localtime())
         print 'Done track in ', (stop_time-start_time), 's'
 
 
     #@profile
     def _track_in_single_slice_mode(self, beam):
-        
-        if self.track_only_first_time:
-            raise NotImplementedError(
-                        'Not implemented (yet) in slice-by-slice mode!')
                     
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
             raise ValueError('ecloud module assumes same size for all beam MPs')
@@ -145,26 +149,16 @@ class Ecloud_fastion(Ecloud):
             self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
 
 
-    # def _track_in_single_slice_mode(self, beam):
-                    
-    #     if hasattr(beam.particlenumber_per_mp, '__iter__'):
-    #         raise ValueError('ecloud module assumes same size for all beam MPs')
-
-    #     if beam.slice_info is not 'unsliced':
-    #         dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']   
-    #         self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
-
 
     def generate_twin_ecloud_with_shared_space_charge(self):
         if hasattr(self, 'efieldmap'):
             raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
 
-        gas_ionization = self.gas_ionization
-
         return Ecloud_fastion(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder,  
                 flag_clean_slices = self.flag_clean_slices, slice_by_slice_mode = self.slice_by_slice_mode, 
-                space_charge_obj = self.spacech_ele, beam_monitor = self.beam_monitor, **self.kwargs)
-
+                space_charge_obj = self.spacech_ele, beam_monitor = self.beam_monitor, 
+                include_cloud_sc = self.include_cloud_sc, ionize_only_first_bunch = self.ionize_only_first_bunch, 
+                **self.kwargs)
 
 
     #@profile   
@@ -211,7 +205,8 @@ class Ecloud_fastion(Ecloud):
                 dt_bunch = 1 / c
                 MP_e = self.gas_ionization.generate(MP_e=MP_e, lambda_t=lambda_bunch, Dt=dt_bunch, sigmax=sigma_x, 
                                                     sigmay=sigma_y, x_beam_pos=mean_x, y_beam_pos=mean_y)
-                self.gas_ion_flag = 0
+                if self.ionize_only_first_bunch:
+                    self.gas_ion_flag = 0
 
             # scatter fields
             MP_e_state.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)

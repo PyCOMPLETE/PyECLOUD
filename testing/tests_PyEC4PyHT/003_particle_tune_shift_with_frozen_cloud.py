@@ -72,7 +72,7 @@ ecloud.track(bunch)
 from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
 L_interaction = machine.circumference/len(machine.transverse_map)
 efieldmap = Transverse_Efield_map(xg = ecloud.spacech_ele.xg, yg = ecloud.spacech_ele.yg, 
-        Ex=ecloud.Ex_ele_last_track, Ey=ecloud.Ey_ele_last_track, n_slices=slicer.n_slices, z_cut=z_cut, 
+        Ex=ecloud.Ex_ele_last_track, Ey=ecloud.Ey_ele_last_track, slicer=ecloud.slicer,
  	L_interaction=L_interaction, flag_clean_slices = False)
 
 # install ecloud field kick after each segment of the machine

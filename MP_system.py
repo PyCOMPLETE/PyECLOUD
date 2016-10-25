@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.1.2                     
+#                   PyECLOUD Version 5.5.2                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -148,6 +148,8 @@ class MP_system:
                 erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
                 
                 new_nel_mp_ref = chrg/self.N_mp_after_soft_regen; 
+                if new_nel_mp_ref<self.nel_mp_ref_0:
+                    new_nel_mp_ref=self.nel_mp_ref_0
                 
                 #if new_nel_mp_ref>self.nel_mp_ref_0:removed from version 3.16
                 print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
@@ -415,7 +417,7 @@ class MP_system:
             
             
             N_new_MP=DNel/self.nel_mp_ref;
-            Nint_new_MP=np.floor(N_new_MP);
+            Nint_new_MP=int(np.floor(N_new_MP));
             rest=N_new_MP-Nint_new_MP;
             Nint_new_MP=Nint_new_MP+int(rand()<rest);
             
