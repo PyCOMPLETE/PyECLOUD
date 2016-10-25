@@ -71,7 +71,8 @@ class Ecloud_fastion(Ecloud):
 
         super(Ecloud_fastion, self).__init__(L_ecloud, slicer, Dt_ref, pyecl_input_folder = pyecl_input_folder, 
                                                 flag_clean_slices = flag_clean_slices, slice_by_slice_mode = slice_by_slice_mode, 
-                                                space_charge_obj = space_charge_obj, **kwargs)
+                                                space_charge_obj = space_charge_obj, MP_e_mass = MP_e_mass, 
+                                                MP_e_charge = MP_e_charge, **kwargs)
        
         self.beam_monitor = beam_monitor
         self.gas_ion_flag = kwargs['gas_ion_flag']
@@ -154,11 +155,11 @@ class Ecloud_fastion(Ecloud):
         if hasattr(self, 'efieldmap'):
             raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
 
-        return Ecloud_fastion(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder,  
-                flag_clean_slices = self.flag_clean_slices, slice_by_slice_mode = self.slice_by_slice_mode, 
-                space_charge_obj = self.spacech_ele, beam_monitor = self.beam_monitor, 
-                include_cloud_sc = self.include_cloud_sc, ionize_only_first_bunch = self.ionize_only_first_bunch, 
-                **self.kwargs)
+        return Ecloud_fastion(self.L_ecloud, self.slicer, self.Dt_ref, self.MP_e.mass, self.MP_e.charge, 
+                self.pyecl_input_folder, flag_clean_slices = self.flag_clean_slices, 
+                slice_by_slice_mode = self.slice_by_slice_mode, space_charge_obj = self.spacech_ele, 
+                beam_monitor = self.beam_monitor, include_cloud_sc = self.include_cloud_sc, 
+                ionize_only_first_bunch = self.ionize_only_first_bunch, **self.kwargs)
 
 
     #@profile   
