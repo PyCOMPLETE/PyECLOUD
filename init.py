@@ -7,7 +7,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.1.2                      
+#		           PyECLOUD Version 5.5.2                      
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -192,6 +192,11 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     E0 = None
 
+    # multigrid parameters
+    f_telescope = None
+    target_grid = None 
+    N_nodes_discard = None
+    N_min_Dh_main = None
     
     
     f=open(pyecl_input_folder+'/'+simulation_param_file)
@@ -246,8 +251,8 @@ def read_parameter_files(pyecl_input_folder='./'):
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
-    filen_main_outp
-
+    filen_main_outp,\
+    f_telescope, target_grid, N_nodes_discard, N_min_Dh_main
 
 
 
@@ -278,7 +283,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
-    filen_main_outp  = \
+    filen_main_outp,\
+    f_telescope, target_grid, N_nodes_discard, N_min_Dh_main = \
     read_parameter_files(pyecl_input_folder)
     
       
@@ -326,7 +332,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     
     beamtim=beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.beam_field_file,lam_th,
                  b_spac=b_par.b_spac, sigmaz=b_par.sigmaz,t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=Dt, t_end=t_end,
-                 beam_long_prof_file=b_par.beam_long_prof_file, Dh_beam_field=b_par.Dh_beam_field, chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
+                 beam_long_prof_file=b_par.beam_long_prof_file, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam = b_par.f_telescope_beam,
+                 target_grid_beam = b_par.target_grid_beam, N_nodes_discard_beam = b_par.N_nodes_discard_beam, N_min_Dh_main_beam = b_par.N_min_Dh_main_beam,
+                 chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                  x_beam_pos = b_par.x_beam_pos, y_beam_pos = b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
                  Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file = (progress_path+'_mapgen'))
     
@@ -334,7 +342,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 		print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
 		sparse_solver='PyKLU'
 		
-    spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode)
+    spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode, 
+                        f_telescope = f_telescope, target_grid = target_grid, N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
     
     sec_beams_list=[]
     if flag_presence_sec_beams:
@@ -344,7 +353,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
             sb_par = sec_b_par_list[ii]
             sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.beam_field_file,lam_th,
                  b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz,t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=Dt, t_end=t_end,
-                 beam_long_prof_file=sb_par.beam_long_prof_file, Dh_beam_field=sb_par.Dh_beam_field, chamb=chamb,  sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
+                 beam_long_prof_file=sb_par.beam_long_prof_file, Dh_beam_field=sb_par.Dh_beam_field, f_telescope_beam = sb_par.f_telescope_beam,
+                 target_grid_beam = sb_par.target_grid_beam, N_nodes_discard_beam = sb_par.N_nodes_discard_beam, N_min_Dh_main_beam = sb_par.N_min_Dh_main_beam,
+                 chamb=chamb,  sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
                  x_beam_pos = sb_par.x_beam_pos, y_beam_pos = sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
                  flag_secodary_beam = True, t_primary_beam = beamtim.t,
                  Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file = (progress_path+('_mapgen_sec_%d'%ii))))

@@ -9,7 +9,7 @@
 #     
 #     This file is part of the code:
 #                                                                      		            
-#		           PyECLOUD Version 5.1.2                   
+#		           PyECLOUD Version 5.5.2                   
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -53,13 +53,13 @@
 
 
 import init as init
-import pickle
+import cPickle
 
 
 class BuildupSimulation(object):
 	def __init__(self, pyecl_input_folder='./', **kwargs):
 
-		print 'PyECLOUD Version 5.1.2'
+		print 'PyECLOUD Version 5.5.2'
 		beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
 				gas_ion_flag, resgasion, t_ion, \
 				spacech_ele,t_sc_ON, photoem_flag, phemiss,\
@@ -192,7 +192,7 @@ class BuildupSimulation(object):
 		print 'Realoading state from file: %s...'% filename_simulation_state 
 		
 		with open(filename_simulation_state, 'rb') as fid:
-			dict_state = pickle.load(fid)
+			dict_state = cPickle.load(fid)
 		
 		self.beamtim = dict_state['beamtim']
 		self.MP_e = dict_state['MP_e']
