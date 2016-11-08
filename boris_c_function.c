@@ -1,12 +1,12 @@
 #include "boris_c_function.h"
+#include <complex.h>
 
 
-
-
-void boris_c(int N_sub_steps, double Dtt, double* B_multip, 
-						  double* xn1, double* yn1,  double* zn1, 
-						  double* vxn1, double* vyn1, double* vzn1,
-						  double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
+void boris_c(int N_sub_steps, double Dtt, 
+		double* k_multip, double* k_skew,  
+		double* xn1, double* yn1,  double* zn1, 
+		double* vxn1, double* vyn1, double* vzn1,
+		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
 							  
 	int p, m, isub;
@@ -22,7 +22,8 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 	double vxn1p, vyn1p, vzn1p;
 	double xn1p, yn1p, zn1p;
 	double x_to_m, y_to_m;
-	double B_mul_curr;
+	double k_mul_curr;
+	double k_skew_curr;
 		
 	me=9.10938291e-31;
 	qe=1.602176565e-19;
@@ -54,26 +55,36 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 			
 			//for (m=0;m<N_multipoles;m++)(WRONG! you need the cross terms)
 			//{
-				//B_mul_curr = B_multip[m];
-				//Bx_n = Bx_n + B_mul_curr*y_to_m;
-				//By_n = By_n + B_mul_curr*x_to_m;
+				//k_mul_curr = k_multip[m];
+				//Bx_n = Bx_n + k_mul_curr*y_to_m;
+				//By_n = By_n + k_mul_curr*x_to_m;
 				//x_to_m = x_to_m*xn1p;
 				//y_to_m = y_to_m*yn1p;
 			//}
 			
 			
 			//Just dipole and quadrupole for now, to be generalized to multipole
-			B_mul_curr = B_multip[0];
-			Bx_n = 0.;
-			By_n = B_mul_curr;
+			k_mul_curr = k_multip[0];
+			k_skew_curr = k_skew[0];
+			Bx_n = k_skew_curr;
+			By_n = k_mul_curr;
 			
-			if (N_multipoles>1)
+//			if (N_multipoles>1)
+//			{
+//				k_mul_curr = k_multip[1];
+//				Bx_n += k_mul_curr*yn1p;
+//				By_n += k_mul_curr*xn1p;
+//			}
+//			
+//			Order=2 for quadrupoles
+			for(int order=2; order<=N_multipoles+1; order++)
 			{
-				B_mul_curr = B_multip[1];
-				Bx_n += B_mul_curr*yn1p;
-				By_n += B_mul_curr*xn1p;
+				k_mul_curr = k_multip[order];
+				k_skew_curr = k_skew[order];
+				Bx_n += calc_bx(order, k_mul_curr, k_skew_curr, &xn1p, &yn1p)
+				By_n += calc_by(order, k_mul_curr, k_skew_curr, &xn1p, &yn1p)
+
 			}
-			
 			
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
@@ -106,9 +117,7 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 			xn1p = xn1p + vxn1p * Dtt;
 			yn1p = yn1p + vyn1p * Dtt;
 			zn1p = zn1p + vzn1p * Dtt;
-
 		}
-
 
 		xn1[p] = xn1p; 
 		yn1[p] = yn1p;
@@ -121,5 +130,14 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 }
 
 
+double calc_bx(int order, float param_norm, float param_skew, float *x, float *y)
+{
+	double complex dVdx = (param_norm + I*param_skew) * order * cpow(*x + I*(*y),order-1);
+	return creal(cimag(dVdx))
+}
 
-
+double calc_by(int order, float param_norm, float param_skew, float *x, float *y)
+{
+	double complex dVdy = (param_norm + I*param_skew) * I*order * cpow(*x+I*(*y),order-1);
+	return creal(dVdy)
+}
