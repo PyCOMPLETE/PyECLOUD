@@ -176,6 +176,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     B_multip = []
     B_skew = None
+    angle_skew_rad = None
     
     PyPICmode = 'FiniteDifferences_ShortleyWeller'
     
@@ -226,6 +227,17 @@ def read_parameter_files(pyecl_input_folder='./'):
         
     if B==-1:
         B   = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen) 
+
+    if not angle_skew_rad is None:
+        if not B_skew is None:
+            raise ValueError('B_skew is specified along with angle_skew_rad!')
+
+        B_skew = zeros(len(B_multip), float)
+        for ii, b in enumerate(B_multip):
+            angle = angle_skew_rad[ii]*(ii+1)
+            B_skew[ii] = b*sin(angle)
+            B_multip[ii] = b*cos(angle)
+
         
     filen_main_outp = 'Pyecltest'
     
