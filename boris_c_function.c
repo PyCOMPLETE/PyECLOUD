@@ -2,14 +2,14 @@
 #include <complex.h>
 
 
-void boris_c(int N_sub_steps, double Dtt, 
-		double* k_multip, double* k_skew,  
-		double* xn1, double* yn1,  double* zn1, 
+void boris_c(int N_sub_steps, double Dtt,
+		double* B_multip, double* B_skew,
+		double* xn1, double* yn1,  double* zn1,
 		double* vxn1, double* vyn1, double* vzn1,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
-							  
-	int p, m, isub;
+
+	int p, isub;
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
 
@@ -21,67 +21,52 @@ void boris_c(int N_sub_steps, double Dtt,
 	double vx_plus, vy_plus, vz_plus;
 	double vxn1p, vyn1p, vzn1p;
 	double xn1p, yn1p, zn1p;
-	double x_to_m, y_to_m;
-	double k_mul_curr;
-	double k_skew_curr;
-		
+	double B_mul_curr;
+	double B_skew_curr;
+
 	me=9.10938291e-31;
 	qe=1.602176565e-19;
 	qm=-qe/me; //is an electron
 
 	for(p=0; p<N_mp; p++)
 	{
-		
+
 		Ex_np = Ex_n[p];
 		Ey_np = Ey_n[p];
 
 		vxn1p = vxn1[p];
 		vyn1p = vyn1[p];
 		vzn1p = vzn1[p];
-		
+
 		xn1p = xn1[p];
 		yn1p = yn1[p];
 		zn1p = zn1[p];
-		
+
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
 
-			//Compute B field
-			
-			//Bx_n = 0.;
-			//By_n = 0.;
-			//x_to_m = 1.;
-			//y_to_m = 1.;
-			
-			//for (m=0;m<N_multipoles;m++)(WRONG! you need the cross terms)
-			//{
-				//k_mul_curr = k_multip[m];
-				//Bx_n = Bx_n + k_mul_curr*y_to_m;
-				//By_n = By_n + k_mul_curr*x_to_m;
-				//x_to_m = x_to_m*xn1p;
-				//y_to_m = y_to_m*yn1p;
-			//}
-			
-			
 			//Just dipole and quadrupole for now, to be generalized to multipole
-			k_mul_curr = k_multip[0];
-			k_skew_curr = k_skew[0];
-			Bx_n = k_skew_curr;
-			By_n = k_mul_curr;
+			B_mul_curr = B_multip[0];
+			B_skew_curr = B_skew[0];
+			Bx_n = B_skew_curr;
+			By_n = B_mul_curr;
 			
 //			if (N_multipoles>1)
 //			{
-//				k_mul_curr = k_multip[1];
-//				Bx_n += k_mul_curr*yn1p;
-//				By_n += k_mul_curr*xn1p;
+//				B_mul_curr = B_multip[1];
+//				Bx_n += B_mul_curr*yn1p;
+//				By_n += B_mul_curr*xn1p;
 //			}
 //			
-//			Order=2 for quadrupoles
-			for(int order=2; order<=N_multipoles+1; order++)
+//			Order=1 for quadrupoles
+			for(int order = 1; order < N_multipoles; order++)
 			{
-				k_mul_curr = k_multip[order];
-				k_skew_curr = k_skew[order];
-				calc_b(order, &k_mul_curr, &k_skew_curr, &xn1p, &yn1p, &Bx_n, &Byn)
+				B_mul_curr = B_multip[order];
+				B_skew_curr = B_skew[order];
+		//		calc_b(order, &B_mul_curr, &B_skew_curr, &xn1p, &yn1p, &Bx_n, &By_n);
+				double complex dVdx = (B_mul_curr + I*B_skew_curr) * cpow(xn1p + I*yn1p,order);
+				By_n += cimag(dVdx);
+				Bx_n += creal(dVdx);
 
 			}
 			
@@ -131,9 +116,9 @@ void boris_c(int N_sub_steps, double Dtt,
 
 void calc_b(int order, double *param_norm, double *param_skew, double *x, double *y, double *Bx, double *By)
 {
-	double complex dVdx = (param_norm + I*param_skew) * order * cpow(*x + I*(*y),order-1);
-	*Bx = cimag(dVdx);
-	*By = creal(dVdx);
+	double complex dVdx = (*param_norm + I*(*param_skew)) * cpow(*x + I*(*y),order-1);
+	printf("dVdx is %.5f+%.5fi\n", creal(dVdx), cimag(dVdx));
+	*Bx += cimag(dVdx);
+	*By += creal(dVdx);
 }
-
 

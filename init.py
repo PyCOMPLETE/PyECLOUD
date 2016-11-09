@@ -175,6 +175,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     sparse_solver = 'scipy_slu'
     
     B_multip = []
+    B_skew = None
     
     PyPICmode = 'FiniteDifferences_ShortleyWeller'
     
@@ -247,7 +248,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
+    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, B_skew,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
@@ -279,7 +280,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, \
+    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, B_skew,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
@@ -421,7 +422,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  B_map_file, fact_Bmap, B_zero_thrhld)
     elif track_method == 'BorisMultipole':
         import dynamics_Boris_multipole as dynmul
-        dynamics=dynmul.pusher_Boris_multipole(Dt=Dt, N_sub_steps=N_sub_steps, B_multip = B_multip)   
+        dynamics=dynmul.pusher_Boris_multipole(Dt=Dt, N_sub_steps=N_sub_steps, B_multip=B_multip, B_skew=B_skew)   
     else:
         raise ValueError("""track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'""")
            
