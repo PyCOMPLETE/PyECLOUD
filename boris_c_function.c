@@ -1,6 +1,4 @@
 #include "boris_c_function.h"
-#include <complex.h>
-
 
 void boris_c(int N_sub_steps, double Dtt,
 		double* B_multip, double* B_skew,
@@ -9,7 +7,7 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
 
-	int p, isub;
+	int p, isub, order;
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
 
@@ -23,6 +21,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	double B_mul_curr;
 	double B_skew_curr;
+	double imxy, rexy , imxy_0, rexy_0;
 
 	me=9.10938291e-31;
 	qe=1.602176565e-19;
@@ -45,31 +44,39 @@ void boris_c(int N_sub_steps, double Dtt,
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
 
-			//Just dipole and quadrupole for now, to be generalized to multipole
 			B_mul_curr = B_multip[0];
 			B_skew_curr = B_skew[0];
 			Bx_n = B_skew_curr;
 			By_n = B_mul_curr;
 			
-//			if (N_multipoles>1)
-//			{
-//				B_mul_curr = B_multip[1];
-//				Bx_n += B_mul_curr*yn1p;
-//				By_n += B_mul_curr*xn1p;
-//			}
-//			
-//			Order=1 for quadrupoles
-			for(int order = 1; order < N_multipoles; order++)
+			/*
+			 * Previous calculation
+			if (N_multipoles>1)
 			{
+				B_mul_curr = B_multip[1];
+				Bx_n += B_mul_curr*yn1p;
+				By_n += B_mul_curr*xn1p;
+			}
+			*/
+			
+			imxy_0 = 0.;
+			rexy_0 = 1.;
+			//Order=1 for quadrupoles
+			for(order = 1; order < N_multipoles; order++)
+			{
+				rexy = rexy_0*xn1p - imxy_0*yn1p;
+				imxy = imxy_0*xn1p + rexy_0*yn1p;
+				rexy_0 = rexy;
+				imxy_0 = imxy;
+
+
 				B_mul_curr = B_multip[order];
 				B_skew_curr = B_skew[order];
-		//		calc_b(order, &B_mul_curr, &B_skew_curr, &xn1p, &yn1p, &Bx_n, &By_n);
-				double complex dVdx = (B_mul_curr + I*B_skew_curr) * cpow(xn1p + I*yn1p,order);
-				By_n += cimag(dVdx);
-				Bx_n += creal(dVdx);
+				By_n += (B_mul_curr * rexy - B_skew_curr * imxy);
+				Bx_n += (B_mul_curr * imxy + B_skew_curr * rexy);
 
 			}
-			
+
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
 
@@ -112,13 +119,3 @@ void boris_c(int N_sub_steps, double Dtt,
 		vzn1[p] = vzn1p;
 	}
 }
-
-
-void calc_b(int order, double *param_norm, double *param_skew, double *x, double *y, double *Bx, double *By)
-{
-	double complex dVdx = (*param_norm + I*(*param_skew)) * cpow(*x + I*(*y),order-1);
-	printf("dVdx is %.5f+%.5fi\n", creal(dVdx), cimag(dVdx));
-	*Bx += cimag(dVdx);
-	*By += creal(dVdx);
-}
-

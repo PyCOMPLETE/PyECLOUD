@@ -78,6 +78,8 @@ class pusher_Boris_multipole():
         self.B_multip = array(B_multip)
         if B_skew is None:
             self.B_skew = zeros_like(self.B_multip)
+        else:
+            self.B_skew = B_skew
         
         if len(self.B_multip)==0:
 			self.B_multip=array([0])
