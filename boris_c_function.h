@@ -9,8 +9,6 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles);
 
 
-float calc_bx(int order, float param_norm, float param_skew, float x, float y);
-float calc_by(int order, float param_norm, float param_skew, float x, float y);
-
+void calc_b(int order, double *param_norm, double *param_skew, double *x, double *y, double *Bx, double *By);
 
 #endif

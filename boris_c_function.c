@@ -81,8 +81,7 @@ void boris_c(int N_sub_steps, double Dtt,
 			{
 				k_mul_curr = k_multip[order];
 				k_skew_curr = k_skew[order];
-				Bx_n += calc_bx(order, k_mul_curr, k_skew_curr, &xn1p, &yn1p)
-				By_n += calc_by(order, k_mul_curr, k_skew_curr, &xn1p, &yn1p)
+				calc_b(order, &k_mul_curr, &k_skew_curr, &xn1p, &yn1p, &Bx_n, &Byn)
 
 			}
 			
@@ -130,14 +129,11 @@ void boris_c(int N_sub_steps, double Dtt,
 }
 
 
-double calc_bx(int order, float param_norm, float param_skew, float *x, float *y)
+void calc_b(int order, double *param_norm, double *param_skew, double *x, double *y, double *Bx, double *By)
 {
 	double complex dVdx = (param_norm + I*param_skew) * order * cpow(*x + I*(*y),order-1);
-	return creal(cimag(dVdx))
+	*Bx = cimag(dVdx);
+	*By = creal(dVdx);
 }
 
-double calc_by(int order, float param_norm, float param_skew, float *x, float *y)
-{
-	double complex dVdy = (param_norm + I*param_skew) * I*order * cpow(*x+I*(*y),order-1);
-	return creal(dVdy)
-}
+
