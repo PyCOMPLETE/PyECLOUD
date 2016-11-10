@@ -21,7 +21,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	double B_mul_curr;
 	double B_skew_curr;
-	double imxy, rexy , imxy_0, rexy_0;
+	double imxy, rexy , rexy_0;
 
 	me=9.10938291e-31;
 	qe=1.602176565e-19;
@@ -51,41 +51,36 @@ void boris_c(int N_sub_steps, double Dtt,
 			
 			/*
 			 * Previous calculation
-			if (N_multipoles>1)
-			{
-				B_mul_curr = B_multip[1];
-				Bx_n += B_mul_curr*yn1p;
-				By_n += B_mul_curr*xn1p;
-			}
-			*/
+			 *
+			 * if (N_multipoles>1)
+			 * {
+			 * 	B_mul_curr = B_multip[1];
+			 * 	Bx_n += B_mul_curr*yn1p;
+			 * 	By_n += B_mul_curr*xn1p;
+			 * }
+			 */
 			
-			imxy_0 = 0.;
-			rexy_0 = 1.;
+			imxy = 0.;
+			rexy = 1.;
 			//Order=1 for quadrupoles
 			for(order = 1; order < N_multipoles; order++)
 			{
-				rexy = rexy_0*xn1p - imxy_0*yn1p;
-				imxy = imxy_0*xn1p + rexy_0*yn1p;
 				rexy_0 = rexy;
-				imxy_0 = imxy;
-
+				rexy = rexy_0*xn1p - imxy*yn1p;
+				imxy = imxy*xn1p + rexy_0*yn1p;
 
 				B_mul_curr = B_multip[order];
 				B_skew_curr = B_skew[order];
 				By_n += (B_mul_curr * rexy - B_skew_curr * imxy);
 				Bx_n += (B_mul_curr * imxy + B_skew_curr * rexy);
-
 			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
-
-
 			tBsq = tBx*tBx + tBy*tBy; 
 
 			sBx = 2.*tBx/(1.+tBsq);
 			sBy = 2.*tBy/(1.+tBsq);
-
 
 			vx_min = vxn1p + 0.5*qm*Ex_np*Dtt;
 			vy_min = vyn1p + 0.5*qm*Ey_np*Dtt;
