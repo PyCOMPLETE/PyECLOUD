@@ -84,9 +84,6 @@ class pusher_Boris_multipole():
         if len(self.B_multip)==0:
 			self.B_multip=array([0])
         
-        if len(self.B_multip)>2:
-			raise ValueError('Higher multipoles not yet implemented!')
-                   
         print "N_subst_init=%d"% self.N_sub_steps
         
     #@profile
