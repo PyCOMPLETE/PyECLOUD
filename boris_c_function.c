@@ -6,7 +6,6 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* vxn1, double* vyn1, double* vzn1,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
-
 	int p, isub, order;
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
@@ -29,7 +28,6 @@ void boris_c(int N_sub_steps, double Dtt,
 
 	for(p=0; p<N_mp; p++)
 	{
-
 		Ex_np = Ex_n[p];
 		Ey_np = Ey_n[p];
 
