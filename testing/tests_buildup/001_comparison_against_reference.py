@@ -15,10 +15,11 @@ import PyECLOUD.mystyle as ms
 
 pl.close('all')
 
-sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
+#sim_folder = './LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_2'
 #~ sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 #~ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization'
 #~ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multigrid'
+sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 
 ref_folder = sim_folder
 curr_folder = sim_folder
