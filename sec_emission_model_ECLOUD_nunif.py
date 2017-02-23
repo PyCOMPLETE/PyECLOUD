@@ -53,28 +53,26 @@ from numpy import sqrt, exp, take
 from numpy.random import rand
 import numpy as np
 
-def yield_fun2(E,costheta,Emax,del_max,R0,E0):
+def yield_fun2(E, costheta, Emax, s, del_max, R0, E0):
     
-    s=1.35;
-    
-    del_max_tilde=del_max*exp(0.5*(1.-costheta));
-    E_max_tilde=Emax*(1.+0.7*(1.-costheta));
+    del_max_tilde=del_max*exp(0.5*(1.-costheta))
+    E_max_tilde=Emax*(1.+0.7*(1.-costheta))
 
-    x=E/E_max_tilde;
+    x=E/E_max_tilde
     
-    true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
-    reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2.;
+    true_sec=del_max_tilde*(s*x)/(s-1.+x**s)
+    reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2.
     
-    delta=true_sec+reflected;
+    delta=true_sec+reflected
     ref_frac=0.*delta
     mask_non_zero=(delta>0)
-    ref_frac[mask_non_zero]=reflected[mask_non_zero]/delta[mask_non_zero];
+    ref_frac[mask_non_zero]=reflected[mask_non_zero]/delta[mask_non_zero]
        
     return delta, ref_frac
 
 
 class SEY_model_ECLOUD_non_unif:
-    def __init__(self, chamb, Emax,del_max,R0,E0=150.):
+    def __init__(self, chamb, Emax, s_model, del_max,R0,E0=150.):
             if chamb.chamb_type!='polyg':
                 raise ValueError("""ECLOUD_nunif can be used only with chamb_type='polyg'!!!""") 
             
@@ -87,6 +85,7 @@ class SEY_model_ECLOUD_non_unif:
             self.Emax_segments[chamb.Emax_segments<0.]=Emax
             
             self.E0=E0
+            self.s_model = s_model
             
             print 'Secondary emission model: ECLOUD non uniform E0=%f'%self.E0           
             
@@ -98,7 +97,7 @@ class SEY_model_ECLOUD_non_unif:
             R0_mp = take(self.R0_segments, i_impact)
             
                     
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp, E0=self.E0);
+            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,Emax_mp, self.s_model, del_max_mp,R0_mp, E0=self.E0);
             flag_elast=(rand(len(ref_frac))<ref_frac);
             flag_truesec=~(flag_elast);
             nel_emit=nel_impact*yiel;

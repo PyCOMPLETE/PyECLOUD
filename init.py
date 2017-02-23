@@ -82,6 +82,7 @@ c=299792458.;
 
 def read_parameter_files(pyecl_input_folder='./'):
     switch_model=0
+    s_model = 1.35
     simulation_param_file='simulation_parameters.input'
     
     save_mp_state_time_file = -1
@@ -230,7 +231,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     
     return b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
-    Emax, del_max, R0, E_th, sigmafit, mufit,\
+    Emax, s_model, del_max, R0, E_th, sigmafit, mufit,\
     Dt, t_end, lam_th, t_ion, N_mp_max,\
     N_mp_regen, N_mp_after_regen, fact_split, fact_clean, nel_mp_ref_0,\
     Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen,regen_hist_cut,\
@@ -262,7 +263,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     
     b_par, x_aper, y_aper, B,\
     gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
-    Emax, del_max, R0, E_th, sigmafit, mufit,\
+    Emax, s_model, del_max, R0, E_th, sigmafit, mufit,\
     Dt, t_end, lam_th, t_ion, N_mp_max,\
     N_mp_regen, N_mp_after_regen, fact_split, fact_clean, nel_mp_ref_0,\
     Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen,regen_hist_cut,\
@@ -367,15 +368,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 		kwargs = {}
 		
     if switch_model==0 or switch_model=='ECLOUD':
-        sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
+        sey_mod=SEY_model_ECLOUD(Emax, s_model, del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':
-        sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0,**kwargs)
+        sey_mod=SEY_model_acc_low_ene(Emax, s_model, del_max,R0,**kwargs)
     elif switch_model=='ECLOUD_nunif':
-        sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax,del_max,R0,**kwargs)
+        sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax, s_model, del_max,R0,**kwargs)
     elif switch_model=='cos_low_ene':
-        sey_mod=SEY_model_cos_le(Emax,del_max,R0,**kwargs)
+        sey_mod=SEY_model_cos_le(Emax, s_model, del_max,R0,**kwargs)
     elif switch_model=='flat_low_ene':
-        sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+        sey_mod=SEY_model_flat_le(Emax, s_model, del_max,R0)
 
     
     flag_seg = (flag_hist_impact_seg==1)
