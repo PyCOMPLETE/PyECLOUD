@@ -6,9 +6,9 @@ sys.path.append("../")
 import numpy as np
 from scipy.constants import c, e, m_p, m_e
 
-from PyHEADTAIL.machines.synchrotron import BasicSynchrotron
+from PyHEADTAIL.machines.synchrotron import Synchrotron
 
-class CLIC_DR(BasicSynchrotron):
+class CLIC_DR(Synchrotron):
 
 	def __init__(self, machine_configuration=None, optics_mode='smooth', wrap_z=True, **kwargs):
 		
