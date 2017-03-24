@@ -22,7 +22,7 @@ init_unif_edens = None
 # rest gas parameters
 gas_ion_flag = 1
 unif_frac = 0. 
-P_nTorr = 20.
+P_nTorr = 5.
 sigma_ion_MBarn = 1.5
 Temp_K = 300.
 A = 44.
@@ -31,7 +31,7 @@ ion_mass = A * m_p
 ion_charge = e
 
 # MPs and MP size (set to match with FASTION code)
-N_MP_ele_init = 501*156 	#500 ion MPs/bunch
+N_MP_ele_init = 501*156		#500 ion MPs/bunch
 N_mp_max = N_MP_ele_init
 nel_mp_ref_0 = P_nTorr * sigma_ion_MBarn / 37.89	#number of real ions/MP
 
@@ -42,10 +42,10 @@ Dt_ref = 1.0e-9
 # define the machine
 from CLIC_DR import CLIC_DR
 machine_configuration ='CLIC_DR_1GHz'
-optics_mode = 'non-smooth'
+optics_mode = 'smooth'
 
-n_segments = 260
-n_turns = 1
+n_segments = 26
+n_turns = 10
 
 if optics_mode == 'smooth':
 	machine = CLIC_DR(machine_configuration=machine_configuration, n_segments=n_segments)
@@ -96,8 +96,8 @@ print 'sigma_x = %.2e, sigma_y = %.2e'%(sigma_x, sigma_y)
 
 # define apertures and PIC grid size
 chamb_type = 'rect'
-x_aper  = 15*sigma_x
-y_aper  = 15*sigma_y
+x_aper  = 20*sigma_x
+y_aper  = 20*sigma_y
 
 Dh_x = x_aper/125.
 Dh_y = y_aper/125.
@@ -120,14 +120,14 @@ filled_buncher.add_statistics(sliceset=filled_slices, beam=beam, statistics=True
 # define a beam monitor 
 from PyHEADTAIL.monitors.monitors import SliceMonitor
 beam_monitor = SliceMonitor(filename='bunch_evolution_A%d_%db_%dips_%dturns_%.2fnTorr'%(A, n_bunches, n_segments, n_turns, P_nTorr), 
-				n_steps = n_turns*n_segments, slicer=filled_buncher, write_buffer_every=100)
+				n_steps = n_turns+1, slicer=filled_buncher, write_buffer_every=5)
 
 
 # initialize ion cloud with single kick per bunch
 import PyECLOUD.PyEC4PyHT_fastion as PyEC4PyHTfi
 ecloud_sk = PyEC4PyHTfi.Ecloud_fastion(L_ecloud=machine.circumference/n_segments, slicer=machine.buncher, 
 			Dt_ref=Dt_ref, MP_e_mass=ion_mass, MP_e_charge=ion_charge,
-			pyecl_input_folder='./pyecloud_config', beam_monitor=beam_monitor, 
+			pyecl_input_folder='./pyecloud_config', beam_monitor=None, 
 			chamb_type = chamb_type, PyPICmode = 'FFT_OpenBoundary',
 			x_aper=x_aper, y_aper=y_aper,
 			filename_chm=filename_chm, Dh_sc=Dh_sc,
@@ -142,7 +142,7 @@ ecloud_sk = PyEC4PyHTfi.Ecloud_fastion(L_ecloud=machine.circumference/n_segments
 			switch_model='perfect_absorber')
 
 
-# print grid size
+#print grid size
 nx, ny = ecloud_sk.spacech_ele.PyPICobj.nx, ecloud_sk.spacech_ele.PyPICobj.ny
 print 'nx = %d, ny = %d'%(nx, ny)
 
@@ -152,11 +152,13 @@ machine.install_after_each_transverse_segment(ecloud_sk)
 
 
 # run simulation
+beam_monitor.dump(beam)
 print 'Start track...'
 t_start_sw = time.mktime(time.localtime())
 print 'Time for initialization ',(t_start_sw-t_start), 's'
 for i_turn in xrange(n_turns):
 	print 'Turn %d'%(i_turn+1)
 	machine.track(beam)
+	beam_monitor.dump(beam)
 t_stop_sw = time.mktime(time.localtime())
 print 'Done track in ', (t_stop_sw-t_start_sw), 's'
