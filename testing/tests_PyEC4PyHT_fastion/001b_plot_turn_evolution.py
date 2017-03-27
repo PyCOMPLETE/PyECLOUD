@@ -8,6 +8,7 @@ pyhdtl = mfm.bunchh5_to_dict('bunch_evolution_A44_156b_26ips_10turns_5.00nTorr.h
 N_turns = 10
 
 pl.close('all')
+pl.ion()
 
 sns.set_context('talk', font_scale=1.4, rc={'lines.linewidth': 1.5})
 sns.set_style('whitegrid', {'grid.linestyle': ':', 'axes.edgecolor': '0.5', 'axes.linewidth': 1.2, 'legend.frameon': False})
@@ -16,7 +17,6 @@ fsize = 12
 
 
 pl.figure(100, figsize=(8,10))
-pl.clf()
 sp3 = pl.subplot(2,1,1)
 pl.plot(pyhdtl['mean_x'][::-1,0], '.-', markersize = mksize) 
 pl.gca().ticklabel_format(style='sci', scilimits=(0,0),axis='y')
@@ -34,14 +34,11 @@ pl.xlim(0,156)
 pl.ylim(-3e-6, 3e-6)
 pl.subplots_adjust(left = 0.21, hspace = 0.3)
 
-pl.ion()
-pl.draw()
-time.sleep(1.5)
+
 
 
 for ii in xrange(N_turns+1):
 
-	pl.figure(100, figsize=(8,10))
 	pl.clf()
 	sp3 = pl.subplot(2,1,1)
 	pl.plot(pyhdtl['mean_x'][::-1,ii], '.-', markersize = mksize) 
@@ -60,8 +57,6 @@ for ii in xrange(N_turns+1):
 	pl.ylim(-3e-6, 3e-6)
 	pl.subplots_adjust(left = 0.21, hspace = 0.3)
 
-	pl.ion()
-	pl.draw()
-	time.sleep(1.5)
+	pl.pause(1.5)
 
 
