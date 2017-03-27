@@ -56,6 +56,7 @@ na = lambda x:np.array([x])
 
 class space_charge:
     #@profile
+
     def __init__(self,chamb, Dh, Dt_sc=None, PyPICmode = 'FiniteDifferences_ShortleyWeller' ,sparse_solver = 'scipy_slu', 
                     f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
         
@@ -93,8 +94,12 @@ class space_charge:
         elif PyPICmode == 'FFT_OpenBoundary':
             if chamb.chamb_type != 'rect':
                 raise ValueError('''PyPICmode = 'FFT_OpenBoundary' can be used only if chamb_type = 'rect' ''' )
-            import PyPIC.FFT_OpenBoundary_SquareGrid as PIC_FFT_Open
-            self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary_SquareGrid(x_aper = chamb.x_aper, y_aper = chamb.y_aper, Dh = Dh)
+            import PyPIC.FFT_OpenBoundary as PIC_FFT_Open
+            if len(np.atleast_1d(Dh)) == 2:
+                self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary(x_aper = chamb.x_aper, y_aper = chamb.y_aper, dx = Dh[0], dy = Dh[1])
+            else:
+                self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary(x_aper = chamb.x_aper, y_aper = chamb.y_aper, Dh = Dh)
+
             #To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)	
@@ -108,6 +113,7 @@ class space_charge:
         self.yg = self.PyPICobj.yg
         self.Nyg = self.PyPICobj.Nyg
         self.bias_y = self.PyPICobj.bias_y
+
 
         self.Dt_sc = Dt_sc
         self.t_last_recom=0.;
@@ -146,8 +152,10 @@ class space_charge:
         
         if flag_recompute or force:
             self.t_last_recom = t_curr
-            self.PyPICobj.scatter_and_solve(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp])
+
+            self.PyPICobj.scatter_and_solve(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
             #~ U_sc_eV_stp = -0.5*eps0*np.sum(b*phi)*self.Dh*self.Dh/qe
+
         self.flag_recomputed_sc=flag_recompute
         
 

@@ -1,6 +1,6 @@
 import sys, os
-BIN=os.path.expanduser('../../../')
-sys.path.append(BIN)
+sys.path.append(os.path.expanduser('../../../'))
+sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 
 import numpy as np
@@ -17,9 +17,9 @@ filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_20150212_
 B_multip = [0.5]
 N_kicks = 1
 
-filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_3kicks_20150212_prb.dat'
-B_multip = [0.5]
-N_kicks = 3
+#~ filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_3kicks_20150212_prb.dat'
+#~ B_multip = [0.5]
+#~ N_kicks = 3
 
 n_part_per_turn = 5000
 
@@ -186,7 +186,7 @@ for ii in xrange(N_turns-1):
 
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(ii, rms_err_x, rms_err_y))
 
-	pl.savefig(filename.split('_prb.dat')[0]+'_%02d.png'%ii, dpi=150)
+	pl.savefig(filename.split('_prb.dat')[0]+'_slicebyslice_%02d.png'%ii, dpi=150)
 
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
@@ -202,7 +202,7 @@ pl.grid('on')
 pl.ylabel('''Relative r.m.s. error [%]''')
 pl.xlabel('Turn')
 pl.legend()
-pl.savefig(filename.split('_prb.dat')[0]+'_errors.png', dpi=200)
+pl.savefig(filename.split('_prb.dat')[0]+'_slicebyslice_errors.png', dpi=200)
 pl.show()
 
 
