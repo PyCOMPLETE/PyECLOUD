@@ -107,10 +107,18 @@ class impact_management_perfect_absorber(impact_management):
         
             ## impact management
             N_mp_old=N_mp
-            # detect impact
-            flag_impact=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
             
-            Nimpact=sum(flag_impact);
+            # check flag_impact array has right size (if not regenerate it)
+            if len(self.flag_impact) != len(x_mp):
+                self.flag_impact = np.array(len(x_mp)*[False])
+            
+            # reset flag_impact array 
+            self.flag_impact[:] = False
+            
+            # detect impact
+            self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
+            
+            Nimpact=int(sum(self.flag_impact))
 
             if Nimpact>0:  
 
@@ -119,7 +127,7 @@ class impact_management_perfect_absorber(impact_management):
 # 					i_found_new_mp = 0*x_mp
 
                 # load segment endpoints
-                x_in=x_mp_old[flag_impact];y_in=y_mp_old[flag_impact];z_in=z_mp_old[flag_impact];
+                x_in=x_mp_old[self.flag_impact[:N_mp_old]];y_in=y_mp_old[self.flag_impact[:N_mp_old]];z_in=z_mp_old[self.flag_impact[:N_mp_old]];
 
                 # just to have them back in the chamber
                 x_emit = x_in
@@ -128,8 +136,8 @@ class impact_management_perfect_absorber(impact_management):
 
                            
                 # load velocities and charges
-                vx_impact=vx_mp[flag_impact]; vy_impact=vy_mp[flag_impact];vz_impact=vz_mp[flag_impact];
-                nel_impact =nel_mp[flag_impact];
+                vx_impact=vx_mp[self.flag_impact]; vy_impact=vy_mp[self.flag_impact];vz_impact=vz_mp[self.flag_impact];
+                nel_impact =nel_mp[self.flag_impact];
                 
                 # compute impact velocities, energy and angle
                 v_impact_mod=sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact);
@@ -157,13 +165,13 @@ class impact_management_perfect_absorber(impact_management):
                 
 
                 # absorb
-                x_mp[flag_impact]=x_emit;
-                y_mp[flag_impact]=y_emit;
-                z_mp[flag_impact]=z_emit;
-                vx_mp[flag_impact]=0.;
-                vy_mp[flag_impact]=0.;
-                vz_mp[flag_impact]=0.;
-                nel_mp[flag_impact]=0.;
+                x_mp[self.flag_impact]=x_emit;
+                y_mp[self.flag_impact]=y_emit;
+                z_mp[self.flag_impact]=z_emit;
+                vx_mp[self.flag_impact]=0.;
+                vy_mp[self.flag_impact]=0.;
+                vz_mp[self.flag_impact]=0.;
+                nel_mp[self.flag_impact]=0.;
             
                 
                 MP_e.x_mp = x_mp
