@@ -1,6 +1,6 @@
 import sys, os
-BIN=os.path.expanduser('../../../')
-sys.path.insert(0,BIN)
+sys.path.append(os.path.expanduser('../../../'))
+sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 from scipy.constants import c, e, m_p
 import numpy as np
