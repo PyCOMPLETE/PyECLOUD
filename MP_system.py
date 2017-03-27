@@ -52,11 +52,8 @@
 import numpy as np
 from numpy.random import rand
 import hist_for as histf
+from scipy.constants import e, m_e
 
-## constants
-me=9.10938291e-31;
-qe=1.602176565e-19;
-qm=qe/me;
 
 class MP_positions:
     def __init__(self,x,y,z):
@@ -68,7 +65,7 @@ class MP_system:
     def __init__(self, N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                  N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                  Dx_hist_reg, Nx_reg, Ny_reg, Nvx_reg, Nvy_reg, Nvz_reg, regen_hist_cut, chamb,
-                 N_mp_soft_regen=None, N_mp_after_soft_regen=None):
+                 N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e):
         
         self.x_mp = np.zeros(N_mp_max,float)
         self.y_mp = np.zeros(N_mp_max,float)
@@ -96,6 +93,9 @@ class MP_system:
         self.Nvy_reg=Nvy_reg
         self.Nvz_reg=Nvz_reg
         self.chamb=chamb
+        
+        self.charge = charge
+        self.mass = mass
         
         xg_hist_reg=np.arange(0,chamb.x_aper+2.*Dx_hist_reg,Dx_hist_reg,float)  
         xgr_hist_reg=xg_hist_reg[1:]
@@ -145,7 +145,7 @@ class MP_system:
                    
             if self.N_mp>self.N_mp_soft_regen:
                 chrg=sum(self.nel_mp);
-                erg=sum(0.5/qm*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+                erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
                 
                 new_nel_mp_ref = chrg/self.N_mp_after_soft_regen; 
                 if new_nel_mp_ref<self.nel_mp_ref_0:
@@ -186,7 +186,7 @@ class MP_system:
                 
                    
                 chrg=sum(self.nel_mp);
-                erg=sum(0.5/qm*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+                erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
                 print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
                     
         
@@ -194,7 +194,7 @@ class MP_system:
         
         if (self.N_mp>self.N_mp_regen or (self.N_mp<self.N_mp_regen_low and self.nel_mp_ref>self.nel_mp_ref_0)):
             chrg=sum(self.nel_mp);
-            erg=sum(0.5/qm*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+            erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
             print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
                 
             
@@ -402,7 +402,7 @@ class MP_system:
             
            
             chrg=sum(self.nel_mp);
-            erg=sum(0.5/qm*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+            erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
             print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
         
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
@@ -411,11 +411,8 @@ class MP_system:
             if x_min==None: x_min = -self.chamb.x_aper 
             if y_max==None: y_max = self.chamb.y_aper
             if y_min==None: y_min = -self.chamb.y_aper           
-
-            me=9.10938291e-31;
-            qe=1.602176565e-19;
             
-            v0=-np.sqrt(2.*(E_init/3.)*qe/me);
+            v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
             
             
             
@@ -463,10 +460,8 @@ class MP_system:
 		if y_min is None:
 			y_min = -self.chamb.y_aper	
 
-		me=9.10938291e-31;
-		qe=1.602176565e-19;
 
-		v0=-np.sqrt(2.*(E_init/3.)*qe/me);
+		v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
 
 
 

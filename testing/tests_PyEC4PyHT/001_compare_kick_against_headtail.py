@@ -1,6 +1,6 @@
 import sys, os
-BIN=os.path.expanduser('../../../')
-sys.path.append(BIN)
+sys.path.append(os.path.expanduser('../../../'))
+sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 
 import numpy as np
@@ -11,17 +11,17 @@ import time
 show_movie = False
 
 
-filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_20150212_prb.dat'
-B_multip = [0.]
-N_kicks = 1
+#~ filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_20150212_prb.dat'
+#~ B_multip = [0.]
+#~ N_kicks = 1
 
 filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_20150212_prb.dat'
 B_multip = [0.5]
 N_kicks = 1
 
-filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_3kicks_20150212_prb.dat'
-B_multip = [0.5]
-N_kicks = 3
+#~ filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_3kicks_20150212_prb.dat'
+#~ B_multip = [0.5]
+#~ N_kicks = 3
 
 n_part_per_turn = 5000
 

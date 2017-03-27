@@ -1,0 +1,10 @@
+# MACHINE PARAMETERS
+
+chamb_type = None #redefine in the script
+
+
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [0.]
+
+
