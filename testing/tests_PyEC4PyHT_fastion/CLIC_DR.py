@@ -44,9 +44,9 @@ class CLIC_DR(Synchrotron):
 			
 			name = None
 			
-			beta_x 		= 15.83451434 
+			beta_x 		= 4.0 
 			D_x 		= 0
-			beta_y 		= 14.2140209
+			beta_y 		= 9.0 
 			D_y 		= 0 
 			
 			alpha_x 	= None
