@@ -25,8 +25,10 @@ all_sim_folders = [
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--ctr', help='Give index for %s' % all_sim_folders)
+parser.add_argument('--index', help='Give index for %s' % all_sim_folders, type=int)
 args = parser.parse_args()
+
+sim_folder = all_sim_folders[args.index]
 
 ref_folder = sim_folder
 curr_folder = sim_folder
