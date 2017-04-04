@@ -193,6 +193,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     flag_assume_convex = True
 
     E0 = None
+    s_param = None
 
     # multigrid parameters
     f_telescope = None
@@ -262,7 +263,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, B_skew,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0, s_param,\
     filen_main_outp,\
     f_telescope, target_grid, N_nodes_discard, N_min_Dh_main
 
@@ -294,7 +295,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, B_skew,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0,\
+    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0, s_param,\
     filen_main_outp,\
     f_telescope, target_grid, N_nodes_discard, N_min_Dh_main = \
     read_parameter_files(pyecl_input_folder)
@@ -371,13 +372,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  x_beam_pos = sb_par.x_beam_pos, y_beam_pos = sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
                  flag_secodary_beam = True, t_primary_beam = beamtim.t,
                  Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file = (progress_path+('_mapgen_sec_%d'%ii))))
-
-
+    
+    kwargs = {}
+    
     if E0 is not None:
-		kwargs = {'E0':E0}
-    else: #If E0 is not provided use default value for each object
-		kwargs = {}
-
+        kwargs.update({'E0':E0})
+        #If E0 is not provided use default value for each object
+        
+    if s_param is not None:
+        if switch_model==0 or switch_model=='ECLOUD':
+            kwargs.update({'s':s_param})
+        else:
+            raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
+        
     if switch_model==0 or switch_model=='ECLOUD':
         sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':

@@ -6,57 +6,55 @@
 #
 #
 #     This file is part of the code:
+#                                                                      		            
+#		           PyECLOUD Version 5.5.3                     
+#                  
+#                                                                       
+#     Author and contact:   Giovanni IADAROLA 
+#                           BE-ABP Group                               
+#                           CERN                                       
+#                           CH-1211 GENEVA 23                          
+#                           SWITZERLAND  
+#                           giovanni.iadarola@cern.ch                  
+#                                                                      
+#                contact:   Giovanni RUMOLO                            
+#                           BE-ABP Group                               
+#                           CERN                                      
+#                           CH-1211 GENEVA 23                          
+#                           SWITZERLAND  
+#                           giovanni.rumolo@cern.ch                    
+#                                                                      
 #
-#		           PyECLOUD Version 5.5.2
-#
-#
-#     Author and contact:   Giovanni IADAROLA
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.iadarola@cern.ch
-#
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
-#
-#
-#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
-#     appropriate  legal  protection  of  this  computer program and
-#     associated documentation reserved  in  all  countries  of  the
-#     world.
-#
-#     Organizations collaborating with CERN may receive this program
-#     and documentation freely and without charge.
-#
-#     CERN undertakes no obligation  for  the  maintenance  of  this
-#     program,  nor responsibility for its correctness,  and accepts
-#     no liability whatsoever resulting from its use.
-#
-#     Program  and documentation are provided solely for the use  of
-#     the organization to which they are distributed.
-#
-#     This program  may  not  be  copied  or  otherwise  distributed
-#     without  permission. This message must be retained on this and
-#     any other authorized copies.
-#
-#     The material cannot be sold. CERN should be  given  credit  in
-#     all references.
+#                                                                      
+#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other   
+#     appropriate  legal  protection  of  this  computer program and   
+#     associated documentation reserved  in  all  countries  of  the   
+#     world.                                                           
+#                                                                      
+#     Organizations collaborating with CERN may receive this program   
+#     and documentation freely and without charge.                     
+#                                                                      
+#     CERN undertakes no obligation  for  the  maintenance  of  this   
+#     program,  nor responsibility for its correctness,  and accepts   
+#     no liability whatsoever resulting from its use.                  
+#                                                                      
+#     Program  and documentation are provided solely for the use  of   
+#     the organization to which they are distributed.                  
+#                                                                      
+#     This program  may  not  be  copied  or  otherwise  distributed   
+#     without  permission. This message must be retained on this and   
+#     any other authorized copies.                                     
+#                                                                      
+#     The material cannot be sold. CERN should be  given  credit  in   
+#     all references.                                                  
 #----------------------------------------------------------------------
 
 from numpy import sqrt, exp
 from numpy.random import rand
 import numpy as np
 
-def yield_fun2(E,costheta,Emax,del_max,R0,E0):
-
-    s=1.35
-
+def yield_fun2(E, costheta, Emax, del_max, R0, E0, s):
+    
     del_max_tilde=del_max*exp(0.5*(1.-costheta));
     E_max_tilde=Emax*(1.+0.7*(1.-costheta));
 
@@ -74,16 +72,17 @@ def yield_fun2(E,costheta,Emax,del_max,R0,E0):
 
 
 class SEY_model_ECLOUD:
-    def __init__(self, Emax,del_max,R0,E0=150.):
+    def __init__(self, Emax,del_max,R0,E0=150., s=1.35):
             self.Emax = Emax
             self.del_max = del_max
             self.R0 = R0
             self.E0 = E0
-
-            print 'Secondary emission model: ECLOUD E0=%f'%self.E0
-
+            self.s = s
+            
+            print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f'%(self.E0, self.s)
+            
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
+            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s);
             flag_elast=(rand(len(ref_frac))<ref_frac);
             flag_truesec=~(flag_elast);
             nel_emit=nel_impact*yiel;
