@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 5.5.2
+#                   PyECLOUD Version 5.5.2
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -231,7 +231,7 @@ def read_parameter_files(pyecl_input_folder='./'):
 
     if angle_skew_rad != None and B_skew != None:
         raise ValueError('B_skew is specified along with angle_skew_rad!')
-
+    elif B_skew == None and angle_skew_rad != None:
         B_skew = zeros(len(B_multip), float)
         for ii, b in enumerate(B_multip):
             angle = angle_skew_rad[ii]*(ii+1)
@@ -324,11 +324,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         chamb=ellip_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file)
     elif chamb_type=='polyg' or chamb_type=='polyg_cython':
 
-		import geom_impact_poly_fast_impact as gipfi
-		chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-									 flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout, flag_assume_convex=flag_assume_convex)
+        import geom_impact_poly_fast_impact as gipfi
+        chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
+                                     flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout, flag_assume_convex=flag_assume_convex)
     elif chamb_type=='polyg_numpy':
-		raise ValueError("chamb_type='polyg_numpy' not supported anymore")
+        raise ValueError("chamb_type='polyg_numpy' not supported anymore")
         #~ chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
                          #~ flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
     elif chamb_type=='rect':
@@ -352,8 +352,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file = (progress_path+'_mapgen'))
 
     if sparse_solver=='klu':
-		print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
-		sparse_solver='PyKLU'
+        print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
+        sparse_solver='PyKLU'
 
     spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode,
                         f_telescope = f_telescope, target_grid = target_grid, N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
@@ -372,19 +372,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  x_beam_pos = sb_par.x_beam_pos, y_beam_pos = sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
                  flag_secodary_beam = True, t_primary_beam = beamtim.t,
                  Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file = (progress_path+('_mapgen_sec_%d'%ii))))
-    
+
     kwargs = {}
-    
+
     if E0 is not None:
         kwargs.update({'E0':E0})
         #If E0 is not provided use default value for each object
-        
+
     if s_param is not None:
         if switch_model==0 or switch_model=='ECLOUD':
             kwargs.update({'s':s_param})
         else:
             raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
-        
+
     if switch_model==0 or switch_model=='ECLOUD':
         sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':
