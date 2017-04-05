@@ -56,7 +56,7 @@
 
 from numpy import array, cross, sum, squeeze, zeros_like
 import scipy.io as sio
-from boris_cython import boris_step_multipole
+from boris_cython import boris_step_multipole, boris_step_simple
 
 
 
@@ -65,7 +65,6 @@ class pusher_Boris_multipole():
 
     def __init__(self, Dt, N_sub_steps=1, B_multip = [], B_skew=None):
 
-        print "Tracker: Boris multipole"
 
         self.N_sub_steps = N_sub_steps
         self.Dt = Dt
@@ -80,6 +79,13 @@ class pusher_Boris_multipole():
             self.B_skew = zeros_like(self.B_multip)
         else:
             self.B_skew = B_skew
+
+        if len(B_multip) <= 2 and B_skew is None:
+            self.boris_step = boris_step_simple
+            print "Tracker: Boris simple"
+        else:
+            self.boris_step = boris_step_multipole
+            print "Tracker: Boris multipole"
 
         if len(self.B_multip)==0:
             self.B_multip=array([0])
@@ -103,7 +109,7 @@ class pusher_Boris_multipole():
                 raise ValueError('Oooops! Not implemented....')
 
 
-            boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_multip, self.B_skew,
+            self.boris_step(self.N_sub_steps, self.Dtt, self.B_multip, self.B_skew,
                       xn1, yn1, zn1, vxn1, vyn1, vzn1,
                       Ex_n, Ey_n)
 
