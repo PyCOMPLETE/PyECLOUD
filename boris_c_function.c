@@ -46,18 +46,7 @@ void boris_c(int N_sub_steps, double Dtt,
 			B_skew_curr = B_skew[0];
 			Bx_n = B_skew_curr;
 			By_n = B_mul_curr;
-			
-			/*
-			 * Previous calculation
-			 *
-			 * if (N_multipoles>1)
-			 * {
-			 * 	B_mul_curr = B_multip[1];
-			 * 	Bx_n += B_mul_curr*yn1p;
-			 * 	By_n += B_mul_curr*xn1p;
-			 * }
-			 */
-			
+
 			imxy = 0.;
 			rexy = 1.;
 			//Order=1 for quadrupoles
