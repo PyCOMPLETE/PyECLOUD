@@ -22,7 +22,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	const double qm = -qe/me; //is an electron
 
-	b_field_function b_field = get_b_field_function(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
+	int b_field_function = get_b_field_function(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
 
 
 	for(p=0; p<N_mp; p++)
@@ -40,7 +40,16 @@ void boris_c(int N_sub_steps, double Dtt,
 
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
-			b_field(B_multip, B_skew, xn1p, yn1p, &Bx_n, &By_n, N_multipoles);
+			switch( b_field_function ){
+				case NONE:
+					break;
+				case QUADRUPOLE:
+					b_field_quadrupole(B_multip, xn1p, yn1p, &Bx_n, &By_n);
+					break;
+				case GENERAL:
+					b_field_general(B_multip, B_skew, xn1p, yn1p, &Bx_n, &By_n, N_multipoles);
+					break;
+			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
@@ -82,10 +91,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	}
 }
 
-void b_field_none(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
-}
-
-void b_field_quadrupole(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+void b_field_quadrupole(double* B_multip, double xn, double yn, double *Bx, double *By){
 	*By = B_multip[1] * xn;
 	*Bx = B_multip[1] * yn;
 }
@@ -112,7 +118,7 @@ void b_field_general(double* B_multip, double* B_skew, double xn, double yn, dou
 	}
 }
 
-b_field_function get_b_field_function(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
+int get_b_field_function(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
 	/* 
 	 * 1. If N_multipoles is 1, the magnetic field is "computed" here and an empty function is returned.
 	 * 2. Else if it is a non skew quadrupole, a simplified function is returned.
@@ -123,21 +129,21 @@ b_field_function get_b_field_function(double* B_multip, double* B_skew, int N_mu
 	if (N_multipoles == 1){
 		*By = B_multip[0];
 		*Bx = B_skew[0];
-		return b_field_none;
+		return NONE;
 	} 
 
-	//3. Skew 
+	//3. Skew quad or skew higher order
 	for(int i=0; i < N_multipoles; i++){
 		if (B_skew[i] != 0.){
-			return b_field_general;
+			return GENERAL;
 		}
 	}
 	
 	//2. Simple quad
 	if (N_multipoles == 2 && B_multip[0] == 0.){
-		return b_field_quadrupole;
+		return QUADRUPOLE;
 	} 
-	//3. Otherwise
-	return b_field_general ;
+	//3. Non skew higher order
+	return GENERAL;
 }
 
