@@ -1,4 +1,69 @@
 #include "boris_c_function.h"
+#include <stdio.h>
+
+const double me = 9.10938291e-31;
+const double qe = 1.602176565e-19;
+
+void b_field_drift(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+}
+
+void b_field_dipole(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+	*By = B_multip[0];
+}
+
+void b_field_quadrupole(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+	*By = B_multip[1] * xn;
+	*Bx = B_multip[1] * yn;
+}
+
+void b_field_general(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+	double B_mul_curr;
+	double B_skew_curr;
+	double rexy_0 ;
+	double rexy = 1.;
+	double imxy = 0.;
+
+	*By = B_multip[0];
+	*Bx = B_skew[0];
+
+	//Order=1 for quadrupoles
+	for(int order = 1; order < N_multipoles; order++){
+		rexy_0 = rexy;
+		rexy = rexy_0*xn - imxy*yn;
+		imxy = imxy*xn + rexy_0*yn;
+		B_mul_curr = B_multip[order];
+		B_skew_curr = B_skew[order];
+		*By += (B_mul_curr * rexy - B_skew_curr * imxy);
+		*Bx += (B_mul_curr * imxy + B_skew_curr * rexy);
+	}
+}
+
+b_field_function get_b_field(double* B_multip, double* B_skew, int N_multipoles){
+	for(int i=0; i < N_multipoles; i++){
+		printf("%.2f\t%.2f\n", B_multip[i], B_skew[i]); 
+		if (B_skew[i] != 0.){
+			printf("General\n");
+			return b_field_general;
+		}
+	}
+	if (N_multipoles == 1){
+		if (B_multip[0] == 0.){
+			printf("Drift\n");
+			return b_field_drift;
+		} else {
+			printf("Dipole\n");
+			return b_field_dipole;
+		}
+	}
+	else if (N_multipoles == 2 && B_multip[0] == 0.){
+		printf("Quadrupole\n");
+		return b_field_quadrupole;
+	}
+	else {
+		printf("General\n");
+		return b_field_general ;
+	}
+}
 
 void boris_c(int N_sub_steps, double Dtt,
 		double* B_multip, double* B_skew,
@@ -6,11 +71,11 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* vxn1, double* vyn1, double* vzn1,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
-	int p, isub, order;
+	int p, isub;
 	double Ex_np, Ey_np;
-	double Bx_n, By_n;
+	double Bx_n = 0.;
+	double By_n = 0.;
 
-	double me, qe, qm;
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
 	double vx_prime, vy_prime, vz_prime;
@@ -18,13 +83,10 @@ void boris_c(int N_sub_steps, double Dtt,
 	double vx_plus, vy_plus, vz_plus;
 	double vxn1p, vyn1p, vzn1p;
 	double xn1p, yn1p, zn1p;
-	double B_mul_curr;
-	double B_skew_curr;
-	double imxy, rexy , rexy_0;
+	const double qm = -qe/me; //is an electron
 
-	me=9.10938291e-31;
-	qe=1.602176565e-19;
-	qm=-qe/me; //is an electron
+	b_field_function b_field = get_b_field(B_multip, B_skew, N_multipoles);
+
 
 	for(p=0; p<N_mp; p++)
 	{
@@ -41,25 +103,10 @@ void boris_c(int N_sub_steps, double Dtt,
 
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
+			b_field(B_multip, B_skew, xn1p, yn1p, &Bx_n, &By_n, N_multipoles);
 
-			B_mul_curr = B_multip[0];
-			B_skew_curr = B_skew[0];
-			Bx_n = B_skew_curr;
-			By_n = B_mul_curr;
-
-			imxy = 0.;
-			rexy = 1.;
-			//Order=1 for quadrupoles
-			for(order = 1; order < N_multipoles; order++)
-			{
-				rexy_0 = rexy;
-				rexy = rexy_0*xn1p - imxy*yn1p;
-				imxy = imxy*xn1p + rexy_0*yn1p;
-
-				B_mul_curr = B_multip[order];
-				B_skew_curr = B_skew[order];
-				By_n += (B_mul_curr * rexy - B_skew_curr * imxy);
-				Bx_n += (B_mul_curr * imxy + B_skew_curr * rexy);
+			if (p == 0 && isub == 0){
+				printf("%.2f\t%.2f\n", Bx_n, By_n);
 			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;

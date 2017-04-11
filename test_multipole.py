@@ -16,8 +16,6 @@ parser.add_argument('-o', help='Path where to save the figure')
 parser.add_argument('--noshow', help='Do not make a plot', action='store_true')
 args = parser.parse_args()
 
-
-
 try:
     from RcParams import init_pyplot
     init_pyplot()
@@ -27,7 +25,7 @@ except ImportError:
 
 plt.close('all')
 
-Dt = 2.5e-13
+Dt = 5e-13
 N_steps=1
 
 chamb=ellip_cham_geom_object(3.,3.)
@@ -61,8 +59,8 @@ sp3.set_xlabel('y [m]')
 sp3.set_ylabel('B_x [T]')
 
 
-angles = np.pi / 4 * np.array([0,1,2,3,4])
-for angle_ctr, angle in enumerate(angles):
+angles = np.pi / 4. * np.array([0,1,2,3,4], dtype=float)
+for angle_ctr, angle in enumerate(angles[:1]):
     ms.figure('Angle %.1f' % angle)
     angle_deg = angle/np.pi *180
     plt.suptitle('Angle = %.2f deg' % angle_deg)
@@ -71,9 +69,9 @@ for angle_ctr, angle in enumerate(angles):
         B_skew = np.zeros(order+1)
         B_multip[order] = 1.*np.cos(angle*(order+1))
         B_skew[order] = 1. * np.sin(angle*(order+1))
-        print order, B_multip[order], B_skew[order]
         if angle == 0:
             B_skew = None
+        print title, B_multip, B_skew
 
         pusher = dbu.pusher_Boris_multipole(Dt, B_multip=B_multip, N_sub_steps=1, B_skew=B_skew)
 
