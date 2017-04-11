@@ -1,69 +1,7 @@
 #include "boris_c_function.h"
-#include <stdio.h>
 
 const double me = 9.10938291e-31;
 const double qe = 1.602176565e-19;
-
-void b_field_drift(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
-}
-
-void b_field_dipole(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
-	*By = B_multip[0];
-}
-
-void b_field_quadrupole(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
-	*By = B_multip[1] * xn;
-	*Bx = B_multip[1] * yn;
-}
-
-void b_field_general(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
-	double B_mul_curr;
-	double B_skew_curr;
-	double rexy_0 ;
-	double rexy = 1.;
-	double imxy = 0.;
-
-	*By = B_multip[0];
-	*Bx = B_skew[0];
-
-	//Order=1 for quadrupoles
-	for(int order = 1; order < N_multipoles; order++){
-		rexy_0 = rexy;
-		rexy = rexy_0*xn - imxy*yn;
-		imxy = imxy*xn + rexy_0*yn;
-		B_mul_curr = B_multip[order];
-		B_skew_curr = B_skew[order];
-		*By += (B_mul_curr * rexy - B_skew_curr * imxy);
-		*Bx += (B_mul_curr * imxy + B_skew_curr * rexy);
-	}
-}
-
-b_field_function get_b_field(double* B_multip, double* B_skew, int N_multipoles){
-	for(int i=0; i < N_multipoles; i++){
-		printf("%.2f\t%.2f\n", B_multip[i], B_skew[i]); 
-		if (B_skew[i] != 0.){
-			printf("General\n");
-			return b_field_general;
-		}
-	}
-	if (N_multipoles == 1){
-		if (B_multip[0] == 0.){
-			printf("Drift\n");
-			return b_field_drift;
-		} else {
-			printf("Dipole\n");
-			return b_field_dipole;
-		}
-	}
-	else if (N_multipoles == 2 && B_multip[0] == 0.){
-		printf("Quadrupole\n");
-		return b_field_quadrupole;
-	}
-	else {
-		printf("General\n");
-		return b_field_general ;
-	}
-}
 
 void boris_c(int N_sub_steps, double Dtt,
 		double* B_multip, double* B_skew,
@@ -73,8 +11,7 @@ void boris_c(int N_sub_steps, double Dtt,
 {
 	int p, isub;
 	double Ex_np, Ey_np;
-	double Bx_n = 0.;
-	double By_n = 0.;
+	double Bx_n, By_n;
 
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
@@ -85,7 +22,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	const double qm = -qe/me; //is an electron
 
-	b_field_function b_field = get_b_field(B_multip, B_skew, N_multipoles);
+	b_field_function b_field = get_b_field_function(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
 
 
 	for(p=0; p<N_mp; p++)
@@ -104,10 +41,6 @@ void boris_c(int N_sub_steps, double Dtt,
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
 			b_field(B_multip, B_skew, xn1p, yn1p, &Bx_n, &By_n, N_multipoles);
-
-			if (p == 0 && isub == 0){
-				printf("%.2f\t%.2f\n", Bx_n, By_n);
-			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
@@ -148,3 +81,63 @@ void boris_c(int N_sub_steps, double Dtt,
 		vzn1[p] = vzn1p;
 	}
 }
+
+void b_field_none(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+}
+
+void b_field_quadrupole(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+	*By = B_multip[1] * xn;
+	*Bx = B_multip[1] * yn;
+}
+
+void b_field_general(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
+	double B_mul_curr;
+	double B_skew_curr;
+	double rexy_0 ;
+	double rexy = 1.;
+	double imxy = 0.;
+
+	*By = B_multip[0];
+	*Bx = B_skew[0];
+
+	//Order=1 for quadrupoles
+	for(int order = 1; order < N_multipoles; order++){
+		rexy_0 = rexy;
+		rexy = rexy_0*xn - imxy*yn;
+		imxy = imxy*xn + rexy_0*yn;
+		B_mul_curr = B_multip[order];
+		B_skew_curr = B_skew[order];
+		*By += (B_mul_curr * rexy - B_skew_curr * imxy);
+		*Bx += (B_mul_curr * imxy + B_skew_curr * rexy);
+	}
+}
+
+b_field_function get_b_field_function(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
+	/* 
+	 * 1. If N_multipoles is 1, the magnetic field is "computed" here and an empty function is returned.
+	 * 2. Else if it is a non skew quadrupole, a simplified function is returned.
+	 * 3. Otherwise, the full multipole/skew function is returned.
+	 */
+	
+	//1. Drift or Dipole
+	if (N_multipoles == 1){
+		*By = B_multip[0];
+		*Bx = B_skew[0];
+		return b_field_none;
+	} 
+
+	//3. Skew 
+	for(int i=0; i < N_multipoles; i++){
+		if (B_skew[i] != 0.){
+			return b_field_general;
+		}
+	}
+	
+	//2. Simple quad
+	if (N_multipoles == 2 && B_multip[0] == 0.){
+		return b_field_quadrupole;
+	} 
+	//3. Otherwise
+	return b_field_general ;
+}
+

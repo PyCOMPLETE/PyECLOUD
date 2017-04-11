@@ -60,7 +60,7 @@ sp3.set_ylabel('B_x [T]')
 
 
 angles = np.pi / 4. * np.array([0,1,2,3,4], dtype=float)
-for angle_ctr, angle in enumerate(angles[:1]):
+for angle_ctr, angle in enumerate(angles):
     ms.figure('Angle %.1f' % angle)
     angle_deg = angle/np.pi *180
     plt.suptitle('Angle = %.2f deg' % angle_deg)
