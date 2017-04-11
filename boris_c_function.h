@@ -12,6 +12,6 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* vxn1, double* vyn1, double* vzn1,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles);
 
-int get_b_field_function(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By);
+int get_b_field_type(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By);
 
 #endif

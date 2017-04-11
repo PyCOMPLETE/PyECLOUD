@@ -14,7 +14,6 @@ void boris_c(int N_sub_steps, double Dtt,
 	double Bx_n, By_n;
 	double rexy, imxy, rexy_0;
 	double B_mul_curr, B_skew_curr;
-
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
 	double vx_prime, vy_prime, vz_prime;
@@ -24,8 +23,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	const double qm = -qe/me; //is an electron
 
-	int b_field_function = get_b_field_function(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
-
+	int b_field_type = get_b_field_function(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
 
 	for(p=0; p<N_mp; p++)
 	{
@@ -42,7 +40,7 @@ void boris_c(int N_sub_steps, double Dtt,
 
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
-			switch( b_field_function ){
+			switch( b_field_type ){
 				case NONE:
 					break;
 				case QUADRUPOLE:
@@ -62,15 +60,15 @@ void boris_c(int N_sub_steps, double Dtt,
 						imxy = imxy*xn1p + rexy_0*yn1p;
 						B_mul_curr = B_multip[order];
 						B_skew_curr = B_skew[order];
-						By_n += (B_mul_curr * rexy - B_skew_curr * imxy);
-						Bx_n += (B_mul_curr * imxy + B_skew_curr * rexy);
+						By_n += (B_mul_curr*rexy - B_skew_curr*imxy);
+						Bx_n += (B_mul_curr*imxy + B_skew_curr*rexy);
 					}
 					break;
 			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
-			tBsq = tBx*tBx + tBy*tBy; 
+			tBsq = tBx*tBx + tBy*tBy;
 
 			sBx = 2.*tBx/(1.+tBsq);
 			sBy = 2.*tBy/(1.+tBsq);
@@ -80,7 +78,7 @@ void boris_c(int N_sub_steps, double Dtt,
 			vz_min = vzn1p;
 
 			//v_prime = v_min + cross(v_min, tB)
-			vx_prime = -vz_min*tBy + vx_min; 
+			vx_prime = -vz_min*tBy + vx_min;
 			vy_prime = vz_min*tBx + vy_min;
 			vz_prime = vx_min*tBy-vy_min*tBx + vz_min;
 
@@ -92,13 +90,13 @@ void boris_c(int N_sub_steps, double Dtt,
 			vxn1p = vx_plus + 0.5*qm*Ex_np*Dtt;
 			vyn1p = vy_plus + 0.5*qm*Ey_np*Dtt;
 			vzn1p = vz_plus;
-			
+
 			xn1p = xn1p + vxn1p * Dtt;
 			yn1p = yn1p + vyn1p * Dtt;
 			zn1p = zn1p + vzn1p * Dtt;
 		}
 
-		xn1[p] = xn1p; 
+		xn1[p] = xn1p;
 		yn1[p] = yn1p;
 		zn1[p] = zn1p;
 
@@ -109,31 +107,28 @@ void boris_c(int N_sub_steps, double Dtt,
 }
 
 
-/* 
+/*
  * 1. If N_multipoles is 1, the magnetic field is "computed" here and an empty function is returned.
  * 2. Else if it is a non skew quadrupole, a simplified function is returned.
  * 3. Otherwise, the full multipole/skew function is returned.
  */
-int get_b_field_function(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
-	
+int get_b_field_type(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
 	//1. Drift or Dipole
 	if (N_multipoles == 1){
 		*By = B_multip[0];
 		*Bx = B_skew[0];
 		return NONE;
-	} 
-
+	}
 	//3. Skew quad or skew higher order
 	for(int i=0; i < N_multipoles; i++){
 		if (B_skew[i] != 0.){
 			return GENERAL;
 		}
 	}
-	
 	//2. Simple quad
 	if (N_multipoles == 2 && B_multip[0] == 0.){
 		return QUADRUPOLE;
-	} 
+	}
 	//3. Non skew higher order
 	return GENERAL;
 }
