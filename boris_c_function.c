@@ -9,9 +9,11 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* vxn1, double* vyn1, double* vzn1,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
 {
-	int p, isub;
+	int p, isub, order;
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
+	double rexy, imxy, rexy_0;
+	double B_mul_curr, B_skew_curr;
 
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
@@ -44,10 +46,25 @@ void boris_c(int N_sub_steps, double Dtt,
 				case NONE:
 					break;
 				case QUADRUPOLE:
-					b_field_quadrupole(B_multip, xn1p, yn1p, &Bx_n, &By_n);
+					By_n = B_multip[1] * xn1p;
+					Bx_n = B_multip[1] * yn1p;
 					break;
 				case GENERAL:
-					b_field_general(B_multip, B_skew, xn1p, yn1p, &Bx_n, &By_n, N_multipoles);
+					rexy = 1.;
+					imxy = 0.;
+					By_n = B_multip[0];
+					Bx_n = B_skew[0];
+
+					//Order=1 for quadrupoles
+					for(order = 1; order < N_multipoles; order++){
+						rexy_0 = rexy;
+						rexy = rexy_0*xn1p - imxy*yn1p;
+						imxy = imxy*xn1p + rexy_0*yn1p;
+						B_mul_curr = B_multip[order];
+						B_skew_curr = B_skew[order];
+						By_n += (B_mul_curr * rexy - B_skew_curr * imxy);
+						Bx_n += (B_mul_curr * imxy + B_skew_curr * rexy);
+					}
 					break;
 			}
 
@@ -91,39 +108,13 @@ void boris_c(int N_sub_steps, double Dtt,
 	}
 }
 
-void b_field_quadrupole(double* B_multip, double xn, double yn, double *Bx, double *By){
-	*By = B_multip[1] * xn;
-	*Bx = B_multip[1] * yn;
-}
 
-void b_field_general(double* B_multip, double* B_skew, double xn, double yn, double *Bx, double *By, int N_multipoles){
-	double B_mul_curr;
-	double B_skew_curr;
-	double rexy_0 ;
-	double rexy = 1.;
-	double imxy = 0.;
-
-	*By = B_multip[0];
-	*Bx = B_skew[0];
-
-	//Order=1 for quadrupoles
-	for(int order = 1; order < N_multipoles; order++){
-		rexy_0 = rexy;
-		rexy = rexy_0*xn - imxy*yn;
-		imxy = imxy*xn + rexy_0*yn;
-		B_mul_curr = B_multip[order];
-		B_skew_curr = B_skew[order];
-		*By += (B_mul_curr * rexy - B_skew_curr * imxy);
-		*Bx += (B_mul_curr * imxy + B_skew_curr * rexy);
-	}
-}
-
+/* 
+ * 1. If N_multipoles is 1, the magnetic field is "computed" here and an empty function is returned.
+ * 2. Else if it is a non skew quadrupole, a simplified function is returned.
+ * 3. Otherwise, the full multipole/skew function is returned.
+ */
 int get_b_field_function(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
-	/* 
-	 * 1. If N_multipoles is 1, the magnetic field is "computed" here and an empty function is returned.
-	 * 2. Else if it is a non skew quadrupole, a simplified function is returned.
-	 * 3. Otherwise, the full multipole/skew function is returned.
-	 */
 	
 	//1. Drift or Dipole
 	if (N_multipoles == 1){
