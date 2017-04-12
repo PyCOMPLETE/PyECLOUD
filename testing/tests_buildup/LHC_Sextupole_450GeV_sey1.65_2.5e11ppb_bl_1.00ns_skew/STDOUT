@@ -1,0 +1,1786 @@
+Sender: LSF System <lsfadmin@b6e37acba2.cern.ch>
+Subject: Job 562292866: <200mhz799> in cluster batch Exited
+
+Job <200mhz799> was submitted from host <lxplus0131.cern.ch> by user <grumolo> in cluster <batch>.
+Job was executed on host(s) <b6e37acba2.cern.ch>, in queue <1nd>, as user <grumolo> in cluster <batch>.
+</afs/cern.ch/user/g/grumolo> was used as the home directory.
+</afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan> was used as the working directory.
+Started at Mon Sep  8 15:18:17 2014
+Results reported at Mon Sep  8 15:51:20 2014
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+
+PYECLOUDPATH=/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/pyecloud/
+CURRDIR=/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns
+export CURRDIR
+
+source /afs/cern.ch/work/k/kli/public/venv_py27_slc6/bin/activate
+which python
+
+PYTHONPATH=$PYECLOUDPATH
+export PYTHONPATH
+echo $PYTHONPATH
+
+
+# Copy input and executable
+cp ${PYECLOUDPATH}/main.py .
+
+cp ${CURRDIR}/*.input .
+cp ${CURRDIR}/*.beam .
+cp ${CURRDIR}/*.mat .
+
+
+#execute beam generation
+python main.py
+
+#save result
+cp Pyecltest.mat ${CURRDIR}
+
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with signal termination: Alarm clock.
+
+Resource usage summary:
+
+    CPU time   :   1874.09 sec.
+    Max Memory :       530 MB
+    Max Swap   :      1400 MB
+
+    Max Processes  :         6
+    Max Threads    :         7
+
+The output (if any) follows:
+
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/grumolo/562292866> on <>
+
+/afs/cern.ch/work/k/kli/public/venv_py27_slc6/bin/python
+/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/pyecloud/
+PyECLOUD Version 4.08
+Parsing beam file: beam.beam
+Starting pyecloud_saver init.
+Using fast polygon
+Start beam profile generation.
+Beam profile generation 0%
+Beam profile generation 5%
+Beam profile generation 10%
+Beam profile generation 15%
+Beam profile generation 20%
+Beam profile generation 25%
+Beam profile generation 30%
+Beam profile generation 35%
+Beam profile generation 40%
+Beam profile generation 45%
+Beam profile generation 50%
+Beam profile generation 55%
+Beam profile generation 60%
+Beam profile generation 65%
+Beam profile generation 70%
+Beam profile generation 75%
+Beam profile generation 80%
+Beam profile generation 85%
+Beam profile generation 90%
+Beam profile generation 95%
+Done beam profile generation.
+No beam field file provided -> Calculate field using Poisson solver
+Start LU space charge init.
+Using Shortley-Weller boundary approx.
+Mat. assembly 0%
+Mat. assembly 5%
+Mat. assembly 10%
+Mat. assembly 15%
+Mat. assembly 20%
+Mat. assembly 25%
+Mat. assembly 30%
+Mat. assembly 35%
+Mat. assembly 40%
+Mat. assembly 45%
+Mat. assembly 50%
+Mat. assembly 55%
+Mat. assembly 60%
+Mat. assembly 65%
+Mat. assembly 70%
+Mat. assembly 75%
+Mat. assembly 80%
+Mat. assembly 85%
+Mat. assembly 90%
+Mat. assembly 95%
+Mat. assembly 100%
+Internal nodes with 0 potential
+[21691, 21981, 38172, 38530, 126252, 126610, 142801, 143091]
+Using scipy superlu solver...
+Done space charge init.
+Computing beam charge density
+Start Linear System Solution.
+Start field computation.
+Done beam field computation.
+Start LU space charge init.
+Using Shortley-Weller boundary approx.
+Mat. assembly 0%
+Mat. assembly 5%
+Mat. assembly 10%
+Mat. assembly 15%
+Mat. assembly 20%
+Mat. assembly 25%
+Mat. assembly 30%
+Mat. assembly 35%
+Mat. assembly 40%
+Mat. assembly 45%
+Mat. assembly 50%
+Mat. assembly 55%
+Mat. assembly 60%
+Mat. assembly 65%
+Mat. assembly 70%
+Mat. assembly 75%
+Mat. assembly 80%
+Mat. assembly 85%
+Mat. assembly 90%
+Mat. assembly 95%
+Mat. assembly 100%
+Internal nodes with 0 potential
+[1560, 1618, 41204, 41262]
+Using klu solver...
+Done factorization!
+Done space charge init.
+Start impact man. init.
+Done impact man. init.
+Start pyecloud_saver observation
+Done init pyecloud_saver.
+Tracker: Boris multipole
+N_subst_init=5
+Start timestep iter
+Start clean. N_mp=59569 Nel=1.074436e+07
+Done clean. N_mp=59498 Nel=1.074436e+07
+**** Done pass_numb = 1/320
+
+Start clean. N_mp=70395 Nel=1.185576e+07
+Done clean. N_mp=70197 Nel=1.185576e+07
+Start SOFT regeneration. N_mp=70197 Nel_tot=1.19e+07 En_tot=6.27e+08
+Applied correction factor = 3.519639e+00
+Done SOFT regeneration. N_mp=19944 Nel_tot=1.19e+07 En_tot=6.16e+08
+**** Done pass_numb = 2/320
+
+Start clean. N_mp=27991 Nel=1.335649e+07
+Done clean. N_mp=27912 Nel=1.335649e+07
+**** Done pass_numb = 3/320
+
+Start clean. N_mp=34779 Nel=1.517397e+07
+Done clean. N_mp=34663 Nel=1.517397e+07
+**** Done pass_numb = 4/320
+
+Start clean. N_mp=41437 Nel=1.764141e+07
+Done clean. N_mp=41325 Nel=1.764141e+07
+**** Done pass_numb = 5/320
+
+Start clean. N_mp=48797 Nel=2.056818e+07
+Done clean. N_mp=48670 Nel=2.056818e+07
+**** Done pass_numb = 6/320
+
+Start clean. N_mp=57371 Nel=2.413734e+07
+Done clean. N_mp=57215 Nel=2.413734e+07
+**** Done pass_numb = 7/320
+
+Start clean. N_mp=67425 Nel=2.854950e+07
+Done clean. N_mp=67280 Nel=2.854950e+07
+Start SOFT regeneration. N_mp=67280 Nel_tot=2.85e+07 En_tot=2.17e+09
+Applied correction factor = 3.390128e+00
+Done SOFT regeneration. N_mp=19881 Nel_tot=2.85e+07 En_tot=2.21e+09
+**** Done pass_numb = 8/320
+
+Start clean. N_mp=27775 Nel=3.390785e+07
+Done clean. N_mp=27742 Nel=3.390785e+07
+**** Done pass_numb = 9/320
+
+Start clean. N_mp=35130 Nel=4.054261e+07
+Done clean. N_mp=35077 Nel=4.054261e+07
+**** Done pass_numb = 10/320
+
+Start clean. N_mp=42678 Nel=4.855552e+07
+Done clean. N_mp=42636 Nel=4.855552e+07
+**** Done pass_numb = 11/320
+
+Start clean. N_mp=51638 Nel=5.849724e+07
+Done clean. N_mp=51587 Nel=5.849724e+07
+**** Done pass_numb = 12/320
+
+Start clean. N_mp=62149 Nel=7.053582e+07
+Done clean. N_mp=62098 Nel=7.053582e+07
+Start SOFT regeneration. N_mp=62098 Nel_tot=7.05e+07 En_tot=6.10e+09
+Applied correction factor = 3.106531e+00
+Done SOFT regeneration. N_mp=20049 Nel_tot=7.05e+07 En_tot=5.94e+09
+**** Done pass_numb = 13/320
+
+Start clean. N_mp=27262 Nel=8.510863e+07
+Done clean. N_mp=27250 Nel=8.510863e+07
+**** Done pass_numb = 14/320
+
+Destroying C klu objects...
+Done.
+
+Job finished at Mon Sep  8 15:51:02 CEST 2014 on node 
+ under linux version Scientific Linux CERN SLC release 6.5 (Carbon)
+
+CERN statistics: This process used approximately : 0:54:30 KSI2K hours (3270 KSI2K seconds)
+                 This process corresponds to     : 3:32:36 HS06  hours (12756 HS06  seconds)
+
+
+PS:
+
+Read file </afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns/STDERR> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@b6fdf9e664.cern.ch>
+Subject: Job 562336416: <200mhz799> in cluster batch Done
+
+Job <200mhz799> was submitted from host <lxplus0131.cern.ch> by user <grumolo> in cluster <batch>.
+Job was executed on host(s) <b6fdf9e664.cern.ch>, in queue <1nd>, as user <grumolo> in cluster <batch>.
+</afs/cern.ch/user/g/grumolo> was used as the home directory.
+</afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan> was used as the working directory.
+Started at Mon Sep  8 18:34:05 2014
+Results reported at Tue Sep  9 02:14:53 2014
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+
+PYECLOUDPATH=/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/pyecloud/
+CURRDIR=/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns
+export CURRDIR
+
+source /afs/cern.ch/work/k/kli/public/venv_py27_slc6/bin/activate
+which python
+
+PYTHONPATH=$PYECLOUDPATH
+export PYTHONPATH
+echo $PYTHONPATH
+
+
+# Copy input and executable
+cp ${PYECLOUDPATH}/main.py .
+
+cp ${CURRDIR}/*.input .
+cp ${CURRDIR}/*.beam .
+cp ${CURRDIR}/*.mat .
+
+
+#execute beam generation
+python main.py
+
+#save result
+cp Pyecltest.mat ${CURRDIR}
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time   :  27209.61 sec.
+    Max Memory :       311 MB
+    Max Swap   :      1110 MB
+
+    Max Processes  :         6
+    Max Threads    :         7
+
+The output (if any) follows:
+
+@(#)CERN job starter $Date: 2010/06/23 14:22:16 $
+Working directory is </pool/lsf/grumolo/562336416> on <>
+
+/afs/cern.ch/work/k/kli/public/venv_py27_slc6/bin/python
+/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/pyecloud/
+PyECLOUD Version 4.09
+Parsing beam file: beam.beam
+Starting pyecloud_saver init.
+Using fast polygon
+Start beam profile generation.
+Beam profile generation 0%
+Beam profile generation 5%
+Beam profile generation 10%
+Beam profile generation 15%
+Beam profile generation 20%
+Beam profile generation 25%
+Beam profile generation 30%
+Beam profile generation 35%
+Beam profile generation 40%
+Beam profile generation 45%
+Beam profile generation 50%
+Beam profile generation 55%
+Beam profile generation 60%
+Beam profile generation 65%
+Beam profile generation 70%
+Beam profile generation 75%
+Beam profile generation 80%
+Beam profile generation 85%
+Beam profile generation 90%
+Beam profile generation 95%
+Done beam profile generation.
+No beam field file provided -> Calculate field using Poisson solver
+Start LU space charge init.
+Using Shortley-Weller boundary approx.
+Mat. assembly 0%
+Mat. assembly 5%
+Mat. assembly 10%
+Mat. assembly 15%
+Mat. assembly 20%
+Mat. assembly 25%
+Mat. assembly 30%
+Mat. assembly 35%
+Mat. assembly 40%
+Mat. assembly 45%
+Mat. assembly 50%
+Mat. assembly 55%
+Mat. assembly 60%
+Mat. assembly 65%
+Mat. assembly 70%
+Mat. assembly 75%
+Mat. assembly 80%
+Mat. assembly 85%
+Mat. assembly 90%
+Mat. assembly 95%
+Mat. assembly 100%
+Internal nodes with 0 potential
+[21691, 21981, 38172, 38530, 126252, 126610, 142801, 143091]
+Using scipy superlu solver...
+Done space charge init.
+Computing beam charge density
+Start Linear System Solution.
+Start field computation.
+Done beam field computation.
+Start LU space charge init.
+Using Shortley-Weller boundary approx.
+Mat. assembly 0%
+Mat. assembly 5%
+Mat. assembly 10%
+Mat. assembly 15%
+Mat. assembly 20%
+Mat. assembly 25%
+Mat. assembly 30%
+Mat. assembly 35%
+Mat. assembly 40%
+Mat. assembly 45%
+Mat. assembly 50%
+Mat. assembly 55%
+Mat. assembly 60%
+Mat. assembly 65%
+Mat. assembly 70%
+Mat. assembly 75%
+Mat. assembly 80%
+Mat. assembly 85%
+Mat. assembly 90%
+Mat. assembly 95%
+Mat. assembly 100%
+Internal nodes with 0 potential
+[1560, 1618, 41204, 41262]
+Using klu solver...
+Done factorization!
+Done space charge init.
+Start impact man. init.
+Done impact man. init.
+Start pyecloud_saver observation
+Done init pyecloud_saver.
+Tracker: Boris multipole
+N_subst_init=5
+Start timestep iter
+Start clean. N_mp=59594 Nel=1.073063e+07
+Done clean. N_mp=59520 Nel=1.073063e+07
+**** Done pass_numb = 1/320
+
+Start clean. N_mp=70393 Nel=1.187686e+07
+Done clean. N_mp=70195 Nel=1.187686e+07
+Start SOFT regeneration. N_mp=70195 Nel_tot=1.19e+07 En_tot=6.19e+08
+Applied correction factor = 3.499743e+00
+Done SOFT regeneration. N_mp=20010 Nel_tot=1.19e+07 En_tot=6.12e+08
+**** Done pass_numb = 2/320
+
+Start clean. N_mp=27988 Nel=1.339775e+07
+Done clean. N_mp=27903 Nel=1.339775e+07
+**** Done pass_numb = 3/320
+
+Start clean. N_mp=35024 Nel=1.539169e+07
+Done clean. N_mp=34906 Nel=1.539169e+07
+**** Done pass_numb = 4/320
+
+Start clean. N_mp=41771 Nel=1.776812e+07
+Done clean. N_mp=41629 Nel=1.776812e+07
+**** Done pass_numb = 5/320
+
+Start clean. N_mp=49209 Nel=2.080169e+07
+Done clean. N_mp=49090 Nel=2.080169e+07
+**** Done pass_numb = 6/320
+
+Start clean. N_mp=57976 Nel=2.447360e+07
+Done clean. N_mp=57846 Nel=2.447360e+07
+**** Done pass_numb = 7/320
+
+Start clean. N_mp=68082 Nel=2.895324e+07
+Done clean. N_mp=67933 Nel=2.895324e+07
+Start SOFT regeneration. N_mp=67933 Nel_tot=2.90e+07 En_tot=2.16e+09
+Applied correction factor = 3.382015e+00
+Done SOFT regeneration. N_mp=20124 Nel_tot=2.90e+07 En_tot=2.18e+09
+**** Done pass_numb = 8/320
+
+Start clean. N_mp=27865 Nel=3.445836e+07
+Done clean. N_mp=27821 Nel=3.445836e+07
+**** Done pass_numb = 9/320
+
+Start clean. N_mp=35018 Nel=4.100525e+07
+Done clean. N_mp=34958 Nel=4.100524e+07
+**** Done pass_numb = 10/320
+
+Start clean. N_mp=42700 Nel=4.902482e+07
+Done clean. N_mp=42663 Nel=4.902482e+07
+**** Done pass_numb = 11/320
+
+Start clean. N_mp=51341 Nel=5.880230e+07
+Done clean. N_mp=51294 Nel=5.880230e+07
+**** Done pass_numb = 12/320
+
+Start clean. N_mp=61863 Nel=7.086583e+07
+Done clean. N_mp=61817 Nel=7.086583e+07
+Start SOFT regeneration. N_mp=61817 Nel_tot=7.09e+07 En_tot=6.19e+09
+Applied correction factor = 3.075205e+00
+Done SOFT regeneration. N_mp=20046 Nel_tot=7.09e+07 En_tot=5.92e+09
+**** Done pass_numb = 13/320
+
+Start clean. N_mp=27476 Nel=8.612555e+07
+Done clean. N_mp=27464 Nel=8.612555e+07
+**** Done pass_numb = 14/320
+
+Start clean. N_mp=34552 Nel=1.040859e+08
+Done clean. N_mp=34539 Nel=1.040859e+08
+**** Done pass_numb = 15/320
+
+Start clean. N_mp=42447 Nel=1.262766e+08
+Done clean. N_mp=42440 Nel=1.262766e+08
+**** Done pass_numb = 16/320
+
+Start clean. N_mp=51903 Nel=1.534104e+08
+Done clean. N_mp=51886 Nel=1.534104e+08
+**** Done pass_numb = 17/320
+
+Start clean. N_mp=63230 Nel=1.872486e+08
+Done clean. N_mp=63216 Nel=1.872486e+08
+Start SOFT regeneration. N_mp=63216 Nel_tot=1.87e+08 En_tot=1.70e+10
+Applied correction factor = 3.159577e+00
+Done SOFT regeneration. N_mp=19956 Nel_tot=1.87e+08 En_tot=1.64e+10
+**** Done pass_numb = 18/320
+
+Start clean. N_mp=26971 Nel=2.279081e+08
+Done clean. N_mp=26964 Nel=2.279081e+08
+**** Done pass_numb = 19/320
+
+Start clean. N_mp=33897 Nel=2.776744e+08
+Done clean. N_mp=33894 Nel=2.776744e+08
+**** Done pass_numb = 20/320
+
+Start clean. N_mp=41841 Nel=3.383772e+08
+Done clean. N_mp=41835 Nel=3.383772e+08
+**** Done pass_numb = 21/320
+
+Start clean. N_mp=51492 Nel=4.143921e+08
+Done clean. N_mp=51485 Nel=4.143921e+08
+**** Done pass_numb = 22/320
+
+Start clean. N_mp=63061 Nel=5.076728e+08
+Done clean. N_mp=63056 Nel=5.076728e+08
+Start SOFT regeneration. N_mp=63056 Nel_tot=5.08e+08 En_tot=4.84e+10
+Applied correction factor = 3.160183e+00
+Done SOFT regeneration. N_mp=19940 Nel_tot=5.08e+08 En_tot=4.76e+10
+**** Done pass_numb = 23/320
+
+Start clean. N_mp=26705 Nel=6.204670e+08
+Done clean. N_mp=26705 Nel=6.204670e+08
+**** Done pass_numb = 24/320
+
+Start clean. N_mp=33634 Nel=7.587977e+08
+Done clean. N_mp=33634 Nel=7.587977e+08
+**** Done pass_numb = 25/320
+
+Start clean. N_mp=41718 Nel=9.216965e+08
+Done clean. N_mp=41718 Nel=9.216965e+08
+**** Done pass_numb = 26/320
+
+Start clean. N_mp=51238 Nel=1.110509e+09
+Done clean. N_mp=51236 Nel=1.110509e+09
+**** Done pass_numb = 27/320
+
+Start clean. N_mp=62486 Nel=1.323349e+09
+Done clean. N_mp=62485 Nel=1.323349e+09
+Start SOFT regeneration. N_mp=62485 Nel_tot=1.32e+09 En_tot=1.30e+11
+Applied correction factor = 3.117685e+00
+Done SOFT regeneration. N_mp=19994 Nel_tot=1.32e+09 En_tot=1.21e+11
+**** Done pass_numb = 28/320
+
+Start clean. N_mp=26974 Nel=1.563369e+09
+Done clean. N_mp=26974 Nel=1.563369e+09
+**** Done pass_numb = 29/320
+
+Start clean. N_mp=33469 Nel=1.801400e+09
+Done clean. N_mp=33469 Nel=1.801400e+09
+**** Done pass_numb = 30/320
+
+Start clean. N_mp=40310 Nel=2.046296e+09
+Done clean. N_mp=40310 Nel=2.046296e+09
+**** Done pass_numb = 31/320
+
+Start clean. N_mp=47814 Nel=2.274956e+09
+Done clean. N_mp=47812 Nel=2.274956e+09
+**** Done pass_numb = 32/320
+
+Start clean. N_mp=55592 Nel=2.477486e+09
+Done clean. N_mp=55590 Nel=2.477486e+09
+**** Done pass_numb = 33/320
+
+Start clean. N_mp=63965 Nel=2.658728e+09
+Done clean. N_mp=63954 Nel=2.658728e+09
+Start SOFT regeneration. N_mp=63954 Nel_tot=2.66e+09 En_tot=2.87e+11
+Applied correction factor = 3.202964e+00
+Done SOFT regeneration. N_mp=19912 Nel_tot=2.66e+09 En_tot=2.98e+11
+**** Done pass_numb = 34/320
+
+Start clean. N_mp=27679 Nel=2.789029e+09
+Done clean. N_mp=27672 Nel=2.789029e+09
+**** Done pass_numb = 35/320
+
+Start clean. N_mp=33593 Nel=2.915371e+09
+Done clean. N_mp=33583 Nel=2.915371e+09
+**** Done pass_numb = 36/320
+
+Start clean. N_mp=38674 Nel=3.009811e+09
+Done clean. N_mp=38651 Nel=3.009811e+09
+**** Done pass_numb = 37/320
+
+Start clean. N_mp=43480 Nel=3.082669e+09
+Done clean. N_mp=43458 Nel=3.082669e+09
+**** Done pass_numb = 38/320
+
+Start clean. N_mp=48159 Nel=3.144449e+09
+Done clean. N_mp=48129 Nel=3.144449e+09
+**** Done pass_numb = 39/320
+
+Start clean. N_mp=52687 Nel=3.183617e+09
+Done clean. N_mp=52656 Nel=3.183617e+09
+**** Done pass_numb = 40/320
+
+Start clean. N_mp=57064 Nel=3.210067e+09
+Done clean. N_mp=57006 Nel=3.210067e+09
+**** Done pass_numb = 41/320
+
+Start clean. N_mp=61461 Nel=3.236297e+09
+Done clean. N_mp=61379 Nel=3.236297e+09
+Start SOFT regeneration. N_mp=61379 Nel_tot=3.24e+09 En_tot=4.05e+11
+Applied correction factor = 3.055549e+00
+Done SOFT regeneration. N_mp=19865 Nel_tot=3.24e+09 En_tot=4.11e+11
+**** Done pass_numb = 42/320
+
+Start clean. N_mp=29018 Nel=3.256004e+09
+Done clean. N_mp=28993 Nel=3.256004e+09
+**** Done pass_numb = 43/320
+
+Start clean. N_mp=35128 Nel=3.259563e+09
+Done clean. N_mp=35099 Nel=3.259563e+09
+**** Done pass_numb = 44/320
+
+Start clean. N_mp=39744 Nel=3.261947e+09
+Done clean. N_mp=39694 Nel=3.261947e+09
+**** Done pass_numb = 45/320
+
+Start clean. N_mp=43978 Nel=3.289514e+09
+Done clean. N_mp=43922 Nel=3.289514e+09
+**** Done pass_numb = 46/320
+
+Start clean. N_mp=47873 Nel=3.301020e+09
+Done clean. N_mp=47804 Nel=3.301020e+09
+**** Done pass_numb = 47/320
+
+Start clean. N_mp=51671 Nel=3.308501e+09
+Done clean. N_mp=51591 Nel=3.308501e+09
+**** Done pass_numb = 48/320
+
+Start clean. N_mp=55284 Nel=3.307936e+09
+Done clean. N_mp=55183 Nel=3.307936e+09
+**** Done pass_numb = 49/320
+
+Start clean. N_mp=58849 Nel=3.308057e+09
+Done clean. N_mp=58689 Nel=3.308057e+09
+**** Done pass_numb = 50/320
+
+Start clean. N_mp=62373 Nel=3.334668e+09
+Done clean. N_mp=62180 Nel=3.334668e+09
+Start SOFT regeneration. N_mp=62180 Nel_tot=3.33e+09 En_tot=4.30e+11
+Applied correction factor = 3.054542e+00
+Done SOFT regeneration. N_mp=20140 Nel_tot=3.33e+09 En_tot=4.04e+11
+**** Done pass_numb = 51/320
+
+Start clean. N_mp=29756 Nel=3.319643e+09
+Done clean. N_mp=29715 Nel=3.319643e+09
+**** Done pass_numb = 52/320
+
+Start clean. N_mp=35943 Nel=3.329668e+09
+Done clean. N_mp=35903 Nel=3.329668e+09
+**** Done pass_numb = 53/320
+
+Start clean. N_mp=40491 Nel=3.322396e+09
+Done clean. N_mp=40433 Nel=3.322396e+09
+**** Done pass_numb = 54/320
+
+Start clean. N_mp=44528 Nel=3.338955e+09
+Done clean. N_mp=44411 Nel=3.338955e+09
+**** Done pass_numb = 55/320
+
+Start clean. N_mp=48303 Nel=3.339441e+09
+Done clean. N_mp=48223 Nel=3.339441e+09
+**** Done pass_numb = 56/320
+
+Start clean. N_mp=51987 Nel=3.348495e+09
+Done clean. N_mp=51848 Nel=3.348495e+09
+**** Done pass_numb = 57/320
+
+Start clean. N_mp=55583 Nel=3.341845e+09
+Done clean. N_mp=55444 Nel=3.341845e+09
+**** Done pass_numb = 58/320
+
+Start clean. N_mp=58906 Nel=3.345794e+09
+Done clean. N_mp=58716 Nel=3.345794e+09
+**** Done pass_numb = 59/320
+
+Start clean. N_mp=62232 Nel=3.345146e+09
+Done clean. N_mp=62014 Nel=3.345146e+09
+Start SOFT regeneration. N_mp=62014 Nel_tot=3.35e+09 En_tot=4.41e+11
+Applied correction factor = 3.171048e+00
+Done SOFT regeneration. N_mp=19779 Nel_tot=3.35e+09 En_tot=4.26e+11
+**** Done pass_numb = 60/320
+
+Start clean. N_mp=29396 Nel=3.346062e+09
+Done clean. N_mp=29369 Nel=3.346062e+09
+**** Done pass_numb = 61/320
+
+Start clean. N_mp=35664 Nel=3.351455e+09
+Done clean. N_mp=35603 Nel=3.351455e+09
+**** Done pass_numb = 62/320
+
+Start clean. N_mp=40274 Nel=3.358687e+09
+Done clean. N_mp=40199 Nel=3.358687e+09
+**** Done pass_numb = 63/320
+
+Start clean. N_mp=44366 Nel=3.362845e+09
+Done clean. N_mp=44278 Nel=3.362845e+09
+**** Done pass_numb = 64/320
+
+Start clean. N_mp=48156 Nel=3.375229e+09
+Done clean. N_mp=48058 Nel=3.375229e+09
+**** Done pass_numb = 65/320
+
+Start clean. N_mp=51874 Nel=3.374286e+09
+Done clean. N_mp=51741 Nel=3.374286e+09
+**** Done pass_numb = 66/320
+
+Start clean. N_mp=55491 Nel=3.383025e+09
+Done clean. N_mp=55329 Nel=3.383025e+09
+**** Done pass_numb = 67/320
+
+Start clean. N_mp=59045 Nel=3.367089e+09
+Done clean. N_mp=58849 Nel=3.367089e+09
+**** Done pass_numb = 68/320
+
+Start clean. N_mp=62456 Nel=3.373948e+09
+Done clean. N_mp=62261 Nel=3.373948e+09
+Start SOFT regeneration. N_mp=62261 Nel_tot=3.37e+09 En_tot=4.36e+11
+Applied correction factor = 3.069469e+00
+Done SOFT regeneration. N_mp=20076 Nel_tot=3.37e+09 En_tot=4.49e+11
+**** Done pass_numb = 69/320
+
+Start clean. N_mp=29733 Nel=3.371386e+09
+Done clean. N_mp=29696 Nel=3.371386e+09
+**** Done pass_numb = 70/320
+
+Start clean. N_mp=35943 Nel=3.370297e+09
+Done clean. N_mp=35892 Nel=3.370297e+09
+**** Done pass_numb = 71/320
+
+Start clean. N_mp=40589 Nel=3.359754e+09
+Done clean. N_mp=40509 Nel=3.359754e+09
+**** Done pass_numb = 72/320
+
+Start clean. N_mp=40951 Nel=2.279039e+09
+Done clean. N_mp=40746 Nel=2.279039e+09
+**** Done pass_numb = 73/320
+
+Start clean. N_mp=40888 Nel=1.698189e+09
+Done clean. N_mp=40656 Nel=1.698189e+09
+**** Done pass_numb = 74/320
+
+Start clean. N_mp=40737 Nel=1.382569e+09
+Done clean. N_mp=40454 Nel=1.382569e+09
+**** Done pass_numb = 75/320
+
+Start clean. N_mp=40494 Nel=1.186432e+09
+Done clean. N_mp=40232 Nel=1.186432e+09
+**** Done pass_numb = 76/320
+
+Start clean. N_mp=40268 Nel=1.056815e+09
+Done clean. N_mp=39957 Nel=1.056815e+09
+**** Done pass_numb = 77/320
+
+Start clean. N_mp=39989 Nel=9.656553e+08
+Done clean. N_mp=39696 Nel=9.656553e+08
+**** Done pass_numb = 78/320
+
+Start clean. N_mp=39709 Nel=8.936823e+08
+Done clean. N_mp=39439 Nel=8.936823e+08
+**** Done pass_numb = 79/320
+
+Start clean. N_mp=39482 Nel=8.463578e+08
+Done clean. N_mp=39172 Nel=8.463577e+08
+**** Done pass_numb = 80/320
+
+Start clean. N_mp=39752 Nel=9.746991e+08
+Done clean. N_mp=39696 Nel=9.746991e+08
+**** Done pass_numb = 81/320
+
+Start clean. N_mp=40519 Nel=1.130447e+09
+Done clean. N_mp=40484 Nel=1.130447e+09
+**** Done pass_numb = 82/320
+
+Start clean. N_mp=41551 Nel=1.307834e+09
+Done clean. N_mp=41504 Nel=1.307834e+09
+**** Done pass_numb = 83/320
+
+Start clean. N_mp=42827 Nel=1.506333e+09
+Done clean. N_mp=42782 Nel=1.506333e+09
+**** Done pass_numb = 84/320
+
+Start clean. N_mp=44334 Nel=1.717875e+09
+Done clean. N_mp=44282 Nel=1.717875e+09
+**** Done pass_numb = 85/320
+
+Start clean. N_mp=46138 Nel=1.941653e+09
+Done clean. N_mp=46067 Nel=1.941653e+09
+**** Done pass_numb = 86/320
+
+Start clean. N_mp=48210 Nel=2.150498e+09
+Done clean. N_mp=48140 Nel=2.150498e+09
+**** Done pass_numb = 87/320
+
+Start clean. N_mp=50430 Nel=2.337729e+09
+Done clean. N_mp=50301 Nel=2.337729e+09
+**** Done pass_numb = 88/320
+
+Start clean. N_mp=52912 Nel=2.527279e+09
+Done clean. N_mp=52745 Nel=2.527279e+09
+**** Done pass_numb = 89/320
+
+Start clean. N_mp=55513 Nel=2.666604e+09
+Done clean. N_mp=55357 Nel=2.666604e+09
+**** Done pass_numb = 90/320
+
+Start clean. N_mp=58276 Nel=2.798043e+09
+Done clean. N_mp=58040 Nel=2.798043e+09
+**** Done pass_numb = 91/320
+
+Start clean. N_mp=61084 Nel=2.903198e+09
+Done clean. N_mp=60835 Nel=2.903198e+09
+Start SOFT regeneration. N_mp=60835 Nel_tot=2.90e+09 En_tot=3.79e+11
+Applied correction factor = 2.986924e+00
+Done SOFT regeneration. N_mp=20094 Nel_tot=2.90e+09 En_tot=3.68e+11
+**** Done pass_numb = 92/320
+
+Start clean. N_mp=30378 Nel=2.984027e+09
+Done clean. N_mp=30335 Nel=2.984027e+09
+**** Done pass_numb = 93/320
+
+Start clean. N_mp=37274 Nel=3.048378e+09
+Done clean. N_mp=37219 Nel=3.048378e+09
+**** Done pass_numb = 94/320
+
+Start clean. N_mp=42311 Nel=3.103190e+09
+Done clean. N_mp=42212 Nel=3.103190e+09
+**** Done pass_numb = 95/320
+
+Start clean. N_mp=46803 Nel=3.182305e+09
+Done clean. N_mp=46703 Nel=3.182305e+09
+**** Done pass_numb = 96/320
+
+Start clean. N_mp=51154 Nel=3.217199e+09
+Done clean. N_mp=51035 Nel=3.217199e+09
+**** Done pass_numb = 97/320
+
+Start clean. N_mp=55256 Nel=3.253613e+09
+Done clean. N_mp=55124 Nel=3.253613e+09
+**** Done pass_numb = 98/320
+
+Start clean. N_mp=59369 Nel=3.273564e+09
+Done clean. N_mp=59194 Nel=3.273564e+09
+**** Done pass_numb = 99/320
+
+Start clean. N_mp=63397 Nel=3.289184e+09
+Done clean. N_mp=63180 Nel=3.289184e+09
+Start SOFT regeneration. N_mp=63180 Nel_tot=3.29e+09 En_tot=4.22e+11
+Applied correction factor = 3.173315e+00
+Done SOFT regeneration. N_mp=20018 Nel_tot=3.29e+09 En_tot=4.36e+11
+**** Done pass_numb = 100/320
+
+Start clean. N_mp=29395 Nel=3.311236e+09
+Done clean. N_mp=29368 Nel=3.311236e+09
+**** Done pass_numb = 101/320
+
+Start clean. N_mp=35620 Nel=3.297537e+09
+Done clean. N_mp=35574 Nel=3.297537e+09
+**** Done pass_numb = 102/320
+
+Start clean. N_mp=40210 Nel=3.307748e+09
+Done clean. N_mp=40146 Nel=3.307748e+09
+**** Done pass_numb = 103/320
+
+Start clean. N_mp=44319 Nel=3.310473e+09
+Done clean. N_mp=44214 Nel=3.310473e+09
+**** Done pass_numb = 104/320
+
+Start clean. N_mp=48140 Nel=3.314726e+09
+Done clean. N_mp=48045 Nel=3.314726e+09
+**** Done pass_numb = 105/320
+
+Start clean. N_mp=51876 Nel=3.333151e+09
+Done clean. N_mp=51752 Nel=3.333151e+09
+**** Done pass_numb = 106/320
+
+Start clean. N_mp=55524 Nel=3.342201e+09
+Done clean. N_mp=55377 Nel=3.342201e+09
+**** Done pass_numb = 107/320
+
+Start clean. N_mp=58961 Nel=3.350317e+09
+Done clean. N_mp=58777 Nel=3.350317e+09
+**** Done pass_numb = 108/320
+
+Start clean. N_mp=62414 Nel=3.363319e+09
+Done clean. N_mp=62196 Nel=3.363319e+09
+Start SOFT regeneration. N_mp=62196 Nel_tot=3.36e+09 En_tot=4.46e+11
+Applied correction factor = 3.133993e+00
+Done SOFT regeneration. N_mp=20005 Nel_tot=3.36e+09 En_tot=4.27e+11
+**** Done pass_numb = 109/320
+
+Start clean. N_mp=29708 Nel=3.364762e+09
+Done clean. N_mp=29682 Nel=3.364762e+09
+**** Done pass_numb = 110/320
+
+Start clean. N_mp=35907 Nel=3.367957e+09
+Done clean. N_mp=35842 Nel=3.367957e+09
+**** Done pass_numb = 111/320
+
+Start clean. N_mp=40507 Nel=3.383444e+09
+Done clean. N_mp=40437 Nel=3.383444e+09
+**** Done pass_numb = 112/320
+
+Start clean. N_mp=44695 Nel=3.394492e+09
+Done clean. N_mp=44612 Nel=3.394492e+09
+**** Done pass_numb = 113/320
+
+Start clean. N_mp=48439 Nel=3.387539e+09
+Done clean. N_mp=48337 Nel=3.387539e+09
+**** Done pass_numb = 114/320
+
+Start clean. N_mp=52173 Nel=3.382405e+09
+Done clean. N_mp=52045 Nel=3.382405e+09
+**** Done pass_numb = 115/320
+
+Start clean. N_mp=55748 Nel=3.383355e+09
+Done clean. N_mp=55603 Nel=3.383355e+09
+**** Done pass_numb = 116/320
+
+Start clean. N_mp=59266 Nel=3.388432e+09
+Done clean. N_mp=59087 Nel=3.388432e+09
+**** Done pass_numb = 117/320
+
+Start clean. N_mp=62510 Nel=3.391001e+09
+Done clean. N_mp=62311 Nel=3.391001e+09
+Start SOFT regeneration. N_mp=62311 Nel_tot=3.39e+09 En_tot=4.45e+11
+Applied correction factor = 3.116338e+00
+Done SOFT regeneration. N_mp=19926 Nel_tot=3.39e+09 En_tot=4.40e+11
+**** Done pass_numb = 118/320
+
+Start clean. N_mp=29687 Nel=3.389323e+09
+Done clean. N_mp=29652 Nel=3.389323e+09
+**** Done pass_numb = 119/320
+
+Start clean. N_mp=36129 Nel=3.393273e+09
+Done clean. N_mp=36075 Nel=3.393273e+09
+**** Done pass_numb = 120/320
+
+Start clean. N_mp=40722 Nel=3.386813e+09
+Done clean. N_mp=40650 Nel=3.386813e+09
+**** Done pass_numb = 121/320
+
+Start clean. N_mp=44814 Nel=3.408959e+09
+Done clean. N_mp=44723 Nel=3.408959e+09
+**** Done pass_numb = 122/320
+
+Start clean. N_mp=48662 Nel=3.400087e+09
+Done clean. N_mp=48553 Nel=3.400087e+09
+**** Done pass_numb = 123/320
+
+Start clean. N_mp=52245 Nel=3.391335e+09
+Done clean. N_mp=52112 Nel=3.391335e+09
+**** Done pass_numb = 124/320
+
+Start clean. N_mp=55859 Nel=3.406104e+09
+Done clean. N_mp=55716 Nel=3.406104e+09
+**** Done pass_numb = 125/320
+
+Start clean. N_mp=59357 Nel=3.401481e+09
+Done clean. N_mp=59151 Nel=3.401481e+09
+**** Done pass_numb = 126/320
+
+Start clean. N_mp=62621 Nel=3.413475e+09
+Done clean. N_mp=62399 Nel=3.413475e+09
+Start SOFT regeneration. N_mp=62399 Nel_tot=3.41e+09 En_tot=4.57e+11
+Applied correction factor = 3.149087e+00
+Done SOFT regeneration. N_mp=19882 Nel_tot=3.41e+09 En_tot=4.38e+11
+**** Done pass_numb = 127/320
+
+Start clean. N_mp=29582 Nel=3.423207e+09
+Done clean. N_mp=29550 Nel=3.423207e+09
+**** Done pass_numb = 128/320
+
+Start clean. N_mp=35891 Nel=3.410632e+09
+Done clean. N_mp=35844 Nel=3.410632e+09
+**** Done pass_numb = 129/320
+
+Start clean. N_mp=40644 Nel=3.423536e+09
+Done clean. N_mp=40567 Nel=3.423536e+09
+**** Done pass_numb = 130/320
+
+Start clean. N_mp=44830 Nel=3.413586e+09
+Done clean. N_mp=44718 Nel=3.413586e+09
+**** Done pass_numb = 131/320
+
+Start clean. N_mp=48573 Nel=3.418529e+09
+Done clean. N_mp=48467 Nel=3.418529e+09
+**** Done pass_numb = 132/320
+
+Start clean. N_mp=52240 Nel=3.434245e+09
+Done clean. N_mp=52113 Nel=3.434245e+09
+**** Done pass_numb = 133/320
+
+Start clean. N_mp=55807 Nel=3.426997e+09
+Done clean. N_mp=55666 Nel=3.426997e+09
+**** Done pass_numb = 134/320
+
+Start clean. N_mp=59210 Nel=3.436168e+09
+Done clean. N_mp=59029 Nel=3.436168e+09
+**** Done pass_numb = 135/320
+
+Start clean. N_mp=62496 Nel=3.446555e+09
+Done clean. N_mp=62306 Nel=3.446555e+09
+Start SOFT regeneration. N_mp=62306 Nel_tot=3.45e+09 En_tot=4.53e+11
+Applied correction factor = 3.103660e+00
+Done SOFT regeneration. N_mp=20032 Nel_tot=3.45e+09 En_tot=4.62e+11
+**** Done pass_numb = 136/320
+
+Start clean. N_mp=29854 Nel=3.462258e+09
+Done clean. N_mp=29826 Nel=3.462258e+09
+**** Done pass_numb = 137/320
+
+Start clean. N_mp=36150 Nel=3.469174e+09
+Done clean. N_mp=36102 Nel=3.469174e+09
+**** Done pass_numb = 138/320
+
+Start clean. N_mp=40911 Nel=3.463734e+09
+Done clean. N_mp=40834 Nel=3.463734e+09
+**** Done pass_numb = 139/320
+
+Start clean. N_mp=45065 Nel=3.455215e+09
+Done clean. N_mp=44981 Nel=3.455215e+09
+**** Done pass_numb = 140/320
+
+Start clean. N_mp=48770 Nel=3.460960e+09
+Done clean. N_mp=48664 Nel=3.460960e+09
+**** Done pass_numb = 141/320
+
+Start clean. N_mp=52383 Nel=3.450476e+09
+Done clean. N_mp=52251 Nel=3.450476e+09
+**** Done pass_numb = 142/320
+
+Start clean. N_mp=55947 Nel=3.450186e+09
+Done clean. N_mp=55789 Nel=3.450186e+09
+**** Done pass_numb = 143/320
+
+Start clean. N_mp=59329 Nel=3.458103e+09
+Done clean. N_mp=59153 Nel=3.458103e+09
+**** Done pass_numb = 144/320
+
+Start clean. N_mp=62581 Nel=3.461545e+09
+Done clean. N_mp=62362 Nel=3.461545e+09
+Start SOFT regeneration. N_mp=62362 Nel_tot=3.46e+09 En_tot=4.43e+11
+Applied correction factor = 3.053975e+00
+Done SOFT regeneration. N_mp=20232 Nel_tot=3.46e+09 En_tot=4.64e+11
+**** Done pass_numb = 145/320
+
+Start clean. N_mp=29607 Nel=3.455597e+09
+Done clean. N_mp=29568 Nel=3.455597e+09
+**** Done pass_numb = 146/320
+
+Start clean. N_mp=35779 Nel=3.462970e+09
+Done clean. N_mp=35728 Nel=3.462970e+09
+**** Done pass_numb = 147/320
+
+Start clean. N_mp=40452 Nel=3.472294e+09
+Done clean. N_mp=40385 Nel=3.472294e+09
+**** Done pass_numb = 148/320
+
+Start clean. N_mp=44525 Nel=3.450375e+09
+Done clean. N_mp=44438 Nel=3.450375e+09
+**** Done pass_numb = 149/320
+
+Start clean. N_mp=48153 Nel=3.449757e+09
+Done clean. N_mp=48056 Nel=3.449757e+09
+**** Done pass_numb = 150/320
+
+Start clean. N_mp=51932 Nel=3.441385e+09
+Done clean. N_mp=51791 Nel=3.441385e+09
+**** Done pass_numb = 151/320
+
+Start clean. N_mp=55387 Nel=3.432222e+09
+Done clean. N_mp=55245 Nel=3.432222e+09
+**** Done pass_numb = 152/320
+
+Start clean. N_mp=55552 Nel=2.312686e+09
+Done clean. N_mp=55164 Nel=2.312686e+09
+**** Done pass_numb = 153/320
+
+Start clean. N_mp=55303 Nel=1.728750e+09
+Done clean. N_mp=54905 Nel=1.728750e+09
+**** Done pass_numb = 154/320
+
+Start clean. N_mp=54965 Nel=1.411866e+09
+Done clean. N_mp=54532 Nel=1.411866e+09
+**** Done pass_numb = 155/320
+
+Start clean. N_mp=54579 Nel=1.212069e+09
+Done clean. N_mp=54092 Nel=1.212069e+09
+**** Done pass_numb = 156/320
+
+Start clean. N_mp=54135 Nel=1.082570e+09
+Done clean. N_mp=53695 Nel=1.082570e+09
+**** Done pass_numb = 157/320
+
+Start clean. N_mp=53916 Nel=1.016306e+09
+Done clean. N_mp=53385 Nel=1.016306e+09
+**** Done pass_numb = 158/320
+
+Start clean. N_mp=53401 Nel=9.307541e+08
+Done clean. N_mp=52947 Nel=9.307540e+08
+**** Done pass_numb = 159/320
+
+Start clean. N_mp=52962 Nel=8.673142e+08
+Done clean. N_mp=52475 Nel=8.673141e+08
+**** Done pass_numb = 160/320
+
+Start clean. N_mp=52909 Nel=9.887502e+08
+Done clean. N_mp=52804 Nel=9.887502e+08
+**** Done pass_numb = 161/320
+
+Start clean. N_mp=53452 Nel=1.142246e+09
+Done clean. N_mp=53353 Nel=1.142246e+09
+**** Done pass_numb = 162/320
+
+Start clean. N_mp=54269 Nel=1.320562e+09
+Done clean. N_mp=54177 Nel=1.320562e+09
+**** Done pass_numb = 163/320
+
+Start clean. N_mp=55350 Nel=1.521477e+09
+Done clean. N_mp=55248 Nel=1.521477e+09
+**** Done pass_numb = 164/320
+
+Start clean. N_mp=56699 Nel=1.726270e+09
+Done clean. N_mp=56594 Nel=1.726270e+09
+**** Done pass_numb = 165/320
+
+Start clean. N_mp=58275 Nel=1.944568e+09
+Done clean. N_mp=58142 Nel=1.944567e+09
+**** Done pass_numb = 166/320
+
+Start clean. N_mp=60173 Nel=2.160780e+09
+Done clean. N_mp=60025 Nel=2.160780e+09
+Start SOFT regeneration. N_mp=60025 Nel_tot=2.16e+09 En_tot=2.72e+11
+Applied correction factor = 3.033515e+00
+Done SOFT regeneration. N_mp=19916 Nel_tot=2.16e+09 En_tot=2.83e+11
+**** Done pass_numb = 167/320
+
+Start clean. N_mp=30737 Nel=2.368859e+09
+Done clean. N_mp=30725 Nel=2.368859e+09
+**** Done pass_numb = 168/320
+
+Start clean. N_mp=38659 Nel=2.548652e+09
+Done clean. N_mp=38640 Nel=2.548652e+09
+**** Done pass_numb = 169/320
+
+Start clean. N_mp=44648 Nel=2.702237e+09
+Done clean. N_mp=44602 Nel=2.702237e+09
+**** Done pass_numb = 170/320
+
+Start clean. N_mp=50230 Nel=2.826822e+09
+Done clean. N_mp=50179 Nel=2.826822e+09
+**** Done pass_numb = 171/320
+
+Start clean. N_mp=55598 Nel=2.938424e+09
+Done clean. N_mp=55526 Nel=2.938424e+09
+**** Done pass_numb = 172/320
+
+Start clean. N_mp=61000 Nel=3.018636e+09
+Done clean. N_mp=60899 Nel=3.018636e+09
+Start SOFT regeneration. N_mp=60899 Nel_tot=3.02e+09 En_tot=3.78e+11
+Applied correction factor = 3.011670e+00
+Done SOFT regeneration. N_mp=20140 Nel_tot=3.02e+09 En_tot=3.73e+11
+**** Done pass_numb = 173/320
+
+Start clean. N_mp=28817 Nel=3.103103e+09
+Done clean. N_mp=28800 Nel=3.103103e+09
+**** Done pass_numb = 174/320
+
+Start clean. N_mp=35016 Nel=3.165351e+09
+Done clean. N_mp=34978 Nel=3.165351e+09
+**** Done pass_numb = 175/320
+
+Start clean. N_mp=39873 Nel=3.207531e+09
+Done clean. N_mp=39826 Nel=3.207531e+09
+**** Done pass_numb = 176/320
+
+Start clean. N_mp=44230 Nel=3.249859e+09
+Done clean. N_mp=44164 Nel=3.249859e+09
+**** Done pass_numb = 177/320
+
+Start clean. N_mp=48399 Nel=3.276832e+09
+Done clean. N_mp=48325 Nel=3.276832e+09
+**** Done pass_numb = 178/320
+
+Start clean. N_mp=52421 Nel=3.306905e+09
+Done clean. N_mp=52325 Nel=3.306905e+09
+**** Done pass_numb = 179/320
+
+Start clean. N_mp=56358 Nel=3.325374e+09
+Done clean. N_mp=56221 Nel=3.325374e+09
+**** Done pass_numb = 180/320
+
+Start clean. N_mp=60301 Nel=3.333232e+09
+Done clean. N_mp=60162 Nel=3.333232e+09
+Start SOFT regeneration. N_mp=60162 Nel_tot=3.33e+09 En_tot=4.61e+11
+Applied correction factor = 3.055840e+00
+Done SOFT regeneration. N_mp=19980 Nel_tot=3.33e+09 En_tot=4.31e+11
+**** Done pass_numb = 181/320
+
+Start clean. N_mp=29524 Nel=3.354169e+09
+Done clean. N_mp=29504 Nel=3.354169e+09
+**** Done pass_numb = 182/320
+
+Start clean. N_mp=35821 Nel=3.374671e+09
+Done clean. N_mp=35780 Nel=3.374671e+09
+**** Done pass_numb = 183/320
+
+Start clean. N_mp=40460 Nel=3.384442e+09
+Done clean. N_mp=40405 Nel=3.384442e+09
+**** Done pass_numb = 184/320
+
+Start clean. N_mp=44655 Nel=3.392124e+09
+Done clean. N_mp=44570 Nel=3.392124e+09
+**** Done pass_numb = 185/320
+
+Start clean. N_mp=48615 Nel=3.406554e+09
+Done clean. N_mp=48526 Nel=3.406554e+09
+**** Done pass_numb = 186/320
+
+Start clean. N_mp=52438 Nel=3.395293e+09
+Done clean. N_mp=52311 Nel=3.395293e+09
+**** Done pass_numb = 187/320
+
+Start clean. N_mp=55884 Nel=3.378994e+09
+Done clean. N_mp=55753 Nel=3.378994e+09
+**** Done pass_numb = 188/320
+
+Start clean. N_mp=59341 Nel=3.378717e+09
+Done clean. N_mp=59191 Nel=3.378717e+09
+**** Done pass_numb = 189/320
+
+Start clean. N_mp=62691 Nel=3.386823e+09
+Done clean. N_mp=62494 Nel=3.386823e+09
+Start SOFT regeneration. N_mp=62494 Nel_tot=3.39e+09 En_tot=4.39e+11
+Applied correction factor = 3.125303e+00
+Done SOFT regeneration. N_mp=19949 Nel_tot=3.39e+09 En_tot=4.41e+11
+**** Done pass_numb = 190/320
+
+Start clean. N_mp=29623 Nel=3.398294e+09
+Done clean. N_mp=29592 Nel=3.398294e+09
+**** Done pass_numb = 191/320
+
+Start clean. N_mp=35986 Nel=3.404287e+09
+Done clean. N_mp=35936 Nel=3.404287e+09
+**** Done pass_numb = 192/320
+
+Start clean. N_mp=40571 Nel=3.391537e+09
+Done clean. N_mp=40508 Nel=3.391537e+09
+**** Done pass_numb = 193/320
+
+Start clean. N_mp=44724 Nel=3.413651e+09
+Done clean. N_mp=44635 Nel=3.413651e+09
+**** Done pass_numb = 194/320
+
+Start clean. N_mp=48571 Nel=3.416817e+09
+Done clean. N_mp=48469 Nel=3.416817e+09
+**** Done pass_numb = 195/320
+
+Start clean. N_mp=52361 Nel=3.435928e+09
+Done clean. N_mp=52227 Nel=3.435928e+09
+**** Done pass_numb = 196/320
+
+Start clean. N_mp=55953 Nel=3.423392e+09
+Done clean. N_mp=55803 Nel=3.423392e+09
+**** Done pass_numb = 197/320
+
+Start clean. N_mp=59392 Nel=3.427650e+09
+Done clean. N_mp=59242 Nel=3.427650e+09
+**** Done pass_numb = 198/320
+
+Start clean. N_mp=62767 Nel=3.436493e+09
+Done clean. N_mp=62573 Nel=3.436493e+09
+Start SOFT regeneration. N_mp=62573 Nel_tot=3.44e+09 En_tot=4.42e+11
+Applied correction factor = 3.146486e+00
+Done SOFT regeneration. N_mp=20072 Nel_tot=3.44e+09 En_tot=4.40e+11
+**** Done pass_numb = 199/320
+
+Start clean. N_mp=29783 Nel=3.433294e+09
+Done clean. N_mp=29753 Nel=3.433294e+09
+**** Done pass_numb = 200/320
+
+Start clean. N_mp=36175 Nel=3.434814e+09
+Done clean. N_mp=36117 Nel=3.434814e+09
+**** Done pass_numb = 201/320
+
+Start clean. N_mp=40829 Nel=3.448534e+09
+Done clean. N_mp=40759 Nel=3.448534e+09
+**** Done pass_numb = 202/320
+
+Start clean. N_mp=44980 Nel=3.455324e+09
+Done clean. N_mp=44898 Nel=3.455324e+09
+**** Done pass_numb = 203/320
+
+Start clean. N_mp=48960 Nel=3.450310e+09
+Done clean. N_mp=48836 Nel=3.450310e+09
+**** Done pass_numb = 204/320
+
+Start clean. N_mp=52602 Nel=3.448299e+09
+Done clean. N_mp=52471 Nel=3.448299e+09
+**** Done pass_numb = 205/320
+
+Start clean. N_mp=56155 Nel=3.462426e+09
+Done clean. N_mp=56003 Nel=3.462426e+09
+**** Done pass_numb = 206/320
+
+Start clean. N_mp=59672 Nel=3.468332e+09
+Done clean. N_mp=59496 Nel=3.468332e+09
+**** Done pass_numb = 207/320
+
+Start clean. N_mp=62986 Nel=3.460596e+09
+Done clean. N_mp=62793 Nel=3.460596e+09
+Start SOFT regeneration. N_mp=62793 Nel_tot=3.46e+09 En_tot=4.31e+11
+Applied correction factor = 3.191200e+00
+Done SOFT regeneration. N_mp=19755 Nel_tot=3.46e+09 En_tot=4.52e+11
+**** Done pass_numb = 208/320
+
+Start clean. N_mp=29474 Nel=3.453931e+09
+Done clean. N_mp=29434 Nel=3.453931e+09
+**** Done pass_numb = 209/320
+
+Start clean. N_mp=35633 Nel=3.449449e+09
+Done clean. N_mp=35589 Nel=3.449449e+09
+**** Done pass_numb = 210/320
+
+Start clean. N_mp=40195 Nel=3.445710e+09
+Done clean. N_mp=40125 Nel=3.445710e+09
+**** Done pass_numb = 211/320
+
+Start clean. N_mp=44245 Nel=3.457665e+09
+Done clean. N_mp=44157 Nel=3.457665e+09
+**** Done pass_numb = 212/320
+
+Start clean. N_mp=48002 Nel=3.454310e+09
+Done clean. N_mp=47896 Nel=3.454310e+09
+**** Done pass_numb = 213/320
+
+Start clean. N_mp=51745 Nel=3.466871e+09
+Done clean. N_mp=51636 Nel=3.466871e+09
+**** Done pass_numb = 214/320
+
+Start clean. N_mp=55272 Nel=3.473996e+09
+Done clean. N_mp=55119 Nel=3.473996e+09
+**** Done pass_numb = 215/320
+
+Start clean. N_mp=58788 Nel=3.472756e+09
+Done clean. N_mp=58591 Nel=3.472756e+09
+**** Done pass_numb = 216/320
+
+Start clean. N_mp=62107 Nel=3.460797e+09
+Done clean. N_mp=61915 Nel=3.460797e+09
+Start SOFT regeneration. N_mp=61915 Nel_tot=3.46e+09 En_tot=4.37e+11
+Applied correction factor = 3.167066e+00
+Done SOFT regeneration. N_mp=19735 Nel_tot=3.46e+09 En_tot=4.21e+11
+**** Done pass_numb = 217/320
+
+Start clean. N_mp=29567 Nel=3.450892e+09
+Done clean. N_mp=29532 Nel=3.450892e+09
+**** Done pass_numb = 218/320
+
+Start clean. N_mp=36010 Nel=3.452787e+09
+Done clean. N_mp=35962 Nel=3.452787e+09
+**** Done pass_numb = 219/320
+
+Start clean. N_mp=40681 Nel=3.458132e+09
+Done clean. N_mp=40597 Nel=3.458132e+09
+**** Done pass_numb = 220/320
+
+Start clean. N_mp=44765 Nel=3.463907e+09
+Done clean. N_mp=44680 Nel=3.463907e+09
+**** Done pass_numb = 221/320
+
+Start clean. N_mp=48527 Nel=3.466573e+09
+Done clean. N_mp=48443 Nel=3.466573e+09
+**** Done pass_numb = 222/320
+
+Start clean. N_mp=52198 Nel=3.465879e+09
+Done clean. N_mp=52092 Nel=3.465879e+09
+**** Done pass_numb = 223/320
+
+Start clean. N_mp=55860 Nel=3.461006e+09
+Done clean. N_mp=55724 Nel=3.461006e+09
+**** Done pass_numb = 224/320
+
+Start clean. N_mp=59201 Nel=3.463595e+09
+Done clean. N_mp=59040 Nel=3.463595e+09
+**** Done pass_numb = 225/320
+
+Start clean. N_mp=62554 Nel=3.448790e+09
+Done clean. N_mp=62372 Nel=3.448790e+09
+Start SOFT regeneration. N_mp=62372 Nel_tot=3.45e+09 En_tot=4.54e+11
+Applied correction factor = 3.122959e+00
+Done SOFT regeneration. N_mp=19910 Nel_tot=3.45e+09 En_tot=4.39e+11
+**** Done pass_numb = 226/320
+
+Start clean. N_mp=29586 Nel=3.460097e+09
+Done clean. N_mp=29563 Nel=3.460097e+09
+**** Done pass_numb = 227/320
+
+Start clean. N_mp=36019 Nel=3.446417e+09
+Done clean. N_mp=35979 Nel=3.446417e+09
+**** Done pass_numb = 228/320
+
+Start clean. N_mp=40777 Nel=3.439306e+09
+Done clean. N_mp=40704 Nel=3.439306e+09
+**** Done pass_numb = 229/320
+
+Start clean. N_mp=44816 Nel=3.447482e+09
+Done clean. N_mp=44722 Nel=3.447482e+09
+**** Done pass_numb = 230/320
+
+Start clean. N_mp=48687 Nel=3.439090e+09
+Done clean. N_mp=48589 Nel=3.439090e+09
+**** Done pass_numb = 231/320
+
+Start clean. N_mp=52357 Nel=3.464707e+09
+Done clean. N_mp=52243 Nel=3.464707e+09
+**** Done pass_numb = 232/320
+
+Start clean. N_mp=52580 Nel=2.321314e+09
+Done clean. N_mp=52254 Nel=2.321314e+09
+**** Done pass_numb = 233/320
+
+Start clean. N_mp=52381 Nel=1.733407e+09
+Done clean. N_mp=52008 Nel=1.733407e+09
+**** Done pass_numb = 234/320
+
+Start clean. N_mp=52060 Nel=1.407511e+09
+Done clean. N_mp=51656 Nel=1.407511e+09
+**** Done pass_numb = 235/320
+
+Start clean. N_mp=51693 Nel=1.206350e+09
+Done clean. N_mp=51294 Nel=1.206350e+09
+**** Done pass_numb = 236/320
+
+Start clean. N_mp=51329 Nel=1.070597e+09
+Done clean. N_mp=50949 Nel=1.070597e+09
+**** Done pass_numb = 237/320
+
+Start clean. N_mp=50978 Nel=9.791348e+08
+Done clean. N_mp=50556 Nel=9.791347e+08
+**** Done pass_numb = 238/320
+
+Start clean. N_mp=50576 Nel=9.099557e+08
+Done clean. N_mp=50204 Nel=9.099557e+08
+**** Done pass_numb = 239/320
+
+Start clean. N_mp=50218 Nel=8.572218e+08
+Done clean. N_mp=49786 Nel=8.572217e+08
+**** Done pass_numb = 240/320
+
+Start clean. N_mp=50221 Nel=9.851950e+08
+Done clean. N_mp=50120 Nel=9.851949e+08
+**** Done pass_numb = 241/320
+
+Start clean. N_mp=50803 Nel=1.144562e+09
+Done clean. N_mp=50712 Nel=1.144562e+09
+**** Done pass_numb = 242/320
+
+Start clean. N_mp=51684 Nel=1.319926e+09
+Done clean. N_mp=51611 Nel=1.319926e+09
+**** Done pass_numb = 243/320
+
+Start clean. N_mp=52816 Nel=1.526770e+09
+Done clean. N_mp=52747 Nel=1.526770e+09
+**** Done pass_numb = 244/320
+
+Start clean. N_mp=54229 Nel=1.741262e+09
+Done clean. N_mp=54132 Nel=1.741262e+09
+**** Done pass_numb = 245/320
+
+Start clean. N_mp=55941 Nel=1.967499e+09
+Done clean. N_mp=55830 Nel=1.967499e+09
+**** Done pass_numb = 246/320
+
+Start clean. N_mp=57900 Nel=2.171455e+09
+Done clean. N_mp=57760 Nel=2.171455e+09
+**** Done pass_numb = 247/320
+
+Start clean. N_mp=60071 Nel=2.366853e+09
+Done clean. N_mp=59892 Nel=2.366853e+09
+**** Done pass_numb = 248/320
+
+Start clean. N_mp=62464 Nel=2.554931e+09
+Done clean. N_mp=62249 Nel=2.554931e+09
+Start SOFT regeneration. N_mp=62249 Nel_tot=2.55e+09 En_tot=3.33e+11
+Applied correction factor = 3.119064e+00
+Done SOFT regeneration. N_mp=20059 Nel_tot=2.55e+09 En_tot=3.33e+11
+**** Done pass_numb = 249/320
+
+Start clean. N_mp=30786 Nel=2.699383e+09
+Done clean. N_mp=30767 Nel=2.699383e+09
+**** Done pass_numb = 250/320
+
+Start clean. N_mp=38481 Nel=2.830690e+09
+Done clean. N_mp=38427 Nel=2.830690e+09
+**** Done pass_numb = 251/320
+
+Start clean. N_mp=44007 Nel=2.955394e+09
+Done clean. N_mp=43960 Nel=2.955394e+09
+**** Done pass_numb = 252/320
+
+Start clean. N_mp=49118 Nel=3.036032e+09
+Done clean. N_mp=49027 Nel=3.036032e+09
+**** Done pass_numb = 253/320
+
+Start clean. N_mp=53765 Nel=3.101214e+09
+Done clean. N_mp=53681 Nel=3.101214e+09
+**** Done pass_numb = 254/320
+
+Start clean. N_mp=58445 Nel=3.155757e+09
+Done clean. N_mp=58339 Nel=3.155757e+09
+**** Done pass_numb = 255/320
+
+Start clean. N_mp=62937 Nel=3.211803e+09
+Done clean. N_mp=62784 Nel=3.211803e+09
+Start SOFT regeneration. N_mp=62784 Nel_tot=3.21e+09 En_tot=4.18e+11
+Applied correction factor = 3.090945e+00
+Done SOFT regeneration. N_mp=19961 Nel_tot=3.21e+09 En_tot=4.04e+11
+**** Done pass_numb = 256/320
+
+Start clean. N_mp=29197 Nel=3.263504e+09
+Done clean. N_mp=29167 Nel=3.263504e+09
+**** Done pass_numb = 257/320
+
+Start clean. N_mp=35237 Nel=3.286404e+09
+Done clean. N_mp=35193 Nel=3.286404e+09
+**** Done pass_numb = 258/320
+
+Start clean. N_mp=39942 Nel=3.324573e+09
+Done clean. N_mp=39900 Nel=3.324573e+09
+**** Done pass_numb = 259/320
+
+Start clean. N_mp=44222 Nel=3.352656e+09
+Done clean. N_mp=44158 Nel=3.352656e+09
+**** Done pass_numb = 260/320
+
+Start clean. N_mp=48252 Nel=3.358167e+09
+Done clean. N_mp=48179 Nel=3.358167e+09
+**** Done pass_numb = 261/320
+
+Start clean. N_mp=52034 Nel=3.384738e+09
+Done clean. N_mp=51930 Nel=3.384738e+09
+**** Done pass_numb = 262/320
+
+Start clean. N_mp=55806 Nel=3.393786e+09
+Done clean. N_mp=55660 Nel=3.393786e+09
+**** Done pass_numb = 263/320
+
+Start clean. N_mp=59410 Nel=3.412138e+09
+Done clean. N_mp=59272 Nel=3.412138e+09
+**** Done pass_numb = 264/320
+
+Start clean. N_mp=63053 Nel=3.422574e+09
+Done clean. N_mp=62874 Nel=3.422574e+09
+Start SOFT regeneration. N_mp=62874 Nel_tot=3.42e+09 En_tot=4.39e+11
+Applied correction factor = 3.114656e+00
+Done SOFT regeneration. N_mp=19934 Nel_tot=3.42e+09 En_tot=4.66e+11
+**** Done pass_numb = 265/320
+
+Start clean. N_mp=29441 Nel=3.421590e+09
+Done clean. N_mp=29414 Nel=3.421590e+09
+**** Done pass_numb = 266/320
+
+Start clean. N_mp=35757 Nel=3.416042e+09
+Done clean. N_mp=35704 Nel=3.416042e+09
+**** Done pass_numb = 267/320
+
+Start clean. N_mp=40230 Nel=3.426427e+09
+Done clean. N_mp=40166 Nel=3.426427e+09
+**** Done pass_numb = 268/320
+
+Start clean. N_mp=44491 Nel=3.443478e+09
+Done clean. N_mp=44408 Nel=3.443478e+09
+**** Done pass_numb = 269/320
+
+Start clean. N_mp=48514 Nel=3.445141e+09
+Done clean. N_mp=48405 Nel=3.445141e+09
+**** Done pass_numb = 270/320
+
+Start clean. N_mp=52150 Nel=3.440355e+09
+Done clean. N_mp=52015 Nel=3.440355e+09
+**** Done pass_numb = 271/320
+
+Start clean. N_mp=55641 Nel=3.449047e+09
+Done clean. N_mp=55521 Nel=3.449047e+09
+**** Done pass_numb = 272/320
+
+Start clean. N_mp=59085 Nel=3.449542e+09
+Done clean. N_mp=58922 Nel=3.449542e+09
+**** Done pass_numb = 273/320
+
+Start clean. N_mp=62512 Nel=3.463708e+09
+Done clean. N_mp=62298 Nel=3.463708e+09
+Start SOFT regeneration. N_mp=62298 Nel_tot=3.46e+09 En_tot=4.28e+11
+Applied correction factor = 3.140071e+00
+Done SOFT regeneration. N_mp=20052 Nel_tot=3.46e+09 En_tot=4.30e+11
+**** Done pass_numb = 274/320
+
+Start clean. N_mp=29758 Nel=3.458509e+09
+Done clean. N_mp=29732 Nel=3.458509e+09
+**** Done pass_numb = 275/320
+
+Start clean. N_mp=36016 Nel=3.447817e+09
+Done clean. N_mp=35978 Nel=3.447817e+09
+**** Done pass_numb = 276/320
+
+Start clean. N_mp=40535 Nel=3.445933e+09
+Done clean. N_mp=40468 Nel=3.445933e+09
+**** Done pass_numb = 277/320
+
+Start clean. N_mp=44596 Nel=3.450076e+09
+Done clean. N_mp=44513 Nel=3.450076e+09
+**** Done pass_numb = 278/320
+
+Start clean. N_mp=48419 Nel=3.451146e+09
+Done clean. N_mp=48328 Nel=3.451146e+09
+**** Done pass_numb = 279/320
+
+Start clean. N_mp=52006 Nel=3.468839e+09
+Done clean. N_mp=51876 Nel=3.468839e+09
+**** Done pass_numb = 280/320
+
+Start clean. N_mp=55592 Nel=3.483732e+09
+Done clean. N_mp=55451 Nel=3.483732e+09
+**** Done pass_numb = 281/320
+
+Start clean. N_mp=59135 Nel=3.472648e+09
+Done clean. N_mp=58971 Nel=3.472648e+09
+**** Done pass_numb = 282/320
+
+Start clean. N_mp=62458 Nel=3.464985e+09
+Done clean. N_mp=62244 Nel=3.464985e+09
+Start SOFT regeneration. N_mp=62244 Nel_tot=3.46e+09 En_tot=4.25e+11
+Applied correction factor = 3.117767e+00
+Done SOFT regeneration. N_mp=19858 Nel_tot=3.46e+09 En_tot=4.37e+11
+**** Done pass_numb = 283/320
+
+Start clean. N_mp=29752 Nel=3.457652e+09
+Done clean. N_mp=29715 Nel=3.457652e+09
+**** Done pass_numb = 284/320
+
+Start clean. N_mp=36087 Nel=3.472070e+09
+Done clean. N_mp=36039 Nel=3.472070e+09
+**** Done pass_numb = 285/320
+
+Start clean. N_mp=40801 Nel=3.471443e+09
+Done clean. N_mp=40744 Nel=3.471443e+09
+**** Done pass_numb = 286/320
+
+Start clean. N_mp=44956 Nel=3.475735e+09
+Done clean. N_mp=44868 Nel=3.475735e+09
+**** Done pass_numb = 287/320
+
+Start clean. N_mp=48725 Nel=3.469849e+09
+Done clean. N_mp=48623 Nel=3.469849e+09
+**** Done pass_numb = 288/320
+
+Start clean. N_mp=52416 Nel=3.464759e+09
+Done clean. N_mp=52305 Nel=3.464759e+09
+**** Done pass_numb = 289/320
+
+Start clean. N_mp=55936 Nel=3.463568e+09
+Done clean. N_mp=55797 Nel=3.463568e+09
+**** Done pass_numb = 290/320
+
+Start clean. N_mp=59300 Nel=3.461171e+09
+Done clean. N_mp=59131 Nel=3.461171e+09
+**** Done pass_numb = 291/320
+
+Start clean. N_mp=62585 Nel=3.470652e+09
+Done clean. N_mp=62389 Nel=3.470652e+09
+Start SOFT regeneration. N_mp=62389 Nel_tot=3.47e+09 En_tot=4.48e+11
+Applied correction factor = 3.122904e+00
+Done SOFT regeneration. N_mp=19899 Nel_tot=3.47e+09 En_tot=4.41e+11
+**** Done pass_numb = 292/320
+
+Start clean. N_mp=29795 Nel=3.480688e+09
+Done clean. N_mp=29772 Nel=3.480688e+09
+**** Done pass_numb = 293/320
+
+Start clean. N_mp=36308 Nel=3.470058e+09
+Done clean. N_mp=36253 Nel=3.470058e+09
+**** Done pass_numb = 294/320
+
+Start clean. N_mp=40957 Nel=3.455721e+09
+Done clean. N_mp=40895 Nel=3.455721e+09
+**** Done pass_numb = 295/320
+
+Start clean. N_mp=44989 Nel=3.472178e+09
+Done clean. N_mp=44893 Nel=3.472178e+09
+**** Done pass_numb = 296/320
+
+Start clean. N_mp=48716 Nel=3.453167e+09
+Done clean. N_mp=48621 Nel=3.453167e+09
+**** Done pass_numb = 297/320
+
+Start clean. N_mp=52294 Nel=3.471107e+09
+Done clean. N_mp=52166 Nel=3.471107e+09
+**** Done pass_numb = 298/320
+
+Start clean. N_mp=55815 Nel=3.475465e+09
+Done clean. N_mp=55648 Nel=3.475465e+09
+**** Done pass_numb = 299/320
+
+Start clean. N_mp=59280 Nel=3.475235e+09
+Done clean. N_mp=59118 Nel=3.475235e+09
+**** Done pass_numb = 300/320
+
+Start clean. N_mp=62605 Nel=3.465313e+09
+Done clean. N_mp=62398 Nel=3.465313e+09
+Start SOFT regeneration. N_mp=62398 Nel_tot=3.47e+09 En_tot=4.44e+11
+Applied correction factor = 3.121988e+00
+Done SOFT regeneration. N_mp=19923 Nel_tot=3.47e+09 En_tot=4.20e+11
+**** Done pass_numb = 301/320
+
+Start clean. N_mp=29825 Nel=3.463789e+09
+Done clean. N_mp=29793 Nel=3.463789e+09
+**** Done pass_numb = 302/320
+
+Start clean. N_mp=36096 Nel=3.470447e+09
+Done clean. N_mp=36046 Nel=3.470447e+09
+**** Done pass_numb = 303/320
+
+Start clean. N_mp=40798 Nel=3.477340e+09
+Done clean. N_mp=40740 Nel=3.477340e+09
+**** Done pass_numb = 304/320
+
+Start clean. N_mp=44775 Nel=3.489669e+09
+Done clean. N_mp=44696 Nel=3.489669e+09
+**** Done pass_numb = 305/320
+
+Start clean. N_mp=48537 Nel=3.474478e+09
+Done clean. N_mp=48436 Nel=3.474478e+09
+**** Done pass_numb = 306/320
+
+Start clean. N_mp=52116 Nel=3.477600e+09
+Done clean. N_mp=51994 Nel=3.477600e+09
+**** Done pass_numb = 307/320
+
+Start clean. N_mp=55651 Nel=3.466192e+09
+Done clean. N_mp=55504 Nel=3.466192e+09
+**** Done pass_numb = 308/320
+
+Start clean. N_mp=59021 Nel=3.474033e+09
+Done clean. N_mp=58843 Nel=3.474033e+09
+**** Done pass_numb = 309/320
+
+Start clean. N_mp=62386 Nel=3.479464e+09
+Done clean. N_mp=62188 Nel=3.479464e+09
+Start SOFT regeneration. N_mp=62188 Nel_tot=3.48e+09 En_tot=4.44e+11
+Applied correction factor = 3.091675e+00
+Done SOFT regeneration. N_mp=20033 Nel_tot=3.48e+09 En_tot=4.41e+11
+**** Done pass_numb = 310/320
+
+Start clean. N_mp=29708 Nel=3.467496e+09
+Done clean. N_mp=29673 Nel=3.467496e+09
+**** Done pass_numb = 311/320
+
+Start clean. N_mp=35984 Nel=3.476106e+09
+Done clean. N_mp=35934 Nel=3.476106e+09
+**** Done pass_numb = 312/320
+
+Start clean. N_mp=36386 Nel=2.331793e+09
+Done clean. N_mp=36240 Nel=2.331793e+09
+**** Done pass_numb = 313/320
+
+Start clean. N_mp=36372 Nel=1.733499e+09
+Done clean. N_mp=36170 Nel=1.733499e+09
+**** Done pass_numb = 314/320
+
+Start clean. N_mp=36264 Nel=1.416753e+09
+Done clean. N_mp=36050 Nel=1.416753e+09
+**** Done pass_numb = 315/320
+
+Start clean. N_mp=36107 Nel=1.215787e+09
+Done clean. N_mp=35859 Nel=1.215787e+09
+**** Done pass_numb = 316/320
+
+Start clean. N_mp=35926 Nel=1.086129e+09
+Done clean. N_mp=35684 Nel=1.086129e+09
+**** Done pass_numb = 317/320
+
+Start clean. N_mp=35713 Nel=9.877774e+08
+Done clean. N_mp=35452 Nel=9.877773e+08
+**** Done pass_numb = 318/320
+
+Start clean. N_mp=35491 Nel=9.182873e+08
+Done clean. N_mp=35237 Nel=9.182873e+08
+**** Done pass_numb = 319/320
+
+Start clean. N_mp=35251 Nel=8.652072e+08
+Done clean. N_mp=34976 Nel=8.652071e+08
+**** Done pass_numb = 320/320
+
+Destroying C klu objects...
+Done.
+
+Job finished at Tue Sep  9 02:14:52 CEST 2014 on node 
+ under linux version Scientific Linux CERN SLC release 6.5 (Carbon)
+
+CERN statistics: This process used approximately : 13:11:57 KSI2K hours (47517 KSI2K seconds)
+                 This process corresponds to     : 51:28:36 HS06  hours (185316 HS06  seconds)
+
+
+PS:
+
+Read file </afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns/STDERR> for stderr output of this job.
+
