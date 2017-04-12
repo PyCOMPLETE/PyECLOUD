@@ -13,7 +13,6 @@ void boris_c(int N_sub_steps, double Dtt,
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
 	double rexy, imxy, rexy_0;
-	double B_mul_curr, B_skew_curr;
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
 	double vx_prime, vy_prime, vz_prime;
@@ -23,7 +22,8 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	const double qm = -qe/me; //is an electron
 
-	int b_field_type = get_b_field_function(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
+	/* Sets b-field for drift and dipoles */
+	int b_field_type = get_b_field_type(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
 
 	for(p=0; p<N_mp; p++)
 	{
@@ -53,15 +53,18 @@ void boris_c(int N_sub_steps, double Dtt,
 					By_n = B_multip[0];
 					Bx_n = B_skew[0];
 
-					//Order=1 for quadrupoles
 					for(order = 1; order < N_multipoles; order++){
+						/* rexy, imxy correspond to real, imaginary part of (x+iy)^(n-1) */
 						rexy_0 = rexy;
 						rexy = rexy_0*xn1p - imxy*yn1p;
 						imxy = imxy*xn1p + rexy_0*yn1p;
-						B_mul_curr = B_multip[order];
-						B_skew_curr = B_skew[order];
-						By_n += (B_mul_curr*rexy - B_skew_curr*imxy);
-						Bx_n += (B_mul_curr*imxy + B_skew_curr*rexy);
+
+						/*
+						 * Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
+						 * where k, k' are the strengths and skew strengths of the magnet
+						 */
+						By_n += (B_multip[order]*rexy - B_skew[order]*imxy);
+						Bx_n += (B_multip[order]*imxy + B_skew[order]*rexy);
 					}
 					break;
 			}
