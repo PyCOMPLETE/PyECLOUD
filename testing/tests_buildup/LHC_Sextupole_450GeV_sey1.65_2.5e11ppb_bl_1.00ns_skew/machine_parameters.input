@@ -13,8 +13,8 @@ filename_chm = 'LHC_chm_ver.mat'
 # Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
 track_method= 'BorisMultipole'
 N_sub_steps = 5
-B_multip = [0.0, 0.0, -4430./sqrt(2)]
-B_skew = [0.0, 0.0, -4430./sqrt(2)]
+B_multip = [0., 0., 0.]
+B_skew =   [0., 0., -4430.]
 
 
 

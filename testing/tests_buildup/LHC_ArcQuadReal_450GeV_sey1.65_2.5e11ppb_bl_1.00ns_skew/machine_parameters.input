@@ -10,8 +10,8 @@ filename_chm = 'LHC_chm_ver.mat'
 # Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
 track_method= 'BorisMultipole'
 N_sub_steps = 5
-B_multip = [0.0, 12.1]
-angle_skew_rad = [0, pi/4.]
+B_multip = [0., 0.]
+B_skew = [0., 12.1]
 
 
 betafx = 85.00
