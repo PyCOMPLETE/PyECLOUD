@@ -1,6 +1,6 @@
 import sys, os
-BIN=os.path.expanduser('../../../')
-sys.path.append(BIN)
+sys.path.append(os.path.expanduser('../../../'))
+sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 
 import numpy as np

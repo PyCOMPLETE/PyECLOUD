@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                          PyECLOUD Version 5.5.3
+#                          PyECLOUD Version 6.0.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -57,9 +57,6 @@
 from numpy import array, zeros_like
 from boris_cython import boris_step_multipole
 
-
-
-
 class pusher_Boris_multipole():
 
     def __init__(self, Dt, N_sub_steps=1, B_multip = [], B_skew=None):
@@ -102,10 +99,9 @@ class pusher_Boris_multipole():
             if  Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')
 
-
             boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_multip, self.B_skew,
                       xn1, yn1, zn1, vxn1, vyn1, vzn1,
-                      Ex_n, Ey_n)
+                      Ex_n, Ey_n, MP_e.charge, MP_e.mass)
 
         return MP_e
 
@@ -124,10 +120,9 @@ class pusher_Boris_multipole():
             if  Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')
 
-
-            boris_step_multipole(N_sub_steps, Dt_substep, self.B_multip,
+            boris_step_multipole(N_sub_steps, Dt_substep, self.B_multip, self.B_skew,
                       xn1, yn1, zn1, vxn1, vyn1, vzn1,
-                      Ex_n, Ey_n)
+                      Ex_n, Ey_n, MP_e.charge, MP_e.mass)
 
         return MP_e
 

@@ -1,13 +1,11 @@
 #include "boris_c_function.h"
 
-const double me = 9.10938291e-31;
-const double qe = 1.602176565e-19;
-
 void boris_c(int N_sub_steps, double Dtt,
 		double* B_multip, double* B_skew,
 		double* xn1, double* yn1,  double* zn1,
 		double* vxn1, double* vyn1, double* vzn1,
-		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles)
+		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles,
+		double charge, double mass)
 {
 	int p, isub, order;
 	double Ex_np, Ey_np;
@@ -20,7 +18,7 @@ void boris_c(int N_sub_steps, double Dtt,
 	double vx_plus, vy_plus, vz_plus;
 	double vxn1p, vyn1p, vzn1p;
 	double xn1p, yn1p, zn1p;
-	const double qm = -qe/me; //is an electron
+	const double qm=charge/mass;
 
 	for(p=0; p<N_mp; p++)
 	{

@@ -8,7 +8,7 @@
 #     
 #     This file is part of the code:
 #                                                                                          
-#                   PyECLOUD Version 5.5.3                     
+#                   PyECLOUD Version 6.0.0                     
 #                  
 #                                                                       
 #     Author and contact:   Giovanni IADAROLA 
@@ -73,7 +73,7 @@ import gen_photoemission_class as gpc
 
 
 import numpy as np
-from scipy.constants import c, e
+from scipy.constants import c, e, m_e
 
 
 class MP_light(object):
@@ -83,10 +83,10 @@ class MP_light(object):
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False,
-                slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
+                slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
         
         
-        print 'PyECLOUD Version 5.5.3'
+        print 'PyECLOUD Version 6.0.0'
         print 'PyHEADTAIL module'
         print 'Initializing ecloud from folder: '+pyecl_input_folder
         self.slicer = slicer
@@ -129,6 +129,7 @@ class Ecloud(object):
                 
         #pyeclsaver=pysav.pyecloud_saver(logfile_path)
        
+
         if switch_model=='ECLOUD_nunif':
             flag_non_unif_sey = 1
         else:
@@ -154,7 +155,7 @@ class Ecloud(object):
         MP_e=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
                            N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                            Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb,
-                           N_mp_soft_regen=N_mp_soft_regen, N_mp_after_soft_regen=N_mp_after_soft_regen)
+                           N_mp_soft_regen=N_mp_soft_regen, N_mp_after_soft_regen=N_mp_after_soft_regen, charge=MP_e_charge, mass=MP_e_mass)
         
 
         
@@ -179,13 +180,20 @@ class Ecloud(object):
             sey_mod=SEY_model_cos_le(Emax,del_max,R0)
         elif switch_model=='flat_low_ene':
             sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+	elif switch_model=='perfect_absorber':
+	    sey_mod=None
 
         
         flag_seg = (flag_hist_impact_seg==1)
            
-        impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                     Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
-        
+	if switch_model=='perfect_absorber':
+	    import perfect_absorber_class as pac
+	    impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
+			Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+	else:
+	    impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
+			Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+
 
         if track_method == 'Boris':
             dynamics=dynB.pusher_Boris(Dt, B0x, B0y, B0z, \
@@ -389,14 +397,12 @@ class Ecloud(object):
         MP_p.y_mp = beam.y[ix]+self.y_beam_offset
         MP_p.nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz#they have to become cylinders
         MP_p.N_mp = len(beam.x[ix])
+        MP_p.charge = beam.charge
         #compute beam field (it assumes electrons!)
         spacech_ele.recompute_spchg_efield(MP_p)
         #scatter to electrons
         Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e)
-        # go to actual beam particles 
-        Ex_n_beam = -Ex_n_beam * beam.charge/e
-        Ey_n_beam = -Ey_n_beam * beam.charge/e
-        
+
         
         ## compute electron field map
         spacech_ele.recompute_spchg_efield(MP_e)
