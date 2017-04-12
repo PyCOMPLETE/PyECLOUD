@@ -45,7 +45,7 @@ Nvz_regen=-1
 regen_hist_cut=-1
 
 
-xx_raw  = np.arange(-1,1.01, 0.1)*1
+xx_raw = np.arange(-1,1.01, 0.1)*1
 N_mp = int(len(xx_raw)**2)
 
 fig2 = ms.figure('Fields at x or y = 0')
@@ -87,7 +87,7 @@ for angle_ctr, angle in enumerate(angles):
 
         vx_mpB = np.zeros_like(x_mpB)
         vy_mpB = np.zeros_like(x_mpB)
-        vz_mpB = np.ones_like(x_mpB)
+        vz_mpB = np.ones_like(x_mpB)*1e5
 
         MP_eB.x_mp = x_mpB.copy()
         MP_eB.y_mp = y_mpB.copy()
@@ -104,11 +104,11 @@ for angle_ctr, angle in enumerate(angles):
 
         MP_eB = pusher.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
 
-        del_x = (MP_eB.x_mp - x_mpB)
-        del_y = (MP_eB.y_mp - y_mpB)
+        del_vx = (MP_eB.vx_mp - vx_mpB)
+        del_vy = (MP_eB.vy_mp - vy_mpB)
 
-        by = -vz_mpB * m_e * del_x / Dt**2 / (-q_e)
-        bx = vz_mpB * m_e * del_y / Dt**2 / (-q_e)
+        by = -vz_mpB * m_e * del_vx / Dt / (-q_e)
+        bx = vz_mpB * m_e * del_vy / Dt / (-q_e)
 
         sp_ctr = order + 1
         sp = plt.subplot(2,2,sp_ctr)
@@ -118,8 +118,8 @@ for angle_ctr, angle in enumerate(angles):
         sp.set_ylabel('y [m]')
 
         len_ = np.sqrt(bx**2+by**2)
-        color = np.hypot(bx, by)
-        sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, color, pivot='middle')
+        outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, len_, pivot='middle')
+        plt.colorbar(outp)
 
         lim = 1.2 * np.max(xx_raw)
         sp.set_xlim(-lim, lim)
