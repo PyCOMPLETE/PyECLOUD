@@ -110,18 +110,16 @@ for angle_ctr, angle in enumerate(angles):
         by = -vz_mpB * m_e * del_x / Dt**2 / (-q_e)
         bx = vz_mpB * m_e * del_y / Dt**2 / (-q_e)
 
-        by = np.round(by, 4)
-        bx = np.round(bx, 4)
-
         sp_ctr = order + 1
         sp = plt.subplot(2,2,sp_ctr)
-        title2 = title + ' B_multip = %s' % B_multip
-        sp.set_title(title2)
+        #title2 = title + ' B_multip = %s' % B_multip
+        sp.set_title(title)
         sp.set_xlabel('x [m]')
         sp.set_ylabel('y [m]')
 
         len_ = np.sqrt(bx**2+by**2)
-        sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, np.hypot(bx, by), pivot='middle')
+        color = np.hypot(bx, by)
+        sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, color, pivot='middle')
 
         lim = 1.2 * np.max(xx_raw)
         sp.set_xlim(-lim, lim)

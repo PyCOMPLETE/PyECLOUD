@@ -22,8 +22,12 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	const double qm = -qe/me; //is an electron
 
-	/* Sets b-field for drift and dipoles */
-	int b_field_type = get_b_field_type(B_multip, B_skew, N_multipoles, &Bx_n, &By_n);
+	int b_field_type = get_b_field_type(B_multip, B_skew, N_multipoles);
+	if (b_field_type == NONE)
+	{
+		By_n = B_multip[0];
+		Bx_n = B_skew[0];
+	}
 
 	for(p=0; p<N_mp; p++)
 	{
@@ -40,7 +44,8 @@ void boris_c(int N_sub_steps, double Dtt,
 
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
-			switch( b_field_type ){
+			switch( b_field_type )
+			{
 				case NONE:
 					break;
 				case QUADRUPOLE:
@@ -53,16 +58,17 @@ void boris_c(int N_sub_steps, double Dtt,
 					By_n = B_multip[0];
 					Bx_n = B_skew[0];
 
-					for(order = 1; order < N_multipoles; order++){
+					for(order = 1; order < N_multipoles; order++)
+					{
 						/* rexy, imxy correspond to real, imaginary part of (x+iy)^(n-1) */
 						rexy_0 = rexy;
 						rexy = rexy_0*xn1p - imxy*yn1p;
 						imxy = imxy*xn1p + rexy_0*yn1p;
 
 						/*
-						 * Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
-						 * where k, k' are the strengths and skew strengths of the magnet
-						 */
+						* Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
+						* where k, k' are the strengths and skew strengths of the magnet
+						*/
 						By_n += (B_multip[order]*rexy - B_skew[order]*imxy);
 						Bx_n += (B_multip[order]*imxy + B_skew[order]*rexy);
 					}
@@ -115,11 +121,9 @@ void boris_c(int N_sub_steps, double Dtt,
  * 2. Else if it is a non skew quadrupole, a simplified function is returned.
  * 3. Otherwise, the full multipole/skew function is returned.
  */
-int get_b_field_type(double* B_multip, double* B_skew, int N_multipoles, double* Bx, double* By){
+int get_b_field_type(double* B_multip, double* B_skew, int N_multipoles){
 	//1. Drift or Dipole
 	if (N_multipoles == 1){
-		*By = B_multip[0];
-		*Bx = B_skew[0];
 		return NONE;
 	}
 	//3. Skew quad or skew higher order
