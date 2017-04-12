@@ -22,13 +22,6 @@ void boris_c(int N_sub_steps, double Dtt,
 	double xn1p, yn1p, zn1p;
 	const double qm = -qe/me; //is an electron
 
-	int b_field_type = get_b_field_type(B_multip, B_skew, N_multipoles);
-	if (b_field_type == NONE)
-	{
-		By_n = B_multip[0];
-		Bx_n = B_skew[0];
-	}
-
 	for(p=0; p<N_mp; p++)
 	{
 		Ex_np = Ex_n[p];
@@ -44,35 +37,24 @@ void boris_c(int N_sub_steps, double Dtt,
 
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
-			switch( b_field_type )
+			rexy = 1.;
+			imxy = 0.;
+			By_n = B_multip[0];
+			Bx_n = B_skew[0];
+
+			for(order = 1; order < N_multipoles; order++)
 			{
-				case NONE:
-					break;
-				case QUADRUPOLE:
-					By_n = B_multip[1] * xn1p;
-					Bx_n = B_multip[1] * yn1p;
-					break;
-				case GENERAL:
-					rexy = 1.;
-					imxy = 0.;
-					By_n = B_multip[0];
-					Bx_n = B_skew[0];
+				/* rexy, imxy correspond to real, imaginary part of (x+iy)^(n-1) */
+				rexy_0 = rexy;
+				rexy = rexy_0*xn1p - imxy*yn1p;
+				imxy = imxy*xn1p + rexy_0*yn1p;
 
-					for(order = 1; order < N_multipoles; order++)
-					{
-						/* rexy, imxy correspond to real, imaginary part of (x+iy)^(n-1) */
-						rexy_0 = rexy;
-						rexy = rexy_0*xn1p - imxy*yn1p;
-						imxy = imxy*xn1p + rexy_0*yn1p;
-
-						/*
-						* Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
-						* where k, k' are the strengths and skew strengths of the magnet
-						*/
-						By_n += (B_multip[order]*rexy - B_skew[order]*imxy);
-						Bx_n += (B_multip[order]*imxy + B_skew[order]*rexy);
-					}
-					break;
+				/*
+				* Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
+				* where k, k' are the strengths and skew strengths of the magnet
+				*/
+				By_n += (B_multip[order]*rexy - B_skew[order]*imxy);
+				Bx_n += (B_multip[order]*imxy + B_skew[order]*rexy);
 			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
@@ -113,30 +95,5 @@ void boris_c(int N_sub_steps, double Dtt,
 		vyn1[p] = vyn1p;
 		vzn1[p] = vzn1p;
 	}
-}
-
-
-/*
- * 1. If N_multipoles is 1, the magnetic field is "computed" here and an empty function is returned.
- * 2. Else if it is a non skew quadrupole, a simplified function is returned.
- * 3. Otherwise, the full multipole/skew function is returned.
- */
-int get_b_field_type(double* B_multip, double* B_skew, int N_multipoles){
-	//1. Drift or Dipole
-	if (N_multipoles == 1){
-		return NONE;
-	}
-	//3. Skew quad or skew higher order
-	for(int i=0; i < N_multipoles; i++){
-		if (B_skew[i] != 0.){
-			return GENERAL;
-		}
-	}
-	//2. Simple quad
-	if (N_multipoles == 2 && B_multip[0] == 0.){
-		return QUADRUPOLE;
-	}
-	//3. Non skew higher order
-	return GENERAL;
 }
 
