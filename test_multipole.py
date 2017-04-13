@@ -107,8 +107,11 @@ for angle_ctr, angle in enumerate(angles):
         del_vx = (MP_eB.vx_mp - vx_mpB)
         del_vy = (MP_eB.vy_mp - vy_mpB)
 
-        by = -vz_mpB * m_e * del_vx / Dt / (-q_e)
-        bx = vz_mpB * m_e * del_vy / Dt / (-q_e)
+        #by = -vz_mpB * m_e * del_vx / Dt / (-q_e)
+        #bx = vz_mpB * m_e * del_vy / Dt / (-q_e)
+
+        by = -del_vx / Dt * m_e / vz_mpB / (-q_e)
+        bx = del_vy / Dt * m_e / vz_mpB / (-q_e)
 
         sp_ctr = order + 1
         sp = plt.subplot(2,2,sp_ctr)
@@ -125,8 +128,8 @@ for angle_ctr, angle in enumerate(angles):
         sp.set_xlim(-lim, lim)
         sp.set_ylim(-lim, lim)
 
-        mask = np.abs(y_mpB) < 1e-15
-        mask2 = np.abs(x_mpB) < 1e-15
+        mask = np.abs(y_mpB) < 1e-12
+        mask2 = np.abs(x_mpB) < 1e-12
 
         if angle_ctr == 0:
             color = ms.colorprog(order, 4)

@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "main.py", line 102, in <module>
-    MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
-  File "/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/pyecloud/impact_management_class.py", line 269, in backtrack_and_second_emiss
-    phi_true=rand(n_add_step)*2*pi;
-KeyboardInterrupt
