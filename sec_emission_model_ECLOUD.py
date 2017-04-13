@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------
-#                                                                      
-#                           CERN                                       
-#                                                                      
-#     European Organization for Nuclear Research                       
-#                                                                      
-#     
+#
+#                           CERN
+#
+#     European Organization for Nuclear Research
+#
+#
 #     This file is part of the code:
 #                                                                      		            
 #		           PyECLOUD Version 6.0.0                     
@@ -59,15 +59,15 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s):
     E_max_tilde=Emax*(1.+0.7*(1.-costheta));
 
     x=E/E_max_tilde;
-    
+
     true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
     reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2.;
-    
+
     delta=true_sec+reflected;
     ref_frac=0.*delta
     mask_non_zero=(delta>0)
     ref_frac[mask_non_zero]=reflected[mask_non_zero]/delta[mask_non_zero];
-       
+
     return delta, ref_frac
 
 
@@ -86,6 +86,6 @@ class SEY_model_ECLOUD:
             flag_elast=(rand(len(ref_frac))<ref_frac);
             flag_truesec=~(flag_elast);
             nel_emit=nel_impact*yiel;
-            
-            return  nel_emit, flag_elast, flag_truesec   
-        
+
+            return  nel_emit, flag_elast, flag_truesec
+

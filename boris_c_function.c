@@ -1,20 +1,16 @@
 #include "boris_c_function.h"
 
-
-
-
-void boris_c(int N_sub_steps, double Dtt, double* B_multip, 
-						  double* xn1, double* yn1,  double* zn1, 
-						  double* vxn1, double* vyn1, double* vzn1,
-						  double* Ex_n, double* Ey_n, int N_mp, int N_multipoles,
-						  double charge, double mass)
+void boris_c(int N_sub_steps, double Dtt,
+		double* B_multip, double* B_skew,
+		double* xn1, double* yn1,  double* zn1,
+		double* vxn1, double* vyn1, double* vzn1,
+		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles,
+		double charge, double mass)
 {
-							  
-	int p, m, isub;
+	int p, isub, order;
 	double Ex_np, Ey_np;
 	double Bx_n, By_n;
-
-	double qm;
+	double rexy, imxy, rexy_0;
 	double tBx, tBy, tBsq;
 	double sBx, sBy;
 	double vx_prime, vy_prime, vz_prime;
@@ -22,75 +18,56 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 	double vx_plus, vy_plus, vz_plus;
 	double vxn1p, vyn1p, vzn1p;
 	double xn1p, yn1p, zn1p;
-	double x_to_m, y_to_m;
-	double B_mul_curr;
-		
-
-	qm=charge/mass; 
+	const double qm=charge/mass;
 
 	for(p=0; p<N_mp; p++)
 	{
-		
 		Ex_np = Ex_n[p];
 		Ey_np = Ey_n[p];
 
 		vxn1p = vxn1[p];
 		vyn1p = vyn1[p];
 		vzn1p = vzn1[p];
-		
+
 		xn1p = xn1[p];
 		yn1p = yn1[p];
 		zn1p = zn1[p];
-		
+
 		for (isub=0; isub<N_sub_steps; isub++)
 		{
+			rexy = 1.;
+			imxy = 0.;
+			By_n = B_multip[0];
+			Bx_n = B_skew[0];
 
-			//Compute B field
-			
-			//Bx_n = 0.;
-			//By_n = 0.;
-			//x_to_m = 1.;
-			//y_to_m = 1.;
-			
-			//for (m=0;m<N_multipoles;m++)(WRONG! you need the cross terms)
-			//{
-				//B_mul_curr = B_multip[m];
-				//Bx_n = Bx_n + B_mul_curr*y_to_m;
-				//By_n = By_n + B_mul_curr*x_to_m;
-				//x_to_m = x_to_m*xn1p;
-				//y_to_m = y_to_m*yn1p;
-			//}
-			
-			
-			//Just dipole and quadrupole for now, to be generalized to multipole
-			B_mul_curr = B_multip[0];
-			Bx_n = 0.;
-			By_n = B_mul_curr;
-			
-			if (N_multipoles>1)
+			for(order = 1; order < N_multipoles; order++)
 			{
-				B_mul_curr = B_multip[1];
-				Bx_n += B_mul_curr*yn1p;
-				By_n += B_mul_curr*xn1p;
+				/* rexy, imxy correspond to real, imaginary part of (x+iy)^(n-1) */
+				rexy_0 = rexy;
+				rexy = rexy_0*xn1p - imxy*yn1p;
+				imxy = imxy*xn1p + rexy_0*yn1p;
+
+				/*
+				* Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
+				* where k, k' are the strengths and skew strengths of the magnet
+				*/
+				By_n += (B_multip[order]*rexy - B_skew[order]*imxy);
+				Bx_n += (B_multip[order]*imxy + B_skew[order]*rexy);
 			}
-			
-			
+
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
-
-
-			tBsq = tBx*tBx + tBy*tBy; 
+			tBsq = tBx*tBx + tBy*tBy;
 
 			sBx = 2.*tBx/(1.+tBsq);
 			sBy = 2.*tBy/(1.+tBsq);
-
 
 			vx_min = vxn1p + 0.5*qm*Ex_np*Dtt;
 			vy_min = vyn1p + 0.5*qm*Ey_np*Dtt;
 			vz_min = vzn1p;
 
 			//v_prime = v_min + cross(v_min, tB)
-			vx_prime = -vz_min*tBy + vx_min; 
+			vx_prime = -vz_min*tBy + vx_min;
 			vy_prime = vz_min*tBx + vy_min;
 			vz_prime = vx_min*tBy-vy_min*tBx + vz_min;
 
@@ -102,15 +79,13 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 			vxn1p = vx_plus + 0.5*qm*Ex_np*Dtt;
 			vyn1p = vy_plus + 0.5*qm*Ey_np*Dtt;
 			vzn1p = vz_plus;
-			
+
 			xn1p = xn1p + vxn1p * Dtt;
 			yn1p = yn1p + vyn1p * Dtt;
 			zn1p = zn1p + vzn1p * Dtt;
-
 		}
 
-
-		xn1[p] = xn1p; 
+		xn1[p] = xn1p;
 		yn1[p] = yn1p;
 		zn1[p] = zn1p;
 
@@ -119,7 +94,4 @@ void boris_c(int N_sub_steps, double Dtt, double* B_multip,
 		vzn1[p] = vzn1p;
 	}
 }
-
-
-
 
