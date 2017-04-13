@@ -1,8 +1,24 @@
 #!/bin/bash
 
-pdflatex reference.tex
-pdflatex reference.tex
-pdflatex reference.tex
-pdflatex reference.tex
+cd $(dirname $0)
+
+cmd="pdflatex -halt-on-error -file-line-error reference.tex"
+logfile="reference.log"
+
+max_iterations=5
+eval $cmd
+cont=true
+iterations=1
+while [[ $iterations -lt $max_iterations ]] && [[ $cont == true ]] ; do
+	cont=false
+	if grep -q 'Rerun to get ' ${logfile} || grep -q 'undefined references' $logfile || grep -q 'Rerun' $logfile ; then
+		eval $cmd
+		cont=true
+		((iterations++))
+	fi
+done
+
+echo "pdflatex or bibtex ran $iterations times"
+
 
 mv reference.pdf ../
