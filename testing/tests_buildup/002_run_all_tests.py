@@ -19,4 +19,3 @@ for ctr, sim_folder in enumerate(all_sim_folders):
     os.system('rm -r %s/comparison_plots' % sim_folder)
     os.system('python ./001_comparison_against_reference.py --folder %s' % sim_folder)
 
-

@@ -1,5 +1,4 @@
 import sys, os
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 BIN = os.path.expanduser("../../../")
 sys.path.append(BIN)
 
