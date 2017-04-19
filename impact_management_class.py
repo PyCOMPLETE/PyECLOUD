@@ -50,8 +50,8 @@
 #----------------------------------------------------------------------
 
 
-#from numpy import array, ceil, pi, cos, sin, zeros, sqrt
-from numpy import *
+from numpy import array, ceil, pi, cos, sin, zeros, sqrt, sum
+#from numpy import *
 import sec_emission
 from numpy.random import rand
 import hist_for as histf
