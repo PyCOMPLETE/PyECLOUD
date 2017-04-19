@@ -66,7 +66,7 @@ class MP_system:
                  N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                  Dx_hist_reg, Nx_reg, Ny_reg, Nvx_reg, Nvy_reg, Nvz_reg, regen_hist_cut, chamb,
                  N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e):
-        
+	N_mp_max = int(N_mp_max)        
         self.x_mp = np.zeros(N_mp_max,float)
         self.y_mp = np.zeros(N_mp_max,float)
         self.z_mp = np.zeros(N_mp_max,float)
