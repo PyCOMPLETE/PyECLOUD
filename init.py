@@ -169,6 +169,11 @@ def read_parameter_files(pyecl_input_folder='./'):
     y_max_hist_det=None
     Dx_hist_det=None
 
+    # histogram for angles
+    flag_cos_angle_hist = False
+    cos_angle_width = 0.05
+
+
     filename_init_MP_state = None
 
     sparse_solver = 'scipy_slu'
@@ -249,6 +254,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, B_skew,\
+    flag_cos_angle_hist, cos_angle_width,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0, s_param,\
@@ -281,6 +287,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip, B_skew,\
+    flag_cos_angle_hist, cos_angle_width,\
     PyPICmode, filename_init_MP_state,\
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex, E0, s_param,\
@@ -388,10 +395,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     flag_seg = (flag_hist_impact_seg==1)
 
     impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg,
+                                     flag_cos_angle_hist=flag_cos_angle_hist, cos_angle_width=cos_angle_width)
 
 
-    resgasion_sec_beam_list=[]
     if gas_ion_flag==1:
         resgasion=gic.residual_gas_ionization(unif_frac, P_nTorr, sigma_ion_MBarn,Temp_K,chamb,E_init_ion)
     else:
@@ -411,7 +418,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=dec_fac_secbeam_prof,
                  el_density_probes=el_density_probes, save_simulation_state_time_file = save_simulation_state_time_file,
                  x_min_hist_det=x_min_hist_det, x_max_hist_det=x_max_hist_det, y_min_hist_det=y_min_hist_det, y_max_hist_det=y_max_hist_det,
-                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp)
+                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp,
+                 flag_cos_angle_hist=flag_cos_angle_hist, cos_angle_width=cos_angle_width)
 
 
 
