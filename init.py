@@ -7,25 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.0.0
-#
-#
-#     Author and contact:   Giovanni IADAROLA
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.iadarola@cern.ch
-#
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
-#
-#                   PyECLOUD Version 5.5.2
+#                          PyECLOUD Version 6.0.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -66,7 +48,6 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #----------------------------------------------------------------------
-
 
 from numpy import *
 import beam_and_timing as beatim
