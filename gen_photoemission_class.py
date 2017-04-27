@@ -49,8 +49,8 @@
 #     all references.
 #----------------------------------------------------------------------
 
-
-from numpy.random import rand, randn, lognormal
+from __future__ import division
+from numpy.random import rand, lognormal, normal
 from numpy import floor, interp, pi, sin, cos, zeros, sqrt, sum
 
 import scipy.io as sio
@@ -94,8 +94,8 @@ class photoemission:
             raise ValueError('x0_refl, y0_refl is outside of the chamber!')
 
         # Convert normal distribution parameters to lognormal distribution parameters
-        self.e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1))
-        self.e_pe_max_logn  = np.log(e_pe_max) - self.e_pe_sigma_logn**2/2
+        self.e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1.))
+        self.e_pe_max_logn  = np.log(e_pe_max) - self.e_pe_sigma_logn**2/2.
         print 'Done photoemission init.'
 
     def generate(self, MP_e, lambda_t, Dt):
@@ -140,7 +140,8 @@ class photoemission:
             #generate theta for nonreflected photon generation
             N_gauss=sum(gauss_flag)
             if N_gauss>0:
-                theta_gen=self.alimit*randn(N_gauss)
+                #theta_gen=self.alimit*randn(N_gauss)
+                theta_gen = normal(0, self.alimit, N_gauss)
                 x_out[gauss_flag]=self.out_radius*cos(theta_gen)
                 y_out[gauss_flag]=self.out_radius*sin(theta_gen)
 
