@@ -50,8 +50,8 @@
 #----------------------------------------------------------------------
 
 
-from numpy import *
-from sec_emission import *
+from numpy import arange, sum, concatenate, linspace, zeros, sqrt, pi, sin, cos
+from sec_emission import hilleret_model2
 from numpy.random import rand
 import hist_for as histf
 import seg_impact as segi
@@ -87,8 +87,8 @@ class impact_management(object):
         xgr_hist=xg_hist[1:]
         xgr_hist=xgr_hist[::-1]#reverse array
         xg_hist=concatenate((-xgr_hist,xg_hist),0)
-        Nxg_hist=len(xg_hist);
-        bias_x_hist=min(xg_hist);
+        Nxg_hist=len(xg_hist)
+        bias_x_hist=min(xg_hist)
 
         self.En_g_hist=linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
         self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]     #hist. step
@@ -141,8 +141,8 @@ class impact_management(object):
 
         self.Nel_impact_last_step=0.
         self.Nel_emit_last_step=0.
-        self.En_imp_last_step_eV=0.;
-        self.En_emit_last_step_eV=0.;
+        self.En_imp_last_step_eV=0.
+        self.En_emit_last_step_eV=0.
 
         if MP_e.N_mp>0:
 
@@ -175,7 +175,7 @@ class impact_management(object):
 
             me = MP_e.mass
             qe = np.abs(MP_e.charge)
-            qm = qe/me;
+            qm = qe/me
 
             ## impact management
             N_mp_old=N_mp
@@ -189,9 +189,9 @@ class impact_management(object):
 
 
             # detect impact
-            self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
+            self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1)
 
-            Nimpact=int(sum(self.flag_impact));
+            Nimpact=int(sum(self.flag_impact))
 
             if Nimpact>0:
 
@@ -199,26 +199,34 @@ class impact_management(object):
                     i_found_new_mp = 0*x_mp
 
                 # load segment endpoints
-                x_in=x_mp_old[self.flag_impact[:N_mp_old]];y_in=y_mp_old[self.flag_impact[:N_mp_old]];z_in=z_mp_old[self.flag_impact[:N_mp_old]];
-                x_out=x_mp[self.flag_impact];y_out=y_mp[self.flag_impact];z_out=z_mp[self.flag_impact];
+                x_in=x_mp_old[self.flag_impact[:N_mp_old]]
+                y_in=y_mp_old[self.flag_impact[:N_mp_old]]
+                z_in=z_mp_old[self.flag_impact[:N_mp_old]]
+                x_out=x_mp[self.flag_impact]
+                y_out=y_mp[self.flag_impact]
+                z_out=z_mp[self.flag_impact]
 
                 # backtracking and surface normal generation
                 [x_emit,y_emit,z_emit,Norm_x,Norm_y, i_found]=\
-                    chamb.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out);
+                    chamb.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out)
 
 
                 # load velocities and charges
-                vx_impact=vx_mp[self.flag_impact]; vy_impact=vy_mp[self.flag_impact];vz_impact=vz_mp[self.flag_impact];
-                vx_emit=zeros(len(vx_impact)); vy_emit=zeros(len(vy_impact));  vz_emit=zeros(len(vz_impact));
-                nel_impact =nel_mp[self.flag_impact];
+                vx_impact=vx_mp[self.flag_impact]
+                vy_impact=vy_mp[self.flag_impact]
+                vz_impact=vz_mp[self.flag_impact]
+                vx_emit=zeros(len(vx_impact))
+                vy_emit=zeros(len(vy_impact))
+                vz_emit=zeros(len(vz_impact))
+                nel_impact =nel_mp[self.flag_impact]
 
                 # compute impact velocities, energy and angle
-                v_impact_mod=sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact);
-                E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod;
-                v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y;
-                costheta_impact=-(v_impact_n)/v_impact_mod;
+                v_impact_mod=sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
+                E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
+                v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
+                costheta_impact=-(v_impact_n)/v_impact_mod
 
-                #costheta_impact[costheta_impact<0]=1.;
+                #costheta_impact[costheta_impact<0]=1.
 
 
                 #electron histogram
@@ -244,84 +252,84 @@ class impact_management(object):
 
 
                 # elastic reflection (only velocities are affected)
-                vx_emit[flag_elast]=vx_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_x[flag_elast];
-                vy_emit[flag_elast]=vy_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_y[flag_elast];
-                vz_emit[flag_elast]=vz_impact[flag_elast];
+                vx_emit[flag_elast]=vx_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_x[flag_elast]
+                vy_emit[flag_elast]=vy_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_y[flag_elast]
+                vz_emit[flag_elast]=vz_impact[flag_elast]
 
 
                 # true secondary
-                N_true_sec=sum(flag_truesec);
+                N_true_sec=sum(flag_truesec)
                 if N_true_sec>0:
 
-                    n_add=zeros(len(flag_truesec));
-                    n_add[flag_truesec]=ceil(nel_emit[flag_truesec]/nel_mp_th)-1;
+                    n_add=zeros(len(flag_truesec))
+                    n_add[flag_truesec]=np.ceil(nel_emit[flag_truesec]/nel_mp_th)-1
                     n_add[n_add<0]=0. #in case of underflow
-                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.);
+                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.)
 
                     # replace old
-                    #En_truesec_eV=hilleret_model( N_true_sec, sigmafit, mufit, E_th);
-                    En_truesec_eV=hilleret_model2(switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy);
-                    v_true_sec_mod=sqrt(2*qm*En_truesec_eV);
+                    #En_truesec_eV=hilleret_model( N_true_sec, sigmafit, mufit, E_th)
+                    En_truesec_eV=hilleret_model2(switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
+                    v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
 
-                    sin_theta_true=rand(N_true_sec);
-                    cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true);
-                    phi_true=rand(N_true_sec)*2*pi;
-                    sin_phi_true=sin(phi_true);
-                    cos_phi_true=cos(phi_true);
+                    sin_theta_true=rand(N_true_sec)
+                    cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
+                    phi_true=rand(N_true_sec)*2*pi
+                    sin_phi_true=sin(phi_true)
+                    cos_phi_true=cos(phi_true)
 
 
                     vx_emit[flag_truesec]=v_true_sec_mod*\
-                        (cos_theta_true*Norm_x[flag_truesec]+sin_theta_true*sin_phi_true*Norm_y[flag_truesec]);
+                        (cos_theta_true*Norm_x[flag_truesec]+sin_theta_true*sin_phi_true*Norm_y[flag_truesec])
                     vy_emit[flag_truesec]=v_true_sec_mod*\
-                        (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec]);
-                    vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true);
+                        (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec])
+                    vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
 
 
-                    flag_add=n_add>0;
-                    n_add_step=sum(flag_add);
+                    flag_add=n_add>0
+                    n_add_step=sum(flag_add)
                     while n_add_step>0:
-                        En_truesec_eV=hilleret_model2(switch_no_increase_energy, n_add_step, sigmafit, mufit, E_th, E_impact_eV[flag_add], thresh_low_energy);
-                        #En_truesec_eV=hilleret_model( n_add_step, sigmafit, mufit, E_th);
-                        v_true_sec_mod=sqrt(2*qm*En_truesec_eV);
+                        En_truesec_eV=hilleret_model2(switch_no_increase_energy, n_add_step, sigmafit, mufit, E_th, E_impact_eV[flag_add], thresh_low_energy)
+                        #En_truesec_eV=hilleret_model( n_add_step, sigmafit, mufit, E_th)
+                        v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
 
-                        sin_theta_true=rand(n_add_step);
-                        cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true);
-                        phi_true=rand(n_add_step)*2*pi;
-                        sin_phi_true=sin(phi_true);
-                        cos_phi_true=cos(phi_true);
+                        sin_theta_true=rand(n_add_step)
+                        cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
+                        phi_true=rand(n_add_step)*2*pi
+                        sin_phi_true=sin(phi_true)
+                        cos_phi_true=cos(phi_true)
 
         #                print   'x_emit=', x_emit
-                        x_mp[N_mp:(N_mp+n_add_step)]=x_emit[flag_add];
-                        y_mp[N_mp:(N_mp+n_add_step)]=y_emit[flag_add];
-                        z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add];
+                        x_mp[N_mp:(N_mp+n_add_step)]=x_emit[flag_add]
+                        y_mp[N_mp:(N_mp+n_add_step)]=y_emit[flag_add]
+                        z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add]
 
                         if flag_seg:
                             i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
 
                         vx_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
-                             (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add]);
+                             (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add])
                         vy_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
-                             (cos_theta_true*Norm_y[flag_add]-sin_theta_true*sin_phi_true*Norm_x[flag_add]);
-                        vz_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*(sin_theta_true*cos_phi_true);
-                        nel_mp[N_mp:(N_mp+n_add_step)]=nel_emit[flag_add];
-                        N_mp=N_mp+n_add_step;
+                             (cos_theta_true*Norm_y[flag_add]-sin_theta_true*sin_phi_true*Norm_x[flag_add])
+                        vz_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
+                        nel_mp[N_mp:(N_mp+n_add_step)]=nel_emit[flag_add]
+                        N_mp=N_mp+n_add_step
 
-                        n_add[flag_add]=n_add[flag_add]-1;
-                        flag_add=n_add>0;
-                        n_add_step=sum(flag_add);
+                        n_add[flag_add]=n_add[flag_add]-1
+                        flag_add=n_add>0
+                        n_add_step=sum(flag_add)
 
 
-                x_mp[self.flag_impact]=x_emit;
-                y_mp[self.flag_impact]=y_emit;
-                z_mp[self.flag_impact]=z_emit;
-                vx_mp[self.flag_impact]=vx_emit;
-                vy_mp[self.flag_impact]=vy_emit;
-                vz_mp[self.flag_impact]=vz_emit;
-                nel_mp[self.flag_impact]=nel_emit;
+                x_mp[self.flag_impact]=x_emit
+                y_mp[self.flag_impact]=y_emit
+                z_mp[self.flag_impact]=z_emit
+                vx_mp[self.flag_impact]=vx_emit
+                vy_mp[self.flag_impact]=vy_emit
+                vz_mp[self.flag_impact]=vz_emit
+                nel_mp[self.flag_impact]=nel_emit
 
                 #subtract replaced macroparticles
-                v_emit_mod=sqrt(vx_emit*vx_emit+vy_emit*vy_emit+vz_emit*vz_emit);
-                E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod;
+                v_emit_mod=sqrt(vx_emit*vx_emit+vy_emit*vy_emit+vz_emit*vz_emit)
+                E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
                 histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                 if flag_seg:
@@ -333,8 +341,8 @@ class impact_management(object):
                 if N_mp>N_mp_old:
                     x_emit=x_mp[N_mp_old:N_mp]
                     nel_emit=nel_mp[N_mp_old:N_mp]
-                    v_emit_mod=sqrt(vx_mp[N_mp_old:N_mp]**2+vy_mp[N_mp_old:N_mp]**2+vz_mp[N_mp_old:N_mp]**2);
-                    E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod;
+                    v_emit_mod=sqrt(vx_mp[N_mp_old:N_mp]**2+vy_mp[N_mp_old:N_mp]**2+vz_mp[N_mp_old:N_mp]**2)
+                    E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
                     wei=-nel_emit*E_emit_eV
                     histf.compute_hist(x_emit,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
