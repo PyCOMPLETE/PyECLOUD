@@ -3,6 +3,5 @@
 pdflatex reference.tex
 pdflatex reference.tex
 pdflatex reference.tex
-pdflatex reference.tex
 
 mv reference.pdf ../
