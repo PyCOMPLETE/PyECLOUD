@@ -217,7 +217,7 @@ for ii,k in enumerate(out_var_curr):
 print 'Saved comparison plots in:'
 print folder_plot
 
-print 'In ipython, you may call EOG() to view the results if eye of gnome is installed.'
+print 'In ipython, you may call EOG() to view the results if EOG is installed.'
 EOG = lambda : os.system('eog %s' % folder_plot)
         #~ #pl.show()
 
