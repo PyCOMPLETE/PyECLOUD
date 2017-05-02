@@ -316,8 +316,8 @@ Scaling factor applied to the magnetic field map.
 \\ \hline
 \multicolumn{2}{p{.97\textwidth}}{When track\_method = `BorisMultipole' the following input variables must be provided:}\\ \hline
 \textbf{N\_sub\_steps} & Number of tracking sub-steps per time step.\\ \hline
-\textbf{B\_multip} & Magnetic momenta. For example: to simulate a dipole with B=8.3~T B\_multip = [8.3]; to simulate a quadrupole with gradient 12.~T/m set  B\_multip = [0., 12.].\\ 
-\hline
+\textbf{B\_multip} & Magnetic momenta. For example: to simulate a dipole with B=8.3~T B\_multip = [8.3]; to simulate a quadrupole with gradient 12~T/m set  B\_multip = [0., 12.].\\ \hline
+    \textbf{B\_skew} & The skew parameters can be included through B\_skew. For a skew quadrupole, set B\_multip to [0.,0.] and B\_skew to [0.,12.].\\ \hline
 \end{longtable}
 
 
