@@ -49,12 +49,13 @@
 #     all references.
 #----------------------------------------------------------------------
 
-from numpy import arange, concatenate, linspace, zeros, sqrt, pi, sin, cos
-from sec_emission import hilleret_model2
+import numpy as np
+from numpy import arange, concatenate, linspace, sqrt, pi, sin, cos
 from numpy.random import rand
+from sec_emission import hilleret_model2
 import hist_for as histf
 import seg_impact as segi
-import numpy as np
+import new_MP_properties
 
 
 class impact_management(object):
@@ -248,7 +249,7 @@ class impact_management(object):
                 N_true_sec = np.sum(flag_truesec)
                 if N_true_sec>0:
 
-                    n_add=zeros(len(flag_truesec))
+                    n_add = np.zeros_like(flag_truesec, dtype=int)
                     n_add[flag_truesec]=np.ceil(nel_emit[flag_truesec]/nel_mp_th)-1
                     n_add[n_add<0]=0. #in case of underflow
                     nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.)
@@ -256,20 +257,26 @@ class impact_management(object):
                     # replace old
                     #En_truesec_eV=hilleret_model( N_true_sec, sigmafit, mufit, E_th)
                     En_truesec_eV=hilleret_model2(switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
-                    v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
 
-                    sin_theta_true=rand(N_true_sec)
-                    cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
-                    phi_true=rand(N_true_sec)*2*pi
-                    sin_phi_true=sin(phi_true)
-                    cos_phi_true=cos(phi_true)
+                    ## This block is replaced ...
+                    #v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
+
+                    #sin_theta_true=rand(N_true_sec)
+                    #cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
+                    #phi_true=rand(N_true_sec)*2*pi
+                    #sin_phi_true=sin(phi_true)
+                    #cos_phi_true=cos(phi_true)
 
 
-                    vx_emit[flag_truesec]=v_true_sec_mod*\
-                        (cos_theta_true*Norm_x[flag_truesec]+sin_theta_true*sin_phi_true*Norm_y[flag_truesec])
-                    vy_emit[flag_truesec]=v_true_sec_mod*\
-                        (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec])
-                    vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
+                    #vx_emit[flag_truesec]=v_true_sec_mod*\
+                    #    (cos_theta_true*Norm_x[flag_truesec]+sin_theta_true*sin_phi_true*Norm_y[flag_truesec])
+                    #vy_emit[flag_truesec]=v_true_sec_mod*\
+                    #    (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec])
+                    #vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
+
+                    ## ...by this line
+                    vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = \
+                        new_MP_properties.velocities_angle_cosine_old(N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
 
 
                     flag_add=n_add>0
