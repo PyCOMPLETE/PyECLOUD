@@ -8,7 +8,7 @@ all_sim_folders = [
     'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns',
     'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew',
     'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_circular',
-    'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_circular_skew',
+    'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular',
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns',
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew',
     ]
