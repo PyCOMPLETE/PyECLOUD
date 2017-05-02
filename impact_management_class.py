@@ -49,15 +49,12 @@
 #     all references.
 #----------------------------------------------------------------------
 
-
-from numpy import arange, sum, concatenate, linspace, zeros, sqrt, pi, sin, cos
+from numpy import arange, concatenate, linspace, zeros, sqrt, pi, sin, cos
 from sec_emission import hilleret_model2
 from numpy.random import rand
 import hist_for as histf
 import seg_impact as segi
 import numpy as np
-
-
 
 
 class impact_management(object):
@@ -93,8 +90,6 @@ class impact_management(object):
         self.En_g_hist=linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
         self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]     #hist. step
 
-
-
         self.xg_hist = xg_hist
         self.Nxg_hist = Nxg_hist
         self.bias_x_hist = bias_x_hist
@@ -113,7 +108,7 @@ class impact_management(object):
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float)
 
-        self.flag_impact = np.array([False]) #just a place holder
+        #self.flag_impact = np.array([False]) #just a place holder
 
         print 'Done impact man. init.'
 
@@ -181,17 +176,13 @@ class impact_management(object):
             N_mp_old=N_mp
 
             # check flag_impact array has right size (if not regenerate it)
-            if len(self.flag_impact) != len(x_mp):
-                self.flag_impact = np.array(len(x_mp)*[False])
-
-            # reset flag_impact array
-            self.flag_impact[:] = False
-
+            flag_impact = np.zeros_like(x_mp, dtype=bool)
+            self.flag_impact = flag_impact
 
             # detect impact
-            self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1)
+            flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1)
 
-            Nimpact=int(sum(self.flag_impact))
+            Nimpact=int(np.sum(flag_impact))
 
             if Nimpact>0:
 
@@ -199,35 +190,31 @@ class impact_management(object):
                     i_found_new_mp = 0*x_mp
 
                 # load segment endpoints
-                x_in=x_mp_old[self.flag_impact[:N_mp_old]]
-                y_in=y_mp_old[self.flag_impact[:N_mp_old]]
-                z_in=z_mp_old[self.flag_impact[:N_mp_old]]
-                x_out=x_mp[self.flag_impact]
-                y_out=y_mp[self.flag_impact]
-                z_out=z_mp[self.flag_impact]
+                x_in=x_mp_old[flag_impact[:N_mp_old]]
+                y_in=y_mp_old[flag_impact[:N_mp_old]]
+                z_in=z_mp_old[flag_impact[:N_mp_old]]
+                x_out=x_mp[flag_impact]
+                y_out=y_mp[flag_impact]
+                z_out=z_mp[flag_impact]
 
                 # backtracking and surface normal generation
                 [x_emit,y_emit,z_emit,Norm_x,Norm_y, i_found]=\
                     chamb.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out)
 
-
                 # load velocities and charges
-                vx_impact=vx_mp[self.flag_impact]
-                vy_impact=vy_mp[self.flag_impact]
-                vz_impact=vz_mp[self.flag_impact]
-                vx_emit=zeros(len(vx_impact))
-                vy_emit=zeros(len(vy_impact))
-                vz_emit=zeros(len(vz_impact))
-                nel_impact =nel_mp[self.flag_impact]
+                vx_impact = vx_mp[flag_impact]
+                vy_impact = vy_mp[flag_impact]
+                vz_impact = vz_mp[flag_impact]
+                vx_emit   = np.zeros_like(vx_impact)
+                vy_emit   = np.zeros_like(vy_impact)
+                vz_emit   = np.zeros_like(vz_impact)
+                nel_impact = nel_mp[flag_impact]
 
                 # compute impact velocities, energy and angle
                 v_impact_mod=sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
                 E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
                 costheta_impact=-(v_impact_n)/v_impact_mod
-
-                #costheta_impact[costheta_impact<0]=1.
-
 
                 #electron histogram
                 histf.compute_hist(x_emit,nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
@@ -245,10 +232,10 @@ class impact_management(object):
 
                 nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact,E_impact_eV, costheta_impact, i_found)
 
-                self.Nel_impact_last_step=sum(nel_impact)
-                self.Nel_emit_last_step=sum(nel_emit)
+                self.Nel_impact_last_step=np.sum(nel_impact)
+                self.Nel_emit_last_step=np.sum(nel_emit)
 
-                self.En_imp_last_step_eV=sum(E_impact_eV*nel_impact)
+                self.En_imp_last_step_eV=np.sum(E_impact_eV*nel_impact)
 
 
                 # elastic reflection (only velocities are affected)
@@ -258,7 +245,7 @@ class impact_management(object):
 
 
                 # true secondary
-                N_true_sec=sum(flag_truesec)
+                N_true_sec = np.sum(flag_truesec)
                 if N_true_sec>0:
 
                     n_add=zeros(len(flag_truesec))
@@ -286,7 +273,7 @@ class impact_management(object):
 
 
                     flag_add=n_add>0
-                    n_add_step=sum(flag_add)
+                    n_add_step=np.sum(flag_add)
                     while n_add_step>0:
                         En_truesec_eV=hilleret_model2(switch_no_increase_energy, n_add_step, sigmafit, mufit, E_th, E_impact_eV[flag_add], thresh_low_energy)
                         #En_truesec_eV=hilleret_model( n_add_step, sigmafit, mufit, E_th)
@@ -316,7 +303,7 @@ class impact_management(object):
 
                         n_add[flag_add]=n_add[flag_add]-1
                         flag_add=n_add>0
-                        n_add_step=sum(flag_add)
+                        n_add_step=np.sum(flag_add)
 
 
                 x_mp[self.flag_impact]=x_emit
@@ -335,7 +322,7 @@ class impact_management(object):
                 if flag_seg:
                     segi.update_seg_impact(i_found,-nel_emit*E_emit_eV,self.energ_eV_impact_seg)
 
-                self.En_emit_last_step_eV=sum(E_emit_eV*nel_emit)
+                self.En_emit_last_step_eV=np.sum(E_emit_eV*nel_emit)
 
                 #subtract new macroparticles
                 if N_mp>N_mp_old:
@@ -349,18 +336,9 @@ class impact_management(object):
                     if flag_seg:
                        segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp],wei,self.energ_eV_impact_seg)
 
-                    self.En_emit_last_step_eV=self.En_emit_last_step_eV+sum(E_emit_eV*nel_emit)
+                    self.En_emit_last_step_eV=self.En_emit_last_step_eV+np.sum(E_emit_eV*nel_emit)
 
-
-                MP_e.x_mp = x_mp
-                MP_e.y_mp = y_mp
-                MP_e.z_mp = z_mp
-                MP_e.vx_mp = vx_mp
-                MP_e.vy_mp = vy_mp
-                MP_e.vz_mp = vz_mp
                 MP_e.N_mp = N_mp
 
         return MP_e
-
-
 
