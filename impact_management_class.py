@@ -50,8 +50,7 @@
 #----------------------------------------------------------------------
 
 import numpy as np
-from numpy import arange, concatenate, linspace, sqrt, pi, sin, cos
-from numpy.random import rand
+from numpy import arange, concatenate, linspace, sqrt
 from sec_emission import hilleret_model2
 import hist_for as histf
 import seg_impact as segi
@@ -247,70 +246,79 @@ class impact_management(object):
 
                 # true secondary
                 N_true_sec = np.sum(flag_truesec)
-                if N_true_sec>0:
-
+                if N_true_sec == 0:
+                    n_add_total = 0
+                    N_mp_new = N_mp_old
+                else:
                     n_add = np.zeros_like(flag_truesec, dtype=int)
                     n_add[flag_truesec]=np.ceil(nel_emit[flag_truesec]/nel_mp_th)-1
                     n_add[n_add<0]=0. #in case of underflow
                     nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.)
 
-                    # replace old
-                    #En_truesec_eV=hilleret_model( N_true_sec, sigmafit, mufit, E_th)
-                    En_truesec_eV=hilleret_model2(switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
+                    n_add_total = np.sum(n_add)
+                    N_mp_new = N_mp_old + n_add_total
 
-                    ## This block is replaced ...
-                    #v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
-
-                    #sin_theta_true=rand(N_true_sec)
-                    #cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
-                    #phi_true=rand(N_true_sec)*2*pi
-                    #sin_phi_true=sin(phi_true)
-                    #cos_phi_true=cos(phi_true)
+                    # replace impacted MPs that are not reflected
+                    En_truesec_eV = hilleret_model2(
+                        switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
+                    vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = new_MP_properties.velocities_angle_cosine_old(
+                        N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
 
 
-                    #vx_emit[flag_truesec]=v_true_sec_mod*\
-                    #    (cos_theta_true*Norm_x[flag_truesec]+sin_theta_true*sin_phi_true*Norm_y[flag_truesec])
-                    #vy_emit[flag_truesec]=v_true_sec_mod*\
-                    #    (cos_theta_true*Norm_y[flag_truesec]-sin_theta_true*sin_phi_true*Norm_x[flag_truesec])
-                    #vz_emit[flag_truesec]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
+                    #flag_add=n_add>0
+                    #n_add_step=np.sum(flag_add)
 
-                    ## ...by this line
-                    vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = \
-                        new_MP_properties.velocities_angle_cosine_old(N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
+                    #while n_add_step>0:
+                    #    En_truesec_eV=hilleret_model2(switch_no_increase_energy, n_add_step, sigmafit, mufit, E_th, E_impact_eV[flag_add], thresh_low_energy)
+                    #    v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
 
+                    #    sin_theta_true=rand(n_add_step)
+                    #    cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
+                    #    phi_true=rand(n_add_step)*2*pi
+                    #    sin_phi_true=sin(phi_true)
+                    #    cos_phi_true=cos(phi_true)
 
-                    flag_add=n_add>0
-                    n_add_step=np.sum(flag_add)
-                    while n_add_step>0:
-                        En_truesec_eV=hilleret_model2(switch_no_increase_energy, n_add_step, sigmafit, mufit, E_th, E_impact_eV[flag_add], thresh_low_energy)
-                        #En_truesec_eV=hilleret_model( n_add_step, sigmafit, mufit, E_th)
-                        v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
+                    #    x_mp[N_mp:(N_mp+n_add_step)]=x_emit[flag_add]
+                    #    y_mp[N_mp:(N_mp+n_add_step)]=y_emit[flag_add]
+                    #    z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add]
 
-                        sin_theta_true=rand(n_add_step)
-                        cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
-                        phi_true=rand(n_add_step)*2*pi
-                        sin_phi_true=sin(phi_true)
-                        cos_phi_true=cos(phi_true)
+                    #    if flag_seg:
+                    #        i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
 
-        #                print   'x_emit=', x_emit
-                        x_mp[N_mp:(N_mp+n_add_step)]=x_emit[flag_add]
-                        y_mp[N_mp:(N_mp+n_add_step)]=y_emit[flag_add]
-                        z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add]
+                    #    vx_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
+                    #         (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add])
+                    #    vy_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
+                    #         (cos_theta_true*Norm_y[flag_add]-sin_theta_true*sin_phi_true*Norm_x[flag_add])
+                    #    vz_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
+                    #    nel_mp[N_mp:(N_mp+n_add_step)]=nel_emit[flag_add]
+                    #    N_mp=N_mp+n_add_step
+
+                    #    n_add[flag_add]=n_add[flag_add]-1
+                    #    flag_add=n_add>0
+                    #    n_add_step=np.sum(flag_add)
+
+                    # Add new MPs
+                    if n_add_total != 0:
+                        # Clone MPs
+                        x_mp_add = np.repeat(x_emit, n_add)
+                        y_mp_add = np.repeat(y_emit, n_add)
+                        z_mp_add = np.repeat(z_emit, n_add)
+                        norm_x_add = np.repeat(Norm_x, n_add)
+                        norm_y_add = np.repeat(Norm_y, n_add)
+                        nel_mp_add = np.repeat(nel_emit, n_add)
+                        E_impact_eV_add = np.repeat(E_impact_eV, n_add)
+
+                        # Generate new MP properties, angles and energies
+                        En_truesec_eV_add = hilleret_model2(
+                            switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
+                        vx_mp_add, vy_mp_add, vz_mp_add = new_MP_properties.velocities_angle_cosine_old(
+                            n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
+
+                        MP_e.set_new_mps(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
+                                         vx_mp_add, vy_mp_add, vz_mp_add)
 
                         if flag_seg:
-                            i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
-
-                        vx_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
-                             (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add])
-                        vy_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
-                             (cos_theta_true*Norm_y[flag_add]-sin_theta_true*sin_phi_true*Norm_x[flag_add])
-                        vz_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
-                        nel_mp[N_mp:(N_mp+n_add_step)]=nel_emit[flag_add]
-                        N_mp=N_mp+n_add_step
-
-                        n_add[flag_add]=n_add[flag_add]-1
-                        flag_add=n_add>0
-                        n_add_step=np.sum(flag_add)
+                            i_found_new_mp[N_mp_old:N_mp_new] = np.repeat(i_found, n_add)
 
 
                 x_mp[self.flag_impact]=x_emit
@@ -322,7 +330,7 @@ class impact_management(object):
                 nel_mp[self.flag_impact]=nel_emit
 
                 #subtract replaced macroparticles
-                v_emit_mod=sqrt(vx_emit*vx_emit+vy_emit*vy_emit+vz_emit*vz_emit)
+                v_emit_mod = np.sqrt(vx_emit**2+vy_emit**2+vz_emit**2)
                 E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
                 histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
@@ -332,20 +340,18 @@ class impact_management(object):
                 self.En_emit_last_step_eV=np.sum(E_emit_eV*nel_emit)
 
                 #subtract new macroparticles
-                if N_mp>N_mp_old:
-                    x_emit=x_mp[N_mp_old:N_mp]
-                    nel_emit=nel_mp[N_mp_old:N_mp]
-                    v_emit_mod=sqrt(vx_mp[N_mp_old:N_mp]**2+vy_mp[N_mp_old:N_mp]**2+vz_mp[N_mp_old:N_mp]**2)
-                    E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
-                    wei=-nel_emit*E_emit_eV
-                    histf.compute_hist(x_emit,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                if n_add_total > 0:
+                    #x_emit=x_mp[N_mp_old:N_mp_new]
+                    #nel_emit=nel_mp[N_mp_old:N_mp_new]
+                    #v_emit_mod=sqrt(vx_mp[N_mp_old:N_mp_new]**2+vy_mp[N_mp_old:N_mp_new]**2+vz_mp[N_mp_old:N_mp_new]**2)
+                    #E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
+                    wei=-nel_mp_add*En_truesec_eV_add
+                    histf.compute_hist(x_mp_add,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
-                       segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp],wei,self.energ_eV_impact_seg)
+                       segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
                     self.En_emit_last_step_eV=self.En_emit_last_step_eV+np.sum(E_emit_eV*nel_emit)
-
-                MP_e.N_mp = N_mp
 
         return MP_e
 
