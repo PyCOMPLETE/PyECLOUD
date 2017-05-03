@@ -50,7 +50,6 @@
 #----------------------------------------------------------------------
 
 import numpy as np
-from numpy import arange, concatenate, linspace, sqrt
 from sec_emission import hilleret_model2
 import hist_for as histf
 import seg_impact as segi
@@ -80,14 +79,14 @@ class impact_management(object):
         self.En_hist_max = En_hist_max
         self.flag_seg = flag_seg
 
-        xg_hist=arange(0,chamb.x_aper+2.*Dx_hist,Dx_hist,float)
+        xg_hist= np.arange(0,chamb.x_aper+2.*Dx_hist,Dx_hist,float)
         xgr_hist=xg_hist[1:]
         xgr_hist=xgr_hist[::-1]#reverse array
-        xg_hist=concatenate((-xgr_hist,xg_hist),0)
+        xg_hist= np.concatenate((-xgr_hist,xg_hist),0)
         Nxg_hist=len(xg_hist)
         bias_x_hist=min(xg_hist)
 
-        self.En_g_hist=linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
+        self.En_g_hist=np.linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
         self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]     #hist. step
 
         self.xg_hist = xg_hist
@@ -99,38 +98,36 @@ class impact_management(object):
         self.En_imp_last_step_eV = None
         self.En_emit_last_step_eV = None
 
-        self.nel_impact_hist_tot = np.zeros(self.Nxg_hist,float)
-        self.nel_impact_hist_scrub  = np.zeros(self.Nxg_hist,float)
-        self.energ_eV_impact_hist = np.zeros(self.Nxg_hist,float)
+        self.nel_impact_hist_tot = np.zeros(Nxg_hist,float)
+        self.nel_impact_hist_scrub  = np.zeros(Nxg_hist,float)
+        self.energ_eV_impact_hist = np.zeros(Nxg_hist,float)
         self.En_hist_line = np.zeros(Nbin_En_hist,float)
 
         if flag_seg:
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float)
 
-        #self.flag_impact = np.array([False]) #just a place holder
-
         print 'Done impact man. init.'
 
     def reset_impact_hist_tot(self):
-        self.nel_impact_hist_tot=0.*self.nel_impact_hist_tot
+        self.nel_impact_hist_tot *= 0.
 
     def reset_impact_hist_scrub(self):
-        self.nel_impact_hist_scrub=0.*self.nel_impact_hist_scrub
+        self.nel_impact_hist_scrub *= 0.
 
     def reset_energ_eV_impact_hist(self):
-        self.energ_eV_impact_hist=0*self.energ_eV_impact_hist
+        self.energ_eV_impact_hist *= 0.
 
     def reset_En_hist_line(self):
-        self.En_hist_line=0*self.En_hist_line
+        self.En_hist_line *= 0.
 
     def reset_hist_impact_seg(self):
         if self.flag_seg:
-            self.nel_hist_impact_seg=0*self.nel_hist_impact_seg
+            self.nel_hist_impact_seg *= 0.
 
     def reset_energ_impact_seg(self):
         if self.flag_seg:
-            self.energ_eV_impact_seg=0*self.energ_eV_impact_seg
+            self.energ_eV_impact_seg *= 0.
     #@profile
     def backtrack_and_second_emiss(self, old_pos, MP_e):
 
@@ -152,7 +149,7 @@ class impact_management(object):
             vy_mp = MP_e.vy_mp
             vz_mp = MP_e.vz_mp
             nel_mp = MP_e.nel_mp
-            N_mp = MP_e.N_mp
+            N_mp_old = MP_e.N_mp
             nel_mp_th = MP_e.nel_mp_split
             chamb = self.chamb
             sey_mod = self.sey_mod
@@ -167,20 +164,17 @@ class impact_management(object):
             scrub_en_th = self.scrub_en_th
             thresh_low_energy = self.thresh_low_energy
 
-
             me = MP_e.mass
             qe = np.abs(MP_e.charge)
             qm = qe/me
 
             ## impact management
-            N_mp_old=N_mp
 
-            # check flag_impact array has right size (if not regenerate it)
             flag_impact = np.zeros_like(x_mp, dtype=bool)
             self.flag_impact = flag_impact
 
             # detect impact
-            flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1)
+            flag_impact[:N_mp_old]=chamb.is_outside(x_mp[0:N_mp_old],y_mp[0:N_mp_old])
 
             Nimpact=int(np.sum(flag_impact))
 
@@ -211,7 +205,7 @@ class impact_management(object):
                 nel_impact = nel_mp[flag_impact]
 
                 # compute impact velocities, energy and angle
-                v_impact_mod=sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
+                v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
                 E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
                 costheta_impact=-(v_impact_n)/v_impact_mod
@@ -264,39 +258,6 @@ class impact_management(object):
                     vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = new_MP_properties.velocities_angle_cosine_old(
                         N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
 
-
-                    #flag_add=n_add>0
-                    #n_add_step=np.sum(flag_add)
-
-                    #while n_add_step>0:
-                    #    En_truesec_eV=hilleret_model2(switch_no_increase_energy, n_add_step, sigmafit, mufit, E_th, E_impact_eV[flag_add], thresh_low_energy)
-                    #    v_true_sec_mod=sqrt(2*qm*En_truesec_eV)
-
-                    #    sin_theta_true=rand(n_add_step)
-                    #    cos_theta_true=sqrt(1-sin_theta_true*sin_theta_true)
-                    #    phi_true=rand(n_add_step)*2*pi
-                    #    sin_phi_true=sin(phi_true)
-                    #    cos_phi_true=cos(phi_true)
-
-                    #    x_mp[N_mp:(N_mp+n_add_step)]=x_emit[flag_add]
-                    #    y_mp[N_mp:(N_mp+n_add_step)]=y_emit[flag_add]
-                    #    z_mp[N_mp:(N_mp+n_add_step)]=z_emit[flag_add]
-
-                    #    if flag_seg:
-                    #        i_found_new_mp[N_mp:(N_mp+n_add_step)] = i_found[flag_add]
-
-                    #    vx_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
-                    #         (cos_theta_true*Norm_x[flag_add]+sin_theta_true*sin_phi_true*Norm_y[flag_add])
-                    #    vy_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*\
-                    #         (cos_theta_true*Norm_y[flag_add]-sin_theta_true*sin_phi_true*Norm_x[flag_add])
-                    #    vz_mp[N_mp:(N_mp+n_add_step)]=v_true_sec_mod*(sin_theta_true*cos_phi_true)
-                    #    nel_mp[N_mp:(N_mp+n_add_step)]=nel_emit[flag_add]
-                    #    N_mp=N_mp+n_add_step
-
-                    #    n_add[flag_add]=n_add[flag_add]-1
-                    #    flag_add=n_add>0
-                    #    n_add_step=np.sum(flag_add)
-
                     # Add new MPs
                     if n_add_total != 0:
                         # Clone MPs
@@ -321,13 +282,13 @@ class impact_management(object):
                             i_found_new_mp[N_mp_old:N_mp_new] = np.repeat(i_found, n_add)
 
 
-                x_mp[self.flag_impact]=x_emit
-                y_mp[self.flag_impact]=y_emit
-                z_mp[self.flag_impact]=z_emit
-                vx_mp[self.flag_impact]=vx_emit
-                vy_mp[self.flag_impact]=vy_emit
-                vz_mp[self.flag_impact]=vz_emit
-                nel_mp[self.flag_impact]=nel_emit
+                x_mp[flag_impact]  = x_emit
+                y_mp[flag_impact]  = y_emit
+                z_mp[flag_impact]  = z_emit
+                vx_mp[flag_impact] = vx_emit
+                vy_mp[flag_impact] = vy_emit
+                vz_mp[flag_impact] = vz_emit
+                nel_mp[flag_impact]= nel_emit
 
                 #subtract replaced macroparticles
                 v_emit_mod = np.sqrt(vx_emit**2+vy_emit**2+vz_emit**2)
@@ -341,17 +302,13 @@ class impact_management(object):
 
                 #subtract new macroparticles
                 if n_add_total > 0:
-                    #x_emit=x_mp[N_mp_old:N_mp_new]
-                    #nel_emit=nel_mp[N_mp_old:N_mp_new]
-                    #v_emit_mod=sqrt(vx_mp[N_mp_old:N_mp_new]**2+vy_mp[N_mp_old:N_mp_new]**2+vz_mp[N_mp_old:N_mp_new]**2)
-                    #E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
-                    wei=-nel_mp_add*En_truesec_eV_add
+                    wei =-nel_mp_add*En_truesec_eV_add
                     histf.compute_hist(x_mp_add,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
                        segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
-                    self.En_emit_last_step_eV=self.En_emit_last_step_eV+np.sum(E_emit_eV*nel_emit)
+                    self.En_emit_last_step_eV += np.sum(En_truesec_eV_add*nel_mp_add)
 
         return MP_e
 
