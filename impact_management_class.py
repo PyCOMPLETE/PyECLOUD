@@ -50,10 +50,9 @@
 #----------------------------------------------------------------------
 
 import numpy as np
-from sec_emission import hilleret_model2
+from sec_emission import hilleret_model2, velocities_angle_cosine
 import hist_for as histf
 import seg_impact as segi
-import new_MP_properties
 
 
 class impact_management(object):
@@ -255,7 +254,7 @@ class impact_management(object):
                     # replace impacted MPs that are not reflected
                     En_truesec_eV = hilleret_model2(
                         switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
-                    vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = new_MP_properties.velocities_angle_cosine_old(
+                    vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = velocities_angle_cosine(
                         N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
 
                     # Add new MPs
@@ -272,7 +271,7 @@ class impact_management(object):
                         # Generate new MP properties, angles and energies
                         En_truesec_eV_add = hilleret_model2(
                             switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
-                        vx_mp_add, vy_mp_add, vz_mp_add = new_MP_properties.velocities_angle_cosine_old(
+                        vx_mp_add, vy_mp_add, vz_mp_add = velocities_angle_cosine(
                             n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
 
                         MP_e.set_new_mps(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,

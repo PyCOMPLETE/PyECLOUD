@@ -53,7 +53,7 @@
 from numpy.random import rand
 from numpy.random import randn
 from numpy import floor, interp, pi, sin, cos, zeros
-import new_MP_properties
+import sec_emission
 #from geom_impact import impact_point_and_normal
 
 import scipy.io as sio
@@ -159,7 +159,7 @@ class photoemission:
                 N_neg=np.sum(flag_negat)
 
             # generate velocities like in impact managment
-            vx_gen, vy_gen, vz_gen = new_MP_properties.velocities_angle_cosine_old(
+            vx_gen, vy_gen, vz_gen = sec_emission.velocities_angle_cosine(
                 Nint_new_MP, En_gen, Norm_x, Norm_y)
 
             MP_e.set_new_mps(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
