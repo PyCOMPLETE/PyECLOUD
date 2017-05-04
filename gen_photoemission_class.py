@@ -62,7 +62,7 @@ qm=qe/me
 class photoemission:
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_method = 'gaussian'):
+                x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_distribution):
 
         print 'Start photoemission init.'
 
@@ -94,13 +94,11 @@ class photoemission:
             raise ValueError('x0_refl, y0_refl is outside of the chamber!')
 
         # Convert normal distribution parameters to lognormal distribution parameters
-        if energy_method == 'lognormal':
-            e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1.))
-            e_pe_max_logn  = np.log(e_pe_max) - self.e_pe_sigma_logn**2/2.
-            self.get_energy = lognormal(e_pe_max_logn, e_pe_sigma_logn)
-        elif energy_method == 'gaussian':
+        if energy_distribution == 'lognormal':
+            self.get_energy = lognormal(e_pe_max, e_pe_sigma)
+        elif energy_distribution == 'gaussian':
             self.get_energy = quasi_gaussian(e_pe_max, e_pe_sigma)
-        elif energy_method == 'uniform':
+        elif energy_distribution == 'uniform':
             self.get_energy = uniform(e_pe_max, e_pe_sigma)
         print 'Done photoemission init.'
 
@@ -163,14 +161,8 @@ class photoemission:
 
 
             #generate energies (the same distr. for all photoelectr.)
-            En_gen=random.randn(Nint_new_MP)*self.e_pe_sigma+self.e_pe_max   #in eV
+            En_gen = self.get_energy(N_new_MP) #in eV
 
-            flag_negat=(En_gen<0.)
-            N_neg=sum(flag_negat);
-            while(N_neg>0):
-                En_gen[flag_negat]=random.randn(N_neg)*self.e_pe_sigma+self.e_pe_max   #in eV
-                flag_negat=(En_gen<0.)
-                N_neg=sum(flag_negat);
 
             # generate velocities like in impact managment
             v_gen_mod=sqrt(2.*qm*En_gen);
@@ -201,14 +193,24 @@ class photoemission:
 
         return MP_e
 
+# Generator functions of one parameter energy generators
 def quasi_gaussian(max_, sigma):
     def func(N_int_new_MP):
-        return random.randn(N_int_new_MP)*sigma + max_
+        En_gen = random.randn(N_int_new_MP)*sigma + max_
+        flag_negat=(En_gen<0.)
+        N_neg=sum(flag_negat);
+        while(N_neg>0):
+            En_gen[flag_negat]=random.randn(N_neg)*sigma + max_   #in eV
+            flag_negat=(En_gen<0.)
+            N_neg=sum(flag_negat);
+        return En_gen
     return func
 
 def lognormal(max_, sigma):
+    e_pe_sigma_logn = np.sqrt(np.log(sigma**2/max_**2 + 1.))
+    e_pe_max_logn  = np.log(max_) - e_pe_sigma_logn**2/2.
     def func(N_int_new_MP):
-        return random.lognormal(max_, sigma, N_int_new_MP)
+        return random.lognormal(e_pe_max_logn, e_pe_sigma_logn, N_int_new_MP)
     return func
 
 def uniform(max_, sigma):

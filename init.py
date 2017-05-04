@@ -132,6 +132,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     x0_refl = -1
     y0_refl = -1
     out_radius = -1
+    energy_distribution = 'gaussian'
 
     # gas ionization parameters
     gas_ion_flag = 0
