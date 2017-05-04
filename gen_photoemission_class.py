@@ -100,15 +100,13 @@ class photoemission:
             self.get_energy = quasi_gaussian(e_pe_max, e_pe_sigma)
         elif energy_distribution == 'uniform':
             self.get_energy = uniform(e_pe_max, e_pe_sigma)
-        print 'Done photoemission init.'
+        elif energy_distribution == 'mono':
+            self.get_energy = mono(e_pe_max)
+        else:
+            raise ValueError('Energy distribution not specified')
+        print 'Done photoemission init. Energy distribution: %s' % energy_distribution
 
     def generate(self, MP_e, lambda_t, Dt):
-
-
-        me=9.10938291e-31;
-        qe=1.602176565e-19;
-
-        qm=qe/me
 
         k_pe=self.k_pe_st*c
         #determine the number of MPs to be generated
@@ -216,5 +214,10 @@ def lognormal(max_, sigma):
 def uniform(max_, sigma):
     def func(N_int_new_MP):
         return max_ + (random.rand(N_int_new_MP)-0.5)*sigma
+    return func
+
+def mono(max_):
+    def func(N_int_new_MP):
+        return np.ones(N_int_new_MP)*max_
     return func
 
