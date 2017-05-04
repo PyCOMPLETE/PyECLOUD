@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                  PyECLOUD Version 6.0.0
+#                  PyECLOUD Version 6.1.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -192,7 +192,7 @@ class impact_management(object):
 
             # check flag_impact array has right size (if not regenerate it)
             if len(self.flag_impact) != len(x_mp):
-                self.flag_impact = array(len(x_mp)*[False])
+                self.flag_impact = np.array(len(x_mp)*[False])
 
             # reset flag_impact array
             self.flag_impact[:] = False

@@ -1,52 +1,52 @@
 #----------------------------------------------------------------------
-#                                                                      
-#                           CERN                                       
-#                                                                      
-#     European Organization for Nuclear Research                       
-#                                                                      
-#     
-#     This file is part of the code:
-#                                                                                          
-#                   PyECLOUD Version 6.0.0                     
-#                  
-#                                                                       
-#     Author and contact:   Giovanni IADAROLA 
-#                           BE-ABP Group                               
-#                           CERN                                       
-#                           CH-1211 GENEVA 23                          
-#                           SWITZERLAND  
-#                           giovanni.iadarola@cern.ch                  
-#                                                                      
-#                contact:   Giovanni RUMOLO                            
-#                           BE-ABP Group                               
-#                           CERN                                      
-#                           CH-1211 GENEVA 23                          
-#                           SWITZERLAND  
-#                           giovanni.rumolo@cern.ch                    
-#                                                                      
 #
-#                                                                      
-#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other   
-#     appropriate  legal  protection  of  this  computer program and   
-#     associated documentation reserved  in  all  countries  of  the   
-#     world.                                                           
-#                                                                      
-#     Organizations collaborating with CERN may receive this program   
-#     and documentation freely and without charge.                     
-#                                                                      
-#     CERN undertakes no obligation  for  the  maintenance  of  this   
-#     program,  nor responsibility for its correctness,  and accepts   
-#     no liability whatsoever resulting from its use.                  
-#                                                                      
-#     Program  and documentation are provided solely for the use  of   
-#     the organization to which they are distributed.                  
-#                                                                      
-#     This program  may  not  be  copied  or  otherwise  distributed   
-#     without  permission. This message must be retained on this and   
-#     any other authorized copies.                                     
-#                                                                      
-#     The material cannot be sold. CERN should be  given  credit  in   
-#     all references.                                                  
+#                           CERN
+#
+#     European Organization for Nuclear Research
+#
+#
+#     This file is part of the code:
+#
+#                   PyECLOUD Version 6.1.0
+#
+#
+#     Author and contact:   Giovanni IADAROLA
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.iadarola@cern.ch
+#
+#                contact:   Giovanni RUMOLO
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.rumolo@cern.ch
+#
+#
+#
+#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
+#     appropriate  legal  protection  of  this  computer program and
+#     associated documentation reserved  in  all  countries  of  the
+#     world.
+#
+#     Organizations collaborating with CERN may receive this program
+#     and documentation freely and without charge.
+#
+#     CERN undertakes no obligation  for  the  maintenance  of  this
+#     program,  nor responsibility for its correctness,  and accepts
+#     no liability whatsoever resulting from its use.
+#
+#     Program  and documentation are provided solely for the use  of
+#     the organization to which they are distributed.
+#
+#     This program  may  not  be  copied  or  otherwise  distributed
+#     without  permission. This message must be retained on this and
+#     any other authorized copies.
+#
+#     The material cannot be sold. CERN should be  given  credit  in
+#     all references.
 #----------------------------------------------------------------------
 
 import dynamics_dipole as dyndip
@@ -123,42 +123,42 @@ for ii in range(N_steps):
     x_lisB.append(x_mpB.copy())
     y_lisB.append(y_mpB.copy())
     z_lisB.append(z_mpB.copy())
-    
+
     x_lisd.append(x_mpd.copy())
     y_lisd.append(y_mpd.copy())
     z_lisd.append(z_mpd.copy())
-    
+
     x_lisg.append(x_mpg.copy())
     y_lisg.append(y_mpg.copy())
     z_lisg.append(z_mpg.copy())
-    
+
     vx_lisB.append(vx_mpB.copy())
     vy_lisB.append(vy_mpB.copy())
     vz_lisB.append(vz_mpB.copy())
-    
+
     vx_lisd.append(vx_mpd.copy())
     vy_lisd.append(vy_mpd.copy())
     vz_lisd.append(vz_mpd.copy())
-    
+
     vx_lisg.append(vx_mpg.copy())
     vy_lisg.append(vy_mpg.copy())
     vz_lisg.append(vz_mpg.copy())
-    
-        
+
+
     x_mpB[0:N_mp], y_mpB[0:N_mp], z_mpB[0:N_mp], vx_mpB[0:N_mp], vy_mpB[0:N_mp], vz_mpB[0:N_mp]=\
                    dynamicsB.step(x_mpB[0:N_mp], y_mpB[0:N_mp], z_mpB[0:N_mp],\
                    vx_mpB[0:N_mp], vy_mpB[0:N_mp],vz_mpB[0:N_mp],Ex_n[0:N_mp],Ey_n[0:N_mp]);
-                   
+
     x_mpd[0:N_mp], y_mpd[0:N_mp], z_mpd[0:N_mp], vx_mpd[0:N_mp], vy_mpd[0:N_mp], vz_mpd[0:N_mp]=\
                    dynamicsd.step(x_mpd[0:N_mp], y_mpd[0:N_mp], z_mpd[0:N_mp],\
-                   vx_mpd[0:N_mp], vy_mpd[0:N_mp],vz_mpd[0:N_mp],Ex_n[0:N_mp],Ey_n[0:N_mp]);                   
-    
+                   vx_mpd[0:N_mp], vy_mpd[0:N_mp],vz_mpd[0:N_mp],Ex_n[0:N_mp],Ey_n[0:N_mp]);
+
     x_mpg[0:N_mp], y_mpg[0:N_mp], z_mpg[0:N_mp], vx_mpg[0:N_mp], vy_mpg[0:N_mp], vz_mpg[0:N_mp]=\
                    dynamicsGen.step(x_mpg[0:N_mp], y_mpg[0:N_mp], z_mpg[0:N_mp],\
-                   vx_mpg[0:N_mp], vy_mpg[0:N_mp],vz_mpg[0:N_mp],Ex_n[0:N_mp],Ey_n[0:N_mp]);                   
-    
-    
-    
+                   vx_mpg[0:N_mp], vy_mpg[0:N_mp],vz_mpg[0:N_mp],Ex_n[0:N_mp],Ey_n[0:N_mp]);
+
+
+
 x_lisB=array(x_lisB)
 y_lisB=array(y_lisB)
 z_lisB=array(z_lisB)
@@ -188,42 +188,42 @@ pl.close('all')
 
 for ii in range(len(x_lisB[1])):
     t_vect = Dt*pl.arange(len(x_lisB[:,ii]))*1e9
-    
+
     pl.figure(2*ii)
     fst=pl.subplot(3,1,1)
     pl.plot(t_vect, x_lisd[:,ii])
     pl.hold('on')
     pl.plot(t_vect, x_lisB[:,ii],'.r')
     pl.plot(t_vect, x_lisg[:,ii],'xg')
-    
+
     pl.subplot(3,1,2, sharex=fst)
     pl.plot(t_vect, y_lisd[:,ii])
     pl.hold('on')
     pl.plot(t_vect, y_lisB[:,ii],'.r')
     pl.plot(t_vect, y_lisg[:,ii],'xg')
-    
-    
+
+
     pl.subplot(3,1,3, sharex=fst)
     pl.plot(t_vect, z_lisd[:,ii])
     pl.hold('on')
     pl.plot(t_vect, z_lisB[:,ii],'.r')
     pl.plot(t_vect, z_lisg[:,ii],'xg')
     pl.xlabel('Time [ns]')
-    
+
     pl.figure(2*ii+1)
     fst=pl.subplot(3,1,1)
     pl.plot(t_vect, vx_lisd[:,ii])
     pl.hold('on')
     pl.plot(t_vect, vx_lisB[:,ii],'.r')
     pl.plot(t_vect, vx_lisg[:,ii],'xg')
-    
+
     pl.subplot(3,1,2, sharex=fst)
     pl.plot(t_vect, vy_lisd[:,ii])
     pl.hold('on')
     pl.plot(t_vect, vy_lisB[:,ii],'.r')
     pl.plot(t_vect, vy_lisg[:,ii],'xg')
-    
-    
+
+
     pl.subplot(3,1,3, sharex=fst)
     pl.plot(t_vect, z_lisd[:,ii])
     pl.hold('on')
