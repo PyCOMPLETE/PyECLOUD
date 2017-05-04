@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.0.0
+#		           PyECLOUD Version 6.1.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -50,7 +50,7 @@
 #----------------------------------------------------------------------
 
 from __future__ import division
-from numpy.random import rand, lognormal, normal
+import numpy.random as random
 from numpy import floor, interp, pi, sin, cos, zeros, sqrt, sum
 
 import scipy.io as sio
@@ -62,7 +62,7 @@ qm=qe/me
 class photoemission:
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac):
+                x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_method = 'gaussian'):
 
         print 'Start photoemission init.'
 
@@ -94,11 +94,23 @@ class photoemission:
             raise ValueError('x0_refl, y0_refl is outside of the chamber!')
 
         # Convert normal distribution parameters to lognormal distribution parameters
-        self.e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1.))
-        self.e_pe_max_logn  = np.log(e_pe_max) - self.e_pe_sigma_logn**2/2.
+        if energy_method == 'lognormal':
+            e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1.))
+            e_pe_max_logn  = np.log(e_pe_max) - self.e_pe_sigma_logn**2/2.
+            self.get_energy = lognormal(e_pe_max_logn, e_pe_sigma_logn)
+        elif energy_method == 'gaussian':
+            self.get_energy = quasi_gaussian(e_pe_max, e_pe_sigma)
+        elif energy_method == 'uniform':
+            self.get_energy = uniform(e_pe_max, e_pe_sigma)
         print 'Done photoemission init.'
 
     def generate(self, MP_e, lambda_t, Dt):
+
+
+        me=9.10938291e-31;
+        qe=1.602176565e-19;
+
+        qm=qe/me
 
         k_pe=self.k_pe_st*c
         #determine the number of MPs to be generated
@@ -107,7 +119,7 @@ class photoemission:
         N_new_MP=DNel/MP_e.nel_mp_ref;
         Nint_new_MP=floor(N_new_MP);
         rest=N_new_MP-Nint_new_MP;
-        Nint_new_MP=Nint_new_MP+int(rand()<rest);
+        Nint_new_MP=Nint_new_MP+int(random.rand()<rest);
         Nint_new_MP=int(Nint_new_MP)
 
 
@@ -119,13 +131,13 @@ class photoemission:
             y_out = zeros(Nint_new_MP)
 
             #for each one generate flag refl
-            refl_flag=(rand(Nint_new_MP)<self.refl_frac)
+            refl_flag=(random.rand(Nint_new_MP)<self.refl_frac)
             gauss_flag=~refl_flag
 
             #generate psi for refl. photons generation
             N_refl=sum(refl_flag)
             if N_refl>0:
-                u_gen=rand(N_refl,1);
+                u_gen=random.rand(N_refl,1);
                 if self.flag_unif:
                     psi_gen = 2.*pi*u_gen
                     x_out[refl_flag]=self.out_radius*cos(psi_gen)
@@ -141,7 +153,7 @@ class photoemission:
             N_gauss=sum(gauss_flag)
             if N_gauss>0:
                 #theta_gen=self.alimit*randn(N_gauss)
-                theta_gen = normal(0, self.alimit, N_gauss)
+                theta_gen = random.normal(0, self.alimit, N_gauss)
                 x_out[gauss_flag]=self.out_radius*cos(theta_gen)
                 y_out[gauss_flag]=self.out_radius*sin(theta_gen)
 
@@ -151,14 +163,21 @@ class photoemission:
 
 
             #generate energies (the same distr. for all photoelectr.)
-            En_gen = lognormal(self.e_pe_max_logn, self.e_pe_sigma_logn, Nint_new_MP) # in eV
+            En_gen=random.randn(Nint_new_MP)*self.e_pe_sigma+self.e_pe_max   #in eV
+
+            flag_negat=(En_gen<0.)
+            N_neg=sum(flag_negat);
+            while(N_neg>0):
+                En_gen[flag_negat]=random.randn(N_neg)*self.e_pe_sigma+self.e_pe_max   #in eV
+                flag_negat=(En_gen<0.)
+                N_neg=sum(flag_negat);
 
             # generate velocities like in impact managment
             v_gen_mod=sqrt(2.*qm*En_gen);
 
-            sin_theta_p=rand(Nint_new_MP);
+            sin_theta_p=random.rand(Nint_new_MP);
             cos_theta_p=sqrt(1.-sin_theta_p*sin_theta_p);
-            phi_p=rand(Nint_new_MP)*2.*pi;
+            phi_p=random.rand(Nint_new_MP)*2.*pi;
             sin_phi_p=sin(phi_p);
             cos_phi_p=cos(phi_p);
 
@@ -181,4 +200,19 @@ class photoemission:
 
 
         return MP_e
+
+def quasi_gaussian(max_, sigma):
+    def func(N_int_new_MP):
+        return random.randn(N_int_new_MP)*sigma + max_
+    return func
+
+def lognormal(max_, sigma):
+    def func(N_int_new_MP):
+        return random.lognormal(max_, sigma, N_int_new_MP)
+    return func
+
+def uniform(max_, sigma):
+    def func(N_int_new_MP):
+        return max_ + (random.rand(N_int_new_MP)-0.5)*sigma
+    return func
 
