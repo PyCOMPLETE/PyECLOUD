@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                  PyECLOUD Version 6.0.0
+#                  PyECLOUD Version 6.1.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -98,7 +98,7 @@ class impact_management(object):
         self.En_emit_last_step_eV = None
 
         self.nel_impact_hist_tot = np.zeros(Nxg_hist,float)
-        self.nel_impact_hist_scrub  = np.zeros(Nxg_hist,float)
+        self.nel_impact_hist_scrub = np.zeros(Nxg_hist,float)
         self.energ_eV_impact_hist = np.zeros(Nxg_hist,float)
         self.En_hist_line = np.zeros(Nbin_En_hist,float)
 

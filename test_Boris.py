@@ -27,15 +27,15 @@ Nx_regen=-1
 Ny_regen=-1
 Nvx_regen=-1
 Nvy_regen =-1
-Nvz_regen=-1 
+Nvz_regen=-1
 regen_hist_cut=-1
 
-                       
-MP_eB=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
+
+MP_eB=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                        N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                        Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
 
-MP_ed=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
+MP_ed=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                        N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                        Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
 
@@ -91,17 +91,17 @@ for ii in range(N_steps):
     x_lisB.append(MP_eB.x_mp.copy())
     y_lisB.append(MP_eB.y_mp.copy())
     z_lisB.append(MP_eB.z_mp.copy())
-    
+
     x_lisd.append(MP_ed.x_mp.copy())
     y_lisd.append(MP_ed.y_mp.copy())
     z_lisd.append(MP_ed.z_mp.copy())
-    
+
     MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp]);
-                   
-    MP_ed = dynamicsd.step(MP_ed,Ex_n[0:N_mp],Ey_n[0:N_mp]);                   
-    
-    
-    
+
+    MP_ed = dynamicsd.step(MP_ed,Ex_n[0:N_mp],Ey_n[0:N_mp]);
+
+
+
 x_lisB=array(x_lisB)
 y_lisB=array(y_lisB)
 z_lisB=array(z_lisB)
@@ -114,20 +114,20 @@ import pylab as pl
 pl.close('all')
 
 for ii in range(len(x_lisB[1])):
-    
+
     pl.figure(ii)
     pl.subplot(3,1,1)
     pl.plot(x_lisd[:,ii])
     pl.hold('on')
     pl.plot(x_lisB[:,ii],'.r')
 
-    
+
     pl.subplot(3,1,2)
     pl.plot(y_lisd[:,ii])
     pl.hold('on')
     pl.plot(y_lisB[:,ii],'.r')
 
-    
+
     pl.subplot(3,1,3)
     pl.plot(z_lisd[:,ii])
     pl.hold('on')

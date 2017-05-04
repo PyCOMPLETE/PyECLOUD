@@ -9,12 +9,12 @@ def myloadmat(filename):
 		except:
 			pass
 	return dict_var
-	
+
 class obj_from_dict:
 	def __init__(self, dictto):
 		for kk in dictto.keys():
 			exec 'self.'+kk +'= dictto[kk]'
-			
-			
+
+
 def myloadmat_to_obj(filename):
 	return  obj_from_dict(myloadmat(filename))

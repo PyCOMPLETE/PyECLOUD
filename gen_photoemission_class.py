@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.0.0
+#		           PyECLOUD Version 6.1.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -54,7 +54,6 @@ from numpy.random import rand
 from numpy.random import randn
 from numpy import floor, interp, pi, sin, cos, zeros
 import sec_emission
-#from geom_impact import impact_point_and_normal
 
 import scipy.io as sio
 import numpy as np
