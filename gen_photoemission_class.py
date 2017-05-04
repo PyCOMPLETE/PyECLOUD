@@ -158,7 +158,7 @@ class photoemission:
                 N_neg=np.sum(flag_negat)
 
             # generate velocities like in impact managment
-            vx_gen, vy_gen, vz_gen = sec_emission.velocities_angle_cosine(
+            vx_gen, vy_gen, vz_gen = sec_emission.velocities_angle_cosine_old(
                 Nint_new_MP, En_gen, Norm_x, Norm_y)
 
             MP_e.set_new_mps(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
