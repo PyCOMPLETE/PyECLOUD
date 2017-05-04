@@ -466,7 +466,7 @@ class MP_system:
 
 
 		N_new_MP=n_ele*(x_max-x_min)*(y_max-y_min)/self.nel_mp_ref;
-		Nint_new_MP=np.floor(N_new_MP);
+		Nint_new_MP=int(np.floor(N_new_MP));
 		rest=N_new_MP-Nint_new_MP;
 		Nint_new_MP=Nint_new_MP+int(rand()<rest);
 
