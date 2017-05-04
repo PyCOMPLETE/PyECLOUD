@@ -1,64 +1,64 @@
 #----------------------------------------------------------------------
-#                                                                      
-#                           CERN                                       
-#                                                                      
-#     European Organization for Nuclear Research                       
-#                                                                      
-#     
-#     This file is part of the code:
-#                                                                      		            
-#		           PyECLOUD Version 6.1.0                     
-#                  
-#                                                                       
-#     Author and contact:   Giovanni IADAROLA 
-#                           BE-ABP Group                               
-#                           CERN                                       
-#                           CH-1211 GENEVA 23                          
-#                           SWITZERLAND  
-#                           giovanni.iadarola@cern.ch                  
-#                                                                      
-#                contact:   Giovanni RUMOLO                            
-#                           BE-ABP Group                               
-#                           CERN                                      
-#                           CH-1211 GENEVA 23                          
-#                           SWITZERLAND  
-#                           giovanni.rumolo@cern.ch                    
-#                                                                      
 #
-#                                                                      
-#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other   
-#     appropriate  legal  protection  of  this  computer program and   
-#     associated documentation reserved  in  all  countries  of  the   
-#     world.                                                           
-#                                                                      
-#     Organizations collaborating with CERN may receive this program   
-#     and documentation freely and without charge.                     
-#                                                                      
-#     CERN undertakes no obligation  for  the  maintenance  of  this   
-#     program,  nor responsibility for its correctness,  and accepts   
-#     no liability whatsoever resulting from its use.                  
-#                                                                      
-#     Program  and documentation are provided solely for the use  of   
-#     the organization to which they are distributed.                  
-#                                                                      
-#     This program  may  not  be  copied  or  otherwise  distributed   
-#     without  permission. This message must be retained on this and   
-#     any other authorized copies.                                     
-#                                                                      
-#     The material cannot be sold. CERN should be  given  credit  in   
-#     all references.                                                  
+#                           CERN
+#
+#     European Organization for Nuclear Research
+#
+#
+#     This file is part of the code:
+#
+#		           PyECLOUD Version 6.1.0
+#
+#
+#     Author and contact:   Giovanni IADAROLA
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.iadarola@cern.ch
+#
+#                contact:   Giovanni RUMOLO
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.rumolo@cern.ch
+#
+#
+#
+#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
+#     appropriate  legal  protection  of  this  computer program and
+#     associated documentation reserved  in  all  countries  of  the
+#     world.
+#
+#     Organizations collaborating with CERN may receive this program
+#     and documentation freely and without charge.
+#
+#     CERN undertakes no obligation  for  the  maintenance  of  this
+#     program,  nor responsibility for its correctness,  and accepts
+#     no liability whatsoever resulting from its use.
+#
+#     Program  and documentation are provided solely for the use  of
+#     the organization to which they are distributed.
+#
+#     This program  may  not  be  copied  or  otherwise  distributed
+#     without  permission. This message must be retained on this and
+#     any other authorized copies.
+#
+#     The material cannot be sold. CERN should be  given  credit  in
+#     all references.
 #----------------------------------------------------------------------
 
 
 from numpy.random import rand
 from numpy.random import randn
 from numpy import *
-from scipy.constants import c, k, e 
+from scipy.constants import c, k, e
 
 class residual_gas_ionization:
-    
+
     def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion):
-        
+
         print 'Start res. gas ioniz. init.'
         self.unif_frac = unif_frac
         self.P_nTorr = P_nTorr
@@ -68,12 +68,12 @@ class residual_gas_ionization:
 #         self.sigmay = sigmay
         self.chamb = chamb
         self.E_init_ion = E_init_ion
-        
+
 #         self.x_beam_pos = x_beam_pos
 #         self.y_beam_pos = y_beam_pos
-        
+
         print 'Done res. gas ioniz. init.'
-    
+
     #@profile
     def generate(self, MP_e, lambda_t, Dt, sigmax, sigmay, x_beam_pos=0., y_beam_pos=0.):
 

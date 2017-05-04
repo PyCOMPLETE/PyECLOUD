@@ -1,4 +1,4 @@
-import os 
+import os
 
 files = os.listdir('.')
 
@@ -12,5 +12,5 @@ for filename in files:
             content=content.replace('PyECLOUD Version 6.1.0', 'PyECLOUD Version 6.1.0')
             with open(filename,'w') as fid:
                 fid.write(content)
-        
+
 os.system('rm *.pyold')
