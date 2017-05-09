@@ -30,11 +30,11 @@ Nx_regen=-1
 Ny_regen=-1
 Nvx_regen=-1
 Nvy_regen =-1
-Nvz_regen=-1 
+Nvz_regen=-1
 regen_hist_cut=-1
 
-                       
-MP_eB=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean, 
+
+MP_eB=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                        N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                        Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
 
@@ -49,7 +49,7 @@ Ey_n=array([0.,0.])
 # x_mpB=array([0.,1.])
 # y_mpB=array([1.,0.])
 # z_mpB=array([0.,0.])
-# 
+#
 # vx_mpB=array([0.,0.])
 # vy_mpB=array([0.,0.])
 # vz_mpB=array([1.,1.])
@@ -57,7 +57,7 @@ Ey_n=array([0.,0.])
 # x_mpB=array([.05])
 # y_mpB=array([.0])
 # z_mpB=array([0.])
-#  
+#
 # vx_mpB=array([0.])
 # vy_mpB=array([0.0003])
 # vz_mpB=array([0.])
@@ -66,7 +66,7 @@ Ey_n=array([0.,0.])
 x_mpB=array([0.0156605126754])
 y_mpB=array([0.0154002281106])
 z_mpB=array([1.59147686348e-05])
- 
+
 vx_mpB=array([335546.817425/5])
 vy_mpB=array([-170848.411391/5])
 vz_mpB=array([223792.460031/5])
@@ -97,15 +97,15 @@ for ii in range(N_steps):
     x_lisB.append(MP_eB.x_mp.copy())
     y_lisB.append(MP_eB.y_mp.copy())
     z_lisB.append(MP_eB.z_mp.copy())
-    
 
-    
+
+
     MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp]);
-                   
-                  
-    
-    
-    
+
+
+
+
+
 x_lisB=array(x_lisB)
 y_lisB=array(y_lisB)
 z_lisB=array(z_lisB)
@@ -115,25 +115,25 @@ import pylab as pl
 pl.close('all')
 
 for ii in range(len(x_lisB[1])):
-    
+
     pl.figure(ii)
     sp1=pl.subplot(3,1,1)
     pl.plot(x_lisB[:,ii],'.-')
 
-    
+
     pl.subplot(3,1,2, sharex=sp1)
     pl.plot(y_lisB[:,ii],'.-')
 
-    
+
     pl.subplot(3,1,3, sharex=sp1)
     pl.plot(z_lisB[:,ii],'.-')
-    
+
     #pl.figure(100+ii)
     #pl.plot(y_lisB[:,ii], z_lisB[:,ii],'.-')
     #pl.axis('equal')
     #pl.xlabel('y')
     #pl.ylabel('z')
-    
+
     pl.figure(200+ii)
     pl.plot(x_lisB[:,ii], y_lisB[:,ii],'.-')
     #pl.xlim(-np.max(np.abs(x_lisB[:,ii])), np.max(np.abs(x_lisB[:,ii])))
@@ -141,7 +141,7 @@ for ii in range(len(x_lisB[1])):
     pl.axis('equal')
     pl.xlabel('x')
     pl.ylabel('y')
-    
+
     #pl.figure(300+ii)
     #pl.plot(x_lisB[:,ii], z_lisB[:,ii],'.-')
     #pl.axis('equal')

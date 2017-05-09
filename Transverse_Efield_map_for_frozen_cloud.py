@@ -21,7 +21,7 @@ class Transverse_Efield_map(object):
 
         self.x_beam_offset = x_beam_offset
         self.y_beam_offset = y_beam_offset
-        
+
         self.slice_by_slice_mode = slice_by_slice_mode
         if self.slice_by_slice_mode:
             self.sid = 0
@@ -41,10 +41,10 @@ class Transverse_Efield_map(object):
             beam.clean_slices()
 
         slices = beam.get_slices(self.slicer)
-        
+
         sid = 0
         for _ in xrange(slices.n_slices):
-            
+
             sid-=1
 
             # select particles in the slice
@@ -52,7 +52,7 @@ class Transverse_Efield_map(object):
 
             # slice size
             dz = (slices.z_bins[sid + 1] - slices.z_bins[sid])
-            
+
             self._track_single_slice(beam, sid, pid)
 
 
@@ -77,14 +77,14 @@ class Transverse_Efield_map(object):
         fact_kick = beam.charge / (beam.p0*beam.beta*c) * self.L_interaction
         beam.xp[pid] += fact_kick * Ex_sc_p
         beam.yp[pid] += fact_kick * Ey_sc_p
-        
-    
+
+
     def _track_in_single_slice_mode(self, beam):
-        
+
         if beam.slice_info is not 'unsliced':
             self.sid -= 1
             self._track_single_slice(beam=beam, sid=self.sid, pid=np.arange(beam.macroparticlenumber))
-            
-    
+
+
     def _finalize_and_reinitialize(self):
-        self.sid = 0   
+        self.sid = 0
