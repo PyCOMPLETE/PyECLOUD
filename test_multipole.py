@@ -71,7 +71,7 @@ for angle_ctr, angle in enumerate(angles):
         B_skew[order] = 1. * np.sin(angle*(order+1))
         if angle == 0:
             B_skew = None
-        print title, B_multip, B_skew
+        #print title, B_multip, B_skew
 
         pusher = dbu.pusher_Boris_multipole(Dt, B_multip=B_multip, N_sub_steps=1, B_skew=B_skew)
 
