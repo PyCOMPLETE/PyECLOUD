@@ -49,12 +49,8 @@
 #     all references.
 #----------------------------------------------------------------------
 
-
-
-
-
-
-from numpy import array, zeros_like
+import math
+import numpy as np
 from boris_cython import boris_step_multipole
 
 class pusher_Boris_multipole():
@@ -70,16 +66,19 @@ class pusher_Boris_multipole():
         else:
             self.Dtt = Dt / float(N_sub_steps)
 
-        self.B_multip = array(B_multip, dtype=float)
+        if len(B_multip) == 0:
+            B_multip = np.array([0], dtype=float)
+
+        # B_multip are derivatives of B_field
+        # B_field are field strengths at x=1 m
+        factorial = np.array([math.factorial(ii) for ii in xrange(len(B_multip))], dtype=float)
+        self.B_field = np.array(B_multip, dtype=float) / factorial
         if B_skew is None:
-            self.B_skew = zeros_like(self.B_multip, dtype=float)
+            self.B_field_skew = np.zeros_like(self.B_field, dtype=float)
         else:
-            self.B_skew = array(B_skew, dtype=float)
+            self.B_field_skew = np.array(B_skew, dtype=float) / factorial
 
         print "Tracker: Boris multipole"
-
-        if len(self.B_multip)==0:
-            self.B_multip=array([0])
 
         print "N_subst_init=%d"% self.N_sub_steps
 
@@ -99,7 +98,7 @@ class pusher_Boris_multipole():
             if  Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')
 
-            boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_multip, self.B_skew,
+            boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_field, self.B_field_skew,
                       xn1, yn1, zn1, vxn1, vyn1, vzn1,
                       Ex_n, Ey_n, MP_e.charge, MP_e.mass)
 
@@ -120,7 +119,7 @@ class pusher_Boris_multipole():
             if  Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')
 
-            boris_step_multipole(N_sub_steps, Dt_substep, self.B_multip, self.B_skew,
+            boris_step_multipole(N_sub_steps, Dt_substep, self.B_field, self.B_field_skew,
                       xn1, yn1, zn1, vxn1, vyn1, vzn1,
                       Ex_n, Ey_n, MP_e.charge, MP_e.mass)
 
