@@ -44,7 +44,7 @@ chamb = geom_impact_ellip.ellip_cham_geom_object(1.,1.)
 MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, chamb)
 
 
-phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, 5, 7, alimit, 0.99, 0, 1.01, chamb, 0.995)
+phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, 5, 7, alimit, 0.99, 0, 1.01, chamb, 0.995, 'lognormal')
 
 phemiss.generate(MP_e, 1, 1)
 
