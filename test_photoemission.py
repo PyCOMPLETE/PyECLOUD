@@ -5,6 +5,7 @@ import argparse
 from scipy.constants import c, e, m_e
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.integrate as integrate
 
 import MP_system
 import geom_impact_ellip
@@ -19,6 +20,7 @@ ms.mystyle()
 parser = argparse.ArgumentParser()
 parser.add_argument('-o')
 parser.add_argument('--noshow', action='store_true')
+parser.add_argument('--energy-dist', choices=['gaussian', 'lognormal'], default='gaussian')
 args = parser.parse_args()
 
 
@@ -38,13 +40,14 @@ k_pe_st = 1/c*N_mp_max
 refl_frac= 3.8e-2
 nel_mp_ref = 1
 alimit = 0.05
+mu, sig = 7, 5
 
 chamb = geom_impact_ellip.ellip_cham_geom_object(1.,1.)
 
 MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, chamb)
 
 
-phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, 5, 7, alimit, 0.99, 0, 1.01, chamb, 0.995, 'lognormal')
+phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb, 0.995, args.energy_dist)
 
 phemiss.generate(MP_e, 1, 1)
 
@@ -91,7 +94,11 @@ sp.set_xlabel('Energies [eV]')
 mask = energies < 30
 sp.hist(energies[mask], bins=40, normed=True)
 xx = np.linspace(0.5,30,1e5)
-yy = lognormal(xx, 7, 5)
+if args.energy_dist == 'lognormal':
+    yy = lognormal(xx, mu, sig)
+elif args.energy_dist == 'gaussian':
+    factor = integrate.quad(lambda x: gauss(x, mu, sig), -np.inf, np.inf)[0] / integrate.quad(lambda x: gauss(x, mu, sig), 0, np.inf)[0]
+    yy = gauss(xx, mu, sig) * factor
 sp.plot(xx,yy, color='g', lw=3)
 
 sp = plt.subplot(2,2,4)
