@@ -27,7 +27,7 @@ args = parser.parse_args()
 def lognormal(xx, mu, sig):
     sig2 = np.sqrt(np.log(sig**2/mu**2 +1))
     mu2 = np.log(mu) - sig2**2/2
-    print sig2, mu2
+    #print sig2, mu2
     fact = 1/(xx*sig2*np.sqrt(2*np.pi))*np.exp(-(np.log(xx)-mu2)**2/(2*sig2**2))
     return fact
 
@@ -35,7 +35,7 @@ def gauss(xx, mu, sig):
     fact = 1/(sig*np.sqrt(2*np.pi))*np.exp(-(xx-mu)**2/(2*sig**2))
     return fact
 
-N_mp_max = int(1e5)
+N_mp_max = int(1e6)
 k_pe_st = 1/c*N_mp_max
 refl_frac= 3.8e-2
 nel_mp_ref = 1
@@ -70,7 +70,7 @@ cos_gen = 1 - sin_gen**2
 sp = plt.subplot(2,2,1)
 sp.grid(True)
 sp.set_xlabel('x')
-sp.set_xlabel('y')
+sp.set_ylabel('y')
 sp.set_title('Positions of new MPs')
 circ = plt.Circle([0,0],1, fill=False, color='black')
 sp.add_artist(circ)
