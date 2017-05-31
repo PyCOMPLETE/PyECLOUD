@@ -95,15 +95,30 @@ class photoemission:
 
         # Convert normal distribution parameters to lognormal distribution parameters
         if energy_distribution == 'lognormal':
-            self.get_energy = lognormal(e_pe_max, e_pe_sigma)
+            e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1.))
+            e_pe_max_logn  = np.log(e_pe_max) - e_pe_sigma_logn**2/2.
+            def get_energy(N_int_new_MP):
+                return random.lognormal(e_pe_max_logn, e_pe_sigma_logn, N_int_new_MP)
+
         elif energy_distribution == 'gaussian':
-            self.get_energy = quasi_gaussian(e_pe_max, e_pe_sigma)
-        elif energy_distribution == 'uniform':
-            self.get_energy = uniform(e_pe_max, e_pe_sigma)
+            def get_energy(N_int_new_MP):
+                En_gen = random.randn(N_int_new_MP)*e_pe_sigma + e_pe_max
+                flag_negat=(En_gen<0.)
+                N_neg=sum(flag_negat);
+                while(N_neg>0):
+                    En_gen[flag_negat]=random.randn(N_neg)*e_pe_sigma + e_pe_max   #in eV
+                    flag_negat=(En_gen<0.)
+                    N_neg=sum(flag_negat);
+                return En_gen
+        elif energy_distribution == 'rect':
+            def get_energy(N_int_new_MP):
+                return e_pe_max + (random.rand(N_int_new_MP)-0.5)*e_pe_sigma
         elif energy_distribution == 'mono':
-            self.get_energy = mono(e_pe_max)
+            def get_energy(N_int_new_MP):
+                return np.ones(N_int_new_MP)*e_pe_max
         else:
             raise ValueError('Energy distribution not specified')
+        self.get_energy = get_energy
         print 'Done photoemission init. Energy distribution: %s' % energy_distribution
 
     def generate(self, MP_e, lambda_t, Dt):
@@ -112,10 +127,10 @@ class photoemission:
         #determine the number of MPs to be generated
         DNel=k_pe*lambda_t*Dt
 
-        N_new_MP=DNel/MP_e.nel_mp_ref;
-        Nint_new_MP=floor(N_new_MP);
-        rest=N_new_MP-Nint_new_MP;
-        Nint_new_MP=Nint_new_MP+int(random.rand()<rest);
+        N_new_MP=DNel/MP_e.nel_mp_ref
+        Nint_new_MP=floor(N_new_MP)
+        rest=N_new_MP-Nint_new_MP
+        Nint_new_MP=Nint_new_MP+int(random.rand()<rest)
         Nint_new_MP=int(Nint_new_MP)
 
 
@@ -190,34 +205,4 @@ class photoemission:
 
 
         return MP_e
-
-# Generator functions of one parameter energy generators
-def quasi_gaussian(max_, sigma):
-    def func(N_int_new_MP):
-        En_gen = random.randn(N_int_new_MP)*sigma + max_
-        flag_negat=(En_gen<0.)
-        N_neg=sum(flag_negat);
-        while(N_neg>0):
-            En_gen[flag_negat]=random.randn(N_neg)*sigma + max_   #in eV
-            flag_negat=(En_gen<0.)
-            N_neg=sum(flag_negat);
-        return En_gen
-    return func
-
-def lognormal(max_, sigma):
-    e_pe_sigma_logn = np.sqrt(np.log(sigma**2/max_**2 + 1.))
-    e_pe_max_logn  = np.log(max_) - e_pe_sigma_logn**2/2.
-    def func(N_int_new_MP):
-        return random.lognormal(e_pe_max_logn, e_pe_sigma_logn, N_int_new_MP)
-    return func
-
-def uniform(max_, sigma):
-    def func(N_int_new_MP):
-        return max_ + (random.rand(N_int_new_MP)-0.5)*sigma
-    return func
-
-def mono(max_):
-    def func(N_int_new_MP):
-        return np.ones(N_int_new_MP)*max_
-    return func
 
