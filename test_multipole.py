@@ -1,5 +1,6 @@
 from __future__ import division
 import os
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -45,7 +46,7 @@ Nvz_regen=-1
 regen_hist_cut=-1
 
 
-xx_raw = np.arange(-1,1.01, 0.1)*1
+xx_raw = np.arange(-1,1.01, 0.2)*1
 N_mp = int(len(xx_raw)**2)
 
 fig2 = ms.figure('Fields at x or y = 0')
@@ -67,11 +68,11 @@ for angle_ctr, angle in enumerate(angles):
     for order, title in enumerate(['Dipole', 'Quadrupole', 'Sextupole', 'Octupole']):
         B_multip = np.zeros(order+1)
         B_skew = np.zeros(order+1)
-        B_multip[order] = 1.*np.cos(angle*(order+1))
-        B_skew[order] = 1. * np.sin(angle*(order+1))
+        B_multip[order] = 1.*np.cos(angle*(order+1)) * math.factorial(order)
+        B_skew[order] = 1. * np.sin(angle*(order+1)) * math.factorial(order)
         if angle == 0:
             B_skew = None
-        print title, B_multip, B_skew
+        #print title, B_multip, B_skew
 
         pusher = dbu.pusher_Boris_multipole(Dt, B_multip=B_multip, N_sub_steps=1, B_skew=B_skew)
 
@@ -121,8 +122,11 @@ for angle_ctr, angle in enumerate(angles):
         sp.set_ylabel('y [m]')
 
         len_ = np.sqrt(bx**2+by**2)
-        outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, len_, pivot='middle')
-        plt.colorbar(outp)
+        if title == 'Dipole':
+            outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, pivot='middle', color='black')
+        else:
+            outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, len_, pivot='middle')
+            plt.colorbar(outp)
 
         lim = 1.2 * np.max(xx_raw)
         sp.set_xlim(-lim, lim)
@@ -137,6 +141,10 @@ for angle_ctr, angle in enumerate(angles):
             sp2.plot(x_mpB[mask], by[mask],'.', label=title, color=color)
             sp2.plot(xx_plot, xx_plot**order, color=color)
             sp3.plot(y_mpB[mask2], bx[mask2],'.', label=title, color=color)
+            if order % 2 == 0:
+                sp3.plot(xx_plot, np.zeros_like(xx_plot), color=color)
+            else:
+                sp3.plot(xx_plot, (xx_plot)**order*(-1)**((order-1)/2), color=color)
 
     sp2.set_ylim(-1.1,1.1)
     sp3.set_ylim(-1.1,1.1)
