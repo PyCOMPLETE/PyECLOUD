@@ -26,10 +26,7 @@ args = parser.parse_args()
 
 
 def lognormal(xx, mu, sig):
-    sig2 = np.sqrt(np.log(sig**2/mu**2 +1))
-    mu2 = np.log(mu) - sig2**2/2
-    #print sig2, mu2
-    fact = 1/(xx*sig2*np.sqrt(2*np.pi))*np.exp(-(np.log(xx)-mu2)**2/(2*sig2**2))
+    fact = 1/(xx*sig*np.sqrt(2*np.pi))*np.exp(-(np.log(xx)-mu)**2/(2*sig**2))
     return fact
 
 def gauss(xx, mu, sig):
@@ -47,6 +44,12 @@ alimit = 0.05
 
 if args.energy_dist == 'lorentz':
     mu, sig = 0.64, 3.7
+elif args.energy_dist == 'lognormal':
+
+    #sig2 = np.sqrt(np.log(sig**2/mu**2 +1))
+    #mu2 = np.log(mu) - sig2**2/2
+    sig = np.sqrt(np.log(5**2/7**2 +1))
+    mu = np.log(7) - sig**2/2
 else:
     mu, sig = 7, 5
 
@@ -57,7 +60,7 @@ MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0
 
 phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb, 0.995, args.energy_dist)
 
-_, En_gen = phemiss.generate(MP_e, 1, 1)
+phemiss.generate(MP_e, 1, 1)
 
 
 fig = ms.figure('Test Photoemission module')
