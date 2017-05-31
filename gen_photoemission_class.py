@@ -94,11 +94,9 @@ class photoemission:
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
             raise ValueError('x0_refl, y0_refl is outside of the chamber!')
 
-        # Convert normal distribution parameters to lognormal distribution parameters
         if energy_distribution == 'lognormal':
             def get_energy(N_int_new_MP):
                 return random.lognormal(e_pe_max, e_pe_sigma, N_int_new_MP)
-
         elif energy_distribution == 'gaussian':
             def get_energy(N_int_new_MP):
                 En_gen = random.randn(N_int_new_MP)*e_pe_sigma + e_pe_max
@@ -116,17 +114,11 @@ class photoemission:
             def get_energy(N_int_new_MP):
                 return np.ones(N_int_new_MP)*e_pe_max
         elif energy_distribution == 'lorentz':
+            xx_min = stats.cauchy.cdf(0, e_pe_max, e_pe_sigma)
+            xx_max = 1
             def get_energy(N_int_new_MP):
-                xx_rand = random.rand(N_int_new_MP)
-                En_gen = stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)
-                flag_negat = (En_gen<0.)
-                N_neg = np.sum(flag_negat);
-                while(N_neg>0):
-                    xx_rand = random.rand(N_neg)
-                    En_gen[flag_negat] = stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)   #in eV
-                    flag_negat = (En_gen<0.)
-                    N_neg = np.sum(flag_negat)
-                return En_gen
+                xx_rand = random.rand(N_int_new_MP)*(xx_max-xx_min) + xx_min
+                return stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)
         else:
             raise ValueError('Energy distribution not specified')
         self.get_energy = get_energy
