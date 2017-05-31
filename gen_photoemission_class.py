@@ -51,9 +51,10 @@
 
 from __future__ import division
 import numpy.random as random
-from numpy import floor, interp, pi, sin, cos, zeros, sqrt, sum
+from numpy import interp, pi, sin, cos, zeros, sqrt, sum
 
 import scipy.io as sio
+import scipy.stats as stats
 from scipy.constants import e as qe, m_e as me, c
 import numpy as np
 
@@ -116,6 +117,18 @@ class photoemission:
         elif energy_distribution == 'mono':
             def get_energy(N_int_new_MP):
                 return np.ones(N_int_new_MP)*e_pe_max
+        elif energy_distribution == 'lorentz':
+            def get_energy(N_int_new_MP):
+                xx_rand = random.rand(N_int_new_MP)
+                En_gen = stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)
+                flag_negat = (En_gen<0.)
+                N_neg = np.sum(flag_negat);
+                while(N_neg>0):
+                    xx_rand = random.rand(N_neg)
+                    En_gen[flag_negat] = stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)   #in eV
+                    flag_negat = (En_gen<0.)
+                    N_neg = np.sum(flag_negat)
+                return En_gen
         else:
             raise ValueError('Energy distribution not specified')
         self.get_energy = get_energy
@@ -128,7 +141,7 @@ class photoemission:
         DNel=k_pe*lambda_t*Dt
 
         N_new_MP=DNel/MP_e.nel_mp_ref
-        Nint_new_MP=floor(N_new_MP)
+        Nint_new_MP = int(N_new_MP)
         rest=N_new_MP-Nint_new_MP
         Nint_new_MP=Nint_new_MP+int(random.rand()<rest)
         Nint_new_MP=int(Nint_new_MP)
@@ -174,7 +187,7 @@ class photoemission:
 
 
             #generate energies (the same distr. for all photoelectr.)
-            En_gen = self.get_energy(N_new_MP) #in eV
+            En_gen = self.get_energy(Nint_new_MP) #in eV
 
 
             # generate velocities like in impact managment
