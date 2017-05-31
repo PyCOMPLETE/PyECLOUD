@@ -1,7 +1,7 @@
 #include "boris_c_function.h"
 
 void boris_c(int N_sub_steps, double Dtt,
-		double* B_multip, double* B_skew,
+		double* B_field, double* B_skew,
 		double* xn1, double* yn1,  double* zn1,
 		double* vxn1, double* vyn1, double* vzn1,
 		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles,
@@ -37,7 +37,7 @@ void boris_c(int N_sub_steps, double Dtt,
 		{
 			rexy = 1.;
 			imxy = 0.;
-			By_n = B_multip[0];
+			By_n = B_field[0];
 			Bx_n = B_skew[0];
 
 			for(order = 1; order < N_multipoles; order++)
@@ -51,8 +51,8 @@ void boris_c(int N_sub_steps, double Dtt,
 				* Bx +iBy = sum[ (k + ik')(x + iy)^(n-1) ]
 				* where k, k' are the strengths and skew strengths of the magnet
 				*/
-				By_n += (B_multip[order]*rexy - B_skew[order]*imxy);
-				Bx_n += (B_multip[order]*imxy + B_skew[order]*rexy);
+				By_n += (B_field[order]*rexy - B_skew[order]*imxy);
+				Bx_n += (B_field[order]*imxy + B_skew[order]*rexy);
 			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
