@@ -373,8 +373,8 @@ If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have u
 \\ \hline
 \textbf{energy\_distribution} & Can be one of:
 \begin{itemize}
-    \item 'gaussian': $p(E) = \frac{1}{\sigma\sqrt{2\pi}}\exp\left(\frac{(E-\sigma)^2}{2\sigma^2}\right)$
-    \item 'log-normal': $p(E) = \frac{1}{E\sigma\sqrt{2\pi}}e^{\frac{(\log(E)-\sigma)^2}{2\sigma^2}}$
+    \item 'gaussian': $p(E) = \frac{1}{\sigma\sqrt{2\pi}}\exp\left(\frac{(E-\mu)^2}{2\sigma^2}\right)$
+    \item 'log-normal': $p(E) = \frac{1}{E\sigma\sqrt{2\pi}}e^{\frac{(\log(E)-\mu)^2}{2\sigma^2}}$
     \item 'rect': $p(E)$ uniform for $\mu-\sigma < E < \mu+\sigma$
     \item 'mono': $E = \mu$
     \item 'lorentz': $p(E) = \frac{1}{\pi}\frac{\sigma}{\sigma^2+(E-\mu)^2}$
