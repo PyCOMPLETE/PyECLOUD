@@ -96,10 +96,8 @@ class photoemission:
 
         # Convert normal distribution parameters to lognormal distribution parameters
         if energy_distribution == 'lognormal':
-            e_pe_sigma_logn = np.sqrt(np.log(e_pe_sigma**2/e_pe_max**2 + 1.))
-            e_pe_max_logn  = np.log(e_pe_max) - e_pe_sigma_logn**2/2.
             def get_energy(N_int_new_MP):
-                return random.lognormal(e_pe_max_logn, e_pe_sigma_logn, N_int_new_MP)
+                return random.lognormal(e_pe_max, e_pe_sigma, N_int_new_MP)
 
         elif energy_distribution == 'gaussian':
             def get_energy(N_int_new_MP):
