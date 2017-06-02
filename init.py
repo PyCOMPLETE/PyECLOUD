@@ -240,7 +240,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     Dt_sc, Dh_sc, t_sc_ON,Dx_hist,r_center, scrub_en_th,\
     progress_path,  logfile_path, flag_movie, flag_sc_movie,\
     Dt_En_hist, Nbin_En_hist,En_hist_max, \
-    photoem_flag, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, alimit, e_pe_sigma,\
+    photoem_flag, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, alimit, energy_distribution, e_pe_sigma,\
     e_pe_max,x0_refl, y0_refl, out_radius, \
     switch_model, switch_no_increase_energy, thresh_low_energy, save_mp_state_time_file, \
     init_unif_flag, Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif,\
@@ -272,7 +272,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     Dt_sc, Dh_sc, t_sc_ON,Dx_hist,r_center, scrub_en_th,\
     progress_path,  logfile_path, flag_movie, flag_sc_movie,\
     Dt_En_hist, Nbin_En_hist,En_hist_max, \
-    photoem_flag, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, alimit, e_pe_sigma,\
+    photoem_flag, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, alimit, energy_distribution, e_pe_sigma,\
     e_pe_max,x0_refl, y0_refl, out_radius, \
     switch_model, switch_no_increase_energy, thresh_low_energy, save_mp_state_time_file, \
     init_unif_flag, Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif,\
@@ -402,7 +402,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     if photoem_flag==1:
         phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac)
+                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, energy_distribution)
     else:
         phemiss=None
 
