@@ -53,7 +53,6 @@
 from numpy.random import rand
 from numpy.random import randn
 from numpy import floor, interp, pi, sin, cos, zeros
-import sec_emission
 
 import scipy.io as sio
 import numpy as np
@@ -63,7 +62,7 @@ from scipy.constants import c
 class photoemission:
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac):
+                x0_refl, y0_refl, out_radius, chamb, resc_fac, angle_dist_func):
 
         print 'Start photoemission init.'
 
@@ -85,6 +84,7 @@ class photoemission:
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
+        self.angle_dist_func = angle_dist_func
 
         if y0_refl!=0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
@@ -158,7 +158,7 @@ class photoemission:
                 N_neg=np.sum(flag_negat)
 
             # generate velocities like in impact managment
-            vx_gen, vy_gen, vz_gen = sec_emission.velocities_angle_cosine_old(
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(
                 Nint_new_MP, En_gen, Norm_x, Norm_y)
 
             MP_e.set_new_mps(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)

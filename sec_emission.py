@@ -103,40 +103,43 @@ def hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit, E_th, En_i
 
     return en_eV
 
-def velocities_angle_cosine(N_new_MP, En_gen, Norm_x, Norm_y):
+
+# Avoid code duplication
+
+def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p):
     v_gen_mod=np.sqrt(2.*qm*En_gen)
 
     phi_p = rand(N_new_MP)*2*np.pi
     sin_phi_p = np.sin(phi_p)
     cos_phi_p = np.cos(phi_p)
 
-    sin_theta_sq = rand(N_new_MP)
-    cos_theta_p = np.sqrt(1-sin_theta_sq)
-    sin_theta_p = np.sqrt(sin_theta_sq)
-
-    vx_gen = v_gen_mod*\
-        (cos_theta_p*Norm_x+sin_theta_p*sin_phi_p*Norm_y)
-    vy_gen = v_gen_mod*\
-        (cos_theta_p*Norm_y-sin_theta_p*sin_phi_p*Norm_x)
-    vz_gen = v_gen_mod*(sin_theta_p*cos_phi_p)
-
-    return vx_gen, vy_gen, vz_gen
-
-def velocities_angle_cosine_old(N_new_MP, En_gen, Norm_x, Norm_y):
-    v_gen_mod=np.sqrt(2.*qm*En_gen)
-
-    phi_p = rand(N_new_MP)*2*np.pi
-    sin_phi_p = np.sin(phi_p)
-    cos_phi_p = np.cos(phi_p)
-
-    sin_theta_p = rand(N_new_MP)
     cos_theta_p = np.sqrt(1-sin_theta_p**2)
 
-    vx_gen = v_gen_mod*\
-        (cos_theta_p*Norm_x+sin_theta_p*sin_phi_p*Norm_y)
-    vy_gen = v_gen_mod*\
-        (cos_theta_p*Norm_y-sin_theta_p*sin_phi_p*Norm_x)
+    vx_gen = v_gen_mod*(cos_theta_p*Norm_x+sin_theta_p*sin_phi_p*Norm_y)
+    vy_gen = v_gen_mod*(cos_theta_p*Norm_y-sin_theta_p*sin_phi_p*Norm_x)
     vz_gen = v_gen_mod*(sin_theta_p*cos_phi_p)
 
     return vx_gen, vy_gen, vz_gen
+
+# This function correctly implements a 3D cosine distribution.
+# The sin(theta) factor that occurs in 3D spherical integrals is taken into account.
+# See also the paper from J.Greenwood,
+# "The correct and incorrect generation of a cosine distribution of scattered
+# particles for Monte-Carlo modelling of vacuum systems"
+# http://www.sciencedirect.com/science/article/pii/S0042207X02001732
+#
+# And further in the proceedings of ECLOUD '02 workshop p.105:
+# Rumolo and Zimmermann: "Electron-Cloud Simulations: Build Up and related effects.
+# https://cds.cern.ch/record/537336?ln=en
+
+def velocities_angle_cosine_3D(N_new_MP, En_gen, Norm_x, Norm_y):
+    sin_theta_p = np.sqrt(rand(N_new_MP))
+    return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p)
+
+# This has been the behavior of the code until the error was spotted.
+
+def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y):
+    sin_theta_p = rand(N_new_MP)
+    return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p)
+
 

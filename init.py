@@ -55,6 +55,7 @@ import beam_and_timing as beatim
 
 from geom_impact_ellip import ellip_cham_geom_object
 
+import sec_emission
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
@@ -64,7 +65,7 @@ import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
 
-import geom_impact_poly as gip
+#import geom_impact_poly as gip
 
 
 import MP_system as MPs
@@ -106,6 +107,9 @@ def read_parameter_files(pyecl_input_folder='./'):
     flag_hist_impact_seg = 0
 
     track_method= 'StrongBdip'
+
+    # new default. Old one would be 'cosine_2D'
+    angle_distribution = 'cosine_3D'
 
     B = 0.   #Tesla (if B=-1 computed from energy and bending radius)
     bm_totlen= -1 #m
@@ -225,7 +229,7 @@ def read_parameter_files(pyecl_input_folder='./'):
             sec_b_par_list.append(pbf.beam_descr_from_fil(pyecl_input_folder+'/'+sec_b_file, betafx, Dx, betafy, Dy))
 
     if B==-1:
-        B   = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen)
+        B = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen)
 
     filen_main_outp = 'Pyecltest'
 
@@ -244,7 +248,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     switch_model, switch_no_increase_energy, thresh_low_energy, save_mp_state_time_file, \
     init_unif_flag, Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif,\
     chamb_type, filename_chm, flag_detailed_MP_info, flag_hist_impact_seg,\
-    track_method, B0x, B0y, B0z, B_map_file,  Bz_map_file, N_sub_steps, fact_Bmap, B_zero_thrhld,\
+    track_method, angle_distribution, B0x, B0y, B0z, B_map_file,  Bz_map_file, N_sub_steps, fact_Bmap, B_zero_thrhld,\
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
@@ -276,7 +280,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     switch_model, switch_no_increase_energy, thresh_low_energy, save_mp_state_time_file, \
     init_unif_flag, Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif,\
     chamb_type, filename_chm, flag_detailed_MP_info, flag_hist_impact_seg,\
-    track_method, B0x, B0y, B0z, B_map_file,  Bz_map_file, N_sub_steps, fact_Bmap, B_zero_thrhld,\
+    track_method, angle_distribution, B0x, B0y, B0z, B_map_file,  Bz_map_file, N_sub_steps, fact_Bmap, B_zero_thrhld,\
     N_mp_soft_regen, N_mp_after_soft_regen,\
     flag_verbose_file, flag_verbose_stdout,\
     flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
@@ -385,13 +389,24 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
 
 
+    if angle_distribution == 'cosine_3D':
+        angle_dist_func = sec_emission.velocities_angle_cosine_3D
+    elif angle_distribution == 'cosine_2D':
+        angle_dist_func = sec_emission.velocities_angle_cosine_2D
+    else:
+        raise ValueError("""Invalid angle_distribution parameter.
+                         Currently supported: cosine_3D (default) or cosine_2D""")
+
+
+
     flag_seg = (flag_hist_impact_seg==1)
 
     impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
+                 flag_seg=flag_seg, angle_dist_func=angle_dist_func)
 
 
-    resgasion_sec_beam_list=[]
+    #resgasion_sec_beam_list=[]
     if gas_ion_flag==1:
         resgasion=gic.residual_gas_ionization(unif_frac, P_nTorr, sigma_ion_MBarn,Temp_K,chamb,E_init_ion)
     else:
@@ -401,7 +416,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     if photoem_flag==1:
         phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac)
+                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, angle_dist_func)
     else:
         phemiss=None
 
