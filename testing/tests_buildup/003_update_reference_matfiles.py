@@ -1,3 +1,4 @@
+import shutil
 import os
 
 all_sim_folders = [
@@ -16,8 +17,10 @@ all_sim_folders = [
     ]
 
 
-for ctr, sim_folder in enumerate(all_sim_folders):
-    os.system('python2 ./000_run_simulation.py --folder %s' % sim_folder)
-    os.system('rm -r %s/comparison_plots' % sim_folder)
-    os.system('python2 ./001_comparison_against_reference.py --folder %s' % sim_folder)
+for folder in all_sim_folders:
+    ref_file = folder + '/Pyecltest_ref.mat'
+    mat_file = folder + '/Pyecltest.mat'
+    os.remove(ref_file)
+    shutil.copy(mat_file, ref_file)
+    print('%s replaced by %s' % (ref_file, mat_file))
 

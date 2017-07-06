@@ -32,3 +32,5 @@ E_init_ion=0.1;   #in eV
 
  
 
+angle_distribution = 'cosine_2D'
+

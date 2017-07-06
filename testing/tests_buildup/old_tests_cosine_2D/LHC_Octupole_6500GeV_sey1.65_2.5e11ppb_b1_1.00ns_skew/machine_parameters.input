@@ -27,3 +27,5 @@ y_max_init_unif =y_aper
 y_min_init_unif =-y_aper
  
 
+angle_distribution = 'cosine_2D'
+
