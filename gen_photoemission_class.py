@@ -161,7 +161,7 @@ class photoemission:
             vx_gen, vy_gen, vz_gen = self.angle_dist_func(
                 Nint_new_MP, En_gen, Norm_x, Norm_y)
 
-            MP_e.set_new_mps(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
+            MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
 
         return MP_e
 

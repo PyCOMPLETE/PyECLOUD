@@ -276,7 +276,7 @@ class impact_management(object):
                         vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
                             n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
 
-                        MP_e.set_new_mps(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
+                        MP_e.add_new_MPs(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
                                          vx_mp_add, vy_mp_add, vz_mp_add)
 
                         if flag_seg:

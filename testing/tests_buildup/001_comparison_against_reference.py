@@ -30,6 +30,7 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation folder')
+parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
 args = parser.parse_args()
 if args.folder:
     sim_folder = args.folder
@@ -53,8 +54,8 @@ except OSError as err:
 myfontsz = 14
 ms.mystyle_arial(fontsz=myfontsz)
 
-dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_ref.mat') # load dictionary of the reference simulation
-dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest.mat')  # load dictionary of the current simulation
+dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
+dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest_%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
 
 
 out_var_ref = dict_ref.keys()       # returns the list of keys

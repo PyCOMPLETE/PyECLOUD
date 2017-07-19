@@ -493,7 +493,7 @@ class MP_system:
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
 
-    def set_new_mps(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz):
+    def add_new_MPs(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz):
         N_mp_old = self.N_mp
         N_mp_new = self.N_mp + N_new_MP
         self.x_mp[N_mp_old:N_mp_new] = x
