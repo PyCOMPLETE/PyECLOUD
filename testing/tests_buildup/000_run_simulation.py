@@ -30,7 +30,7 @@ if args.folder:
     sim_folder = args.folder
 
 angle_distribution = 'cosine_%s' % args.angle_dist_func
-filen_main_outp = sim_folder+'/Pyecltest_%s.mat' % args.angle_dist_func
+filen_main_outp = sim_folder+'/Pyecltest_angle%s.mat' % args.angle_dist_func
 
 
 time_0 = time.time()

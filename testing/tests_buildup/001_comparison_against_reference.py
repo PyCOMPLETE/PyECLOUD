@@ -54,8 +54,8 @@ except OSError as err:
 myfontsz = 14
 ms.mystyle_arial(fontsz=myfontsz)
 
-dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
-dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest_%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
+dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_angle%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
+dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest_angle%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
 
 
 out_var_ref = dict_ref.keys()       # returns the list of keys
@@ -215,13 +215,13 @@ for ii,k in enumerate(out_var_curr):
 
         gs1.update(top=top, bottom=bottom)
         gs2.update(top=top, bottom=bottom)
-        pl.savefig(folder_plot+'/%s'%k, dpi=300)
+        pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 print 'Saved comparison plots in:'
 print folder_plot
 
 print 'In ipython, you may call EOG() to view the results if EOG is installed.'
-EOG = lambda : os.system('eog %s' % folder_plot)
+EOG = lambda : os.system('eog %s/*%s*' % (folder_plot, args.angle_dist_func))
         #~ #pl.show()
 
 
