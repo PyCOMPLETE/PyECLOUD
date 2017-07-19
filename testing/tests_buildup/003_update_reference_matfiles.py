@@ -44,6 +44,6 @@ all_sim_folders = [
 #    shutil.move(new_ref_file_2D, ref_file_2D)
 
 for folder in all_sim_folders:
-    old_mat = folder +'/Pyecltest.mat'
-    new_mat = folder +'/Pyecltest_3D.mat'
+    old_mat = folder +'/Pyecltest_3D_ref.mat'
+    new_mat = folder +'/Pyecltest_angle3D_ref.mat'
     shutil.move(old_mat, new_mat)
