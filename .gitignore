@@ -22,6 +22,8 @@ scripts/
 *.h5part
 .ipynb_checkpoints
 Pyecltest.mat
+Pyecltest_angle2D.mat
+Pyecltest_angle3D.mat
 *.png
 *.swp
 test_multipole
