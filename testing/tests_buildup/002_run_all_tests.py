@@ -19,8 +19,6 @@ all_sim_folders = [
     'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular',
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns',
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew',
-    'LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns',
-    'LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew',
     ]
 
 
