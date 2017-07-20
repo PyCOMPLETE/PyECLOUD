@@ -108,7 +108,7 @@ def read_parameter_files(pyecl_input_folder='./'):
 
     track_method= 'StrongBdip'
 
-    secondary_angle_distribution = 'cosine_2D'
+    secondary_angle_distribution = None
     photoelectron_angle_distribution = 'cosine_2D'
 
     B = 0.   #Tesla (if B=-1 computed from energy and bending radius)
@@ -577,6 +577,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
 
 
+    if secondary_angle_distribution == None:
+        raise ValueError("You have to specify the parameter 'secondary_angle_distribution' in the input files!")
     secondary_angle_dist_func = {
         'cosine_3D': sec_emission.velocities_angle_cosine_3D,
         'cosine_2D': sec_emission.velocities_angle_cosine_2D,
