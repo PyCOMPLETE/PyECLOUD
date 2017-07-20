@@ -416,22 +416,9 @@ If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have u
 \end{longtable}
 
 
-%\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
-%\hline\endfirsthead\hline\endhead\rowcolor{Gray}
-%\multicolumn{2}{p{.97\textwidth}}{\textbf{Initial angular distribution of new MPs relative to the surface normal vector}}
-%\\ \hline
-%\textbf{secondary\_angle\_distribution} & Can be 'cosine\_2D' or 'cosine\_3D'\\
-%    & d$n$/d$\theta=\cos\theta$ or d$n$/d$\theta=\cos\theta\sin\theta$ in the 2D or 3D cases, respectively.
-%The default is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates.
-%\\ \hline
-%\textbf{photoelectron\_angle\_distribution} & See secondary\_angle\_distribution'
-%\\
-%\hline
-%\end{longtable}
+\newpage
 
-
-
-\newpage\subsection{Beam parameters}
+\subsection{Beam parameters}
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
@@ -556,7 +543,7 @@ Typically this feature is NOT enabled.\\ \hline
     For new electrons, $\theta$ describes the angle between the surface normal and their initial velocity vector.
     d$n$/d$\theta=\cos\theta$ or d$n$/d$\theta=\cos\theta\sin\theta$ in the 2D or 3D cases, respectively. More info \href{http://www.sciencedirect.com/science/article/pii/S0042207X02001732}{here}.
 The more accurate is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates.
-Still 'cosine\_2D' is kept as default for backwards compatibility.
+An error is raised if this input is not specified.
 \\ \hline
 \end{longtable}
 
