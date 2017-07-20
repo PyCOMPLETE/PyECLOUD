@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.2.1
+#		           PyECLOUD Version 6.3.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -52,17 +52,17 @@
 
 from numpy.random import rand
 from numpy.random import randn
-from numpy import floor, interp, pi, sin, cos, zeros, sqrt
-#from geom_impact import impact_point_and_normal
+from numpy import floor, interp, pi, sin, cos, zeros
 
 import scipy.io as sio
 import numpy as np
+from scipy.constants import c
 
 
 class photoemission:
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac):
+                x0_refl, y0_refl, out_radius, chamb, resc_fac, angle_dist_func):
 
         print 'Start photoemission init.'
 
@@ -84,6 +84,7 @@ class photoemission:
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
+        self.angle_dist_func = angle_dist_func
 
         if y0_refl!=0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
@@ -97,22 +98,14 @@ class photoemission:
 
     def generate(self, MP_e, lambda_t, Dt):
 
-
-        c=299792458.;
-
-        me=9.10938291e-31;
-        qe=1.602176565e-19;
-
-        qm=qe/me
-
         k_pe=self.k_pe_st*c
         #determine the number of MPs to be generated
         DNel=k_pe*lambda_t*Dt
 
-        N_new_MP=DNel/MP_e.nel_mp_ref;
-        Nint_new_MP=floor(N_new_MP);
-        rest=N_new_MP-Nint_new_MP;
-        Nint_new_MP=Nint_new_MP+int(rand()<rest);
+        N_new_MP=DNel/MP_e.nel_mp_ref
+        Nint_new_MP=floor(N_new_MP)
+        rest=N_new_MP-Nint_new_MP
+        Nint_new_MP=Nint_new_MP+int(rand()<rest)
         Nint_new_MP=int(Nint_new_MP)
 
 
@@ -128,22 +121,22 @@ class photoemission:
             gauss_flag=~refl_flag
 
             #generate psi for refl. photons generation
-            N_refl=sum(refl_flag)
+            N_refl=np.sum(refl_flag)
             if N_refl>0:
-                u_gen=rand(N_refl,1);
+                u_gen=rand(N_refl,1)
                 if self.flag_unif:
                     psi_gen = 2.*pi*u_gen
                     x_out[refl_flag]=self.out_radius*cos(psi_gen)
                     y_out[refl_flag]=self.out_radius*sin(psi_gen)
                 else:
-                    psi_gen=interp(u_gen,self.u_sam_CDF_refl, self.inv_CDF_refl);
+                    psi_gen=interp(u_gen,self.u_sam_CDF_refl, self.inv_CDF_refl)
                     x_in[refl_flag]=self.x0_refl
                     x_out[refl_flag]=-2.*self.out_radius*cos(psi_gen)+self.x0_refl
                     y_out[refl_flag]=2.*self.out_radius*sin(psi_gen)
 
 
             #generate theta for nonreflected photon generation
-            N_gauss=sum(gauss_flag)
+            N_gauss=np.sum(gauss_flag)
             if N_gauss>0:
                 theta_gen=self.alimit*randn(N_gauss)
                 x_out[gauss_flag]=self.out_radius*cos(theta_gen)
@@ -158,43 +151,17 @@ class photoemission:
             En_gen=randn(Nint_new_MP)*self.e_pe_sigma+self.e_pe_max   #in eV
 
             flag_negat=(En_gen<0.)
-            N_neg=sum(flag_negat);
+            N_neg=np.sum(flag_negat)
             while(N_neg>0):
                 En_gen[flag_negat]=randn(N_neg)*self.e_pe_sigma+self.e_pe_max   #in eV
                 flag_negat=(En_gen<0.)
-                N_neg=sum(flag_negat);
-
-
-
-
+                N_neg=np.sum(flag_negat)
 
             # generate velocities like in impact managment
-            v_gen_mod=sqrt(2.*qm*En_gen);
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(
+                Nint_new_MP, En_gen, Norm_x, Norm_y)
 
-            sin_theta_p=rand(Nint_new_MP);
-            cos_theta_p=sqrt(1.-sin_theta_p*sin_theta_p);
-            phi_p=rand(Nint_new_MP)*2.*pi;
-            sin_phi_p=sin(phi_p);
-            cos_phi_p=cos(phi_p);
-
-            vx_gen=v_gen_mod*\
-                (cos_theta_p*Norm_x+sin_theta_p*sin_phi_p*Norm_y);
-            vy_gen=v_gen_mod*\
-                (cos_theta_p*Norm_y-sin_theta_p*sin_phi_p*Norm_x);
-            vz_gen=v_gen_mod*(sin_theta_p*cos_phi_p);
-
-
-            MP_e.x_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=x_int;#Be careful to the indexing when translating to python
-            MP_e.y_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=y_int;
-            MP_e.z_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=0.;#randn(Nint_new_MP,1);
-            MP_e.vx_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=vx_gen
-            MP_e.vy_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=vy_gen
-            MP_e.vz_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=vz_gen
-            MP_e.nel_mp[MP_e.N_mp:MP_e.N_mp+Nint_new_MP]=MP_e.nel_mp_ref;
-
-            MP_e.N_mp=int(MP_e.N_mp+Nint_new_MP);
-
+            MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
 
         return MP_e
-
 
