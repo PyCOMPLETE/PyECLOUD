@@ -104,7 +104,7 @@ for ii,k in enumerate(out_var_curr):
 
         pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='upper left')
         ms.sciy()
-        pl.savefig(folder_plot+'/%s'%k, dpi=300)
+        pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 
 
