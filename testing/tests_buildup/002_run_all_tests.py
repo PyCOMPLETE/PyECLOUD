@@ -32,7 +32,7 @@ else:
 for ctr, sim_folder in enumerate(all_sim_folders):
     for dist in dists:
         for cmd in [
-            'python2 ./000_run_simulation.py --folder %s --angle-dist-func %s' % (sim_folder, dist),
+            #'python2 ./000_run_simulation.py --folder %s --angle-dist-func %s' % (sim_folder, dist),
             'python2 ./001_comparison_against_reference.py --folder %s --angle-dist-func %s' % (sim_folder, dist)
         ]:
             status = os.system(cmd)
