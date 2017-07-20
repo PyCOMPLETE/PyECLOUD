@@ -19,8 +19,6 @@ all_sim_folders = [
     'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular',
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns',
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew',
-    'LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns',
-    'LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew',
     ]
 
 
@@ -32,7 +30,7 @@ else:
 for ctr, sim_folder in enumerate(all_sim_folders):
     for dist in dists:
         for cmd in [
-            #'python2 ./000_run_simulation.py --folder %s --angle-dist-func %s' % (sim_folder, dist),
+            'python2 ./000_run_simulation.py --folder %s --angle-dist-func %s' % (sim_folder, dist),
             'python2 ./001_comparison_against_reference.py --folder %s --angle-dist-func %s' % (sim_folder, dist)
         ]:
             status = os.system(cmd)
