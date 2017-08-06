@@ -5,6 +5,7 @@ class SEY_from_file(object):
 
     def __init__(self, file_):
 
+        work_function = 0.
         energy_eV = []
         sey_parameter = []
         with open(os.path.expanduser(file_)) as f:
