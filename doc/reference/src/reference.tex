@@ -190,16 +190,18 @@ Target number of MPs obtained after a soft regeneration.\\
 }\\ \hline
 \textbf{Dt\_sc}&	[s] Time step for the update of the electron space charge field map.\\ \hline
 \textbf{Dh\_sc }&		[m] Grid size for the space charge PIC solver.\\ \hline
-\textbf{t\_sc\_ON}& [s] Electron space charge forces are neglected for t<t\_sc\_ON -- normally t\_sc\_ON=0.\\ 
-\hline
+\textbf{t\_sc\_ON}& [s] Electron space charge forces are neglected for t<t\_sc\_ON -- normally t\_sc\_ON=0.
+\\ \hline
+\textbf{sparse\_solver} & [optional] choices are 'klu', 'scipy\_slu' [default'
+\\ \hline
 \end{longtable}
 
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 	\hline\endfirsthead\hline\endhead
 	\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
-		\textbf{Multigrid parameters} 
-		
+		\textbf{Multigrid parameters}
+
 		 To be used with PyPICmode = 'ShortleyWeller\_WithTelescopicGrids'
 	}\\
 	\hline
@@ -207,7 +209,7 @@ Target number of MPs obtained after a soft regeneration.\\
 	\textbf{target\_grid}&		Target grid parameters. It is a dictionary containing: 'x\_min\_target', 'x\_max\_target', 'y\_min\_target', 'y\_max\_target' and 'Dh\_target'.
 \\ \hline
 	\textbf{N\_nodes\_discard}& Number of nodes at the edge of the internal grids which are discarded in the field interpolation (going to coarser grid). \\ \hline
-	\textbf{N\_min\_Dh\_main}& Minimum size of the first internal grid in the $\Delta h$ of the main grid. \\ 
+	\textbf{N\_min\_Dh\_main}& Minimum size of the first internal grid in the $\Delta h$ of the main grid. \\
 	\hline
 \end{longtable}
 
@@ -278,7 +280,7 @@ Possible settings:
 \\ \hline
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:}
 \\ \hline
-\textbf{filename\_chamb} & Name of file containing horizontal and vertical vertexes of the chamber profile.
+\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile.
 \\
 \hline
 \end{longtable}
@@ -361,6 +363,8 @@ Scaling factor applied to the magnetic field map.
 \textbf{unif\_frac} & Fraction of primary electrons uniformly distributed inside the chamber. The remaining part is generated according to the transverse distribution of the beam.
 \\ \hline
 \textbf{E\_init\_ion} & [eV] Initial energy of the generated electrons.
+\\ \hline
+\textbf{t\_ion} & ???
 \\
 \hline
 \end{longtable}

@@ -49,9 +49,10 @@
 #     all references.
 #----------------------------------------------------------------------
 
+import imp
 from numpy import *
+from scipy.constants import c, e as qe
 import beam_and_timing as beatim
-
 
 from geom_impact_ellip import ellip_cham_geom_object
 
@@ -65,9 +66,6 @@ import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
 
-#import geom_impact_poly as gip
-
-
 import MP_system as MPs
 import space_charge_class as scc
 import impact_management_class as imc
@@ -77,12 +75,12 @@ import gen_photoemission_class as gpc
 
 import parse_beam_file as pbf
 
-qe=1.602176565e-19;
-c=299792458.;
+import input_parameters_format_specification as inp_spec
+
 
 def read_parameter_files(pyecl_input_folder='./'):
-    switch_model=0
-    simulation_param_file='simulation_parameters.input'
+    switch_model = 0
+    simulation_param_file = 'simulation_parameters.input'
 
     save_mp_state_time_file = -1
 
@@ -204,19 +202,23 @@ def read_parameter_files(pyecl_input_folder='./'):
     N_min_Dh_main = None
 
 
-    f=open(pyecl_input_folder+'/'+simulation_param_file)
-    exec(f.read())
-    f.close()
+    simulation_parameters = imp.load_source('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
+    inp_spec.assert_module_has_parameters(simulation_parameters)
+
+    from simulation_parameters import machine_param_file, secondary_emission_parameters_file
+    from simulation_parameters import *
 
 
-    f=open(pyecl_input_folder+'/'+machine_param_file)
-    exec(f.read())
-    f.close()
+    machine_parameters = imp.load_source('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
+    inp_spec.assert_module_has_parameters(machine_parameters)
+    from machine_parameters import *
 
-    f=open(pyecl_input_folder+'/'+secondary_emission_parameters_file)
-    exec(f.read())
-    f.close()
+    secondary_emission_parameters = imp.load_source('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
+    inp_spec.assert_module_has_parameters(secondary_emission_parameters)
+    from secondary_emission_parameters import *
 
+    beam_beam = imp.load_source('beam.beam', pyecl_input_folder+'/'+beam_parameters_file)
+    inp_spec.assert_module_has_parameters(beam_beam)
     b_par = pbf.beam_descr_from_fil(pyecl_input_folder+'/'+beam_parameters_file, betafx, Dx, betafy, Dy)
 
     flag_presence_sec_beams = False
@@ -660,3 +662,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         gas_ion_flag, resgasion, t_ion, \
         spacech_ele,t_sc_ON, photoem_flag, phemiss,\
         flag_presence_sec_beams, sec_beams_list
+
+
+

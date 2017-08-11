@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.3.1
+#                   PyECLOUD Version 6.3.1
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -57,29 +57,29 @@ import cPickle
 
 
 class BuildupSimulation(object):
-	def __init__(self, pyecl_input_folder='./', **kwargs):
+    def __init__(self, pyecl_input_folder='./', **kwargs):
 
-		print 'PyECLOUD Version 6.3.1'
-		beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
-				gas_ion_flag, resgasion, t_ion, \
-				spacech_ele,t_sc_ON, photoem_flag, phemiss,\
-				flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components(\
-															pyecl_input_folder=pyecl_input_folder, **kwargs)
+        print 'PyECLOUD Version 6.3.1'
+        beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
+                gas_ion_flag, resgasion, t_ion, \
+                spacech_ele,t_sc_ON, photoem_flag, phemiss,\
+                flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components(\
+                                                            pyecl_input_folder=pyecl_input_folder, **kwargs)
 
-		self.beamtim = beamtim
-		self.MP_e = MP_e
-		self.dynamics = dynamics
-		self.impact_man = impact_man
-		self.pyeclsaver = pyeclsaver
-		self.gas_ion_flag = gas_ion_flag
-		self.resgasion = resgasion
-		self.t_ion = t_ion
-		self.spacech_ele = spacech_ele
-		self.t_sc_ON = t_sc_ON
-		self.photoem_flag = photoem_flag
-		self.phemiss = phemiss
-		self.flag_presence_sec_beams = flag_presence_sec_beams
-		self.sec_beams_list = sec_beams_list
+        self.beamtim = beamtim
+        self.MP_e = MP_e
+        self.dynamics = dynamics
+        self.impact_man = impact_man
+        self.pyeclsaver = pyeclsaver
+        self.gas_ion_flag = gas_ion_flag
+        self.resgasion = resgasion
+        self.t_ion = t_ion
+        self.spacech_ele = spacech_ele
+        self.t_sc_ON = t_sc_ON
+        self.photoem_flag = photoem_flag
+        self.phemiss = phemiss
+        self.flag_presence_sec_beams = flag_presence_sec_beams
+        self.sec_beams_list = sec_beams_list
 
 	def run(self, t_end_sim = None):
 
