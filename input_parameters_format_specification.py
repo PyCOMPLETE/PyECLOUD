@@ -11,13 +11,13 @@ def assert_module_has_parameters(module):
     module_contents = filter(lambda x: (not x.startswith('__')), dir(module))
     module_contents = set(filter(lambda x: (not isinstance(getattr(module, x), types.ModuleType)), module_contents))
 
-    allowed_parameters = essential_parameters.union(optional_parameters)
+    allowed_parameters = essential_parameters | optional_parameters
 
-    missing_parameters = essential_parameters.difference(module_contents)
+    missing_parameters = essential_parameters - module_contents
     if missing_parameters:
         raise PyECLOUD_ConfigException('Error! These essential parameters are not provided by %s: %r' % (module_name, missing_parameters))
 
-    extra_parameters = module_contents.difference(allowed_parameters)
+    extra_parameters = module_contents - allowed_parameters
     if extra_parameters:
         raise PyECLOUD_ConfigException('Error! These parameters should not be in %s: %r' % (module_name, extra_parameters))
 
