@@ -13,11 +13,11 @@ ms.mystyle(12)
 
 
 regex_label = re.compile('sample_(.*cm_.*)\.txt$')
-main_dir = './SEY-LE_SEY'
+main_dir = os.path.abspath(os.path.dirname(__file__)) + '/SEY-LE_SEY'
 all_files = os.listdir(main_dir)
-plot_files = sorted(filter(lambda x: 'V2' in x and x.endswith('.txt'), all_files))
+plot_files = sorted(filter(lambda x: 'merged' in x and 'V2' in x and x.endswith('.txt'), all_files))
 
-xx_lin = np.linspace(1, 1.8e3, 1e3)
+xx_lin = np.exp(np.linspace(np.log(1), np.log(1.8e3), int(1e3)))
 
 sey_model_e = sem_e.SEY_model_ECLOUD(330, 1.85, 0.7)
 
@@ -53,27 +53,32 @@ for file_ in plot_files:
     else:
         color = 'g'
 
-    sef = sem.SEY_from_file(main_dir + '/' + file_, 0.7)
+    sef = sem.SEY_from_file(main_dir + '/' + file_, R0=0.7, range_extrapolate_right=300)
 
     print '%.2f eV' % sef.work_function
 
     xx, yy = sef.energy_eV, sef.sey_parameter
     sp.plot(xx, yy, label=label, ls=ls, color=color)
-    sp3.semilogx(xx, yy, label=label_full, ls=ls, color=color)
+    sp3.semilogx(xx, yy,'.', label=label_full, ls='None', color=color)
+    sp1.plot(xx, yy,'.', label=label_full, ls='None', color=color)
 
-    yy = sef.SEY_process(1, xx_lin, 1, None)[0]
-    sp4.semilogx(xx_lin, yy, label=label_full, ls=ls, color=color)
+    xx_lin_r = xx_lin.copy()
+    np.random.shuffle(xx_lin_r)
+    yy_r = sef.SEY_process(1, xx_lin_r, 1, None)[0]
+    sp4.semilogx(xx_lin_r, yy_r,'.', label=label_full, ls='None', color=color)
 
 
 yy = sey_model_e.SEY_process(1, xx_lin, 1, None)[0]
 
-sp2.plot(xx_lin, yy, label='ECLOUD model', color='r')
-sp3.plot(xx_lin, yy, label='ECLOUD model', color='r')
+for sp_ in sp2, sp3, sp4:
+    sp_.plot(xx_lin, yy, label='ECLOUD model', color='r')
 
 
-xx = np.linspace(0, 80, 1e3)
+xx = np.linspace(1, 80, int(1e3))
 yy = sey_model_e.SEY_process(1, xx, 1, None)[0]
 sp1.plot(xx, yy, label='ECLOUD model', color='r')
+
+sp1.set_xlim(0, 80)
 
 for sp in sp1, sp2, sp3, sp4:
     sp.legend(loc='upper left', bbox_to_anchor=(1,1))
