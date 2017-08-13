@@ -2,9 +2,9 @@ from __future__ import division
 import os
 import numpy as np
 
-class SEY_from_file(object):
+class SEY_model_from_file(object):
 
-    def __init__(self, sey_file, R0=None, default_work_function=4.25, range_extrapolate_right=None, delta_e=0.1):
+    def __init__(self, sey_file, R0, default_work_function=4.25, range_extrapolate_right=None, delta_e=0.1):
         """
         range_extrapolate_right states the range in electron volts which is used to create a linear fit in order to extrapolate high energies.
         """
@@ -12,7 +12,13 @@ class SEY_from_file(object):
         work_function = default_work_function
         energy_eV_list = []
         sey_parameter_list = []
-        with open(os.path.expanduser(sey_file)) as f:
+
+        if os.path.isfile(os.path.expanduser(sey_file)):
+            sey_file_real = os.path.expanduser(sey_file)
+        else:
+            sey_file_real = os.path.abspath(os.path.dirname(__file__)) + '/sey_files/SEY-LE_SEY/' + sey_file
+
+        with open(sey_file_real) as f:
             for ctr, line in enumerate(f):
                 split = line.split()
                 if 'Work function' in line:
@@ -62,12 +68,12 @@ class SEY_from_file(object):
         delta[mask_regular] = self.interp(E_impact_eV[mask_regular])
         delta[mask_fit] = self.extrapolate_const + self.extrapolate_grad * E_impact_eV[mask_fit]
 
-        return delta, ref_frac
+        return nel_impact*delta, ref_frac, ~ref_frac
 
     def interp(self, energy_eV):
         index_float = (energy_eV - self.energy_eV_min)/self.delta_e
         index_remainder, index_int = np.modf(index_float)
-        return self.sey_parameter[index_int] + index_remainder*self.sey_diff[index_int]
+        return self.sey_parameter[index_int.astype(int)] + index_remainder*self.sey_diff[index_int.astype(int)]
 
     def interp_regular(self, energy_eV):
         """

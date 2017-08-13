@@ -61,6 +61,8 @@ from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
+from sec_emission_model_from_file import SEY_model_from_file
+
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
@@ -351,11 +353,12 @@ def read_parameter_files(pyecl_input_folder='./'):
         f_telescope,
         target_grid,
         N_nodes_discard,
-        N_min_Dh_main
+        N_min_Dh_main,
+        sey_file,
+        R0_file,
+        range_extrapolate_right,
+        delta_e,
     )
-
-
-
 
 
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
@@ -477,7 +480,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         f_telescope,
         target_grid,
         N_nodes_discard,
-        N_min_Dh_main
+        N_min_Dh_main,
+        sey_file,
+        R0_file,
+        range_extrapolate_right,
+        delta_e,
         ) = read_parameter_files(pyecl_input_folder)
 
 
@@ -575,6 +582,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_cos_le(Emax,del_max,R0,**kwargs)
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+    elif switch_model == 'from_file':
+        sey_mod = SEY_model_from_file(sey_file, R0=R0_file, range_extrapolate_right=200, delta_e=delta_e)
 
 
     secondary_angle_dist_func = {
