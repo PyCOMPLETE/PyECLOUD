@@ -4,7 +4,7 @@ import numpy as np
 
 class SEY_model_from_file(object):
 
-    def __init__(self, sey_file, R0, default_work_function=4.25, range_extrapolate_right=None, delta_e=0.1):
+    def __init__(self, sey_file, R0, range_extrapolate_right, delta_e, flag_factor_costheta, default_work_function=4.25):
         """
         range_extrapolate_right states the range in electron volts which is used to create a linear fit in order to extrapolate high energies.
         """
@@ -35,11 +35,11 @@ class SEY_model_from_file(object):
         sey_parameter = np.interp(energy_eV, energy_eV_0, sey_parameter_0)
 
         if range_extrapolate_right is not None:
-            mask_xx_fit = energy_eV > energy_eV.max() - range_extrapolate_right
-            xx_fit = energy_eV[mask_xx_fit]
+            mask_xx_fit = energy_eV_0 > energy_eV.max() - range_extrapolate_right
+            xx_fit = energy_eV_0[mask_xx_fit]
             if len(xx_fit) < 2:
                 raise ValueError('Range for fit is too small!')
-            yy_fit = sey_parameter[mask_xx_fit]
+            yy_fit = sey_parameter_0[mask_xx_fit]
             self.extrapolate_grad, self.extrapolate_const = np.polyfit(xx_fit, yy_fit, 1)
         else:
             self.extrapolate_grad, self.extrapolate_const = None, None
@@ -51,6 +51,7 @@ class SEY_model_from_file(object):
         self.work_function = work_function
         self.R0 = R0
         self.sey_file= sey_file
+        self.flag_factor_costheta = flag_factor_costheta
         self.energy_eV_min = energy_eV.min()
         self.energy_eV_max = energy_eV.max()
         self.delta_e = delta_e
@@ -68,7 +69,12 @@ class SEY_model_from_file(object):
         delta[mask_regular] = self.interp(E_impact_eV[mask_regular])
         delta[mask_fit] = self.extrapolate_const + self.extrapolate_grad * E_impact_eV[mask_fit]
 
-        return nel_impact*delta, ref_frac, ~ref_frac
+        if self.flag_factor_costheta:
+            factor_costheta = np.exp(0.5*(1.-costheta_impact))
+        else:
+            factor_costheta = 1
+
+        return nel_impact*delta*factor_costheta, ref_frac, ~ref_frac
 
     def interp(self, energy_eV):
         index_float = (energy_eV - self.energy_eV_min)/self.delta_e

@@ -205,6 +205,11 @@ def read_parameter_files(pyecl_input_folder='./'):
     N_nodes_discard = None
     N_min_Dh_main = None
 
+    # secondary emission from file
+
+    sey_file, R0_file, range_extrapolate_right, delta_e, flag_factor_costheta = [None]*5
+
+
 
     f=open(pyecl_input_folder+'/'+simulation_param_file)
     exec(f.read())
@@ -358,6 +363,7 @@ def read_parameter_files(pyecl_input_folder='./'):
         R0_file,
         range_extrapolate_right,
         delta_e,
+        flag_factor_costheta,
     )
 
 
@@ -485,6 +491,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         R0_file,
         range_extrapolate_right,
         delta_e,
+        flag_factor_costheta,
         ) = read_parameter_files(pyecl_input_folder)
 
 
@@ -583,7 +590,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
     elif switch_model == 'from_file':
-        sey_mod = SEY_model_from_file(sey_file, R0=R0_file, range_extrapolate_right=200, delta_e=delta_e)
+        sey_mod = SEY_model_from_file(sey_file, R0_file, range_extrapolate_right, delta_e, flag_factor_costheta)
 
 
     secondary_angle_dist_func = {
