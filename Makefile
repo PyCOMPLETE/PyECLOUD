@@ -1,3 +1,17 @@
+
+.PHONY: local cern all
+
+# On arch linux, the command f2py2 has to be used for python2 programs such as PyECLOUD.
+# On ubuntu, there is no command called f2py2
+F2PY2_EXIST := $(shell command -v f2py2 2> /dev/null)
+
+ifdef F2PY2_EXIST
+		F2PY = f2py2
+else
+		F2PY = f2py
+endif
+
+
 all:local
 
 cern:
@@ -9,10 +23,10 @@ cern:
 	/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/f2py -m boris_step -c boris_step.f
 	/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/f2py -m vectsum -c vectsum.f
 local:
-	f2py2 -m rhocompute -c compute_rho.f
-	f2py2 -m int_field_for -c interp_field_for.f
-	f2py2 -m hist_for -c compute_hist.f
-	f2py2 -m seg_impact -c update_seg_impact.f
-	f2py2 -m errffor -c errfff.f
-	f2py2 -m boris_step -c boris_step.f
-	f2py2 -m vectsum -c vectsum.f
+	$(F2PY) -m rhocompute -c compute_rho.f
+	$(F2PY) -m int_field_for -c interp_field_for.f
+	$(F2PY) -m hist_for -c compute_hist.f
+	$(F2PY) -m seg_impact -c update_seg_impact.f
+	$(F2PY) -m errffor -c errfff.f
+	$(F2PY) -m boris_step -c boris_step.f
+	$(F2PY) -m vectsum -c vectsum.f
