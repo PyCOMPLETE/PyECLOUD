@@ -222,7 +222,7 @@ class impact_management(object):
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
                 E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
-                costheta_impact=-(v_impact_n)/v_impact_mod
+                costheta_impact = np.abs((v_impact_n)/v_impact_mod)
 
                 #electron histogram
                 histf.compute_hist(x_emit, nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
