@@ -53,7 +53,7 @@ for file_ in plot_files:
     else:
         color = 'g'
 
-    sef = sem.SEY_model_from_file(main_dir + '/' + file_, R0=0.7, range_extrapolate_right=300)
+    sef = sem.SEY_model_from_file(main_dir + '/' + file_, R0=0.7, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False)
 
     print '%.2f eV' % sef.work_function
 
