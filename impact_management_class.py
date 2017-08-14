@@ -92,7 +92,8 @@ class impact_management(object):
         self.flag_cos_angle_hist = flag_cos_angle_hist
         if flag_cos_angle_hist:
             self.cos_angle_width = cos_angle_width
-            self.cos_angle_hist  = np.arange(0, 1+cos_angle_width/2., cos_angle_width)
+            N_angles = int(1./ cos_angle_width)+1
+            self.cos_angle_hist  = np.zeros(N_angles, float)
             print 'Saving cosine of angle of incident electrons.'
         else:
             print 'Not saving cosine of angle of incident electrons.'
