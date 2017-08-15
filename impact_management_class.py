@@ -223,7 +223,9 @@ class impact_management(object):
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
                 E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
-                costheta_impact = np.abs((v_impact_n)/v_impact_mod)
+                # Use np.abs to rule out negative values, which can happen in very seldom fringe cases.
+                # Mathematically correct would be -(v_impact_n)/v_impact_mod
+                costheta_impact = np.abs(v_impact_n/v_impact_mod)
 
                 #electron histogram
                 histf.compute_hist(x_emit, nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
@@ -325,7 +327,7 @@ class impact_management(object):
                     histf.compute_hist(x_mp_add,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
-                       segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
+                        segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
                     self.En_emit_last_step_eV += np.sum(En_truesec_eV_add*nel_mp_add)
 
