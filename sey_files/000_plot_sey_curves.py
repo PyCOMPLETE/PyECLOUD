@@ -15,9 +15,9 @@ ms.mystyle(12)
 regex_label = re.compile('sample_(.*cm_.*)\.txt$')
 main_dir = os.path.abspath(os.path.dirname(__file__)) + '/SEY-LE_SEY'
 all_files = os.listdir(main_dir)
-plot_files = sorted(filter(lambda x: 'merged' in x and 'V2' in x and x.endswith('.txt'), all_files))
+plot_files = sorted(filter(lambda x: 'merged' in x, all_files))
 
-xx_lin = np.exp(np.linspace(np.log(1), np.log(1.8e3), int(1e3)))
+xx_lin = np.exp(np.linspace(np.log(0.1), np.log(1.8e3), int(1e3)))
 
 sey_model_e = sem_e.SEY_model_ECLOUD(330, 1.85, 0.7)
 
@@ -29,8 +29,8 @@ sp3 = plt.subplot(2,2,3)
 sp4 = plt.subplot(2,2,4)
 sp1.set_title('Low energy')
 sp2.set_title('High energy')
-sp3.set_title('Full range')
-sp4.set_title('Implementation')
+sp3.set_title('Full range (Logarithmic)')
+sp4.set_title('Implementation (Logarithmic)')
 for sp in sp1, sp2:
     sp.set_xlabel('Energy [eV]')
     sp.set_ylabel('SEY')
@@ -38,15 +38,7 @@ for sp in sp1, sp2:
 for file_ in plot_files:
     print file_
     label = regex_label.search(file_).groups()[0]
-
-    if 'LE' in file_:
-        sp = sp1
-        label_full = 'LE ' + label
-        ls = '--'
-    else:
-        sp = sp2
-        label_full = label
-        ls = '-'
+    label_full = label
 
     if '3.5' in file_:
         color = 'b'
@@ -57,8 +49,8 @@ for file_ in plot_files:
 
     print '%.2f eV' % sef.work_function
 
-    xx, yy = sef.energy_eV, sef.sey_parameter
-    sp.plot(xx, yy, label=label, ls=ls, color=color)
+    xx, yy = sef.energy_eV_0, sef.sey_parameter_0
+    sp2.plot(xx, yy, '.', label=label, ls='None', color=color)
     sp3.semilogx(xx, yy,'.', label=label_full, ls='None', color=color)
     sp1.plot(xx, yy,'.', label=label_full, ls='None', color=color)
 

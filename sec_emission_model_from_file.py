@@ -27,7 +27,7 @@ class SEY_model_from_file(object):
                     energy_eV_list.append(split[0])
                     sey_parameter_list.append(split[1])
 
-        energy_eV_0 = np.array(energy_eV_list, dtype=float) + work_function
+        energy_eV_0 = np.array(energy_eV_list, dtype=float)# + work_function
         sey_parameter_0 = np.array(sey_parameter_list, dtype=float)
 
         # Build equally spaced arrays that are used by the interp function
@@ -65,7 +65,8 @@ class SEY_model_from_file(object):
         mask_fit = (E_impact_eV > self.energy_eV_max)
         mask_regular = ~ref_frac & ~mask_fit
 
-        delta[ref_frac] = self.R0
+        #delta[ref_frac] = self.R0
+        delta[ref_frac] = self.interp(E_impact_eV[ref_frac])
         delta[mask_regular] = self.interp(E_impact_eV[mask_regular])
         delta[mask_fit] = self.extrapolate_const + self.extrapolate_grad * E_impact_eV[mask_fit]
 
@@ -87,6 +88,4 @@ class SEY_model_from_file(object):
         """
         print('Warning! Do not use interp_regular!')
         return np.interp(energy_eV, self.energy_eV, self.sey_parameter)
-
-# ideas for reflected photons:
 
