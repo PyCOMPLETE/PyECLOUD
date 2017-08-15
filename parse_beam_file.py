@@ -45,13 +45,13 @@ class beam_descr_from_fil:
         f.close()
 
         # keep beackwards compatibility (optics in the machine params file)
-        if Dx == None:
+        if Dx is None:
             Dx = Dx_from_mach_parms_file
-        if Dy == None:
+        if Dy is None:
             Dy = Dy_from_mach_parms_file
-        if betafx == None:
+        if betafx is None:
             betafx = betafx_from_mach_parms_file
-        if betafy == None:
+        if betafy is None:
             betafy = betafy_from_mach_parms_file
 
         qe=1.602176565e-19;
