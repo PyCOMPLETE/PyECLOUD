@@ -15,7 +15,7 @@ ms.mystyle(12)
 regex_label = re.compile('sample_(.*cm_.*)\.txt$')
 main_dir = os.path.abspath(os.path.dirname(__file__)) + '/SEY-LE_SEY'
 all_files = os.listdir(main_dir)
-plot_files = sorted(filter(lambda x: 'merged' in x, all_files))
+plot_files = sorted(filter(lambda x: 'merged' in x and x.endswith('.txt'), all_files))
 
 xx_lin = np.exp(np.linspace(np.log(0.1), np.log(1.8e3), int(1e3)))
 
@@ -45,9 +45,7 @@ for file_ in plot_files:
     else:
         color = 'g'
 
-    sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False)
-
-    print '%.2f eV' % sef.work_function
+    sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False, factor_sey=1)
 
     xx, yy = sef.energy_eV_0, sef.sey_parameter_0
     sp2.plot(xx, yy, '.', label=label, ls='None', color=color)

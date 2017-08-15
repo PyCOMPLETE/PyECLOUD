@@ -4,9 +4,15 @@ import numpy as np
 
 class SEY_model_from_file(object):
 
-    def __init__(self, sey_file, range_extrapolate_right, delta_e, flag_factor_costheta):
+    def __init__(self, sey_file, range_extrapolate_right, delta_e, flag_factor_costheta, factor_sey):
         """
-        range_extrapolate_right states the range in electron volts which is used to create a linear fit in order to extrapolate high energies.
+        - sey file is the path to a file of the correct format, either an absolute path or in the sey_files/SEY-LE_SEY folder.
+            See the example files in sey_files/SEY-LE_SEY for the format that should be used for input files.
+        - range_extrapolate_right states the range in electron volts which is used to create a linear fit in order to extrapolate high energies.
+        - delta_e is the resolution used for the interpolation, for example .1 eV.
+        - if flag_factor_costheta is True, the SEY is increased depending on the angle with which the electrons are hitting.
+        - factor_sey is a factor applied to the SEY from the file, for example to emulate scrubbing effects
+
         """
 
         # Search for file with given name, either as an absolute path or in the dedicated folder
@@ -33,7 +39,7 @@ class SEY_model_from_file(object):
                     energy_eV_list.append(float(split[0]))
                     sey_parameter_list.append(float(split[1]))
         energy_eV_0 = np.array(energy_eV_list, dtype=float)
-        sey_parameter_0 = np.array(sey_parameter_list, dtype=float)
+        sey_parameter_0 = np.array(sey_parameter_list, dtype=float) * factor_sey
 
         # Build equally spaced arrays that are used by the interp function
         energy_eV = np.arange(energy_eV_0.min(), energy_eV_0.max()+delta_e*.5, delta_e)
@@ -48,6 +54,7 @@ class SEY_model_from_file(object):
         self.extrapolate_grad, self.extrapolate_const = np.polyfit(xx_fit, yy_fit, 1)
 
         # sey_diff is needed by the interp function
+        # A 0 is appended because this last element is never needed but the array must have the correct shape
         self.sey_diff = np.append(np.diff(sey_parameter), 0.)
 
         # This merely populates the object namespace
@@ -60,6 +67,7 @@ class SEY_model_from_file(object):
         self.energy_eV_min          = energy_eV.min()
         self.energy_eV_max          = energy_eV.max()
         self.delta_e                = delta_e
+        self.factor_sey             = factor_sey
 
         print('Secondary emission from file %s' % sey_file_real)
 
@@ -93,8 +101,7 @@ class SEY_model_from_file(object):
         return self.sey_parameter[index_int] + index_remainder*self.sey_diff[index_int]
 
     def interp_regular(self, energy_eV):
-        #return np.interp(energy_eV, self.energy_eV, self.sey_parameter)
-
         #This fails if the input is not in ascending order.
+        #return np.interp(energy_eV, self.energy_eV, self.sey_parameter)
         raise ValueError('Warning! Do not use interp_regular!')
 
