@@ -1,9 +1,9 @@
-"#LHC beam screen, longitudinal position (along the beam axis) = 17 cm far from BS extremity, measurement done in the center of flat top side"	
-#sample ref : Beam_screen_V2_sample_1B_Top_08	
-Inflection point (eV)	1.7
-Work function (eV)	4.3
-	
-Ep (eV)	LE_SEY
+#"#LHC beam screen, longitudinal position (along the beam axis) = 17 cm far from BS extremity, measurement done in the center of flat top side"	
+##sample ref : Beam_screen_V2_sample_1B_Top_08	
+#Inflection point (eV)	1.7
+#Work function (eV)	4.3
+#	
+#Ep (eV)	LE_SEY
 0.0000	1.0300
 0.1000	1.0300
 0.2000	1.0200
@@ -110,6 +110,7 @@ Ep (eV)	LE_SEY
 51.0000	1.2000
 53.0000	1.2200
 55.0000	1.2400
+##
 60	1.2967
 70	1.3807
 80	1.4628
