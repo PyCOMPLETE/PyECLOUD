@@ -286,7 +286,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file = (progress_path+'_mapgen'))
 
     if sparse_solver=='klu':
-        print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
+        print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
         sparse_solver='PyKLU'
 
     spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode,
@@ -296,7 +296,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     if flag_presence_sec_beams:
         N_sec_beams = len(sec_b_par_list)
         for ii in xrange(N_sec_beams):
-            print 'Initialize secondary beam %d/%d'%(ii+1, N_sec_beams)
+            print('Initialize secondary beam %d/%d'%(ii+1, N_sec_beams))
             sb_par = sec_b_par_list[ii]
             sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.beam_field_file,lam_th,
                  b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz,t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=Dt, t_end=t_end,
@@ -394,19 +394,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
 
     if init_unif_flag==1:
-        print "Adding inital %.2e electrons to the initial distribution"%Nel_init_unif
+        print("Adding inital %.2e electrons to the initial distribution"%Nel_init_unif)
         MP_e.add_uniform_MP_distrib(Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif)
 
 
     if init_unif_edens_flag==1:
-        print "Adding inital %.2e electrons/m^3 to the initial distribution"%init_unif_edens
+        print("Adding inital %.2e electrons/m^3 to the initial distribution"%init_unif_edens)
         MP_e.add_uniform_ele_density(n_ele=init_unif_edens, E_init=E_init_unif_edens,
         x_max=x_max_init_unif_edens, x_min=x_min_init_unif_edens,
         y_max=y_max_init_unif_edens, y_min=y_min_init_unif_edens)
 
 
     if filename_init_MP_state!=-1 and filename_init_MP_state is not None:
-        print "Adding inital electrons from: %s"%filename_init_MP_state
+        print("Adding inital electrons from: %s"%filename_init_MP_state)
         MP_e.add_from_file(filename_init_MP_state)
 
 
