@@ -36,8 +36,12 @@ class SEY_model_from_file(object):
                 if line.startswith('#'):
                     continue
                 elif len(split) == 2:
-                    energy_eV_list.append(float(split[0]))
-                    sey_parameter_list.append(float(split[1]))
+                    try:
+                        energy_eV_list.append(float(split[0]))
+                        sey_parameter_list.append(float(split[1]))
+                    except:
+                        print('Error in line %i of file %s: %s' % (ctr, sey_file_real, line))
+                        raise
         energy_eV_0 = np.array(energy_eV_list, dtype=float)
         sey_parameter_0 = np.array(sey_parameter_list, dtype=float) * factor_sey
 
