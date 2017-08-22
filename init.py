@@ -49,7 +49,10 @@
 #     all references.
 #----------------------------------------------------------------------
 
-import imp
+import sys
+import os
+import shutil
+
 import numpy as np
 from scipy.constants import c, e as qe
 import beam_and_timing as beatim
@@ -77,12 +80,40 @@ import parse_beam_file as pbf
 
 import input_parameters_format_specification as inp_spec
 
+def import_module_from_file(module_name, file_name):
+    # Load any file as a python module. This function works for python2 and python3.
+    # See https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
+    # "One might think that python imports are getting more and more complicated with each new version."
+
+    if sys.version_info.major == 2:
+        import imp
+        return imp.load_source(module_name, file_name)
+
+    elif sys.version_info.major == 3:
+        import importlib.util
+        # In python3, imp.load_source works as well, however it does not return the exact same as the import statement.
+        # There are some superfluous contents in the namespace which collides with the inp_spec.assert_module_has_parameters method.
+
+        # The importlib.util method requires the file name to end with .py
+        dir_name = '/tmp/PyECLOUD_%i' % os.getpid()
+        if not os.path.isdir(dir_name):
+            os.mkdir(dir_name)
+        new_file_name = dir_name+'/temp_file.py'
+        shutil.copy(file_name, new_file_name)
+
+        spec = importlib.util.spec_from_file_location(module_name, new_file_name)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        shutil.rmtree(dir_name)
+        return module
+
+
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     simulation_param_file = 'simulation_parameters.input'
     config_dict = {}
 
-    simulation_parameters = imp.load_source('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
+    simulation_parameters = import_module_from_file('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
     inp_spec.assert_module_has_parameters(simulation_parameters)
     inp_spec.update_config_dict(config_dict, simulation_parameters)
 
@@ -90,16 +121,30 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     secondary_emission_parameters_file = config_dict['secondary_emission_parameters_file']
     beam_parameters_file = config_dict['beam_parameters_file']
 
-    machine_parameters = imp.load_source('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
+    machine_parameters = import_module_from_file('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
     inp_spec.assert_module_has_parameters(machine_parameters)
     inp_spec.update_config_dict(config_dict, machine_parameters)
 
-    secondary_emission_parameters = imp.load_source('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
+    secondary_emission_parameters = import_module_from_file('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
     inp_spec.assert_module_has_parameters(secondary_emission_parameters)
     inp_spec.update_config_dict(config_dict, secondary_emission_parameters)
 
-    beam_beam = imp.load_source('beam_beam', pyecl_input_folder+'/'+beam_parameters_file)
+    beam_beam = import_module_from_file('beam_beam', pyecl_input_folder+'/'+beam_parameters_file)
     inp_spec.assert_module_has_parameters(beam_beam)
+
+    # Probably promote this to an optional parameter in simulation_parameters.input
+    filen_main_outp = 'Pyecltest'
+
+    # Override config values with kwargs
+    for attr, value in kwargs.iteritems():
+        print('Ecloud init. From kwargs: %s = %r' % (attr, value))
+        if attr == 'filen_main_outp':
+            filen_main_outp = value
+        elif attr in config_dict:
+            config_dict[attr] = value
+        else:
+            print('Warning! What exactly does %s do? It is not part of any config file.' % attr)
+            exec('%s=value') % attr
 
     x_aper = config_dict['x_aper']
     y_aper = config_dict['y_aper']
@@ -223,13 +268,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     betafy = config_dict['betafy']
     Dy = config_dict['Dy']
 
-
-    # Probably promote this to an optional parameter in simulation_parameters.input
-    filen_main_outp = 'Pyecltest'
-    # Override config values with kwargs
-    for attr, value in kwargs.iteritems():
-        print('Ecloud init. From kwargs: %s = %r' % (attr, value))
-        exec('%s=value' % attr)
 
 
     flag_presence_sec_beams = len(secondary_beams_file_list)>0
