@@ -1,17 +1,18 @@
-from __future__ import division
+from __future__ import division, print_function
 import os
 import numpy as np
 
 class SEY_model_from_file(object):
 
-    def __init__(self, sey_file, range_extrapolate_right, delta_e, flag_factor_costheta, factor_sey):
+    def __init__(self, sey_file, range_extrapolate_right, delta_e, flag_factor_costheta, max_sey):
         """
         - sey file is the path to a file of the correct format, either an absolute path or in the sey_files/SEY-LE_SEY folder.
             See the example files in sey_files/SEY-LE_SEY for the format that should be used for input files.
         - range_extrapolate_right states the range in electron volts which is used to create a linear fit in order to extrapolate high energies.
         - delta_e is the resolution used for the interpolation, for example .1 eV.
         - if flag_factor_costheta is True, the SEY is increased depending on the angle with which the electrons are hitting.
-        - factor_sey is a factor applied to the SEY from the file, for example to emulate scrubbing effects
+        - max_sey is a factor applied to the SEY from the file, for example to emulate scrubbing effects.
+            Set to None or False to disable.
 
         """
 
@@ -42,8 +43,11 @@ class SEY_model_from_file(object):
                     except:
                         print('Error in line %i of file %s: %s' % (ctr, sey_file_real, line))
                         raise
+
         energy_eV_0 = np.array(energy_eV_list, dtype=float)
-        sey_parameter_0 = np.array(sey_parameter_list, dtype=float) * factor_sey
+        sey_parameter_0 = np.array(sey_parameter_list, dtype=float)
+        if max_sey:
+            sey_parameter_0 *= max_sey / max(sey_parameter_list)
 
         # Build equally spaced arrays that are used by the interp function
         energy_eV = np.arange(energy_eV_0.min(), energy_eV_0.max()+delta_e*.5, delta_e)
@@ -71,7 +75,7 @@ class SEY_model_from_file(object):
         self.energy_eV_min          = energy_eV.min()
         self.energy_eV_max          = energy_eV.max()
         self.delta_e                = delta_e
-        self.factor_sey             = factor_sey
+        self.max_sey                = max_sey
 
         print('Secondary emission from file %s' % sey_file_real)
 

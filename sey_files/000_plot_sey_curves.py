@@ -45,7 +45,7 @@ for file_ in plot_files:
     else:
         color = 'g'
 
-    sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False, factor_sey=1)
+    sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False, max_sey=False)
 
     xx, yy = sef.energy_eV_0, sef.sey_parameter_0
     sp2.plot(xx, yy, '.', label=label, ls='None', color=color)
