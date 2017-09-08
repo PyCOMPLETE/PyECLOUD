@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
-parser.add_argument('--all', help='Run 2D and 3D consecutively', choices=('2D', '3D'), default='3D')
+parser.add_argument('--all', help='Run 2D and 3D consecutively', action='store_true')
 args = parser.parse_args()
 
 
