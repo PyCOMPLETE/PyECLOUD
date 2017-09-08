@@ -1,3 +1,4 @@
+from __future__ import division
 import os
 import re
 import numpy as np
@@ -10,6 +11,8 @@ import PyECLOUD.sec_emission_model_ECLOUD as sem_e
 
 plt.close('all')
 ms.mystyle(12)
+
+plt.rcParams['lines.markersize'] = 3
 
 
 regex_label = re.compile('sample_(.*cm_.*)\.txt$')
@@ -36,7 +39,6 @@ for sp in sp1, sp2:
     sp.set_ylabel('SEY')
 
 for file_ in plot_files:
-    print file_
     label = regex_label.search(file_).groups()[0]
     label_full = label
 
@@ -72,6 +74,44 @@ sp1.set_xlim(0, 80)
 
 for sp in sp1, sp2, sp3, sp4:
     sp.legend(loc='upper left', bbox_to_anchor=(1,1))
+
+
+
+sey_vect = [1.1, 1.4, 1.7, False][::-1]
+ms.figure('SEY from files, max SEY')
+
+for file_ctr, file_ in enumerate(plot_files):
+    sp_ctr = file_ctr + 1
+    sp = plt.subplot(2,2,sp_ctr)
+    sp.grid(True)
+    sp.set_xlabel('Energy [eV]')
+    sp.set_ylabel('SEY')
+    sp.set_title(file_)
+
+    label = regex_label.search(file_).groups()[0]
+    label_full = label
+
+    for sey_ctr, max_sey in enumerate(sey_vect):
+        color = ms.colorprog(sey_ctr, sey_vect)
+
+
+        sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False, max_sey=max_sey)
+
+        if max_sey is False:
+            max_sey = sef.sey_parameter_0.max()
+
+        sey_model_e = sem_e.SEY_model_ECLOUD(330, max_sey, 0.7)
+
+        xx, yy = sef.energy_eV_0, sef.sey_parameter_0
+
+
+        sp.semilogx(xx, yy, marker='o',label='%.2f' % max_sey, color=color)
+
+        yy2 = sey_model_e.SEY_process(1, xx, 1, None)[0]
+        sp.semilogx(xx, yy2,ls='--', color=color)
+
+    sp.legend(title='Max SEY')
+
 
 plt.show()
 

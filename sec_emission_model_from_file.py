@@ -47,7 +47,8 @@ class SEY_model_from_file(object):
         energy_eV_0 = np.array(energy_eV_list, dtype=float)
         sey_parameter_0 = np.array(sey_parameter_list, dtype=float)
         if max_sey:
-            sey_parameter_0 *= max_sey / max(sey_parameter_list)
+            index_min_sey = np.argmin(sey_parameter_0)
+            sey_parameter_0[index_min_sey:] *= max_sey/sey_parameter_0.max()
 
         # Build equally spaced arrays that are used by the interp function
         energy_eV = np.arange(energy_eV_0.min(), energy_eV_0.max()+delta_e*.5, delta_e)
