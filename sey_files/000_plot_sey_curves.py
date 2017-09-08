@@ -4,10 +4,18 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 
-import LHCMeasurementTools.mystyle as ms
+import create_equally_spaced_file as cesf
 
 import PyECLOUD.sec_emission_model_from_file as sem
 import PyECLOUD.sec_emission_model_ECLOUD as sem_e
+
+try:
+    import PyECLOUD.mystyle as ms
+except ImportError:
+    import sys
+    sys.path.append('../..')
+    import PyECLOUD.mystyle as ms
+
 
 plt.close('all')
 ms.mystyle(12)
@@ -15,10 +23,10 @@ ms.mystyle(12)
 plt.rcParams['lines.markersize'] = 3
 
 
-regex_label = re.compile('sample_(.*cm_.*)\.txt$')
-main_dir = os.path.abspath(os.path.dirname(__file__)) + '/SEY-LE_SEY'
+regex_label = re.compile('sey_file_(.*cm)\.gz$')
+main_dir = os.path.abspath(os.path.dirname(__file__))
 all_files = os.listdir(main_dir)
-plot_files = sorted(filter(lambda x: 'merged' in x and x.endswith('.txt'), all_files))
+plot_files = sorted(filter(lambda x: 'example' in x and x.endswith('.gz'), all_files))
 
 xx_lin = np.exp(np.linspace(np.log(0.1), np.log(1.8e3), int(1e3)))
 
@@ -47,9 +55,9 @@ for file_ in plot_files:
     else:
         color = 'g'
 
-    sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False, max_sey=False)
+    sef = sem.SEY_model_from_file(main_dir + '/' + file_, flag_factor_costheta=False)
 
-    xx, yy = sef.energy_eV_0, sef.sey_parameter_0
+    xx, yy = sef.energy_eV, sef.sey_parameter
     sp2.plot(xx, yy, '.', label=label, ls='None', color=color)
     sp3.semilogx(xx, yy,'.', label=label_full, ls='None', color=color)
     sp1.plot(xx, yy,'.', label=label_full, ls='None', color=color)
@@ -77,7 +85,7 @@ for sp in sp1, sp2, sp3, sp4:
 
 
 
-sey_vect = [1.1, 1.4, 1.7, False][::-1]
+sey_vect = [False][::-1]
 ms.figure('SEY from files, max SEY')
 
 for file_ctr, file_ in enumerate(plot_files):
@@ -95,14 +103,14 @@ for file_ctr, file_ in enumerate(plot_files):
         color = ms.colorprog(sey_ctr, sey_vect)
 
 
-        sef = sem.SEY_model_from_file(main_dir + '/' + file_, range_extrapolate_right=300, delta_e=0.1, flag_factor_costheta=False, max_sey=max_sey)
+        sef = sem.SEY_model_from_file(main_dir + '/' + file_, flag_factor_costheta=False)
 
         if max_sey is False:
-            max_sey = sef.sey_parameter_0.max()
+            max_sey = sef.sey_parameter.max()
 
         sey_model_e = sem_e.SEY_model_ECLOUD(330, max_sey, 0.7)
 
-        xx, yy = sef.energy_eV_0, sef.sey_parameter_0
+        xx, yy = sef.energy_eV, sef.sey_parameter
 
 
         sp.semilogx(xx, yy, marker='o',label='%.2f' % max_sey, color=color)

@@ -211,7 +211,7 @@ def read_parameter_files(pyecl_input_folder='./'):
 
     # secondary emission from file
 
-    sey_file, range_extrapolate_right, delta_e, flag_factor_costheta, max_sey = [None]*5
+    sey_file, flag_factor_costheta = [None]*2
 
 
 
@@ -364,10 +364,7 @@ def read_parameter_files(pyecl_input_folder='./'):
         N_nodes_discard,
         N_min_Dh_main,
         sey_file,
-        range_extrapolate_right,
-        delta_e,
         flag_factor_costheta,
-        max_sey,
         flag_cos_angle_hist,
         cos_angle_width,
     )
@@ -494,10 +491,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         N_nodes_discard,
         N_min_Dh_main,
         sey_file,
-        range_extrapolate_right,
-        delta_e,
         flag_factor_costheta,
-        max_sey,
         flag_cos_angle_hist,
         cos_angle_width,
         ) = read_parameter_files(pyecl_input_folder)
@@ -598,7 +592,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
     elif switch_model == 'from_file':
-        sey_mod = SEY_model_from_file(sey_file, range_extrapolate_right, delta_e, flag_factor_costheta, max_sey)
+        sey_mod = SEY_model_from_file(sey_file, flag_factor_costheta)
 
 
     flag_seg = (flag_hist_impact_seg==1)
