@@ -222,6 +222,10 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
 \textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
+\textbf{flag\_cos\_angle\_hist} & Save the cosine of the incident angle of impacting electrons. (optional -- default True)
+\\ \hline
+\textbf{cos\_angle\_width} & Width of the histogram bins. (optional -- default 0.05)
+\\ \hline
 \textbf{flag\_movie}&	(optional -- default=0)
 
 (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron density distribution at each space charge evaluation.\\ \hline
@@ -416,22 +420,9 @@ If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have u
 \end{longtable}
 
 
-%\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
-%\hline\endfirsthead\hline\endhead\rowcolor{Gray}
-%\multicolumn{2}{p{.97\textwidth}}{\textbf{Initial angular distribution of new MPs relative to the surface normal vector}}
-%\\ \hline
-%\textbf{secondary\_angle\_distribution} & Can be 'cosine\_2D' or 'cosine\_3D'\\
-%    & d$n$/d$\theta=\cos\theta$ or d$n$/d$\theta=\cos\theta\sin\theta$ in the 2D or 3D cases, respectively.
-%The default is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates.
-%\\ \hline
-%\textbf{photoelectron\_angle\_distribution} & See secondary\_angle\_distribution'
-%\\
-%\hline
-%\end{longtable}
+\newpage
 
-
-
-\newpage\subsection{Beam parameters}
+\subsection{Beam parameters}
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}

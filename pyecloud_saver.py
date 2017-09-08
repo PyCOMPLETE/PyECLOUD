@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.3.0
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -65,17 +65,18 @@ qm=qe/me;
 class pyecloud_saver:
 
     def __init__(self, logfile_path):
-		self.logfile_path = logfile_path
-		print 'Starting pyecloud_saver init.'
-		flog=open(self.logfile_path,'w')
-		flog.write('PyECLOUD Version 6.3.0\n')
-		timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-		flog.write('Simulation started on %s\n'%timestr)
-		flog.close()
+        self.logfile_path = logfile_path
+        print 'Starting pyecloud_saver init.'
+        flog=open(self.logfile_path,'w')
+        flog.write('PyECLOUD Version 6.4.0\n')
+        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
+        flog.write('Simulation started on %s\n'%timestr)
+        flog.close()
 
 
     def start_observing(self, MP_e, beamtim, impact_man,
                  r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info=0,
+                 cos_angle_width=0.05, flag_cos_angle_hist=True,
                  flag_movie=0, flag_sc_movie=0, save_mp_state_time_file=-1,
                  flag_presence_sec_beams=False, sec_beams_list=[], dec_fac_secbeam_prof=1,
                  el_density_probes = [],
@@ -133,6 +134,12 @@ class pyecloud_saver:
         self.En_hist=np.zeros((self.N_En_hist,impact_man.Nbin_En_hist),float) #allocate histograms
         self.i_En_hist=0
 
+        # Angle histogram
+        self.flag_cos_angle_hist = flag_cos_angle_hist
+        if flag_cos_angle_hist:
+            N_angles = int(1./ cos_angle_width)+1
+            self.cos_angle_hist = np.zeros((self.N_En_hist, N_angles),float)
+
         #Space charge electrostatic energy
         self.t_sc_video=[]
         self.U_sc_eV=[]
@@ -178,8 +185,8 @@ class pyecloud_saver:
         self.N_mp_ref_pass=np.zeros(beamtim.N_pass_tot+1)
 
         if impact_man.flag_seg:
-				self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
-				self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+                self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+                self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
         else:
                 self.nel_hist_impact_seg=-1
                 self.energ_eV_impact_seg=-1
@@ -316,6 +323,10 @@ class pyecloud_saver:
             impact_man.reset_En_hist_line()
             self.i_En_hist=self.i_En_hist+1
 
+            if self.flag_cos_angle_hist:
+                self.cos_angle_hist[self.i_En_hist,:] = impact_man.cos_angle_hist
+                impact_man.reset_cos_angle_hist()
+
         #Space charge electrostatic energy
         if spacech_ele.flag_recomputed_sc:
             self.t_sc_video.append(beamtim.tt_curr)
@@ -326,45 +337,45 @@ class pyecloud_saver:
             if not os.path.exists('rho_video'):
                 os.makedirs('rho_video')
             if self.rho_video is None:
-				self.rho_video=[]
-				self.t_video=[]
+                self.rho_video=[]
+                self.t_video=[]
             if spacech_ele.flag_recomputed_sc:
                 self.rho_video.append(spacech_ele.rho)
                 self.t_video.append(beamtim.tt_curr)
             if beamtim.flag_new_bunch_pass:
-				self.rho_video=np.array(self.rho_video)
-				self.t_video=np.array(self.t_video)
-				filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
-				print 'Saving %s'%filename_rho
-				sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
-				print 'Done'
-				self.rho_video=[]
-				self.t_video=[]
+                self.rho_video=np.array(self.rho_video)
+                self.t_video=np.array(self.t_video)
+                filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
+                print 'Saving %s'%filename_rho
+                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
+                print 'Done'
+                self.rho_video=[]
+                self.t_video=[]
 
         #save efield video
         if self.flag_sc_video:
-			if not os.path.exists('efield_video'):
-				os.makedirs('efield_video')
-			if self.efx_video is None:
-				self.efx_video=[]
-				self.efy_video=[]
-				self.t_efield_video=[]
-			if spacech_ele.flag_recomputed_sc:
-				self.efx_video.append(spacech_ele.efx)
-				self.efy_video.append(spacech_ele.efy)
-				self.t_efield_video.append(beamtim.tt_curr)
-			if beamtim.flag_new_bunch_pass:
-				self.efx_video=np.array(self.efx_video)
-				self.efy_video=np.array(self.efy_video)
-				self.t_efield_video=np.array(self.t_efield_video)
-				filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
-				print 'Saving %s'%filename_efield
-				sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
-										  'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
-				print 'Done'
-				self.efx_video=[]
-				self.efy_video=[]
-				self.t_efield_video=[]
+            if not os.path.exists('efield_video'):
+                os.makedirs('efield_video')
+            if self.efx_video is None:
+                self.efx_video=[]
+                self.efy_video=[]
+                self.t_efield_video=[]
+            if spacech_ele.flag_recomputed_sc:
+                self.efx_video.append(spacech_ele.efx)
+                self.efy_video.append(spacech_ele.efy)
+                self.t_efield_video.append(beamtim.tt_curr)
+            if beamtim.flag_new_bunch_pass:
+                self.efx_video=np.array(self.efx_video)
+                self.efy_video=np.array(self.efy_video)
+                self.t_efield_video=np.array(self.t_efield_video)
+                filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
+                print 'Saving %s'%filename_efield
+                sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
+                                          'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
+                print 'Done'
+                self.efx_video=[]
+                self.efy_video=[]
+                self.t_efield_video=[]
 
 
         #save step by step data
@@ -457,24 +468,49 @@ class pyecloud_saver:
             #self.t_dec = beamtim.t[::dec_fact_out]
             #self.lam_t_array_dec = beamtim.lam_t_array[::dec_fact_out]
 
-            sio.savemat(self.filen_main_outp,{'Nel_timep':self.Nel_time,'t':self.t_dec,'t_hist':self.t_hist,'nel_hist':self.nel_hist, 'xg_hist': impact_man.xg_hist,\
-                                 'nel_impact_hist_tot':self.nel_impact_hist_tot,'nel_impact_hist_scrub':self.nel_impact_hist_scrub,\
-                                 'energ_eV_impact_hist':self.energ_eV_impact_hist,'cen_density':self.cen_density,\
-                                 'Nel_imp_time':self.Nel_imp_time,'Nel_emit_time':self.Nel_emit_time,\
-                                 'En_imp_eV_time':self.En_imp_eV_time,'En_emit_eV_time':self.En_emit_eV_time,\
-                                 'En_g_hist':impact_man.En_g_hist, 'En_hist':self.En_hist, 't_En_hist':self.t_En_hist,\
-                                 'lam_t_array':self.lam_t_array_dec,'b_spac':beamtim.b_spac,\
-                                 't_sc_video':np.array(self.t_sc_video),'U_sc_eV':np.array(self.U_sc_eV),'En_kin_eV_time':self.En_kin_eV_time,\
-                                 'N_mp_impact_pass':self.N_mp_impact_pass, 'N_mp_corrected_pass':self.N_mp_corrected_pass, 'N_mp_pass':self.N_mp_pass,\
-                                 'N_mp_time':self.N_mp_time,'N_mp_ref_pass':self.N_mp_ref_pass,\
-                                 'nel_hist_impact_seg':self.nel_hist_impact_seg,\
-                                 'energ_eV_impact_seg':self.energ_eV_impact_seg,\
-                                 't_sec_beams':self.t_sec_beams, 'sec_beam_profiles':self.sec_beam_profiles,\
-                                 'el_dens_at_probes':self.el_dens_at_probes, 'x_el_dens_probes':self.x_el_dens_probes,\
-                                 'y_el_dens_probes':self.y_el_dens_probes, 'r_el_dens_probes':self.r_el_dens_probes,\
-                                 'nel_hist_det':self.nel_hist_det, 'xg_hist_det': self.xg_hist_det,
-                                 'dec_fact_out':self.dec_fact_out},\
-                                 oned_as='row')
+            saved_dict = {
+                    'Nel_timep':            self.Nel_time,
+                    't':                    self.t_dec,
+                    't_hist':               self.t_hist,
+                    'nel_hist':             self.nel_hist,
+                    'xg_hist':              impact_man.xg_hist,
+                    'nel_impact_hist_tot':  self.nel_impact_hist_tot,
+                    'nel_impact_hist_scrub':self.nel_impact_hist_scrub,
+                    'energ_eV_impact_hist': self.energ_eV_impact_hist,
+                    'cen_density':          self.cen_density,
+                    'Nel_imp_time':         self.Nel_imp_time,
+                    'Nel_emit_time':        self.Nel_emit_time,
+                    'En_imp_eV_time':       self.En_imp_eV_time,
+                    'En_emit_eV_time':      self.En_emit_eV_time,
+                    'En_g_hist':            impact_man.En_g_hist,
+                    'En_hist':              self.En_hist,
+                    't_En_hist':            self.t_En_hist,
+                    'lam_t_array':          self.lam_t_array_dec,
+                    'b_spac':               beamtim.b_spac,
+                    't_sc_video':           np.array(self.t_sc_video),
+                    'U_sc_eV':              np.array(self.U_sc_eV),
+                    'En_kin_eV_time':       self.En_kin_eV_time,
+                    'N_mp_impact_pass':     self.N_mp_impact_pass,
+                    'N_mp_corrected_pass':  self.N_mp_corrected_pass,
+                    'N_mp_pass':            self.N_mp_pass,
+                    'N_mp_time':            self.N_mp_time,
+                    'N_mp_ref_pass':        self.N_mp_ref_pass,
+                    'nel_hist_impact_seg':  self.nel_hist_impact_seg,
+                    'energ_eV_impact_seg':  self.energ_eV_impact_seg,
+                    't_sec_beams':          self.t_sec_beams,
+                    'sec_beam_profiles':    self.sec_beam_profiles,
+                    'el_dens_at_probes':    self.el_dens_at_probes,
+                    'x_el_dens_probes':     self.x_el_dens_probes,
+                    'y_el_dens_probes':     self.y_el_dens_probes,
+                    'r_el_dens_probes':     self.r_el_dens_probes,
+                    'nel_hist_det':         self.nel_hist_det,
+                    'xg_hist_det':          self.xg_hist_det,
+                    'dec_fact_out':         self.dec_fact_out,
+                }
+            if self.flag_cos_angle_hist:
+                    saved_dict['cos_angle_hist'] = self.cos_angle_hist
+
+            sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
 
             # logfile and progressfile
@@ -509,7 +545,7 @@ class pyecloud_saver:
             #stop simulation
             try:
                 with open(self.stopfile, 'r') as fid:
-                    lll = fid.readlines()
+                    fid.readlines()
                     raise ValueError('Stopped by user.')
             except IOError:
                 pass

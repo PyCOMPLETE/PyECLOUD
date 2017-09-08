@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.3.0
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -58,11 +58,13 @@ import scipy.io as sio
 import numpy as np
 from scipy.constants import c
 
+import sec_emission
+
 
 class photoemission:
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac, angle_dist_func):
+                x0_refl, y0_refl, out_radius, chamb, resc_fac, photoelectron_angle_distribution):
 
         print 'Start photoemission init.'
 
@@ -84,7 +86,7 @@ class photoemission:
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
-        self.angle_dist_func = angle_dist_func
+        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
 
         if y0_refl!=0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')

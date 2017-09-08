@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.3.0
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -124,7 +124,7 @@ class Ecloud_fastion(Ecloud):
 
             self._track_single_slice(beam, ix, dz)
 
-        if self.beam_monitor != None:
+        if self.beam_monitor is not None:
             self.beam_monitor.dump(beam)
 
         self._finalize()

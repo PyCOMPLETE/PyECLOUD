@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.3.0
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -54,11 +54,11 @@
 #for compatibility with old PyECLOUD versions
 
 try:
-	from buildup_simulation import BuildupSimulation
-	print 'Imported from local folder'
+    from buildup_simulation import BuildupSimulation
+    print 'Imported from local folder'
 except ImportError:
-	from PyECLOUD.buildup_simulation import BuildupSimulation
-	print 'Imported from PyECLOUD folder'
+    from PyECLOUD.buildup_simulation import BuildupSimulation
+    print 'Imported from PyECLOUD folder'
 
 
 sim = BuildupSimulation()
