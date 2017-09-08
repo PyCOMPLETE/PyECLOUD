@@ -577,23 +577,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
 
 
-    secondary_angle_dist_func = {
-        'cosine_3D': sec_emission.velocities_angle_cosine_3D,
-        'cosine_2D': sec_emission.velocities_angle_cosine_2D,
-    }[secondary_angle_distribution]
-
-    photoelectron_angle_dist_func = {
-        'cosine_3D': sec_emission.velocities_angle_cosine_3D,
-        'cosine_2D': sec_emission.velocities_angle_cosine_2D,
-    }[photoelectron_angle_distribution]
-
-
-
     flag_seg = (flag_hist_impact_seg==1)
 
     impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
-                 flag_seg=flag_seg, angle_dist_func=secondary_angle_dist_func)
+                 flag_seg=flag_seg, secondary_angle_distribution=secondary_angle_distribution)
 
 
     #resgasion_sec_beam_list=[]
@@ -605,8 +593,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
 
     if photoem_flag==1:
-        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, photoelectron_angle_dist_func)
+        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
+                                  x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, photoelectron_angle_distribution)
     else:
         phemiss=None
 

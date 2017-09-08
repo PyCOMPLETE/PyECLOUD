@@ -50,6 +50,7 @@
 #----------------------------------------------------------------------
 
 from __future__ import division
+import time
 import numpy as np
 from numpy.random import lognormal, randn, rand
 from scipy.constants import e as qe, m_e
@@ -142,4 +143,14 @@ def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y):
     sin_theta_p = rand(N_new_MP)
     return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p)
 
+def get_angle_dist_func(string):
+    if string == 'cosine_3D':
+        print('Using cosine_3D emission angle distribution.')
+        return velocities_angle_cosine_3D
+    elif string == 'cosine_2D':
+        print('Warning! The 2D emission angle distribution is used!')
+        time.sleep(5)
+        return velocities_angle_cosine_2D
+    else:
+        raise ValueError("The emission angle distribution must be specified with either 'cosine_2D' or 'cosine_3D'!")
 

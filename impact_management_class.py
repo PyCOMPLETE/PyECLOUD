@@ -57,7 +57,7 @@ import seg_impact as segi
 
 class impact_management(object):
     def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False, angle_dist_func=None):
+                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False, secondary_angle_distribution=None):
 
         print 'Start impact man. init.'
 
@@ -106,7 +106,7 @@ class impact_management(object):
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float)
 
-        self.angle_dist_func = angle_dist_func
+        self.angle_dist_func = sec_emission.get_angle_dist_func(secondary_angle_distribution)
 
         print 'Done impact man. init.'
 
