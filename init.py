@@ -173,6 +173,11 @@ def read_parameter_files(pyecl_input_folder='./'):
     y_max_hist_det=None
     Dx_hist_det=None
 
+    # histogram for angles
+    flag_cos_angle_hist = True
+    cos_angle_width = 0.05
+
+
     filename_init_MP_state = None
 
     sparse_solver = 'scipy_slu'
@@ -351,9 +356,10 @@ def read_parameter_files(pyecl_input_folder='./'):
         f_telescope,
         target_grid,
         N_nodes_discard,
-        N_min_Dh_main
+        N_min_Dh_main,
+        flag_cos_angle_hist,
+        cos_angle_width,
     )
-
 
 
 
@@ -477,7 +483,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         f_telescope,
         target_grid,
         N_nodes_discard,
-        N_min_Dh_main
+        N_min_Dh_main,
+        flag_cos_angle_hist,
+        cos_angle_width,
         ) = read_parameter_files(pyecl_input_folder)
 
 
@@ -581,8 +589,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
-                 flag_seg=flag_seg, secondary_angle_distribution=secondary_angle_distribution)
-
+                 flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
 
     #resgasion_sec_beam_list=[]
     if gas_ion_flag==1:
@@ -604,7 +611,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=dec_fac_secbeam_prof,
                  el_density_probes=el_density_probes, save_simulation_state_time_file = save_simulation_state_time_file,
                  x_min_hist_det=x_min_hist_det, x_max_hist_det=x_max_hist_det, y_min_hist_det=y_min_hist_det, y_max_hist_det=y_max_hist_det,
-                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp)
+                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp,
+                 flag_cos_angle_hist=flag_cos_angle_hist, cos_angle_width=cos_angle_width)
 
 
 
