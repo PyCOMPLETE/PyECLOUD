@@ -74,6 +74,9 @@ for variab in out_var_curr:
 
 
 for ii,k in enumerate(out_var_curr):
+    if '__' in k:
+        print('Skipped %s' % k)
+        continue
 
 
     if len(dict_curr[k].shape)==1:  # var is a vector!
