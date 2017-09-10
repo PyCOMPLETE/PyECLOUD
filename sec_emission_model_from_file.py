@@ -23,10 +23,10 @@ class SEY_model_from_file(object):
         if not existing_files:
             raise ValueError('SEY file %s is not found' % sey_file)
         sey_file_real = existing_files[0]
+        print('Secondary emission from file %s' % sey_file_real)
 
         # Parse file
         # Must be equally spaced, and extrapolate_grad and extrapolate_const have to be specified
-
         extrapolate_grad, extrapolate_const = None, None
         energy_eV_list = []
         sey_parameter_list = []
@@ -40,7 +40,7 @@ class SEY_model_from_file(object):
             for ctr, line in enumerate(f):
                 try:
                     split = line.split()
-                    if line.startswith('#'):
+                    if split[0].startswith('#') or len(split) == 0:
                         continue
                     elif split[0] == 'extrapolate_grad':
                         extrapolate_grad = float(split[1])
@@ -49,6 +49,8 @@ class SEY_model_from_file(object):
                     elif len(split) == 2:
                             energy_eV_list.append(float(split[0]))
                             sey_parameter_list.append(float(split[1]))
+                    else:
+                        raise ValueError
                 except:
                     print('Error in line %i of file %s: %s' % (ctr, sey_file_real, line))
                     raise
@@ -58,9 +60,12 @@ class SEY_model_from_file(object):
 
         diff_e = np.round(np.diff(energy_eV), 3)
         delta_e = diff_e[0]
-        assert np.all(diff_e == delta_e)
-        assert extrapolate_grad is not None
-        assert extrapolate_const is not None
+        if np.any(diff_e != delta_e):
+            raise ValueError('Energy in file %s is not equally spaced.' % sey_file_real)
+        if extrapolate_grad is None:
+            raise ValueError('extrapolate_grad is not specified in %s' % sey_file_real)
+        if extrapolate_const is None:
+            raise ValueError('extrapolate_const is not specified in %s' % sey_file_real)
 
         # sey_diff is needed by the interp function
         # A 0 is appended because this last element is never needed but the array must have the correct shape
@@ -76,8 +81,6 @@ class SEY_model_from_file(object):
         self.delta_e                = delta_e
         self.extrapolate_grad       = extrapolate_grad
         self.extrapolate_const      = extrapolate_const
-
-        print('Secondary emission from file %s' % sey_file_real)
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
 

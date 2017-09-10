@@ -13,8 +13,7 @@ def main(sey_file, range_extrapolate_right, delta_e, max_sey, output_file):
     - output_file requires no explanation
     """
 
-
-
+    # Read original file
     energy_eV_list = []
     sey_parameter_list = []
     with open(sey_file) as f:
@@ -60,7 +59,6 @@ def main(sey_file, range_extrapolate_right, delta_e, max_sey, output_file):
     for energy, sey in zip(energy_eV, sey_parameter):
         lines.append('%f %f\n' % (energy, sey))
     lines.append('\n')
-
 
     with gzip.open(output_file, 'w') as f:
         f.writelines(lines)
