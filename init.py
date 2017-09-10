@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                          PyECLOUD Version 6.3.1
+#                          PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -59,7 +59,6 @@ import beam_and_timing as beatim
 
 from geom_impact_ellip import ellip_cham_geom_object
 
-import sec_emission
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
@@ -191,6 +190,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     logfile_path = config_dict['logfile_path']
     flag_movie = config_dict['flag_movie']
     flag_sc_movie = config_dict['flag_sc_movie']
+    flag_cos_angle_hist = config_dict['flag_cos_angle_hist']
+    cos_angle_width = config_dict['cos_angle_width']
     Dt_En_hist = config_dict['Dt_En_hist']
     Nbin_En_hist = config_dict['Nbin_En_hist']
     En_hist_max = config_dict['En_hist_max']
@@ -284,7 +285,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen)
 
 
-
     ##########################################
 
     pyeclsaver=pysav.pyecloud_saver(logfile_path)
@@ -371,24 +371,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
 
 
-    secondary_angle_dist_func = {
-        'cosine_3D': sec_emission.velocities_angle_cosine_3D,
-        'cosine_2D': sec_emission.velocities_angle_cosine_2D,
-    }[secondary_angle_distribution]
-
-    photoelectron_angle_dist_func = {
-        'cosine_3D': sec_emission.velocities_angle_cosine_3D,
-        'cosine_2D': sec_emission.velocities_angle_cosine_2D,
-    }[photoelectron_angle_distribution]
-
-
-
     flag_seg = (flag_hist_impact_seg==1)
 
     impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
-                 flag_seg=flag_seg, angle_dist_func=secondary_angle_dist_func)
-
+                 flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
 
     #resgasion_sec_beam_list=[]
     if gas_ion_flag==1:
@@ -399,8 +386,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
 
     if photoem_flag==1:
-        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, photoelectron_angle_dist_func)
+        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
+                                  x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, photoelectron_angle_distribution)
     else:
         phemiss=None
 
@@ -410,7 +397,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=dec_fac_secbeam_prof,
                  el_density_probes=el_density_probes, save_simulation_state_time_file = save_simulation_state_time_file,
                  x_min_hist_det=x_min_hist_det, x_max_hist_det=x_max_hist_det, y_min_hist_det=y_min_hist_det, y_max_hist_det=y_max_hist_det,
-                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp)
+                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp,
+                 flag_cos_angle_hist=flag_cos_angle_hist, cos_angle_width=cos_angle_width)
 
 
 
