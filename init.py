@@ -89,23 +89,27 @@ def import_module_from_file(module_name, file_name):
     dir_name = '/tmp/PyECLOUD_%i' % os.getpid()
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
-    new_file_name = dir_name+'/temp_file.py'
-    shutil.copy(file_name, new_file_name)
+    try:
+        new_file_name = dir_name+'/temp_file.py'
+        shutil.copy(file_name, new_file_name)
 
-    if sys.version_info.major == 2:
-        import imp
-        module = imp.load_source(module_name, new_file_name)
+        if sys.version_info.major == 2:
+            import imp
+            module = imp.load_source(module_name, new_file_name)
 
-    elif sys.version_info.major == 3:
-        import importlib.util
-        # In python3, imp.load_source works as well, however it does not return the exact same as the import statement.
-        # There are some superfluous contents in the namespace which collides with the inp_spec.assert_module_has_parameters method.
+        elif sys.version_info.major == 3:
+            import importlib.util
+            # In python3, imp.load_source works as well, however it does not return the exact same as the import statement.
+            # There are some superfluous contents in the namespace which collides with the inp_spec.assert_module_has_parameters method.
 
-        spec = importlib.util.spec_from_file_location(module_name, new_file_name)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+            spec = importlib.util.spec_from_file_location(module_name, new_file_name)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
-    shutil.rmtree(dir_name)
+        reload(module)
+    finally:
+        shutil.rmtree(dir_name)
+
     return module
 
 

@@ -9,11 +9,7 @@
 #
 #     This file is part of the code:
 #
-<<<<<<< HEAD
-#                   PyECLOUD Version 6.3.1
-=======
 #                   PyECLOUD Version 6.4.0
->>>>>>> develop
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -63,11 +59,7 @@ import cPickle
 class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', **kwargs):
 
-<<<<<<< HEAD
-        print 'PyECLOUD Version 6.3.1'
-=======
         print 'PyECLOUD Version 6.4.0'
->>>>>>> develop
         beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
                 gas_ion_flag, resgasion, t_ion, \
                 spacech_ele,t_sc_ON, photoem_flag, phemiss,\

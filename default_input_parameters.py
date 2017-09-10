@@ -55,6 +55,8 @@ parameters_dict = {
             # Saving settings
             'flag_movie': 0,
             'flag_sc_movie': 0,
+            'flag_cos_angle_hist': True,
+            'cos_angle_width' : 0.05,
             'save_mp_state_time_file': -1,
             'flag_detailed_MP_info': 0,
             'flag_hist_impact_seg': 0,
