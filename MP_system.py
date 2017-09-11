@@ -461,7 +461,6 @@ class MP_system:
         if y_min is None:
             y_min = -self.chamb.y_aper
 
-
         v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
 
 
