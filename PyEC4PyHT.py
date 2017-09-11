@@ -179,20 +179,20 @@ class Ecloud(object):
         elif switch_model=='cos_low_ene':
             sey_mod=SEY_model_cos_le(Emax,del_max,R0)
         elif switch_model=='flat_low_ene':
-            sey_mod=SEY_model_flat_le(Emax,del_max,R0)
-    elif switch_model=='perfect_absorber':
-        sey_mod=None
+                sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+        elif switch_model=='perfect_absorber':
+            sey_mod=None
 
 
         flag_seg = (flag_hist_impact_seg==1)
 
-    if switch_model=='perfect_absorber':
-        import perfect_absorber_class as pac
-        impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-            Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
-    else:
-        impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-            Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+        if switch_model=='perfect_absorber':
+            import perfect_absorber_class as pac
+            impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
+                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+        else:
+            impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
+                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
 
 
         if track_method == 'Boris':
@@ -564,7 +564,7 @@ class Ecloud(object):
                 self.slice_by_slice_mode, space_charge_obj=self.spacech_ele, **self.kwargs)
 
 
-
+'''
 def read_parameter_files_pyhdtl(pyecl_input_folder):
     switch_model=0
     simulation_param_file=pyecl_input_folder+'/simulation_parameters.input'
@@ -734,7 +734,7 @@ def read_parameter_files_pyhdtl(pyecl_input_folder):
     init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
     x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex,\
     f_telescope, target_grid, N_nodes_discard, N_min_Dh_main
-
+'''
 
 
 
