@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.3.1
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -66,9 +66,9 @@ class polyg_cham_geom_object:
         print 'Polygonal chamber - cython implementation'
 
         if type(filename_chm)==str:
-			dict_chm=sio.loadmat(filename_chm)
+            dict_chm=sio.loadmat(filename_chm)
         else:
-			dict_chm=filename_chm
+            dict_chm=filename_chm
 
         Vx=squeeze(dict_chm['Vx'])
         Vy=squeeze(dict_chm['Vy'])
@@ -125,19 +125,19 @@ class polyg_cham_geom_object:
             fbckt.close()
 
         if self.flag_assume_convex:
-			if not(self.is_convex()):
-				raise ValueError(\
-					'The polygon looks not convex!!!!\nIn this case you can use the general algorithm (probably slower) by setting:\nflag_assume_convex = False')
-			self.cythonisoutside = gipc.is_outside_convex
-			print 'Assuming convex polygon'
+            if not(self.is_convex()):
+                raise ValueError(\
+                    'The polygon looks not convex!!!!\nIn this case you can use the general algorithm (probably slower) by setting:\nflag_assume_convex = False')
+            self.cythonisoutside = gipc.is_outside_convex
+            print 'Assuming convex polygon'
         else:
-			self.cythonisoutside = gipc.is_outside_nonconvex
-			print 'No assumption on the convexity of the polygon'
+            self.cythonisoutside = gipc.is_outside_nonconvex
+            print 'No assumption on the convexity of the polygon'
 
 
     def is_outside(self, x_mp, y_mp):
-		#~ return gipc.is_outside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
-		return self.cythonisoutside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
+        #~ return gipc.is_outside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
+        return self.cythonisoutside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
 
 
     #@profile
@@ -147,7 +147,7 @@ class polyg_cham_geom_object:
         self.N_mp_impact=self.N_mp_impact+N_impacts
 
         x_int,y_int,z_int,Nx_int,Ny_int, i_found  =  gipc.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out,
-							  self.Vx,  self.Vy,self.Nx,  self.Ny,  self.N_edg, resc_fac)
+                              self.Vx,  self.Vy,self.Nx,  self.Ny,  self.N_edg, resc_fac)
 
         mask_found = i_found>=0
 
@@ -200,102 +200,102 @@ class polyg_cham_geom_object:
 
 
         if flag_robust:
-			flag_impact=self.is_outside(x_int, y_int)
-			if flag_impact.any():
-				self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
-				x_int[flag_impact] = x_in[flag_impact];
-				y_int[flag_impact] = y_in[flag_impact];
-				x_in_error = x_in[flag_impact]
-				y_in_error = y_in[flag_impact]
-				x_out_error = x_out[flag_impact]
-				y_out_error = y_out[flag_impact]
-				N_errors = len(x_in_error)
+            flag_impact=self.is_outside(x_int, y_int)
+            if flag_impact.any():
+                self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
+                x_int[flag_impact] = x_in[flag_impact];
+                y_int[flag_impact] = y_in[flag_impact];
+                x_in_error = x_in[flag_impact]
+                y_in_error = y_in[flag_impact]
+                x_out_error = x_out[flag_impact]
+                y_out_error = y_out[flag_impact]
+                N_errors = len(x_in_error)
 
-				if self.flag_verbose_stdout:
-					print """Reporting backtrack error of kind 2: outside after backtracking"""
-					print """x_in, y_in, x_out, y_out"""
-					for i_err in xrange(N_errors):
-						lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-						print lcurr
-					print """End reporting backtrack error of kind 2"""
+                if self.flag_verbose_stdout:
+                    print """Reporting backtrack error of kind 2: outside after backtracking"""
+                    print """x_in, y_in, x_out, y_out"""
+                    for i_err in xrange(N_errors):
+                        lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                        print lcurr
+                    print """End reporting backtrack error of kind 2"""
 
-				if self.flag_verbose_file:
-					with open('bcktr_errors.txt','a') as fbckt:
-						for i_err in xrange(N_errors):
-							lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-							fbckt.write('2,'+lcurr+'\n')
+                if self.flag_verbose_file:
+                    with open('bcktr_errors.txt','a') as fbckt:
+                        for i_err in xrange(N_errors):
+                            lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                            fbckt.write('2,'+lcurr+'\n')
 
-			flag_impact=self.is_outside(x_int, y_int)
-			if sum(flag_impact)>0:
-				#~ import pylab as pl
-				#~ pl.close('all')
-				#~ pl.plot(self.Vx, self.Vy)
-				#~ pl.plot(x_in, y_in,'.b')
-				#~ pl.plot(x_out, y_out,'.k')
-				#~ pl.plot(x_int, y_int,'.g')
-				#~ pl.plot(x_int[flag_impact], y_int[flag_impact],'.r')
-				#~ pl.show()
-				if self.flag_verbose_stdout:
-					print """Reporting backtrack error of kind 3: outside after correction"""
-					print """x_in, y_in, x_out, y_out"""
-				x_in_error = x_in[flag_impact]
-				y_in_error = y_in[flag_impact]
-				x_out_error = x_out[flag_impact]
-				y_out_error = y_out[flag_impact]
-				N_errors = len(x_in_error)
+            flag_impact=self.is_outside(x_int, y_int)
+            if sum(flag_impact)>0:
+                #~ import pylab as pl
+                #~ pl.close('all')
+                #~ pl.plot(self.Vx, self.Vy)
+                #~ pl.plot(x_in, y_in,'.b')
+                #~ pl.plot(x_out, y_out,'.k')
+                #~ pl.plot(x_int, y_int,'.g')
+                #~ pl.plot(x_int[flag_impact], y_int[flag_impact],'.r')
+                #~ pl.show()
+                if self.flag_verbose_stdout:
+                    print """Reporting backtrack error of kind 3: outside after correction"""
+                    print """x_in, y_in, x_out, y_out"""
+                x_in_error = x_in[flag_impact]
+                y_in_error = y_in[flag_impact]
+                x_out_error = x_out[flag_impact]
+                y_out_error = y_out[flag_impact]
+                N_errors = len(x_in_error)
 
-				if self.flag_verbose_stdout:
-					print """Reporting backtrack error of kind 3: outside after correction"""
-					print """x_in, y_in, x_out, y_out"""
-					for i_err in xrange(N_errors):
-						lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-						print lcurr
-					print """End reporting backtrack error of kind 3"""
+                if self.flag_verbose_stdout:
+                    print """Reporting backtrack error of kind 3: outside after correction"""
+                    print """x_in, y_in, x_out, y_out"""
+                    for i_err in xrange(N_errors):
+                        lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                        print lcurr
+                    print """End reporting backtrack error of kind 3"""
 
-				if self.flag_verbose_file:
-					with open('bcktr_errors.txt','a') as fbckt:
-						for i_err in xrange(N_errors):
-							lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-							fbckt.write('3,'+lcurr+'\n')
+                if self.flag_verbose_file:
+                    with open('bcktr_errors.txt','a') as fbckt:
+                        for i_err in xrange(N_errors):
+                            lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                            fbckt.write('3,'+lcurr+'\n')
 
 
-				raise ValueError('Outside after backtracking!!!!')
+                raise ValueError('Outside after backtracking!!!!')
 
 
         return  x_int,y_int,z_int,Nx_int,Ny_int, i_found
 
     def is_convex(self):
-			# From:
-			# http://csharphelper.com/blog/2014/07/determine-whether-a-polygon-is-convex-in-c/
+            # From:
+            # http://csharphelper.com/blog/2014/07/determine-whether-a-polygon-is-convex-in-c/
 
-			# For each set of three adjacent points A, B, C,
-			# find the cross product AB x BC. If the sign of
-			# all the cross products is the same, the angles
-			# are all positive or negative (depending on the
-			# order in which we visit them) so the polygon
-			# is convex.
-			got_negative = False;
-			got_positive = False;
-			num_points = self.N_edg;
-			for A in xrange(num_points):
+            # For each set of three adjacent points A, B, C,
+            # find the cross product AB x BC. If the sign of
+            # all the cross products is the same, the angles
+            # are all positive or negative (depending on the
+            # order in which we visit them) so the polygon
+            # is convex.
+            got_negative = False;
+            got_positive = False;
+            num_points = self.N_edg;
+            for A in xrange(num_points):
 
-				B = np.mod((A + 1),num_points);
-				C = np.mod((B + 1), num_points);
+                B = np.mod((A + 1),num_points);
+                C = np.mod((B + 1), num_points);
 
-				BAx = self.Vx[A] - self.Vx[B];
-				BAy = self.Vy[A] - self.Vy[B];
-				BCx = self.Vx[C] - self.Vx[B];
-				BCy = self.Vy[C] - self.Vy[B];
+                BAx = self.Vx[A] - self.Vx[B];
+                BAy = self.Vy[A] - self.Vy[B];
+                BCx = self.Vx[C] - self.Vx[B];
+                BCy = self.Vy[C] - self.Vy[B];
 
-				cross_product = (BAx * BCy - BAy * BCx)
+                cross_product = (BAx * BCy - BAy * BCx)
 
-				if (cross_product < 0):
-					got_negative = True;
-				elif (cross_product > 0):
-					got_positive = True;
-				if (got_negative and got_positive):
-					return False
+                if (cross_product < 0):
+                    got_negative = True;
+                elif (cross_product > 0):
+                    got_positive = True;
+                if (got_negative and got_positive):
+                    return False
 
 
-			# If we got this far, the polygon is convex.
-			return True
+            # If we got this far, the polygon is convex.
+            return True

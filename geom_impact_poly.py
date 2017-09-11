@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.3.1
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -62,9 +62,9 @@ class polyg_cham_geom_object:
         print 'Polygonal chamber - numpy implementation'
 
         if type(filename_chm)==str:
-			dict_chm=sio.loadmat(filename_chm)
+            dict_chm=sio.loadmat(filename_chm)
         else:
-			dict_chm=filename_chm
+            dict_chm=filename_chm
         Vx=squeeze(dict_chm['Vx'])
         Vy=squeeze(dict_chm['Vy'])
         cx=float(squeeze(dict_chm['x_sem_ellip_insc']))
@@ -230,66 +230,66 @@ class polyg_cham_geom_object:
 
 
         if flag_robust:
-			flag_impact=self.is_outside(x_int, y_int)
-			if flag_impact.any():
-				self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
-				x_int[flag_impact] = x_in[flag_impact];
-				y_int[flag_impact] = y_in[flag_impact];
-				x_in_error = x_in[flag_impact]
-				y_in_error = y_in[flag_impact]
-				x_out_error = x_out[flag_impact]
-				y_out_error = y_out[flag_impact]
-				N_errors = len(x_in_error)
+            flag_impact=self.is_outside(x_int, y_int)
+            if flag_impact.any():
+                self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
+                x_int[flag_impact] = x_in[flag_impact];
+                y_int[flag_impact] = y_in[flag_impact];
+                x_in_error = x_in[flag_impact]
+                y_in_error = y_in[flag_impact]
+                x_out_error = x_out[flag_impact]
+                y_out_error = y_out[flag_impact]
+                N_errors = len(x_in_error)
 
-				if self.flag_verbose_stdout:
-					print """Reporting backtrack error of kind 2: outside after backtracking"""
-					print """x_in, y_in, x_out, y_out"""
-					for i_err in xrange(N_errors):
-						lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-						print lcurr
-					print """End reporting backtrack error of kind 2"""
+                if self.flag_verbose_stdout:
+                    print """Reporting backtrack error of kind 2: outside after backtracking"""
+                    print """x_in, y_in, x_out, y_out"""
+                    for i_err in xrange(N_errors):
+                        lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                        print lcurr
+                    print """End reporting backtrack error of kind 2"""
 
-				if self.flag_verbose_file:
-					with open('bcktr_errors.txt','a') as fbckt:
-						for i_err in xrange(N_errors):
-							lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-							fbckt.write('2,'+lcurr+'\n')
+                if self.flag_verbose_file:
+                    with open('bcktr_errors.txt','a') as fbckt:
+                        for i_err in xrange(N_errors):
+                            lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                            fbckt.write('2,'+lcurr+'\n')
 
-			flag_impact=self.is_outside(x_int, y_int)
-			if sum(flag_impact)>0:
-				#~ import pylab as pl
-				#~ pl.close('all')
-				#~ pl.plot(self.Vx, self.Vy)
-				#~ pl.plot(x_in, y_in,'.b')
-				#~ pl.plot(x_out, y_out,'.k')
-				#~ pl.plot(x_int, y_int,'.g')
-				#~ pl.plot(x_int[flag_impact], y_int[flag_impact],'.r')
-				#~ pl.show()
-				if self.flag_verbose_stdout:
-					print """Reporting backtrack error of kind 3: outside after correction"""
-					print """x_in, y_in, x_out, y_out"""
-				x_in_error = x_in[flag_impact]
-				y_in_error = y_in[flag_impact]
-				x_out_error = x_out[flag_impact]
-				y_out_error = y_out[flag_impact]
-				N_errors = len(x_in_error)
+            flag_impact=self.is_outside(x_int, y_int)
+            if sum(flag_impact)>0:
+                #~ import pylab as pl
+                #~ pl.close('all')
+                #~ pl.plot(self.Vx, self.Vy)
+                #~ pl.plot(x_in, y_in,'.b')
+                #~ pl.plot(x_out, y_out,'.k')
+                #~ pl.plot(x_int, y_int,'.g')
+                #~ pl.plot(x_int[flag_impact], y_int[flag_impact],'.r')
+                #~ pl.show()
+                if self.flag_verbose_stdout:
+                    print """Reporting backtrack error of kind 3: outside after correction"""
+                    print """x_in, y_in, x_out, y_out"""
+                x_in_error = x_in[flag_impact]
+                y_in_error = y_in[flag_impact]
+                x_out_error = x_out[flag_impact]
+                y_out_error = y_out[flag_impact]
+                N_errors = len(x_in_error)
 
-				if self.flag_verbose_stdout:
-					print """Reporting backtrack error of kind 3: outside after correction"""
-					print """x_in, y_in, x_out, y_out"""
-					for i_err in xrange(N_errors):
-						lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-						print lcurr
-					print """End reporting backtrack error of kind 3"""
+                if self.flag_verbose_stdout:
+                    print """Reporting backtrack error of kind 3: outside after correction"""
+                    print """x_in, y_in, x_out, y_out"""
+                    for i_err in xrange(N_errors):
+                        lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                        print lcurr
+                    print """End reporting backtrack error of kind 3"""
 
-				if self.flag_verbose_file:
-					with open('bcktr_errors.txt','a') as fbckt:
-						for i_err in xrange(N_errors):
-							lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-							fbckt.write('3,'+lcurr+'\n')
+                if self.flag_verbose_file:
+                    with open('bcktr_errors.txt','a') as fbckt:
+                        for i_err in xrange(N_errors):
+                            lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
+                            fbckt.write('3,'+lcurr+'\n')
 
 
-				raise ValueError('Outside after backtracking!!!!')
+                raise ValueError('Outside after backtracking!!!!')
 
 
         return  x_int,y_int,z_int,Nx_int,Ny_int, i_found

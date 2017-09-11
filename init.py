@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                          PyECLOUD Version 6.3.1
+#                          PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -174,6 +174,11 @@ def read_parameter_files(pyecl_input_folder='./'):
     y_max_hist_det=None
     Dx_hist_det=None
 
+    # histogram for angles
+    flag_cos_angle_hist = True
+    cos_angle_width = 0.05
+
+
     filename_init_MP_state = None
 
     sparse_solver = 'scipy_slu'
@@ -285,6 +290,7 @@ def read_parameter_files(pyecl_input_folder='./'):
         k_pe_st,
         refl_frac,
         alimit,
+        energy_distribution,
         e_pe_sigma,
         e_pe_max,
         x0_refl,
@@ -353,11 +359,9 @@ def read_parameter_files(pyecl_input_folder='./'):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
-        energy_distribution,
+        flag_cos_angle_hist,
+        cos_angle_width,
     )
-
-
-
 
 
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
@@ -412,6 +416,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         k_pe_st,
         refl_frac,
         alimit,
+        energy_distribution,
         e_pe_sigma,
         e_pe_max,
         x0_refl,
@@ -480,18 +485,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
-        energy_distribution,
+        flag_cos_angle_hist,
+        cos_angle_width,
         ) = read_parameter_files(pyecl_input_folder)
-
 
 
     for attr in kwargs.keys():
             print 'Ecloud init. From kwargs: %s = %s'%(attr, repr(kwargs[attr]))
             tmpattr = kwargs[attr]
             exec('%s=tmpattr'%attr)
-
-
-
 
 
     ##########################################
@@ -580,24 +582,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
 
 
-    secondary_angle_dist_func = {
-        'cosine_3D': sec_emission.velocities_angle_cosine_3D,
-        'cosine_2D': sec_emission.velocities_angle_cosine_2D,
-    }[secondary_angle_distribution]
-
-    photoelectron_angle_dist_func = {
-        'cosine_3D': sec_emission.velocities_angle_cosine_3D,
-        'cosine_2D': sec_emission.velocities_angle_cosine_2D,
-    }[photoelectron_angle_distribution]
-
-
-
     flag_seg = (flag_hist_impact_seg==1)
 
     impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
-                 flag_seg=flag_seg, angle_dist_func=secondary_angle_dist_func)
-
+                 flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
 
     #resgasion_sec_beam_list=[]
     if gas_ion_flag==1:
@@ -608,8 +597,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
 
     if photoem_flag==1:
-        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, energy_distribution, photoelectron_angle_dist_func)
+        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
+                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, energy_distribution, photoelectron_angle_distribution)
     else:
         phemiss=None
 
@@ -619,7 +608,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=dec_fac_secbeam_prof,
                  el_density_probes=el_density_probes, save_simulation_state_time_file = save_simulation_state_time_file,
                  x_min_hist_det=x_min_hist_det, x_max_hist_det=x_max_hist_det, y_min_hist_det=y_min_hist_det, y_max_hist_det=y_max_hist_det,
-                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp)
+                 Dx_hist_det=Dx_hist_det, dec_fact_out=dec_fact_out, stopfile=stopfile, filen_main_outp=filen_main_outp,
+                 flag_cos_angle_hist=flag_cos_angle_hist, cos_angle_width=cos_angle_width)
 
 
 

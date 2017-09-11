@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 4.30
+#                   PyECLOUD Version 4.30
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -124,7 +124,7 @@ class impact_management_perfect_absorber(impact_management):
 
                 if flag_seg:
                     raise ValueError('Segment identification not implemented for perfect absorber! Sorry...')
-# 					i_found_new_mp = 0*x_mp
+#                     i_found_new_mp = 0*x_mp
 
                 # load segment endpoints
                 x_in=x_mp_old[self.flag_impact[:N_mp_old]];y_in=y_mp_old[self.flag_impact[:N_mp_old]];z_in=z_mp_old[self.flag_impact[:N_mp_old]];

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#		           PyECLOUD Version 6.3.1
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -51,19 +51,21 @@
 
 from __future__ import division
 import numpy.random as random
-from numpy import interp, pi, sin, cos, zeros, sum
+from numpy import interp, pi, sin, cos, zeros, sqrt, sum
 
 import scipy.io as sio
 import scipy.stats as stats
 from scipy.constants import e as qe, m_e as me, c
 import numpy as np
 
+import sec_emission
+
 qm=qe/me
 
 class photoemission:
 
-    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max, alimit,
-                 x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_distribution, angle_dist_func):
+    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
+                x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
 
         print 'Start photoemission init.'
 
@@ -85,7 +87,7 @@ class photoemission:
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
-        self.angle_dist_func = angle_dist_func
+        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
 
         if y0_refl!=0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
@@ -153,7 +155,7 @@ class photoemission:
             #generate psi for refl. photons generation
             N_refl=np.sum(refl_flag)
             if N_refl>0:
-                u_gen = random.rand(N_refl, 1)
+                u_gen=random.rand(N_refl);
                 if self.flag_unif:
                     psi_gen = 2.*pi*u_gen
                     x_out[refl_flag]=self.out_radius*cos(psi_gen)
@@ -179,6 +181,7 @@ class photoemission:
 
             #generate energies (the same distr. for all photoelectr.)
             En_gen = self.get_energy(Nint_new_MP) #in eV
+            # generate velocities like in impact managment
             vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
 
             MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)

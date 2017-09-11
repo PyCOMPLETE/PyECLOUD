@@ -23,8 +23,8 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew'
-#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns'
-#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew'
+#sim_folder = './LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
+#sim_folder = './LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
 
 
 # check if user provided folder as command line argument
@@ -74,6 +74,9 @@ for variab in out_var_curr:
 
 
 for ii,k in enumerate(out_var_curr):
+    if '__' in k:
+        print('Skipped %s' % k)
+        continue
 
 
     if len(dict_curr[k].shape)==1:  # var is a vector!
