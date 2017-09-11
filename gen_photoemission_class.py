@@ -51,7 +51,7 @@
 
 from __future__ import division
 import numpy.random as random
-from numpy import interp, pi, sin, cos, zeros, sqrt, sum
+from numpy import interp, pi, sin, cos, zeros, sum
 
 import scipy.io as sio
 import scipy.stats as stats
@@ -64,8 +64,8 @@ qm=qe/me
 
 class photoemission:
 
-    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
+    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, x0_refl,
+                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
 
         print 'Start photoemission init.'
 
@@ -155,7 +155,7 @@ class photoemission:
             #generate psi for refl. photons generation
             N_refl=np.sum(refl_flag)
             if N_refl>0:
-                u_gen=random.rand(N_refl);
+                u_gen=random.rand(N_refl)
                 if self.flag_unif:
                     psi_gen = 2.*pi*u_gen
                     x_out[refl_flag]=self.out_radius*cos(psi_gen)

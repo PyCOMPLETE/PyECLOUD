@@ -55,7 +55,6 @@ import beam_and_timing as beatim
 
 from geom_impact_ellip import ellip_cham_geom_object
 
-import sec_emission
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
