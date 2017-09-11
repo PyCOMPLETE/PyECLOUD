@@ -49,11 +49,7 @@
 #     all references.
 #----------------------------------------------------------------------
 
-import sys
-import os
-import shutil
-import time
-
+from __future__ import division, print_function
 import numpy as np
 from scipy.constants import c, e as qe
 
@@ -82,46 +78,13 @@ import gen_photoemission_class as gpc
 import parse_beam_file as pbf
 import input_parameters_format_specification as inp_spec
 
-def import_module_from_file(module_name, file_name):
-    # Load any file as a python module. This function works for python2 and python3.
-    # See https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
-    # "One might think that python imports are getting more and more complicated with each new version."
-
-    # The importlib.util method requires the file name to end with '.py'.
-    # Also, loading the module from a temporary directory does not leave any .pyc files.
-    dir_name = '/tmp/PyECLOUD_%i' % os.getpid()
-    real_module_name = module_name + '_%f' % time.time()
-    if not os.path.isdir(dir_name):
-        os.mkdir(dir_name)
-    try:
-        new_file_name = dir_name+'/temp_file.py'
-        shutil.copy(file_name, new_file_name)
-
-        if sys.version_info.major == 2:
-            import imp
-            module = imp.load_source(real_module_name, new_file_name)
-
-        elif sys.version_info.major == 3:
-            import importlib.util
-            # In python3, imp.load_source works as well, however it does not return the exact same as the import statement.
-            # There are some superfluous contents in the namespace which collides with the inp_spec.assert_module_has_parameters method.
-
-            spec = importlib.util.spec_from_file_location(real_module_name, new_file_name)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-
-    finally:
-        shutil.rmtree(dir_name)
-
-    return module
-
 
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     simulation_param_file = 'simulation_parameters.input'
     config_dict = {}
 
-    simulation_parameters = import_module_from_file('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
+    simulation_parameters = inp_spec.import_module_from_file('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
     inp_spec.assert_module_has_parameters(simulation_parameters, 'simulation_parameters')
     inp_spec.update_config_dict(config_dict, simulation_parameters, 'simulation_parameters')
 
@@ -129,15 +92,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     secondary_emission_parameters_file = config_dict['secondary_emission_parameters_file']
     beam_parameters_file = config_dict['beam_parameters_file']
 
-    machine_parameters = import_module_from_file('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
+    machine_parameters = inp_spec.import_module_from_file('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
     inp_spec.assert_module_has_parameters(machine_parameters, 'machine_parameters')
     inp_spec.update_config_dict(config_dict, machine_parameters, 'machine_parameters')
 
-    secondary_emission_parameters = import_module_from_file('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
+    secondary_emission_parameters = inp_spec.import_module_from_file('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
     inp_spec.assert_module_has_parameters(secondary_emission_parameters, 'secondary_emission_parameters')
     inp_spec.update_config_dict(config_dict, secondary_emission_parameters, 'secondary_emission_parameters')
 
-    beam_beam = import_module_from_file('beam_beam', pyecl_input_folder+'/'+beam_parameters_file)
+    beam_beam = inp_spec.import_module_from_file('beam_beam', pyecl_input_folder+'/'+beam_parameters_file)
     inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
 
     # Probably promote this to an optional parameter in simulation_parameters.input
@@ -267,7 +230,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         resgasion=None
 
 
-
     if cc.photoem_flag:
         phemiss=gpc.photoemission(cc.inv_CDF_refl_photoem_file, cc.k_pe_st, cc.refl_frac, cc.e_pe_sigma, cc.e_pe_max, cc.alimit,
                                   cc.x0_refl, cc.y0_refl, cc.out_radius, chamb, cc.phem_resc_fac, cc.photoelectron_angle_distribution)
@@ -284,10 +246,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_cos_angle_hist=cc.flag_cos_angle_hist, cos_angle_width=cc.cos_angle_width)
 
 
-
-
-
-
     if cc.track_method == 'Boris':
         dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
                  cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=cc.N_sub_steps)
@@ -301,7 +259,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
     else:
         raise ValueError("""track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'""")
-
 
 
     if cc.init_unif_flag==1:
