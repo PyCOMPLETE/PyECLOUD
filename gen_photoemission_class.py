@@ -155,7 +155,7 @@ class photoemission:
             #generate psi for refl. photons generation
             N_refl=np.sum(refl_flag)
             if N_refl>0:
-                u_gen=random.rand(N_refl,1);
+                u_gen=random.rand(N_refl);
                 if self.flag_unif:
                     psi_gen = 2.*pi*u_gen
                     x_out[refl_flag]=self.out_radius*cos(psi_gen)
