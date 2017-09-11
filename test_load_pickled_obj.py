@@ -18,7 +18,7 @@ dec_fac_secbeam_prof=1
 
 
 with open(filename_sim_state, 'rb') as fid:
-	dict_state = pickle.load(fid)
+    dict_state = pickle.load(fid)
 
 
 beamtim=dict_state['beamtim']

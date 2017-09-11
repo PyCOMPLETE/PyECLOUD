@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.2.0
+#                   PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -66,6 +66,7 @@ class MP_system:
                  N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                  Dx_hist_reg, Nx_reg, Ny_reg, Nvx_reg, Nvy_reg, Nvz_reg, regen_hist_cut, chamb,
                  N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e):
+
         N_mp_max = int(N_mp_max)
         self.x_mp = np.zeros(N_mp_max,float)
         self.y_mp = np.zeros(N_mp_max,float)
@@ -118,12 +119,12 @@ class MP_system:
     def clean_small_MPs(self):
 
 
-        print "Start clean. N_mp=%d Nel=%e"%(self.N_mp,sum(self.nel_mp[0:self.N_mp]))
+        print "Start clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
 
         flag_clean=(self.nel_mp<self.nel_mp_cl_th);
         flag_keep=~(flag_clean)
         flag_keep[self.N_mp:]=False
-        self.N_mp=sum(flag_keep);
+        self.N_mp=np.sum(flag_keep);
 
 
         self.x_mp[0:self.N_mp]=self.x_mp[flag_keep].copy();
@@ -136,7 +137,7 @@ class MP_system:
 
         self.nel_mp[self.N_mp:]=0.0
 
-        print "Done clean. N_mp=%d Nel=%e"%(self.N_mp,sum(self.nel_mp[0:self.N_mp]))
+        print "Done clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
 
 
     def check_for_soft_regeneration(self):
@@ -144,8 +145,8 @@ class MP_system:
         if self.flag_soft_regen:
 
             if self.N_mp>self.N_mp_soft_regen:
-                chrg=sum(self.nel_mp);
-                erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+                chrg=np.sum(self.nel_mp);
+                erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
 
                 new_nel_mp_ref = chrg/self.N_mp_after_soft_regen;
                 if new_nel_mp_ref<self.nel_mp_ref_0:
@@ -163,7 +164,7 @@ class MP_system:
 
                 flag_keep=np.array(len(self.x_mp)*[False])
                 flag_keep[:self.N_mp]=(rand(self.N_mp)>death_prob)
-                self.N_mp=sum(flag_keep);
+                self.N_mp=np.sum(flag_keep);
 
                 self.x_mp[0:self.N_mp]=np.array(self.x_mp[flag_keep].copy());
                 self.y_mp[0:self.N_mp]=np.array(self.y_mp[flag_keep].copy());
@@ -176,7 +177,7 @@ class MP_system:
                 self.nel_mp[self.N_mp:]=0.0
 
                 chrg_before=chrg
-                chrg_after=sum(self.nel_mp);
+                chrg_after=np.sum(self.nel_mp);
 
                 correct_fact=chrg_before/chrg_after
 
@@ -185,16 +186,16 @@ class MP_system:
                 self.nel_mp[0:self.N_mp]=self.nel_mp[0:self.N_mp]*correct_fact
 
 
-                chrg=sum(self.nel_mp);
-                erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+                chrg=np.sum(self.nel_mp);
+                erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
                 print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
 
     def check_for_regeneration(self):
 
         if (self.N_mp>self.N_mp_regen or (self.N_mp<self.N_mp_regen_low and self.nel_mp_ref>self.nel_mp_ref_0)):
-            chrg=sum(self.nel_mp);
-            erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+            chrg=np.sum(self.nel_mp);
+            erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
             print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
 
@@ -210,14 +211,14 @@ class MP_system:
 
             hist_vect=np.zeros(self.Nxg_hist_reg,float)
             histf.compute_hist(self.x_mp[0:self.N_mp],self.nel_mp[0:self.N_mp],self.bias_x_hist_reg,self.Dx_hist_reg,hist_vect)
-            nel_tot=sum(hist_vect)
+            nel_tot=np.sum(hist_vect)
 
             #eliminate the negligible part of the x histogram
             i_cut=1;
-            cut_away=sum(hist_vect[:i_cut])+sum(hist_vect[-i_cut:]);
+            cut_away=np.sum(hist_vect[:i_cut])+np.sum(hist_vect[-i_cut:]);
             while(cut_away<self.regen_hist_cut*nel_tot):
                 i_cut=i_cut+1
-                cut_away=sum(hist_vect[:i_cut])+sum(hist_vect[-i_cut:]);
+                cut_away=np.sum(hist_vect[:i_cut])+np.sum(hist_vect[-i_cut:]);
 
             x_max=(len(hist_vect)-i_cut+1)*self.Dx_hist_reg+self.bias_x_hist_reg;
 
@@ -226,7 +227,7 @@ class MP_system:
             flag_clean=(abs(self.x_mp)>x_max);
             flag_keep=~(flag_clean)
             flag_keep[self.N_mp:]=False
-            self.N_mp=sum(flag_keep);
+            self.N_mp=np.sum(flag_keep);
 
 
             self.x_mp[0:self.N_mp]=np.array(self.x_mp[flag_keep].copy());
@@ -349,7 +350,7 @@ class MP_system:
             #
             intnum_MP_in_cell=intnum_MP_in_cell+np.int_(flag_rest);
             #% intnum_MP_in_cell_chk=intnum_MP_in_cell;
-            N_mp_expect=sum(intnum_MP_in_cell);
+            N_mp_expect=np.sum(intnum_MP_in_cell);
             #
             #
             #
@@ -359,7 +360,7 @@ class MP_system:
             self.nel_mp[0:N_mp_expect]=np.ones(N_mp_expect)*self.nel_mp_ref;
             #
             flag_add=(intnum_MP_in_cell>0);
-            n_add_step=sum(flag_add);
+            n_add_step=np.sum(flag_add);
             #
             self.N_mp=0;
             while n_add_step>0:
@@ -375,13 +376,13 @@ class MP_system:
                 y_nonzero_temp=y_nonzero[flag_add];
 
                 flag_np = self.chamb.is_outside(x_temp, y_temp);#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
-                Nout=sum(flag_np);
+                Nout=np.sum(flag_np);
                 while(Nout>0):
             #        indices=find(flag_np);
                     x_temp[flag_np]=x_nonzero_temp[flag_np]+Dx_reg*(rand(Nout)-0.5);
                     y_temp[flag_np]=y_nonzero_temp[flag_np]+Dy_reg*(rand(Nout)-0.5);
                     flag_np = self.chamb.is_outside(x_temp, y_temp);#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
-                    Nout=sum(flag_np);
+                    Nout=np.sum(flag_np);
 
 
                 self.x_mp[self.N_mp:self.N_mp+n_add_step]=x_temp;
@@ -395,14 +396,14 @@ class MP_system:
 
                 intnum_MP_in_cell[flag_add]=intnum_MP_in_cell[flag_add]-1;
                 flag_add=intnum_MP_in_cell>0;
-                n_add_step=sum(flag_add);
+                n_add_step=np.sum(flag_add);
 
             #end
 
 
 
-            chrg=sum(self.nel_mp);
-            erg=sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
+            chrg=np.sum(self.nel_mp);
+            erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
             print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
@@ -427,12 +428,12 @@ class MP_system:
                 y_temp=(y_max-y_min)*rand(Nint_new_MP)+y_min
 
                 flag_np=self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
-                Nout=sum(flag_np);
+                Nout=np.sum(flag_np);
                 while(Nout>0):
                     x_temp[flag_np]=(x_max-x_min)*rand(Nout)+x_min
                     y_temp[flag_np]=(y_max-y_min)*rand(Nout)+y_min
                     flag_np=self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
-                    Nout=sum(flag_np);
+                    Nout=np.sum(flag_np);
 
                 self.x_mp[self.N_mp:self.N_mp+Nint_new_MP]=x_temp;#Be careful to the indexing when translating to python
                 self.y_mp[self.N_mp:self.N_mp+Nint_new_MP]=y_temp;
@@ -448,68 +449,80 @@ class MP_system:
 
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
 
-		if x_max is None:
-			x_max = self.chamb.x_aper
+        if x_max is None:
+            x_max = self.chamb.x_aper
 
-		if x_min is None:
-			x_min = -self.chamb.x_aper
+        if x_min is None:
+            x_min = -self.chamb.x_aper
 
-		if y_max is None:
-			y_max = self.chamb.y_aper
+        if y_max is None:
+            y_max = self.chamb.y_aper
 
-		if y_min is None:
-			y_min = -self.chamb.y_aper
-
-
-		v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
+        if y_min is None:
+            y_min = -self.chamb.y_aper
 
 
+        v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
 
-		N_new_MP=n_ele*(x_max-x_min)*(y_max-y_min)/self.nel_mp_ref;
-		Nint_new_MP=int(np.floor(N_new_MP));
-		rest=N_new_MP-Nint_new_MP;
-		Nint_new_MP=Nint_new_MP+int(rand()<rest);
 
-		if Nint_new_MP>0:
 
-			x_temp=(x_max-x_min)*rand(Nint_new_MP)+x_min
-			y_temp=(y_max-y_min)*rand(Nint_new_MP)+y_min
+        N_new_MP=n_ele*(x_max-x_min)*(y_max-y_min)/self.nel_mp_ref;
+        Nint_new_MP=int(np.floor(N_new_MP));
+        rest=N_new_MP-Nint_new_MP;
+        Nint_new_MP=Nint_new_MP+int(rand()<rest);
 
-			flag_keep = ~self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
-			x_temp = x_temp[flag_keep]
-			y_temp = y_temp[flag_keep]
-			Nint_new_MP = len(x_temp)
+        if Nint_new_MP>0:
 
-			self.x_mp[self.N_mp:self.N_mp+Nint_new_MP]=x_temp;#Be careful to the indexing when translating to python
-			self.y_mp[self.N_mp:self.N_mp+Nint_new_MP]=y_temp;
-			self.z_mp[self.N_mp:self.N_mp+Nint_new_MP]=0.;#randn(Nint_new_MP,1);
-			self.vx_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);#if you note a towards down polarization look here
-			self.vy_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);
-			self.vz_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);
-			self.nel_mp[self.N_mp:self.N_mp+Nint_new_MP]=self.nel_mp_ref;
+            x_temp=(x_max-x_min)*rand(Nint_new_MP)+x_min
+            y_temp=(y_max-y_min)*rand(Nint_new_MP)+y_min
 
-			self.N_mp=int(self.N_mp+Nint_new_MP);
+            flag_keep = ~self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+            x_temp = x_temp[flag_keep]
+            y_temp = y_temp[flag_keep]
+            Nint_new_MP = len(x_temp)
+
+            self.x_mp[self.N_mp:self.N_mp+Nint_new_MP]=x_temp;#Be careful to the indexing when translating to python
+            self.y_mp[self.N_mp:self.N_mp+Nint_new_MP]=y_temp;
+            self.z_mp[self.N_mp:self.N_mp+Nint_new_MP]=0.;#randn(Nint_new_MP,1);
+            self.vx_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);#if you note a towards down polarization look here
+            self.vy_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);
+            self.vz_mp[self.N_mp:self.N_mp+Nint_new_MP]=v0*(rand()-0.5);
+            self.nel_mp[self.N_mp:self.N_mp+Nint_new_MP]=self.nel_mp_ref;
+
+            self.N_mp=int(self.N_mp+Nint_new_MP);
 
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
 
+    def add_new_MPs(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz):
+        N_mp_old = self.N_mp
+        N_mp_new = self.N_mp + N_new_MP
+        self.x_mp[N_mp_old:N_mp_new] = x
+        self.y_mp[N_mp_old:N_mp_new] = y
+        self.z_mp[N_mp_old:N_mp_new] = z
+        self.vx_mp[N_mp_old:N_mp_new] = vx
+        self.vy_mp[N_mp_old:N_mp_new] = vy
+        self.vz_mp[N_mp_old:N_mp_new] = vz
+        self.nel_mp[N_mp_old:N_mp_new] =nel_new_mp
+        self.N_mp = N_mp_new
 
     def add_from_file(self, filename_MPs):
 
-		if type(filename_MPs) is str:
-			import scipy.io as sio
-			dict_MP_init = sio.loadmat(filename_MPs)
-		else:
-			dict_MP_init = filename_MPs
+        if type(filename_MPs) is str:
+            import scipy.io as sio
+            dict_MP_init = sio.loadmat(filename_MPs)
+        else:
+            dict_MP_init = filename_MPs
 
-		Nint_new_MP = int(dict_MP_init['N_mp'])
+        Nint_new_MP = int(dict_MP_init['N_mp'])
 
-		self.x_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['x_mp'])
-		self.y_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['y_mp'])
-		self.z_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['z_mp'])
-		self.vx_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vx_mp'])
-		self.vy_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
-		self.vz_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
-		self.nel_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['nel_mp'])
+        self.x_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['x_mp'])
+        self.y_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['y_mp'])
+        self.z_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['z_mp'])
+        self.vx_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vx_mp'])
+        self.vy_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
+        self.vz_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
+        self.nel_mp[self.N_mp:self.N_mp+Nint_new_MP] = np.squeeze(dict_MP_init['nel_mp'])
 
-		self.N_mp=int(self.N_mp+Nint_new_MP);
+        self.N_mp=int(self.N_mp+Nint_new_MP);
+
