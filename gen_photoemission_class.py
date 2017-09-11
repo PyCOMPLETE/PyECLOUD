@@ -156,13 +156,6 @@ class photoemission:
             #generate energies (the same distr. for all photoelectr.)
             En_gen = self.get_energy(Nint_new_MP) #in eV
 
-            flag_negat=(En_gen<0.)
-            N_neg=np.sum(flag_negat)
-            while(N_neg>0):
-                En_gen[flag_negat]=randn(N_neg)*self.e_pe_sigma+self.e_pe_max   #in eV
-                flag_negat=(En_gen<0.)
-                N_neg=np.sum(flag_negat)
-
             # generate velocities like in impact managment
             vx_gen, vy_gen, vz_gen = self.angle_dist_func(
                 Nint_new_MP, En_gen, Norm_x, Norm_y)
