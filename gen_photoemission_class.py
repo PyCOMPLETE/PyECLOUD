@@ -167,7 +167,7 @@ class photoemission(object):
 
         Nint_new_MP = self.get_number_new_mps(lambda_t, Dt, MP_e.nel_mp_ref)
 
-        if Nint_new_MP>0:
+        if Nint_new_MP > 0:
             #generate appo x_in and x_out
             x_in = np.zeros(Nint_new_MP)
             y_in = np.zeros(Nint_new_MP)
@@ -206,16 +206,20 @@ class photoemission(object):
 
 
 class photoemission_from_file(photoemission):
-    def __init__(self, photoemission_file, chamb, resc_frac, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st, out_radius, photoelectron_angle_distribution):
-        print('Start photoemission init from file %s.' % photoemission_file)
+    def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st, out_radius, photoelectron_angle_distribution):
+        print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
 
-        mat = sio.loadmat(photoemission_file)
-        self.inv_CDF = mat['inv_CDF']
-        self.angles = mat['angles']
+        flag_uniform = (inv_CDF_all_photoem_file == 'unif_no_file')
+        if not flag_uniform:
+            mat = sio.loadmat(inv_CDF_all_photoem_file)
+            self.inv_CDF = mat['inv_CDF']
+            self.angles = mat['angles']
+
+        self.flag_uniform = flag_uniform
         self.k_pe_st = k_pe_st
         self.out_radius = out_radius
         self.chamb = chamb
-        self,resc_frac = resc_frac
+        self.resc_fac = resc_fac
 
         self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
@@ -224,10 +228,13 @@ class photoemission_from_file(photoemission):
     def generate(self, MP_e, lambda_t, Dt):
 
         Nint_new_MP = self.get_number_new_mps(lambda_t, Dt, MP_e.nel_mp_ref)
-        if Nint_new_MP>0:
+        if Nint_new_MP > 0:
 
-            cdf_gen = random.rand(Nint_new_MP)
-            theta_gen = np.interp(cdf_gen, self.inv_CDF, self.angles)
+            if self.flag_uniform:
+                theta_gen = random.rand(Nint_new_MP)*2*np.pi
+            else:
+                cdf_gen = random.rand(Nint_new_MP)
+                theta_gen = np.interp(cdf_gen, self.inv_CDF, self.angles)
 
             x_out = self.out_radius*np.cos(theta_gen)
             y_out = self.out_radius*np.sin(theta_gen)
