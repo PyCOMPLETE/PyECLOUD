@@ -51,13 +51,12 @@
 
 from __future__ import division, print_function
 import numpy.random as random
-from numpy import interp, pi, sin, cos, zeros, sqrt, sum
+from numpy import interp, pi, sin, cos, zeros, sum
 
 import scipy.io as sio
 import scipy.stats as stats
 from scipy.constants import e as qe, m_e as me, c
 import numpy as np
-from scipy.constants import c
 
 import sec_emission
 
@@ -65,8 +64,8 @@ qm=qe/me
 
 class photoemission:
 
-    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, \
-                x0_refl, y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
+    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, x0_refl,
+                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
 
         print('Start photoemission init.')
 
@@ -128,13 +127,13 @@ class photoemission:
             #generate psi for refl. photons generation
             N_refl=np.sum(refl_flag)
             if N_refl>0:
-                u_gen=random.rand(N_refl,1);
+                u_gen=random.rand(N_refl)
                 if self.flag_unif:
                     psi_gen = 2.*pi*u_gen
                     x_out[refl_flag]=self.out_radius*cos(psi_gen)
                     y_out[refl_flag]=self.out_radius*sin(psi_gen)
                 else:
-                    psi_gen=interp(u_gen,self.u_sam_CDF_refl, self.inv_CDF_refl)
+                    psi_gen=interp(u_gen, self.u_sam_CDF_refl, self.inv_CDF_refl)
                     x_in[refl_flag]=self.x0_refl
                     x_out[refl_flag]=-2.*self.out_radius*cos(psi_gen)+self.x0_refl
                     y_out[refl_flag]=2.*self.out_radius*sin(psi_gen)
@@ -150,15 +149,12 @@ class photoemission:
 
             #generate points and normals
             x_int, y_int, _, Norm_x, Norm_y, i_found= self.chamb.impact_point_and_normal(x_in, y_in, 0*x_in,
-                                                                                          x_out, y_out, 0*x_out, resc_fac=self.resc_fac)
-
+                                                                                         x_out, y_out, 0*x_out, resc_fac=self.resc_fac)
 
             #generate energies (the same distr. for all photoelectr.)
             En_gen = self.get_energy(Nint_new_MP) #in eV
-
             # generate velocities like in impact managment
-            vx_gen, vy_gen, vz_gen = self.angle_dist_func(
-                Nint_new_MP, En_gen, Norm_x, Norm_y)
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
 
             MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
 
@@ -180,12 +176,12 @@ def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
     elif energy_distribution == 'gaussian':
         def get_energy(N_int_new_MP):
             En_gen = random.randn(N_int_new_MP)*e_pe_sigma + e_pe_max
-            flag_negat=(En_gen<0.)
-            N_neg=sum(flag_negat);
+            flag_negat = (En_gen<0.)
+            N_neg = sum(flag_negat)
             while(N_neg>0):
-                En_gen[flag_negat]=random.randn(N_neg)*e_pe_sigma + e_pe_max   #in eV
-                flag_negat=(En_gen<0.)
-                N_neg=sum(flag_negat);
+                En_gen[flag_negat] = random.randn(N_neg)*e_pe_sigma + e_pe_max   #in eV
+                flag_negat = (En_gen<0.)
+                N_neg = sum(flag_negat)
             return En_gen
     elif energy_distribution == 'rect':
         def get_energy(N_int_new_MP):
@@ -196,6 +192,7 @@ def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
     elif energy_distribution == 'lorentz':
         xx_min = stats.cauchy.cdf(0, e_pe_max, e_pe_sigma)
         xx_max = 1
+
         def get_energy(N_int_new_MP):
             xx_rand = random.rand(N_int_new_MP)*(xx_max-xx_min) + xx_min
             return stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)

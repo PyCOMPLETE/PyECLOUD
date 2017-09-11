@@ -11,6 +11,7 @@ import scipy.stats as stats
 import MP_system
 import geom_impact_ellip
 import gen_photoemission_class
+import sec_emission as se
 
 import LHCMeasurementTools.mystyle as ms
 
@@ -19,7 +20,7 @@ ms.mystyle()
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-o')
+parser.add_argument('-o', help='Define output of plots')
 parser.add_argument('--noshow', action='store_true')
 parser.add_argument('--energy-dist', choices=['gaussian', 'lognormal', 'lorentz'], default='gaussian')
 args = parser.parse_args()
@@ -58,7 +59,7 @@ chamb = geom_impact_ellip.ellip_cham_geom_object(1.,1.)
 MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, chamb)
 
 
-phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb, 0.995, args.energy_dist)
+phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb, 0.995, args.energy_dist, se.velocities_angle_cosine_3D)
 
 phemiss.generate(MP_e, 1, 1)
 
@@ -120,7 +121,7 @@ sp.grid(True)
 sp.set_title('Histogram of velocity vector\nrel. to normal')
 sp.set_xlabel(r'$\theta$ [rad]')
 sp.hist(angles_v, bins=40, normed=True)
-sp.plot(xx_a[xx_a>0], np.cos(xx_a[xx_a>0]), color='g', lw=3)
+sp.plot(xx_a[xx_a>0], np.sin(2*xx_a[xx_a>0]), color='g', lw=3)
 
 
 
