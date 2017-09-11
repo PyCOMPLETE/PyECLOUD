@@ -70,6 +70,8 @@ import impact_management_class as imc
 import gas_ionization_class as gic
 import gen_photoemission_class as gpc
 
+import init
+
 
 
 import numpy as np
@@ -96,31 +98,128 @@ class Ecloud(object):
         self.pyecl_input_folder = pyecl_input_folder
         self.kwargs = kwargs
 
-        b_par, x_aper, y_aper, B,\
-        gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
-        Emax, del_max, R0, E_th, sigmafit, mufit,\
-        Dt, t_end, lam_th, t_ion, N_mp_max,\
-        N_mp_regen, N_mp_after_regen, fact_split, fact_clean, nel_mp_ref_0,\
-        Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen,regen_hist_cut,\
-        N_mp_regen_low,\
-        Dt_sc, Dh_sc, t_sc_ON,Dx_hist,r_center, scrub_en_th,\
-        progress_path,  logfile_path, flag_movie, flag_sc_movie,\
-        Dt_En_hist, Nbin_En_hist,En_hist_max, \
-        photoem_flag, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, alimit, e_pe_sigma,\
-        e_pe_max,x0_refl, y0_refl, out_radius, \
-        switch_model, switch_no_increase_energy, thresh_low_energy, save_mp_state_time_file, \
-        init_unif_flag, Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif,\
-        chamb_type, filename_chm, flag_detailed_MP_info, flag_hist_impact_seg,\
-        track_method, B0x, B0y, B0z, B_map_file,  Bz_map_file, N_sub_steps, fact_Bmap, B_zero_thrhld,\
-        N_mp_soft_regen, N_mp_after_soft_regen,\
-        flag_verbose_file, flag_verbose_stdout,\
-        flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-        x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
-        PyPICmode, filename_init_MP_state,\
-        init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-        x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex,\
-        f_telescope, target_grid, N_nodes_discard, N_min_Dh_main = \
-        read_parameter_files_pyhdtl(pyecl_input_folder)
+        (
+        b_par,
+        x_aper,
+        y_aper,
+        B,
+        gas_ion_flag,
+        P_nTorr,
+        sigma_ion_MBarn,
+        Temp_K,
+        unif_frac,
+        E_init_ion,
+        Emax,
+        del_max,
+        R0, E_th,
+        sigmafit,
+        mufit,
+        Dt,
+        t_end,
+        lam_th,
+        t_ion,
+        N_mp_max,
+        N_mp_regen,
+        N_mp_after_regen,
+        fact_split,
+        fact_clean,
+        nel_mp_ref_0,
+        Nx_regen,
+        Ny_regen,
+        Nvx_regen,
+        Nvy_regen,
+        Nvz_regen,
+        regen_hist_cut,
+        N_mp_regen_low,
+        Dt_sc,
+        Dh_sc,
+        t_sc_ON,
+        Dx_hist,
+        r_center,
+        scrub_en_th,
+        progress_path,
+        logfile_path,
+        flag_movie,
+        flag_sc_movie,
+        Dt_En_hist,
+        Nbin_En_hist,
+        En_hist_max,
+        photoem_flag,
+        inv_CDF_refl_photoem_file,
+        k_pe_st,
+        refl_frac,
+        alimit,
+        e_pe_sigma,
+        e_pe_max,
+        x0_refl,
+        y0_refl,
+        out_radius,
+        switch_model,
+        switch_no_increase_energy,
+        thresh_low_energy,
+        save_mp_state_time_file,
+        init_unif_flag,
+        Nel_init_unif,
+        E_init_unif,
+        x_max_init_unif,
+        x_min_init_unif,
+        y_max_init_unif,
+        y_min_init_unif,
+        chamb_type,
+        filename_chm,
+        flag_detailed_MP_info,
+        flag_hist_impact_seg,
+        track_method,
+        secondary_angle_distribution,
+        photoelectron_angle_distribution,
+        B0x,
+        B0y,
+        B0z,
+        B_map_file,
+        Bz_map_file,
+        N_sub_steps,
+        fact_Bmap,
+        B_zero_thrhld,
+        N_mp_soft_regen,
+        N_mp_after_soft_regen,
+        flag_verbose_file,
+        flag_verbose_stdout,
+        flag_presence_sec_beams,
+        sec_b_par_list,
+        phem_resc_fac,
+        dec_fac_secbeam_prof,
+        el_density_probes,
+        save_simulation_state_time_file,
+        x_min_hist_det,
+        x_max_hist_det,
+        y_min_hist_det,
+        y_max_hist_det,
+        Dx_hist_det,
+        dec_fact_out,
+        stopfile,
+        sparse_solver,
+        B_multip,
+        B_skew,
+        PyPICmode,
+        filename_init_MP_state,
+        init_unif_edens_flag,
+        init_unif_edens,
+        E_init_unif_edens,
+        x_max_init_unif_edens,
+        x_min_init_unif_edens,
+        y_max_init_unif_edens,
+        y_min_init_unif_edens,
+        flag_assume_convex,
+        E0,
+        s_param,
+        filen_main_outp,
+        f_telescope,
+        target_grid,
+        N_nodes_discard,
+        N_min_Dh_main,
+        flag_cos_angle_hist,
+        cos_angle_width,
+        ) = init.read_parameter_files(pyecl_input_folder, skip_beam_files=True)
 
         for attr in kwargs.keys():
             print 'Ecloud init. From kwargs: %s = %s'%(attr, repr(kwargs[attr]))
@@ -192,7 +291,8 @@ class Ecloud(object):
                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
         else:
             impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
+                 flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
 
 
         if track_method == 'Boris':

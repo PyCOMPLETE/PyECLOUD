@@ -77,10 +77,12 @@ import gen_photoemission_class as gpc
 
 import parse_beam_file as pbf
 
+import numpy as np
+
 qe=1.602176565e-19;
 c=299792458.;
 
-def read_parameter_files(pyecl_input_folder='./'):
+def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     switch_model=0
     simulation_param_file='simulation_parameters.input'
 
@@ -222,14 +224,17 @@ def read_parameter_files(pyecl_input_folder='./'):
     exec(f.read())
     f.close()
 
-    b_par = pbf.beam_descr_from_fil(pyecl_input_folder+'/'+beam_parameters_file, betafx, Dx, betafy, Dy)
+    if skip_beam_files:
+        b_par = None
+    else:
+        b_par = pbf.beam_descr_from_fil(pyecl_input_folder+'/'+beam_parameters_file, betafx, Dx, betafy, Dy)
 
     flag_presence_sec_beams = False
-    if len(secondary_beams_file_list)>0:
+    if len(secondary_beams_file_list)>0 and not skip_beam_files:
         flag_presence_sec_beams = True
 
     sec_b_par_list=[]
-    if flag_presence_sec_beams:
+    if flag_presence_sec_beams and not skip_beam_files:
         for sec_b_file in secondary_beams_file_list:
             sec_b_par_list.append(pbf.beam_descr_from_fil(pyecl_input_folder+'/'+sec_b_file, betafx, Dx, betafy, Dy))
 
