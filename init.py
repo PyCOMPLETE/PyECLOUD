@@ -52,6 +52,7 @@
 import sys
 import os
 import shutil
+import time
 
 import numpy as np
 from scipy.constants import c, e as qe
@@ -89,6 +90,7 @@ def import_module_from_file(module_name, file_name):
     # The importlib.util method requires the file name to end with '.py'.
     # Also, loading the module from a temporary directory does not leave any .pyc files.
     dir_name = '/tmp/PyECLOUD_%i' % os.getpid()
+    real_module_name = module_name + '_%f' % time.time()
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
     try:
@@ -97,14 +99,14 @@ def import_module_from_file(module_name, file_name):
 
         if sys.version_info.major == 2:
             import imp
-            module = imp.load_source(module_name, new_file_name)
+            module = imp.load_source(real_module_name, new_file_name)
 
         elif sys.version_info.major == 3:
             import importlib.util
             # In python3, imp.load_source works as well, however it does not return the exact same as the import statement.
             # There are some superfluous contents in the namespace which collides with the inp_spec.assert_module_has_parameters method.
 
-            spec = importlib.util.spec_from_file_location(module_name, new_file_name)
+            spec = importlib.util.spec_from_file_location(real_module_name, new_file_name)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
@@ -120,23 +122,23 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     config_dict = {}
 
     simulation_parameters = import_module_from_file('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
-    inp_spec.assert_module_has_parameters(simulation_parameters)
-    inp_spec.update_config_dict(config_dict, simulation_parameters)
+    inp_spec.assert_module_has_parameters(simulation_parameters, 'simulation_parameters')
+    inp_spec.update_config_dict(config_dict, simulation_parameters, 'simulation_parameters')
 
     machine_param_file = config_dict['machine_param_file']
     secondary_emission_parameters_file = config_dict['secondary_emission_parameters_file']
     beam_parameters_file = config_dict['beam_parameters_file']
 
     machine_parameters = import_module_from_file('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
-    inp_spec.assert_module_has_parameters(machine_parameters)
-    inp_spec.update_config_dict(config_dict, machine_parameters)
+    inp_spec.assert_module_has_parameters(machine_parameters, 'machine_parameters')
+    inp_spec.update_config_dict(config_dict, machine_parameters, 'machine_parameters')
 
     secondary_emission_parameters = import_module_from_file('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
-    inp_spec.assert_module_has_parameters(secondary_emission_parameters)
-    inp_spec.update_config_dict(config_dict, secondary_emission_parameters)
+    inp_spec.assert_module_has_parameters(secondary_emission_parameters, 'secondary_emission_parameters')
+    inp_spec.update_config_dict(config_dict, secondary_emission_parameters, 'secondary_emission_parameters')
 
     beam_beam = import_module_from_file('beam_beam', pyecl_input_folder+'/'+beam_parameters_file)
-    inp_spec.assert_module_has_parameters(beam_beam)
+    inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
 
     # Probably promote this to an optional parameter in simulation_parameters.input
     filen_main_outp = 'Pyecltest'

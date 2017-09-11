@@ -30,7 +30,6 @@ parameters_dict = {
             'nel_mp_ref_0',
             'Nx_regen', 'Ny_regen', 'Nvx_regen', 'Nvy_regen', 'Nvz_regen',
             'regen_hist_cut',
-            'N_mp_soft_regen',
 
             # Space charge parameters
             'Dt_sc',
