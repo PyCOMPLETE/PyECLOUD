@@ -43,7 +43,7 @@ def update_config_dict(config_dict, module, module_name, verbose=True):
         if verbose:
             print('%s: %s = %s' % (module_name, parameter, value))
 
-    for parameter, default_value in optional_parameters.iteritems():
+    for parameter, default_value in optional_parameters.items():
         if hasattr(module, parameter):
             if parameter in config_dict and parameter != 't_ion':
                 raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
