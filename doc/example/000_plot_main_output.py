@@ -15,7 +15,7 @@ pl.close('all')
 ms.mystyle_arial(fontsz=16)
 dpiset = 200
 
-ob=mlo.myloadmat_to_obj('../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/Pyecltest_ref.mat')
+ob=mlo.myloadmat_to_obj('../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/Pyecltest_angle3D_ref.mat')
 
 ifig = 0
 

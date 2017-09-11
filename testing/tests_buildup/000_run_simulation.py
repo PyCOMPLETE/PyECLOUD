@@ -17,17 +17,25 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew'
+#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns'
+#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew'
 
 
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation_folder')
+parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
 args = parser.parse_args()
-if args.folder: sim_folder = args.folder
+if args.folder:
+    sim_folder = args.folder
+
+angle_distribution = 'cosine_%s' % args.angle_dist_func
+filen_main_outp = sim_folder+'/Pyecltest_angle%s.mat' % args.angle_dist_func
 
 
 time_0 = time.time()
-sim = BuildupSimulation(pyecl_input_folder = sim_folder, filen_main_outp = sim_folder+'/Pyecltest.mat')
+sim = BuildupSimulation(pyecl_input_folder = sim_folder, filen_main_outp=filen_main_outp,
+                        secondary_angle_distribution=angle_distribution, photoelectron_angle_distribution=angle_distribution)
 sim.run()
 
 time_needed = time.time() - time_0

@@ -23,11 +23,14 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew'
-    
-    
+#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns'
+#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew'
+
+
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation folder')
+parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
 args = parser.parse_args()
 if args.folder:
     sim_folder = args.folder
@@ -51,8 +54,8 @@ except OSError as err:
 myfontsz = 14
 ms.mystyle_arial(fontsz=myfontsz)
 
-dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_ref.mat') # load dictionary of the reference simulation
-dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest.mat')  # load dictionary of the current simulation
+dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_angle%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
+dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest_angle%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
 
 
 out_var_ref = dict_ref.keys()       # returns the list of keys
@@ -71,6 +74,9 @@ for variab in out_var_curr:
 
 
 for ii,k in enumerate(out_var_curr):
+    if '__' in k:
+        print('Skipped %s' % k)
+        continue
 
 
     if len(dict_curr[k].shape)==1:  # var is a vector!
@@ -101,7 +107,7 @@ for ii,k in enumerate(out_var_curr):
 
         pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='upper left')
         ms.sciy()
-        pl.savefig(folder_plot+'/%s'%k, dpi=300)
+        pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 
 
@@ -212,13 +218,13 @@ for ii,k in enumerate(out_var_curr):
 
         gs1.update(top=top, bottom=bottom)
         gs2.update(top=top, bottom=bottom)
-        pl.savefig(folder_plot+'/%s'%k, dpi=300)
+        pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 print 'Saved comparison plots in:'
 print folder_plot
 
 print 'In ipython, you may call EOG() to view the results if EOG is installed.'
-EOG = lambda : os.system('eog %s' % folder_plot)
+EOG = lambda : os.system('eog %s/*%s*' % (folder_plot, args.angle_dist_func))
         #~ #pl.show()
 
 
