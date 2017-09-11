@@ -1,9 +1,11 @@
-import sys, os
+from __future__ import division, print_function
+import sys
+import os
 import time
+import argparse
 BIN = os.path.expanduser("../../../") #folder containing PyECLOUD, PyPIC, PyKLU
 if BIN not in sys.path:
     sys.path.append(BIN)
-import argparse
 
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
@@ -17,8 +19,8 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew'
-#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns'
-#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew'
+#sim_folder = './LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
+#sim_folder = './LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
 
 
 # check if user provided folder as command line argument
@@ -41,8 +43,8 @@ sim.run()
 time_needed = time.time() - time_0
 
 
-print ''
-print 'Test simulation done in %.2f s!' % time_needed
-print 'To inspect the results you can run:'
-print '001_comparison_against_reference.py'
-print ''
+print('')
+print('Test simulation done in %.2f s!' % time_needed)
+print('To inspect the results you can run:')
+print('001_comparison_against_reference.py')
+print('')
