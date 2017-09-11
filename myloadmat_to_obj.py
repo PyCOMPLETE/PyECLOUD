@@ -15,6 +15,6 @@ class obj_from_dict:
         for kk in dictto.keys():
             exec 'self.'+kk +'= dictto[kk]'
 
-
 def myloadmat_to_obj(filename):
-    return  obj_from_dict(myloadmat(filename))
+    return obj_from_dict(myloadmat(filename))
+
