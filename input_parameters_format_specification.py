@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import division, print_function
 import sys
 import os
 import time
@@ -41,7 +41,7 @@ def update_config_dict(config_dict, module, module_name, verbose=True):
         value = getattr(module, parameter)
         config_dict[parameter] = value
         if verbose:
-            print('%s = %s' % (parameter, value))
+            print('%s: %s = %s' % (module_name, parameter, value))
 
     for parameter, default_value in optional_parameters.iteritems():
         if hasattr(module, parameter):
@@ -57,7 +57,8 @@ def update_config_dict(config_dict, module, module_name, verbose=True):
             value = default_value
         config_dict[parameter] = value
         if verbose:
-            print('%s = %s' % (parameter, value))
+            print('%s: %s = %s' % (module_name, parameter, value))
+
 
 def import_module_from_file(module_name, file_name):
     # Load any file as a python module. This function works for python2 and python3.
@@ -72,7 +73,7 @@ def import_module_from_file(module_name, file_name):
         os.mkdir(dir_name)
 
     try:
-        new_file_name = dir_name+'/temp_file.py'
+        new_file_name = dir_name+'/temp_file_%s.py' % (str(time.time()).replace('.','_'))
         shutil.copy(file_name, new_file_name)
 
         if sys.version_info.major == 2:
