@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                  PyECLOUD Version 6.3.1
+#                  PyECLOUD Version 6.4.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -57,7 +57,8 @@ import seg_impact as segi
 
 class impact_management(object):
     def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False, angle_dist_func=None):
+                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False,
+                 cos_angle_width=0.05, flag_cos_angle_hist=True,  secondary_angle_distribution=None):
 
         print 'Start impact man. init.'
 
@@ -83,10 +84,19 @@ class impact_management(object):
         xgr_hist=xgr_hist[::-1]#reverse array
         xg_hist= np.concatenate((-xgr_hist,xg_hist),0)
         Nxg_hist=len(xg_hist)
-        bias_x_hist=min(xg_hist)
+        bias_x_hist=np.min(xg_hist)
 
         self.En_g_hist=np.linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
         self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]     #hist. step
+
+        self.flag_cos_angle_hist = flag_cos_angle_hist
+        if flag_cos_angle_hist:
+            self.cos_angle_width = cos_angle_width
+            N_angles = int(1./ cos_angle_width)+1
+            self.cos_angle_hist  = np.zeros(N_angles, float)
+            print 'Saving cosine of angle of incident electrons.'
+        else:
+            print 'Not saving cosine of angle of incident electrons.'
 
         self.xg_hist = xg_hist
         self.Nxg_hist = Nxg_hist
@@ -106,7 +116,7 @@ class impact_management(object):
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float)
 
-        self.angle_dist_func = angle_dist_func
+        self.angle_dist_func = sec_emission.get_angle_dist_func(secondary_angle_distribution)
 
         print 'Done impact man. init.'
 
@@ -129,6 +139,10 @@ class impact_management(object):
     def reset_energ_impact_seg(self):
         if self.flag_seg:
             self.energ_eV_impact_seg *= 0.
+
+    def reset_cos_angle_hist(self):
+        self.cos_angle_hist *= 0
+
     #@profile
     def backtrack_and_second_emiss(self, old_pos, MP_e):
 
@@ -209,12 +223,18 @@ class impact_management(object):
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
                 E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
-                costheta_impact=-(v_impact_n)/v_impact_mod
+                # Use np.abs to rule out negative values, which can happen in very seldom fringe cases.
+                # Mathematically correct would be -(v_impact_n)/v_impact_mod
+                costheta_impact = np.abs(v_impact_n/v_impact_mod)
 
                 #electron histogram
-                histf.compute_hist(x_emit,nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
-                histf.compute_hist(x_emit,nel_impact*(E_impact_eV>scrub_en_th),bias_x_hist,Dx_hist,self.nel_impact_hist_scrub)
-                histf.compute_hist(x_emit,nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                histf.compute_hist(x_emit, nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
+                histf.compute_hist(x_emit, nel_impact*(E_impact_eV>scrub_en_th),bias_x_hist,Dx_hist,self.nel_impact_hist_scrub)
+                histf.compute_hist(x_emit, nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+
+                # angle histogram
+                if self.flag_cos_angle_hist:
+                    histf.compute_hist(costheta_impact, nel_impact, 0., self.cos_angle_width, self.cos_angle_hist)
 
                 if flag_seg:
                     segi.update_seg_impact(i_found,nel_impact,self.nel_hist_impact_seg)#riga incriminata???
@@ -307,7 +327,7 @@ class impact_management(object):
                     histf.compute_hist(x_mp_add,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
-                       segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
+                        segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
                     self.En_emit_last_step_eV += np.sum(En_truesec_eV_add*nel_mp_add)
 

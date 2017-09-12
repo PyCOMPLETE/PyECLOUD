@@ -17,13 +17,14 @@ all_sim_folders = [
     ]
 
 
-#for folder in all_sim_folders:
-#    ref_file = folder + '/Pyecltest_ref.mat'
-#    mat_file = folder + '/Pyecltest.mat'
-#    os.remove(ref_file)
-#    shutil.copy(mat_file, ref_file)
-#    print('%s replaced by %s' % (ref_file, mat_file))
-#
+for folder in all_sim_folders:
+    for dim in 2, 3:
+        ref_file = folder + '/Pyecltest_angle_%iD_ref.mat' % dim
+        mat_file = folder + '/Pyecltest_angle_%iD.mat' % dim
+        os.remove(ref_file)
+        shutil.copy(mat_file, ref_file)
+        print('%s replaced by %s' % (ref_file, mat_file))
+
 
 #for folder in all_sim_folders:
 #    ref_file = folder + '/Pyecltest_ref.mat'
@@ -43,7 +44,7 @@ all_sim_folders = [
 #    shutil.move(new_ref_file, ref_file)
 #    shutil.move(new_ref_file_2D, ref_file_2D)
 
-for folder in all_sim_folders:
-    old_mat = folder +'/Pyecltest_3D_ref.mat'
-    new_mat = folder +'/Pyecltest_angle3D_ref.mat'
-    shutil.move(old_mat, new_mat)
+#for folder in all_sim_folders:
+#    old_mat = folder +'/Pyecltest_3D_ref.mat'
+#    new_mat = folder +'/Pyecltest_angle3D_ref.mat'
+#    shutil.move(old_mat, new_mat)
