@@ -1,6 +1,6 @@
 from __future__ import division, print_function
-import gzip
 import numpy as np
+import scipy.io as sio
 
 def main(sey_file, range_extrapolate_right, delta_e, max_sey, output_file):
     """
@@ -48,21 +48,13 @@ def main(sey_file, range_extrapolate_right, delta_e, max_sey, output_file):
     extrapolate_grad, extrapolate_const = np.polyfit(xx_fit, yy_fit, 1)
 
     # save file
-
-    lines = [
-        '##input file: %s\n' % sey_file,
-        '#range_extrapolate_right %f\n' % range_extrapolate_right,
-        'extrapolate_grad %f\n' % extrapolate_grad,
-        'extrapolate_const %f\n' % extrapolate_const,
-        '##\n\n',
-    ]
-    for energy, sey in zip(energy_eV, sey_parameter):
-        lines.append('%f %f\n' % (energy, sey))
-    lines.append('\n')
-
-    with gzip.open(output_file, 'w') as f:
-        f.writelines(lines)
-
+    save_dict = {
+        'extrapolate_grad': extrapolate_grad,
+        'extrapolate_const': extrapolate_const,
+        'energy_eV': energy_eV,
+        'sey_parameter': sey_parameter,
+    }
+    sio.savemat(output_file, save_dict)
 
 if __name__ == '__main__':
     import argparse

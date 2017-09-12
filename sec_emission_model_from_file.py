@@ -1,14 +1,14 @@
 from __future__ import division, print_function
-import gzip
 import os
+
 import numpy as np
+import scipy.io as sio
 
 class SEY_model_from_file(object):
 
     def __init__(self, sey_file, flag_factor_costheta):
         """
-        - sey file is the path to a file of the correct format, either an absolute path or in the sey_files folder.
-            See the example files in sey_files for the format that should be used for input files.
+        - sey file is the path to a mat file of the correct format, either an absolute path or in the sey_files folder.
         - if flag_factor_costheta is True, the SEY is increased depending on the angle with which the electrons are hitting.
             Set to None or False to disable.
         """
@@ -25,47 +25,16 @@ class SEY_model_from_file(object):
         sey_file_real = existing_files[0]
         print('Secondary emission from file %s' % sey_file_real)
 
-        # Parse file
-        # Must be equally spaced, and extrapolate_grad and extrapolate_const have to be specified
-        extrapolate_grad, extrapolate_const = None, None
-        energy_eV_list = []
-        sey_parameter_list = []
-
-        if sey_file_real.endswith('.gz'):
-            open_ = gzip.open
-        else:
-            open_ = open
-
-        with open_(sey_file_real) as f:
-            for ctr, line in enumerate(f):
-                try:
-                    split = line.split()
-                    if split[0].startswith('#') or len(split) == 0:
-                        continue
-                    elif split[0] == 'extrapolate_grad':
-                        extrapolate_grad = float(split[1])
-                    elif split[0] == 'extrapolate_const':
-                        extrapolate_const = float(split[1])
-                    elif len(split) == 2:
-                            energy_eV_list.append(float(split[0]))
-                            sey_parameter_list.append(float(split[1]))
-                    else:
-                        raise ValueError
-                except:
-                    print('Error in line %i of file %s: %s' % (ctr, sey_file_real, line))
-                    raise
-
-        energy_eV = np.array(energy_eV_list, dtype=float)
-        sey_parameter = np.array(sey_parameter_list, dtype=float)
+        sey_properties = sio.loadmat(sey_file)
+        energy_eV = sey_properties['energy_eV'].squeeze()
+        sey_parameter = sey_properties['sey_parameter'].squeeze()
+        extrapolate_grad = float(sey_properties['extrapolate_grad'].squeeze())
+        extrapolate_const = float(sey_properties['extrapolate_const'].squeeze())
 
         diff_e = np.round(np.diff(energy_eV), 3)
         delta_e = diff_e[0]
         if np.any(diff_e != delta_e):
             raise ValueError('Energy in file %s is not equally spaced.' % sey_file_real)
-        if extrapolate_grad is None:
-            raise ValueError('extrapolate_grad is not specified in %s' % sey_file_real)
-        if extrapolate_const is None:
-            raise ValueError('extrapolate_const is not specified in %s' % sey_file_real)
 
         # sey_diff is needed by the interp function
         # A 0 is appended because this last element is never needed but the array must have the correct shape
