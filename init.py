@@ -127,6 +127,7 @@ def read_parameter_files(pyecl_input_folder='./'):
     # photoemission parameters
     photoem_flag = 0
     inv_CDF_refl_photoem_file = -1
+    inv_CDF_all_photoem_file = -1
     k_pe_st = -1
     refl_frac = -1
     alimit= -1
@@ -286,6 +287,7 @@ def read_parameter_files(pyecl_input_folder='./'):
         En_hist_max,
         photoem_flag,
         inv_CDF_refl_photoem_file,
+        inv_CDF_all_photoem_file,
         k_pe_st,
         refl_frac,
         alimit,
@@ -412,6 +414,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         En_hist_max,
         photoem_flag,
         inv_CDF_refl_photoem_file,
+        inv_CDF_all_photoem_file,
         k_pe_st,
         refl_frac,
         alimit,
@@ -595,9 +598,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
 
 
-    if photoem_flag==1:
-        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
+    if photoem_flag == 1:
+        phemiss = gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
                 x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, energy_distribution, photoelectron_angle_distribution)
+    elif photoem_flag in (2, 'from_file'):
+        phemiss = gpc.photoemission_from_file(inv_CDF_all_photoem_file, chamb, phem_resc_fac, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st, out_radius, photoelectron_angle_distribution)
     else:
         phemiss=None
 

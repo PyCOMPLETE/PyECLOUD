@@ -31,8 +31,9 @@ x_min_init_unif =-x_aper
 y_max_init_unif =y_aper
 y_min_init_unif =-y_aper
  
-photoem_flag = 1
+photoem_flag = 2
 inv_CDF_refl_photoem_file = 'unif_no_file'
+inv_CDF_all_photoem_file = 'unif_no_file'
 k_pe_st = 0.00070025484948869714
 refl_frac = 0.18859001808468617
 alimit = 0.36e-3
