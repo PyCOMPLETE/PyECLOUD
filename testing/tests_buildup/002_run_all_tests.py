@@ -1,9 +1,10 @@
-import sys
 import os
 import argparse
 
+all_dists = ('2D', '3D')
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
+parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=all_dists, default='3D')
 parser.add_argument('--all', help='Run 2D and 3D consecutively', action='store_true')
 args = parser.parse_args()
 
@@ -20,9 +21,8 @@ all_sim_folders = [
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew',
 ]
 
-
 if args.all:
-    dists = ['2D', '3D']
+    dists = all_dists
 else:
     dists = [args.angle_dist_func]
 
@@ -34,6 +34,5 @@ for ctr, sim_folder in enumerate(all_sim_folders):
         ]:
             status = os.system(cmd)
             if status != 0:
-                print('%s finished with status %i' % (cmd, status))
-                sys.exit()
+                raise SystemError('%s finished with status %i' % (cmd, status))
 
