@@ -74,10 +74,11 @@ class pyecloud_saver:
         self.logfile_path = logfile_path
 
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
+        cmd = 'git --git-dir %s rev-parse HEAD' % path_to_git
         try:
-            git_hash = 'git hash: %s\n' % (subprocess.check_output(['git', '--git-dir', path_to_git, 'rev-parse', 'HEAD']))
+            git_hash = 'git hash: %s' % (subprocess.check_output(cmd.split()))
         except Exception as e:
-            git_hash = 'Retrieving git_hash failed\n'
+            git_hash = 'Retrieving git_hash failed'
             print(e)
         print(git_hash)
 
@@ -86,7 +87,7 @@ class pyecloud_saver:
         print('Starting pyecloud_saver init.')
         with open(self.logfile_path,'w') as flog:
             flog.write('PyECLOUD Version 6.4.0\n')
-            flog.write(git_hash)
+            flog.write('%s\n' % git_hash)
             flog.write('Simulation started on %s\n' % timestr)
 
 
