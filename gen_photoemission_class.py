@@ -61,43 +61,7 @@ import sec_emission
 
 qm=qe/me
 
-class photoemission(object):
-
-    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, x0_refl,
-                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
-
-        print('Start photoemission init.')
-
-        if inv_CDF_refl_photoem_file == 'unif_no_file':
-            self.flag_unif = True
-        else:
-            self.flag_unif = False
-            dict_psi_inv_CDF = sio.loadmat(inv_CDF_refl_photoem_file)
-            self.inv_CDF_refl = np.squeeze(dict_psi_inv_CDF['inv_CDF'].real)
-            self.u_sam_CDF_refl = np.squeeze(dict_psi_inv_CDF['u_sam'].real)
-
-        self.k_pe_st = k_pe_st
-        self.refl_frac = refl_frac
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-        self.alimit = alimit
-        self.x0_refl = x0_refl
-        self.y0_refl = y0_refl
-        self.out_radius = out_radius
-        self.chamb = chamb
-        self.resc_fac = resc_fac
-        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
-
-        if y0_refl != 0.:
-            raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
-
-        x0_refl_np_arr = np.array([x0_refl])
-        y0_refl_np_arr = np.array([y0_refl])
-        if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
-            raise ValueError('x0_refl, y0_refl is outside of the chamber!')
-
-        self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
-        print('Done photoemission init. Energy distribution: %s' % energy_distribution)
+class photoemission_base(object):
 
     @staticmethod
     def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
@@ -138,7 +102,7 @@ class photoemission(object):
                 xx_rand = random.rand(N_int_new_MP)*(xx_max-xx_min) + xx_min
                 return stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)
         else:
-            raise ValueError('Energy distribution not specified')
+            raise ValueError('Energy distribution %s is invalid!' % energy_distribution)
 
         return get_energy
 
@@ -163,6 +127,45 @@ class photoemission(object):
         vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
 
         MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
+
+
+class photoemission(photoemission_base):
+
+    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, x0_refl,
+                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
+
+        print('Start photoemission init.')
+
+        if inv_CDF_refl_photoem_file == 'unif_no_file':
+            self.flag_unif = True
+        else:
+            self.flag_unif = False
+            dict_psi_inv_CDF = sio.loadmat(inv_CDF_refl_photoem_file)
+            self.inv_CDF_refl = np.squeeze(dict_psi_inv_CDF['inv_CDF'].real)
+            self.u_sam_CDF_refl = np.squeeze(dict_psi_inv_CDF['u_sam'].real)
+
+        self.k_pe_st = k_pe_st
+        self.refl_frac = refl_frac
+        self.e_pe_sigma = e_pe_sigma
+        self.e_pe_max = e_pe_max
+        self.alimit = alimit
+        self.x0_refl = x0_refl
+        self.y0_refl = y0_refl
+        self.out_radius = out_radius
+        self.chamb = chamb
+        self.resc_fac = resc_fac
+        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+
+        if y0_refl != 0.:
+            raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
+
+        x0_refl_np_arr = np.array([x0_refl])
+        y0_refl_np_arr = np.array([y0_refl])
+        if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
+            raise ValueError('x0_refl, y0_refl is outside of the chamber!')
+
+        self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 
     def generate(self, MP_e, lambda_t, Dt):
 
@@ -205,15 +208,16 @@ class photoemission(object):
         return MP_e
 
 
-class photoemission_from_file(photoemission):
+class photoemission_from_file(photoemission_base):
+
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st, out_radius, photoelectron_angle_distribution):
         print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
 
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
         if not self.flag_unif:
             mat = sio.loadmat(inv_CDF_all_photoem_file)
-            self.inv_CDF = mat['inv_CDF']
-            self.angles = mat['angles']
+            self.inv_CDF = mat['inv_CDF'].squeeze()
+            self.angles = mat['angles'].squeeze()
 
         self.k_pe_st = k_pe_st
         self.out_radius = out_radius
