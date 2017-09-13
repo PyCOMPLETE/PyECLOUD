@@ -139,6 +139,7 @@ class pyecloud_saver:
         if flag_cos_angle_hist:
             N_angles = int(1./ cos_angle_width)+1
             self.cos_angle_hist = np.zeros((self.N_En_hist, N_angles),float)
+            self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
 
         #Space charge electrostatic energy
         self.t_sc_video=[]
@@ -509,6 +510,7 @@ class pyecloud_saver:
                 }
             if self.flag_cos_angle_hist:
                     saved_dict['cos_angle_hist'] = self.cos_angle_hist
+                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle
 
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
