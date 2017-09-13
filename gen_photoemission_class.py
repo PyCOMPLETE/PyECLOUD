@@ -106,8 +106,11 @@ class photoemission_base(object):
 
         return get_energy
 
-    @staticmethod
-    def get_number_new_mps(k_pe_st, lambda_t, Dt, nel_mp_ref):
+    def get_number_new_mps(self, k_pe_st, lambda_t, Dt, nel_mp_ref):
+
+        if self.flag_continuous_emission:
+            lambda_t = self.mean_lambda
+
         DNel = k_pe_st*c*lambda_t*Dt
         N_new_MP = DNel/nel_mp_ref
         rest, Nint_new_MP = np.modf(N_new_MP)
@@ -132,7 +135,8 @@ class photoemission_base(object):
 class photoemission(photoemission_base):
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, x0_refl,
-                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution):
+                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution,
+                 beamtim, flag_continuous_emission):
 
         print('Start photoemission init.')
 
@@ -155,6 +159,10 @@ class photoemission(photoemission_base):
         self.chamb = chamb
         self.resc_fac = resc_fac
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        self.flag_continuous_emission = flag_continuous_emission
+
+        if flag_continuous_emission:
+            self.mean_lambda = np.mean(beamtim.lam_t_array)
 
         if y0_refl != 0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
@@ -165,6 +173,7 @@ class photoemission(photoemission_base):
             raise ValueError('x0_refl, y0_refl is outside of the chamber!')
 
         self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+
         print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 
     def generate(self, MP_e, lambda_t, Dt):
@@ -210,7 +219,8 @@ class photoemission(photoemission_base):
 
 class photoemission_from_file(photoemission_base):
 
-    def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st, out_radius, photoelectron_angle_distribution):
+    def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
+                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim, flag_continuous_emission):
         print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
 
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
@@ -223,6 +233,10 @@ class photoemission_from_file(photoemission_base):
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
+        self.flag_continuous_emission = flag_continuous_emission
+
+        if flag_continuous_emission:
+            self.mean_curr = np.mean(beamtim.lam_t_array)
 
         self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
