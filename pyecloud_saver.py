@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.4.0
+#                   PyECLOUD Version 6.4.1
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -71,7 +71,9 @@ qm=qe/me;
 class pyecloud_saver:
 
     def __init__(self, logfile_path):
+        print('Starting pyecloud_saver init.')
         self.logfile_path = logfile_path
+        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
         cmd = 'git --git-dir %s rev-parse HEAD' % path_to_git
@@ -82,11 +84,8 @@ class pyecloud_saver:
             print(e)
         print(git_hash)
 
-        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-
-        print('Starting pyecloud_saver init.')
         with open(self.logfile_path,'w') as flog:
-            flog.write('PyECLOUD Version 6.4.0\n')
+            flog.write('PyECLOUD Version 6.4.1\n')
             flog.write('%s\n' % git_hash)
             flog.write('Simulation started on %s\n' % timestr)
 

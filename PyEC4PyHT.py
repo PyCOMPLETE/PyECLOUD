@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.4.0
+#                   PyECLOUD Version 6.4.1
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -88,7 +88,7 @@ class Ecloud(object):
                 slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
 
 
-        print 'PyECLOUD Version 6.4.0'
+        print 'PyECLOUD Version 6.4.1'
         print 'PyHEADTAIL module'
         print 'Initializing ecloud from folder: '+pyecl_input_folder
         self.slicer = slicer
@@ -288,7 +288,8 @@ class Ecloud(object):
         if switch_model=='perfect_absorber':
             import perfect_absorber_class as pac
             impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, flag_seg=flag_seg)
+                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, 
+                flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
         else:
             impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
