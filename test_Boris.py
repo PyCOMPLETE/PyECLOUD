@@ -1,9 +1,9 @@
-import dynamics_dipole as dyndip
-import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
+from . import dynamics_dipole as dyndip
+from . import dynamics_Boris_f2py as dynB
+from . import dynamics_strong_B_generalized as dyngen
 from numpy import array
-import MP_system as MPs
-from geom_impact_ellip import ellip_cham_geom_object
+from . import MP_system as MPs
+from .geom_impact_ellip import ellip_cham_geom_object
 
 Dt=25e-12;
 N_steps=10000

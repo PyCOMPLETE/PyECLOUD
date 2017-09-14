@@ -53,10 +53,10 @@
 import numpy as np
 import scipy.sparse as scsp
 from scipy.sparse.linalg import spsolve
-import rhocompute as rhocom
-import int_field_for as iff
+from . import rhocompute as rhocom
+from . import int_field_for as iff
 import scipy.sparse.linalg as ssl
-from vectsum import vectsum
+from .vectsum import vectsum
 
 na = lambda x:np.array([x])
 
@@ -64,8 +64,8 @@ class space_charge:
     #@profile
     def __init__(self,chamb, Dh, Dt_sc=None, sparse_solver = 'scipy_slu'):
 
-        print 'Start LU space charge init.'
-        print 'Using Shortley-Weller boundary approx.'
+        print('Start LU space charge init.')
+        print('Using Shortley-Weller boundary approx.')
         xg=np.arange(0,chamb.x_aper+5.*Dh,Dh,float)
         xgr=xg[1:]
         xgr=xgr[::-1]#reverse array
@@ -108,7 +108,7 @@ class space_charge:
         # Build A Dx Dy matrices
         for u in range(0,Nxg*Nyg):
             if np.mod(u, Nxg*Nyg/20)==0:
-                print ('Mat. assembly %.0f'%(float(u)/ float(Nxg*Nyg)*100)+"""%""")
+                print(('Mat. assembly %.0f'%(float(u)/ float(Nxg*Nyg)*100)+"""%"""))
             if flag_inside_n[u]:
 
                 #Compute Shortley-Weller coefficients
@@ -214,8 +214,8 @@ class space_charge:
         ii_max_border = np.max((np.where(sumcurr>0))[0])
         ii_min_border = np.min((np.where(sumcurr>0))[0])
 
-        print 'Internal nodes with 0 potential'
-        print list_internal_force_zero
+        print('Internal nodes with 0 potential')
+        print(list_internal_force_zero)
 
         A=A.tocsr() #convert to csr format
 
@@ -236,16 +236,16 @@ class space_charge:
 
 
         if sparse_solver == 'scipy_slu':
-            print "Using scipy superlu solver..."
+            print("Using scipy superlu solver...")
             luobj = ssl.splu(Asel.tocsc())
         elif sparse_solver == 'klu':
-            print "Using klu solver..."
+            print("Using klu solver...")
             try:
                 import klulib.klu as klu
                 luobj = klu.Klu(Asel.tocsc())
-            except StandardError, e:
-                print "Got exception: ", e
-                print "Falling back on scipy superlu solver:"
+            except Exception as e:
+                print("Got exception: ", e)
+                print("Falling back on scipy superlu solver:")
                 luobj = ssl.splu(Asel.tocsc())
         else:
             raise ValueError('Solver not recognized!!!!\nsparse_solver must be "scipy_slu" or "klu"\n')
@@ -290,7 +290,7 @@ class space_charge:
         self.Msel = Msel.tocsc()
         self.Msel_T = (Msel.T).tocsc()
 
-        print 'Done space charge init.'
+        print('Done space charge init.')
 
     #@profile
     def recompute_spchg_efield(self, MP_e, t_curr=None):
@@ -330,7 +330,7 @@ class space_charge:
         b[(self.flag_force_zero)]=0; #boundary condition
 
         if flag_verbose:
-            print 'Start Linear System Solution.'
+            print('Start Linear System Solution.')
         b_sel = self.Msel_T*b
         phi_sel = self.luobj.solve(b_sel)
         phi = self.Msel*phi_sel
@@ -338,7 +338,7 @@ class space_charge:
         U_sc_eV_stp = -0.5*eps0*np.sum(b*phi)*self.Dh*self.Dh/qe
 
         if flag_verbose:
-            print 'Start field computation.'
+            print('Start field computation.')
 
         efx = self.Dx*phi
         efy = self.Dy*phi
@@ -346,16 +346,16 @@ class space_charge:
         efx=np.reshape(efx,(self.Nxg,self.Nyg))
         efy=np.reshape(efy,(self.Nxg,self.Nyg))
 
-        for jj in xrange(self.jj_max_border, self.Nyg):
+        for jj in range(self.jj_max_border, self.Nyg):
             efx[:, jj]=efx[:, self.jj_max_border-1]
 
-        for jj in xrange(0, self.jj_min_border+1):
+        for jj in range(0, self.jj_min_border+1):
             efx[:, jj]=efx[:, self.jj_min_border+1]
 
-        for ii in xrange(self.ii_max_border, self.Nxg):
+        for ii in range(self.ii_max_border, self.Nxg):
             efy[ii, :]=efy[self.ii_max_border-1, :]
 
-        for ii in xrange(0, self.ii_min_border+1):
+        for ii in range(0, self.ii_min_border+1):
             efy[ii,:]=efy[self.ii_min_border+1,:]
 
         self.rho = rho

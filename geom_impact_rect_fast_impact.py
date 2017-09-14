@@ -50,7 +50,7 @@
 #----------------------------------------------------------------------
 
 
-import geom_impact_poly_fast_impact as gipfi
+from . import geom_impact_poly_fast_impact as gipfi
 import numpy as np
 
 na = np.array

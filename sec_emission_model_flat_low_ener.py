@@ -81,7 +81,7 @@ class SEY_model_flat_le:
             self.Emax = Emax
             self.del_max = del_max
             self.R0 = R0
-            print 'Secondary emission model: Flat Low Energy '
+            print('Secondary emission model: Flat Low Energy ')
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
             yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0);

@@ -51,7 +51,7 @@
 
 import numpy as np
 from numpy.random import rand
-import hist_for as histf
+from . import hist_for as histf
 from scipy.constants import e, m_e
 
 
@@ -119,7 +119,7 @@ class MP_system:
     def clean_small_MPs(self):
 
 
-        print "Start clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
+        print("Start clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp])))
 
         flag_clean=(self.nel_mp<self.nel_mp_cl_th);
         flag_keep=~(flag_clean)
@@ -137,7 +137,7 @@ class MP_system:
 
         self.nel_mp[self.N_mp:]=0.0
 
-        print "Done clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
+        print("Done clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp])))
 
 
     def check_for_soft_regeneration(self):
@@ -153,7 +153,7 @@ class MP_system:
                     new_nel_mp_ref=self.nel_mp_ref_0
 
                 #if new_nel_mp_ref>self.nel_mp_ref_0:removed from version 3.16
-                print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+                print('Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg));
 
                 self.nel_mp_ref=new_nel_mp_ref
                 self.nel_mp_split = self.fact_split*self.nel_mp_ref;
@@ -181,14 +181,14 @@ class MP_system:
 
                 correct_fact=chrg_before/chrg_after
 
-                print 'Applied correction factor = %e'%correct_fact
+                print('Applied correction factor = %e'%correct_fact)
 
                 self.nel_mp[0:self.N_mp]=self.nel_mp[0:self.N_mp]*correct_fact
 
 
                 chrg=np.sum(self.nel_mp);
                 erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
-                print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+                print('Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg));
 
 
     def check_for_regeneration(self):
@@ -196,7 +196,7 @@ class MP_system:
         if (self.N_mp>self.N_mp_regen or (self.N_mp<self.N_mp_regen_low and self.nel_mp_ref>self.nel_mp_ref_0)):
             chrg=np.sum(self.nel_mp);
             erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
-            print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+            print('Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg));
 
 
             self.nel_mp_ref=chrg/self.N_mp_after_regen;
@@ -222,7 +222,7 @@ class MP_system:
 
             x_max=(len(hist_vect)-i_cut+1)*self.Dx_hist_reg+self.bias_x_hist_reg;
 
-            print 'x_max = %e'%x_max
+            print('x_max = %e'%x_max)
 
             flag_clean=(abs(self.x_mp)>x_max);
             flag_keep=~(flag_clean)
@@ -266,7 +266,7 @@ class MP_system:
             Dvz_reg=2*vz_max/(self.Nvz_reg-1);
             bias_vz=np.ceil(float(self.Nvz_reg)/2); #Attention when trnslating to python
 
-            print 'particles_assigned_to grid'
+            print('particles_assigned_to grid')
 
             ##
             #% MATLAB-like indices
@@ -288,7 +288,7 @@ class MP_system:
             indices_nonzero_cells=np.sort(indices_nonzero_cells)
 
 
-            vect_dens=dict(zip(indices_nonzero_cells,np.zeros(len(indices_nonzero_cells))))
+            vect_dens=dict(list(zip(indices_nonzero_cells,np.zeros(len(indices_nonzero_cells)))))
             #lil_matrix((Nx_reg*Ny_reg*Nvx_reg*Nvy_reg*Nvz_reg,1));#allocate a sparse matrix
             #
 
@@ -296,7 +296,7 @@ class MP_system:
                 index_curr=indexes[i_mp]
                 vect_dens[index_curr]=vect_dens[index_curr]+self.nel_mp[i_mp];
 
-            nonzero_cells=np.array(map(vect_dens.get,indices_nonzero_cells))
+            nonzero_cells=np.array(list(map(vect_dens.get,indices_nonzero_cells)))
 
 
             #%% retrieve indices of nonempty cells
@@ -404,7 +404,7 @@ class MP_system:
 
             chrg=np.sum(self.nel_mp);
             erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
-            print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+            print('Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg));
 
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
 

@@ -54,7 +54,7 @@ import numpy as np
 import scipy.io as sio
 import scipy.special as sspe
 from numpy import array
-import int_field_for as iff
+from . import int_field_for as iff
 
 qe=1.602176565e-19;
 def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
@@ -66,7 +66,7 @@ def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
 
     for ii in range(0,N_bucket):
         if np.mod(ii, N_bucket/20)==0:
-            print ('Beam profile generation %.0f'%(float(ii)/ float(N_bucket)*100)+"""%""")
+            print(('Beam profile generation %.0f'%(float(ii)/ float(N_bucket)*100)+"""%"""))
 
         ppb  =  ppb_vect[ii]
         sigmaz = sigmaz_vect[ii]
@@ -97,13 +97,13 @@ class beam_and_timing:
             raise ValueError('The beam is outside the chamber!')
 
         if flag_bunched_beam:
-            print 'Start beam profile generation.'
+            print('Start beam profile generation.')
 
             if type(filling_pattern_file) is str:
                 if '.mat' in filling_pattern_file:
                     dict_fillp = sio.loadmat(filling_pattern_file)
                     ppb_vect = np.squeeze(dict_fillp['ppb_vect'])
-                    if 'sigmaz_vect' in dict_fillp.keys():
+                    if 'sigmaz_vect' in list(dict_fillp.keys()):
                         sigmaz_vect = np.squeeze(dict_fillp['sigmaz_vect'])
                 else:
                     f=open(filling_pattern_file)
@@ -130,7 +130,7 @@ class beam_and_timing:
                     raise ValueError('Bunch length is not defined!!!')
 
             lam_t_array=bunch_train4(t, b_spac,t_offs,ppb_vect,sigmaz_vect);
-            print 'Done beam profile generation.'
+            print('Done beam profile generation.')
         else:
             dict_lam=sio.loadmat(beam_long_prof_file)
             t=np.squeeze(dict_lam['t'].real)
@@ -153,16 +153,16 @@ class beam_and_timing:
 
         flag_PyPIC_state_mode = False
         if beam_field_file==-1 or beam_field_file=='computeFD':
-            print 'No beam field file provided -> Calculate field using Poisson solver'
+            print('No beam field file provided -> Calculate field using Poisson solver')
 
             if Dh_beam_field is None:
                 raise ValueError('Grid size Dh_beam_field MUST be provided for beam field computation!')
 
-            import space_charge_class as scc
+            from . import space_charge_class as scc
             from numpy import exp, pi
             scb = scc.space_charge(chamb, Dh_beam_field, Dt_sc=1.)
 
-            print 'Computing beam charge density'
+            print('Computing beam charge density')
             #rho=1./(2.*pi*sigmax*sigmay)*exp(-(scb.xn-x_beam_pos)**2/(2.*sigmax**2)-(scb.yn-y_beam_pos)**2/(2.*sigmay**2))
 
             rho = 1./(4.*Dh_beam_field**2)*(sspe.erf((scb.xn-x_beam_pos)/(np.sqrt(2)*sigmax) + Dh_beam_field/(2*np.sqrt(2)*sigmax))\
@@ -177,11 +177,11 @@ class beam_and_timing:
             xx_beam=scb.xg
             yy_beam=scb.yg
             #self.scb = scb #######DEBUG!!
-            print 'Done beam field computation.'
+            print('Done beam field computation.')
 
         elif beam_field_file=='computeBE':
 
-            print 'No beam field file provided -> Calculate field using Bassetti Erskine formula'
+            print('No beam field file provided -> Calculate field using Bassetti Erskine formula')
 
             if chamb.chamb_type!='ellip':
                 raise ValueError('You can only use Bassetti Erskine formula with an elliptic chamber!')
@@ -190,7 +190,7 @@ class beam_and_timing:
             if x_beam_pos!=0. or y_beam_pos!=0.:
                 raise ValueError('x_beam_pos, y_beam_pos and MUST be 0 for Bassetti Erskine formula!')
 
-            print "sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d"%(sigmax, sigmay, Nx, Ny, nimag)
+            print("sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d"%(sigmax, sigmay, Nx, Ny, nimag))
 
             if progress_mapgen_file is not None:
                 fprog=open(progress_mapgen_file,'w')
@@ -199,7 +199,7 @@ class beam_and_timing:
                 fprog.close()
 
 
-            import BassErsk as BE
+            from . import BassErsk as BE
             a=chamb.x_aper
             b=chamb.y_aper
 
@@ -210,11 +210,11 @@ class beam_and_timing:
 
             Ex=np.zeros((len(xx),len(yy)),dtype=complex);
             Ey=np.zeros((len(xx),len(yy)),dtype=complex);
-            print 'Start beam field map generation.'
+            print('Start beam field map generation.')
             for ii in range(len(xx)):
 
                 if np.mod(ii, Nx/20)==0:
-                    print ('Beam field map generation %.0f'%(float(ii)/ float(Nx)*100)+"""%""")
+                    print(('Beam field map generation %.0f'%(float(ii)/ float(Nx)*100)+"""%"""))
 
                     if progress_mapgen_file is not None:
                         fprog=open(progress_mapgen_file,'a')
@@ -237,7 +237,7 @@ class beam_and_timing:
                 fprog=open(progress_mapgen_file,'a')
                 fprog.write('Done.\n')
                 fprog.close()
-            print 'Done beam field map generation.'
+            print('Done beam field map generation.')
         elif beam_field_file=='compute_FDSW_multigrid':
 
             if Dh_beam_field is None:
@@ -286,7 +286,7 @@ class beam_and_timing:
 
 
         else:
-            print 'Loading beam field map from file'
+            print('Loading beam field map from file')
             dict_beam=sio.loadmat(beam_field_file)
 
             Ex_beam=np.squeeze(dict_beam['Ex'].real)

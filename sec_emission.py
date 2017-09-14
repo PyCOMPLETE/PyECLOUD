@@ -49,7 +49,7 @@
 #     all references.
 #----------------------------------------------------------------------
 
-from __future__ import division
+
 import time
 import numpy as np
 from numpy.random import lognormal, randn, rand

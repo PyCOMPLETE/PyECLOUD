@@ -60,7 +60,7 @@ class space_charge:
     def __init__(self,chamb, Dh, Dt_sc=None, PyPICmode = 'FiniteDifferences_ShortleyWeller' ,sparse_solver = 'scipy_slu',
                     f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
 
-        print 'Start space charge init.'
+        print('Start space charge init.')
 
         if PyPICmode == 'FiniteDifferences_ShortleyWeller':
             import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
@@ -124,7 +124,7 @@ class space_charge:
         self.flag_decimate=(self.Dt_sc is not None)
         self.flag_recomputed_sc=False
 
-        print 'Done space charge init.'
+        print('Done space charge init.')
 
     @property
     def rho(self):

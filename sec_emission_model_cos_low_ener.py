@@ -79,7 +79,7 @@ class SEY_model_cos_le:
             self.del_max = del_max
             self.R0 = R0
             self.E0 = E0
-            print 'Secondary emission model: Cosine Low Energy E0=%f'%self.E0
+            print('Secondary emission model: Cosine Low Energy E0=%f'%self.E0)
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
             yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);

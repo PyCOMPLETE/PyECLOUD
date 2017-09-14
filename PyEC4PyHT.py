@@ -180,8 +180,8 @@ class Ecloud(object):
             sey_mod=SEY_model_cos_le(Emax,del_max,R0)
         elif switch_model=='flat_low_ene':
             sey_mod=SEY_model_flat_le(Emax,del_max,R0)
-    elif switch_model=='perfect_absorber':
-        sey_mod=None
+        elif switch_model=='perfect_absorber':
+            sey_mod=None
 
 
         flag_seg = (flag_hist_impact_seg==1)

@@ -1,6 +1,6 @@
-import sec_emission_model_cos_low_ener as sem_cle
-import sec_emission_model_flat_low_ener as sem_fle
-import sec_emission_model_ECLOUD as sem_ECLOUD
+from . import sec_emission_model_cos_low_ener as sem_cle
+from . import sec_emission_model_flat_low_ener as sem_fle
+from . import sec_emission_model_ECLOUD as sem_ECLOUD
 import numpy as np
 import pylab as pl
 E_vect=np.linspace(0.,1000., 20000)

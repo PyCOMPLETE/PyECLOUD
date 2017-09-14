@@ -52,14 +52,14 @@
 #----------------------------------------------------------------------
 
 
-import init as init
-import cPickle
+from . import init as init
+import pickle
 
 
 class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', **kwargs):
 
-        print 'PyECLOUD Version 6.4.0'
+        print('PyECLOUD Version 6.4.0')
         beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
                 gas_ion_flag, resgasion, t_ion, \
                 spacech_ele,t_sc_ON, photoem_flag, phemiss,\
@@ -98,7 +98,7 @@ class BuildupSimulation(object):
         flag_presence_sec_beams = self.flag_presence_sec_beams
         sec_beams_list = self.sec_beams_list
 
-        print 'Start timestep iter'
+        print('Start timestep iter')
 
         ## simulation
         while not beamtim.end_simulation():
@@ -179,20 +179,20 @@ class BuildupSimulation(object):
                 ## soft regeneration
                 MP_e.check_for_soft_regeneration()
 
-                print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
+                print('**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot))
 
             ## every bunch passage
             if t_end_sim is not None:
                 if beamtim.tt_curr>    t_end_sim:
-                    print 'Reached user defined t_end_sim --> Ending simulation'
+                    print('Reached user defined t_end_sim --> Ending simulation')
                     break
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'):
 
-        print 'Realoading state from file: %s...'% filename_simulation_state
+        print('Realoading state from file: %s...'% filename_simulation_state)
 
         with open(filename_simulation_state, 'rb') as fid:
-            dict_state = cPickle.load(fid)
+            dict_state = pickle.load(fid)
 
         self.beamtim = dict_state['beamtim']
         self.MP_e = dict_state['MP_e']
@@ -214,6 +214,6 @@ class BuildupSimulation(object):
 
         self.pyeclsaver.filen_main_outp = filen_main_outp
 
-        print 'Restoring PyPIC LU object...'
+        print('Restoring PyPIC LU object...')
         self.spacech_ele.PyPICobj.build_sparse_solver()
-        print 'Done reload.'
+        print('Done reload.')

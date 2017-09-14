@@ -59,7 +59,7 @@ class residual_gas_ionization:
 
     def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion):
 
-        print 'Start res. gas ioniz. init.'
+        print('Start res. gas ioniz. init.')
         self.unif_frac = unif_frac
         self.P_nTorr = P_nTorr
         self.sigma_ion_MBarn = sigma_ion_MBarn
@@ -72,7 +72,7 @@ class residual_gas_ionization:
 #         self.x_beam_pos = x_beam_pos
 #         self.y_beam_pos = y_beam_pos
 
-        print 'Done res. gas ioniz. init.'
+        print('Done res. gas ioniz. init.')
 
     #@profile
     def generate(self, MP_e, lambda_t, Dt, sigmax, sigmay, x_beam_pos=0., y_beam_pos=0.):

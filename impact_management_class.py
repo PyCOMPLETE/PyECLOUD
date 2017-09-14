@@ -50,9 +50,9 @@
 #----------------------------------------------------------------------
 
 import numpy as np
-import sec_emission
-import hist_for as histf
-import seg_impact as segi
+from . import sec_emission
+from . import hist_for as histf
+from . import seg_impact as segi
 
 
 class impact_management(object):
@@ -60,7 +60,7 @@ class impact_management(object):
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False,
                  cos_angle_width=0.05, flag_cos_angle_hist=True,  secondary_angle_distribution=None):
 
-        print 'Start impact man. init.'
+        print('Start impact man. init.')
 
         if flag_seg and chamb.chamb_type!='polyg':
                 raise ValueError("""flag_seg can be True only with chamb_type='polyg'!!!!""")
@@ -94,9 +94,9 @@ class impact_management(object):
             self.cos_angle_width = cos_angle_width
             N_angles = int(1./ cos_angle_width)+1
             self.cos_angle_hist  = np.zeros(N_angles, float)
-            print 'Saving cosine of angle of incident electrons.'
+            print('Saving cosine of angle of incident electrons.')
         else:
-            print 'Not saving cosine of angle of incident electrons.'
+            print('Not saving cosine of angle of incident electrons.')
 
         self.xg_hist = xg_hist
         self.Nxg_hist = Nxg_hist
@@ -118,7 +118,7 @@ class impact_management(object):
 
         self.angle_dist_func = sec_emission.get_angle_dist_func(secondary_angle_distribution)
 
-        print 'Done impact man. init.'
+        print('Done impact man. init.')
 
     def reset_impact_hist_tot(self):
         self.nel_impact_hist_tot *= 0.

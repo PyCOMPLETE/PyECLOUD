@@ -53,8 +53,8 @@
 import numpy as np
 from scipy.constants import c, e
 import time
-from PyEC4PyHT import Ecloud
-from gas_ionization_class import residual_gas_ionization
+from .PyEC4PyHT import Ecloud
+from .gas_ionization_class import residual_gas_ionization
 
 
 class MP_light(object):
@@ -97,7 +97,7 @@ class Ecloud_fastion(Ecloud):
 
         if self.track_only_first_time:
             if self.N_tracks>0:
-                print 'Warning: Track skipped because track_only_first_time is True.'
+                print('Warning: Track skipped because track_only_first_time is True.')
                 return
 
         self._reinitialize()
@@ -132,7 +132,7 @@ class Ecloud_fastion(Ecloud):
         self.N_tracks+=1
 
         stop_time = time.mktime(time.localtime())
-        print 'Done track in ', (stop_time-start_time), 's'
+        print('Done track in ', (stop_time-start_time), 's')
 
 
     #@profile

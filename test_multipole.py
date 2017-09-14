@@ -1,14 +1,14 @@
-from __future__ import division
+
 import os
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-import dynamics_Boris_multipole as dbu
-from geom_impact_ellip import ellip_cham_geom_object
-import MP_system as MPs
-import mystyle as ms
+from . import dynamics_Boris_multipole as dbu
+from .geom_impact_ellip import ellip_cham_geom_object
+from . import MP_system as MPs
+from . import mystyle as ms
 
 from scipy.constants import m_e, e as q_e
 

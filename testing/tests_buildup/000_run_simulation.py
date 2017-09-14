@@ -41,8 +41,8 @@ sim.run()
 time_needed = time.time() - time_0
 
 
-print ''
-print 'Test simulation done in %.2f s!' % time_needed
-print 'To inspect the results you can run:'
-print '001_comparison_against_reference.py'
-print ''
+print('')
+print('Test simulation done in %.2f s!' % time_needed)
+print('To inspect the results you can run:')
+print('001_comparison_against_reference.py')
+print('')

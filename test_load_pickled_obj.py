@@ -1,5 +1,5 @@
 import pickle
-import pyecloud_saver as pysav
+from . import pyecloud_saver as pysav
 
 filename_sim_state = 'simulation_state_0.pkl'
 
@@ -48,7 +48,7 @@ pyeclsaver=pysav.pyecloud_saver(MP_e, beamtim, impact_man,
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=dec_fac_secbeam_prof,
                  el_density_probes=el_density_probes)
 
-print 'Start timestep iter'
+print('Start timestep iter')
 
 ## simulation
 while not beamtim.end_simulation():
@@ -129,7 +129,7 @@ while not beamtim.end_simulation():
         ## soft regeneration
         MP_e.check_for_soft_regeneration()
 
-        print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
+        print('**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot))
 
 
 

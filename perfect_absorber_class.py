@@ -51,13 +51,13 @@
 
 
 from numpy import *
-from sec_emission import *
+from .sec_emission import *
 from numpy.random import rand
-import hist_for as histf
-import seg_impact as segi
+from . import hist_for as histf
+from . import seg_impact as segi
 import numpy as np
 
-from impact_management_class import impact_management
+from .impact_management_class import impact_management
 
 
 

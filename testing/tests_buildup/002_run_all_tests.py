@@ -35,6 +35,6 @@ for ctr, sim_folder in enumerate(all_sim_folders):
         ]:
             status = os.system(cmd)
             if status != 0:
-                print('%s finished with status %i' % (cmd, status))
+                print(('%s finished with status %i' % (cmd, status)))
                 sys.exit()
 

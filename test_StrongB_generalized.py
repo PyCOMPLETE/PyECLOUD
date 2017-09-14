@@ -49,9 +49,9 @@
 #     all references.
 #----------------------------------------------------------------------
 
-import dynamics_dipole as dyndip
+from . import dynamics_dipole as dyndip
 import dynamics_Boris as dynB
-import dynamics_strong_B_generalized as dyngen
+from . import dynamics_strong_B_generalized as dyngen
 from numpy import array
 
 Dt=25e-12;

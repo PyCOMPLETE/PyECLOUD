@@ -88,7 +88,7 @@ class SEY_model_ECLOUD_non_unif:
 
             self.E0=E0
 
-            print 'Secondary emission model: ECLOUD non uniform E0=%f'%self.E0
+            print('Secondary emission model: ECLOUD non uniform E0=%f'%self.E0)
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
 

@@ -50,7 +50,7 @@
 #----------------------------------------------------------------------
 
 import dynamics_Boris as dynB
-import dynamics_strong_B_generalized as dyngen
+from . import dynamics_strong_B_generalized as dyngen
 from numpy import array
 import numpy as np
 
@@ -103,7 +103,7 @@ N_step_print=int(np.round(N_steps)/100.)
 for ii in range(N_steps):
 
     if np.mod(ii,N_step_print)==0:
-        print (('%2.f'%(float(ii)/float(N_steps)*100))+"""%""")
+        print((('%2.f'%(float(ii)/float(N_steps)*100))+"""%"""))
 
 
 

@@ -1,9 +1,9 @@
 
-import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
+from . import dynamics_Boris_f2py as dynB
+from . import dynamics_strong_B_generalized as dyngen
 from numpy import array
-import MP_system as MPs
-from geom_impact_ellip import ellip_cham_geom_object
+from . import MP_system as MPs
+from .geom_impact_ellip import ellip_cham_geom_object
 import numpy as np
 
 
@@ -161,7 +161,7 @@ z_lisg=[];
 
 for ii in range(N_steps):
     if np.mod(ii, 10000)==0:
-        print float(ii)/float(N_steps)
+        print(float(ii)/float(N_steps))
     #print ii
     x_lisB.append(MP_eB.x_mp.copy())
     y_lisB.append(MP_eB.y_mp.copy())

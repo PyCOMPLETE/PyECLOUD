@@ -51,7 +51,7 @@
 
 import math
 import numpy as np
-from boris_cython import boris_step_multipole
+from .boris_cython import boris_step_multipole
 
 class pusher_Boris_multipole():
 
@@ -71,16 +71,16 @@ class pusher_Boris_multipole():
 
         # B_multip are derivatives of B_field
         # B_field are field strengths at x=1 m
-        factorial = np.array([math.factorial(ii) for ii in xrange(len(B_multip))], dtype=float)
+        factorial = np.array([math.factorial(ii) for ii in range(len(B_multip))], dtype=float)
         self.B_field = np.array(B_multip, dtype=float) / factorial
         if B_skew is None:
             self.B_field_skew = np.zeros_like(self.B_field, dtype=float)
         else:
             self.B_field_skew = np.array(B_skew, dtype=float) / factorial
 
-        print "Tracker: Boris multipole"
+        print("Tracker: Boris multipole")
 
-        print "N_subst_init=%d"% self.N_sub_steps
+        print("N_subst_init=%d"% self.N_sub_steps)
 
     #@profile
     def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):

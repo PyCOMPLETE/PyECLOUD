@@ -56,14 +56,14 @@ from numpy import squeeze, array,diff, max, sum, sqrt,\
 import scipy.io as sio
 import numpy as np
 
-import geom_impact_poly_cython as gipc
+from . import geom_impact_poly_cython as gipc
 
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey,
                  flag_verbose_file=False, flag_verbose_stdout=False, flag_assume_convex=True):
 
 
-        print 'Polygonal chamber - cython implementation'
+        print('Polygonal chamber - cython implementation')
 
         if type(filename_chm)==str:
             dict_chm=sio.loadmat(filename_chm)
@@ -129,10 +129,10 @@ class polyg_cham_geom_object:
                 raise ValueError(\
                     'The polygon looks not convex!!!!\nIn this case you can use the general algorithm (probably slower) by setting:\nflag_assume_convex = False')
             self.cythonisoutside = gipc.is_outside_convex
-            print 'Assuming convex polygon'
+            print('Assuming convex polygon')
         else:
             self.cythonisoutside = gipc.is_outside_nonconvex
-            print 'No assumption on the convexity of the polygon'
+            print('No assumption on the convexity of the polygon')
 
 
     def is_outside(self, x_mp, y_mp):
@@ -183,16 +183,16 @@ class polyg_cham_geom_object:
             self.N_mp_corrected = self.N_mp_corrected + N_errors
 
             if self.flag_verbose_stdout:
-                print """Reporting backtrack error of kind 1: no impact found"""
-                print """x_in, y_in, x_out, y_out"""
-                for i_err in xrange(N_errors):
+                print("""Reporting backtrack error of kind 1: no impact found""")
+                print("""x_in, y_in, x_out, y_out""")
+                for i_err in range(N_errors):
                     lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-                    print lcurr
-                print """End reporting backtrack error of kind 1"""
+                    print(lcurr)
+                print("""End reporting backtrack error of kind 1""")
 
             if self.flag_verbose_file:
                 with open('bcktr_errors.txt','a') as fbckt:
-                    for i_err in xrange(N_errors):
+                    for i_err in range(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         fbckt.write('1,'+lcurr+'\n')
 
@@ -212,16 +212,16 @@ class polyg_cham_geom_object:
                 N_errors = len(x_in_error)
 
                 if self.flag_verbose_stdout:
-                    print """Reporting backtrack error of kind 2: outside after backtracking"""
-                    print """x_in, y_in, x_out, y_out"""
-                    for i_err in xrange(N_errors):
+                    print("""Reporting backtrack error of kind 2: outside after backtracking""")
+                    print("""x_in, y_in, x_out, y_out""")
+                    for i_err in range(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-                        print lcurr
-                    print """End reporting backtrack error of kind 2"""
+                        print(lcurr)
+                    print("""End reporting backtrack error of kind 2""")
 
                 if self.flag_verbose_file:
                     with open('bcktr_errors.txt','a') as fbckt:
-                        for i_err in xrange(N_errors):
+                        for i_err in range(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('2,'+lcurr+'\n')
 
@@ -236,8 +236,8 @@ class polyg_cham_geom_object:
                 #~ pl.plot(x_int[flag_impact], y_int[flag_impact],'.r')
                 #~ pl.show()
                 if self.flag_verbose_stdout:
-                    print """Reporting backtrack error of kind 3: outside after correction"""
-                    print """x_in, y_in, x_out, y_out"""
+                    print("""Reporting backtrack error of kind 3: outside after correction""")
+                    print("""x_in, y_in, x_out, y_out""")
                 x_in_error = x_in[flag_impact]
                 y_in_error = y_in[flag_impact]
                 x_out_error = x_out[flag_impact]
@@ -245,16 +245,16 @@ class polyg_cham_geom_object:
                 N_errors = len(x_in_error)
 
                 if self.flag_verbose_stdout:
-                    print """Reporting backtrack error of kind 3: outside after correction"""
-                    print """x_in, y_in, x_out, y_out"""
-                    for i_err in xrange(N_errors):
+                    print("""Reporting backtrack error of kind 3: outside after correction""")
+                    print("""x_in, y_in, x_out, y_out""")
+                    for i_err in range(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-                        print lcurr
-                    print """End reporting backtrack error of kind 3"""
+                        print(lcurr)
+                    print("""End reporting backtrack error of kind 3""")
 
                 if self.flag_verbose_file:
                     with open('bcktr_errors.txt','a') as fbckt:
-                        for i_err in xrange(N_errors):
+                        for i_err in range(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('3,'+lcurr+'\n')
 
@@ -277,7 +277,7 @@ class polyg_cham_geom_object:
             got_negative = False;
             got_positive = False;
             num_points = self.N_edg;
-            for A in xrange(num_points):
+            for A in range(num_points):
 
                 B = np.mod((A + 1),num_points);
                 C = np.mod((B + 1), num_points);
