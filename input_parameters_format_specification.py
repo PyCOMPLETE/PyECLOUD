@@ -1,10 +1,10 @@
-from __future__ import division, print_function
+
 import sys
 import os
 import time
 import shutil
 import types
-from default_input_parameters import parameters_dict
+from .default_input_parameters import parameters_dict
 
 class PyECLOUD_ConfigException(Exception):
     pass
@@ -16,8 +16,8 @@ def assert_module_has_parameters(module, module_name):
         optional_parameters = set(optional_parameters.keys())
 
     # Filter out (a) builtin python variables and (b) imported modules
-    module_contents = filter(lambda x: (not x.startswith('__')), dir(module))
-    module_contents = set(filter(lambda x: (not isinstance(getattr(module, x), types.ModuleType)), module_contents))
+    module_contents = [x for x in dir(module) if (not x.startswith('__'))]
+    module_contents = set([x for x in module_contents if (not isinstance(getattr(module, x), types.ModuleType))])
 
     allowed_parameters = mandatory_parameters | optional_parameters
 

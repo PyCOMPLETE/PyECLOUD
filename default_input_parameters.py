@@ -1,3 +1,4 @@
+from scipy.constants import m_p
 
 parameters_dict = {
     'simulation_parameters': {
@@ -175,39 +176,53 @@ parameters_dict = {
             # Beam longitudinal profile
             'b_spac',
             'fact_beam',
-            'coast_dens',
             'flag_bunched_beam',
+
+            # this is mandatory!
+            't_offs',
+            'filling_pattern_file',
         },
         'optional': {
             # Basic definitions
-            'm0_part',
-            'Dp_p',
-            'nemittx', 'nemitty',
-            'x_beam_pos', 'y_beam_pos',
-            'sigmax', 'sigmay',
+            'm0_part': m_p,
+            'Dp_p': 0.,
+            'nemittx': None,
+            'nemitty': None,
+            'x_beam_pos': 0.,
+            'y_beam_pos': 0.,
+            'sigmax': -1,
+            'sigmay': -1,
 
             #Transverse electric field
-            'save_beam_field_file_as',
+            'save_beam_field_file_as': None,
 
             # if beam_field_file is given
-            'Dh_beam_field',
-            'Nx', 'Ny',
-            'nimag',
+            'Dh_beam_field': None,
+            'Nx': None,
+            'Ny': None,
+            'nimag': None,
 
             # if compute_FDSW_multigrid
-            'Dh_beam_field',
-            'f_telescope_beam',
-            'target_grid_beam',
-            'N_nodes_discard_beam',
-            'N_min_Dh_main_beam',
+            'Dh_beam_field': None,
+            'f_telescope_beam': None,
+            'target_grid_beam': None,
+            'N_nodes_discard_beam': None,
+            'N_min_Dh_main_beam': None,
 
             # if flag_bunched_beam == 1
-            'sigmaz',
-            't_offs',
-            'filling_pattern_file',
+            'sigmaz' : -1,
 
             # if flag_bunched_beam == 0
-            'beam_long_prof_file',
+            'beam_long_prof_file': None,
+
+            #????
+            'Dx': None,
+            'Dy': None,
+            'betafx': None,
+            'betafy': None,
+
+            # this is optional!
+            'coast_dens': 0.
         },
     },
     'secondary_emission_parameters': {

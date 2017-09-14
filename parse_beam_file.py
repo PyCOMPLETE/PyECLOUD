@@ -1,120 +1,91 @@
 import numpy as np
-from numpy import sqrt
+from scipy.constants import c, e as qe
+
+from . import input_parameters_format_specification as inp_spec
+from . import myloadmat_to_obj as mlm
 
 class beam_descr_from_fil:
-    def __init__(self, beamfilename, betafx_from_mach_parms_file, Dx_from_mach_parms_file, \
-                    betafy_from_mach_parms_file, Dy_from_mach_parms_file):
+    def __init__(self, beamfilename, betafx_from_mach_parms_file, Dx_from_mach_parms_file,
+                 betafy_from_mach_parms_file, Dy_from_mach_parms_file):
 
-        sigmax = -1
-        sigmay = -1
-        sigmaz = -1
+        print('Parsing beam file: %s' % beamfilename)
 
-        nemittx = None
-        nemitty = None
+        config_dict = {}
+        beam_beam = inp_spec.import_module_from_file('beam_beam', beamfilename)
+        inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
+        inp_spec.update_config_dict(config_dict, beam_beam, 'beam_beam')
 
+        cc = mlm.obj_from_dict(config_dict)
 
-        m0_part =  1.672621777e-27 #kg
-        Dp_p = 0.
-
-        Dx = None
-        Dy = None
-        betafx = None
-        betafy = None
-
-        x_beam_pos = 0.
-        y_beam_pos = 0.
-
-        Nx = None
-        Ny = None
-        nimag = None
-
-        Dh_beam_field = None
-        f_telescope_beam = None
-        target_grid_beam = None
-        N_nodes_discard_beam = None
-        N_min_Dh_main_beam = None
-        save_beam_field_file_as = None
-
-        coast_dens = 0.
-        beam_long_prof_file = None
-
-        print 'Parsing beam file: %s'%beamfilename
-
-        f=open(beamfilename)
-        exec(f.read())
-        f.close()
 
         # keep beackwards compatibility (optics in the machine params file)
-        if Dx is None:
-            Dx = Dx_from_mach_parms_file
-        if Dy is None:
-            Dy = Dy_from_mach_parms_file
-        if betafx is None:
-            betafx = betafx_from_mach_parms_file
-        if betafy is None:
-            betafy = betafy_from_mach_parms_file
+        if cc.Dx is None:
+            cc.Dx = Dx_from_mach_parms_file
+        if cc.Dy is None:
+            cc.Dy = Dy_from_mach_parms_file
+        if cc.betafx is None:
+            cc.betafx = betafx_from_mach_parms_file
+        if cc.betafy is None:
+            cc.betafy = betafy_from_mach_parms_file
 
-        qe=1.602176565e-19;
-        c=299792458.;
-
-        energy_J = energy_eV * qe
-        gamma_rel= energy_J/(m0_part*c*c)
-        beta_rel = sqrt(1-1/(gamma_rel*gamma_rel))
+        energy_J = cc.energy_eV * qe
+        gamma_rel= energy_J/(cc.m0_part*c**2)
+        beta_rel = np.sqrt(1-1/(gamma_rel*gamma_rel))
         beta_rel = beta_rel.real
 
-        if (sigmax==-1) and ((betafx is None) or (nemittx is None)):
+        if (cc.sigmax==-1) and ((cc.betafx is None) or (cc.nemittx is None)):
             raise ValueError('If sigmax =-1 valid betafx and nemittx MUST be provided!')
 
-        if sigmax == -1:
-            gemittx  = nemittx/(beta_rel*gamma_rel)
-            sigmax   = sqrt(betafx*gemittx+Dx*Dx*Dp_p*Dp_p)
-            sigmax   = sigmax.real
+        if cc.sigmax == -1:
+            gemittx  = cc.nemittx/(beta_rel*gamma_rel)
+            cc.sigmax   = np.sqrt(cc.betafx*gemittx+cc.Dx**2*cc.Dp_p**2)
+            cc.sigmax   = cc.sigmax.real
 
-        if (sigmay==-1) and ((betafy is None) or (nemitty is None)):
+        if (cc.sigmay==-1) and ((cc.betafy is None) or (cc.nemitty is None)):
             raise ValueError('If sigmay =-1 valid betafy and nemitty MUST be provided!')
 
-        if sigmay == -1:
-            gemitty  = nemitty/(beta_rel*gamma_rel)
-            sigmay   = sqrt(betafy*gemitty+Dy*Dy*Dp_p*Dp_p)
-            sigmay   = sigmay.real
+        if cc.sigmay == -1:
+            gemitty  = cc.nemitty/(beta_rel*gamma_rel)
+            cc.sigmay   = np.sqrt(cc.betafy*gemitty+cc.Dy**2*cc.Dp_p**2)
+            cc.sigmay   = cc.sigmay.real
 
-        self.sigmax = sigmax
-        self.sigmay = sigmay
-        self.x_beam_pos = x_beam_pos
-        self.y_beam_pos = y_beam_pos
+        self.sigmax = cc.sigmax
+        self.sigmay = cc.sigmay
+        self.x_beam_pos = cc.x_beam_pos
+        self.y_beam_pos = cc.y_beam_pos
 
-        self.m0_part = m0_part
-        self.energy_eV = energy_eV
+        self.m0_part = cc.m0_part
+        self.energy_eV = cc.energy_eV
         self.energy_J = energy_J
         self.beta_rel = beta_rel
-        self.Dp_p = Dp_p
-        self.nemittx = nemittx
-        self.nemitty = nemitty
+        self.Dp_p = cc.Dp_p
+        self.nemittx = cc.nemittx
+        self.nemitty = cc.nemitty
 
-        self.beam_field_file = beam_field_file
+        self.beam_field_file = cc.beam_field_file
 
-        self.b_spac = b_spac
+        self.b_spac = cc.b_spac
 
-        self.fact_beam = fact_beam
-        self.coast_dens = coast_dens
+        self.fact_beam = cc.fact_beam
+        self.coast_dens = cc.coast_dens
 
-        self.flag_bunched_beam = flag_bunched_beam
+        self.flag_bunched_beam = cc.flag_bunched_beam
 
-        self.sigmaz = sigmaz
-        self.t_offs = t_offs
-        self.filling_pattern_file = filling_pattern_file
+        self.sigmaz = cc.sigmaz
+        self.t_offs = cc.t_offs
+        self.filling_pattern_file = cc.filling_pattern_file
 
-        self.beam_long_prof_file = beam_long_prof_file
+        self.beam_long_prof_file = cc.beam_long_prof_file
 
-        self.Dh_beam_field = Dh_beam_field
-        self.f_telescope_beam = f_telescope_beam
-        self.target_grid_beam = target_grid_beam
-        self.N_nodes_discard_beam = N_nodes_discard_beam
-        self.N_min_Dh_main_beam = N_min_Dh_main_beam
+        self.Dh_beam_field = cc.Dh_beam_field
+        self.f_telescope_beam = cc.f_telescope_beam
+        self.target_grid_beam = cc.target_grid_beam
+        self.N_nodes_discard_beam = cc.N_nodes_discard_beam
+        self.N_min_Dh_main_beam = cc.N_min_Dh_main_beam
 
-        self.save_beam_field_file_as = save_beam_field_file_as
+        self.save_beam_field_file_as = cc.save_beam_field_file_as
 
-        self.Nx = Nx
-        self.Ny = Ny
-        self.nimag = nimag
+        self.Nx = cc.Nx
+        self.Ny = cc.Ny
+        self.nimag = cc.nimag
 
