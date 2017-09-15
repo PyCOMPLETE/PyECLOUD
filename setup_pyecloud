@@ -1,12 +1,13 @@
 #!/bin/bash
 
-[[ "$1" == "python3" ]] && python_version=python3 || python_version=python2
+python_version=python2
+[[ "$1" == "python3" ]] && python_version=python3
 
 echo "python version: $python_version"
 which $python_version
 
-sleep 5
+sleep 2
 
-rm *.so
+make clean
 make $python_version
 

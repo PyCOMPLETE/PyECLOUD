@@ -1,9 +1,12 @@
 
-.PHONY: all python2 python3
+.PHONY: all python2 python3 clean
 
-# On arch linux, the command f2py2 has to be used for python2 programs such as PyECLOUD.
-# On ubuntu, there is no command called f2py2
-ARCH_LINUX := $(shell command -v pacman &2>/dev/null)
+# On Arch Linux, the default python version is python3
+# Therefore, the command f2py2 has to be used for python2 programs such as PyECLOUD.
+# Ubuntu and Red Hat Linux use the other nomenclature where the default python version
+# is python2.
+
+ARCH_LINUX := $(shell command -v man archlinux 2>/dev/null)
 
 ifdef ARCH_LINUX
 		F2PY_py2 = f2py2
@@ -35,3 +38,7 @@ python3:
 	$(F2PY_py3) -m boris_step -c boris_step.f
 	$(F2PY_py3) -m vectsum -c vectsum.f
 	$@ setup.py build_ext -i
+
+clean:
+	rm -f *.so *.pyc
+	rm -rf __pycache__ build
