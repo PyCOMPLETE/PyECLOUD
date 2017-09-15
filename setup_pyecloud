@@ -1,10 +1,12 @@
 #!/bin/bash
 
-which python
+[[ "$1" == "python3" ]] && python_version=python3 || python_version=python2
+
+echo "python version: $python_version"
+which $python_version
+
+sleep 5
 
 rm *.so
-make all
-
-./cythonize
-
+make $python_version
 
