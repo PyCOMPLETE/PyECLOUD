@@ -83,12 +83,16 @@ class pyecloud_saver:
 
         try:
             git_hash = 'git hash: %s' % (subprocess.check_output(cmd_hash.split()).split()[0])
-            git_branch = 'git branch: %s' % (subprocess.check_output(cmd_branch.split()).split()[0])
         except Exception as e:
             git_hash = 'Retrieving git hash failed'
-            git_branch = 'Retrieving git branch failed'
             print(e)
         print(git_hash)
+
+        try:
+            git_branch = 'git branch: %s' % (subprocess.check_output(cmd_branch.split()).split()[0])
+        except Exception as e:
+            git_branch = 'Retrieving git branch failed'
+            print(e)
         print(git_branch)
 
         with open(self.logfile_path,'w') as flog:
