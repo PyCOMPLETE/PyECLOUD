@@ -6,7 +6,7 @@
 # Ubuntu and Red Hat Linux use the other nomenclature where the default python version
 # is python2.
 
-ARCH_LINUX := $(shell command -v man archlinux 2>/dev/null)
+ARCH_LINUX := $(shell grep "Arch Linux" /etc/os-release 2>/dev/null)
 
 ifdef ARCH_LINUX
 		F2PY_py2 = f2py2
