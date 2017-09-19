@@ -51,12 +51,18 @@
 
 
 
-from numpy import squeeze, array,diff, max, sum, sqrt,\
-                  logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
+from numpy import squeeze, array,diff, max, sum, sqrt, arctan2, sin, cos
 import scipy.io as sio
 import numpy as np
 
 from . import geom_impact_poly_cython as gipc
+
+# python3 compatibility
+try:
+    range = xrange
+except NameError:
+    pass
+
 
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey,

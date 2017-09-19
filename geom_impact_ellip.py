@@ -53,6 +53,12 @@
 
 from numpy import sum, sqrt, arctan2, sin, cos, isnan
 
+# python3 compatibility
+try:
+    range = xrange
+except NameError:
+    pass
+
 class ellip_cham_geom_object:
     def __init__(self, x_aper, y_aper, flag_verbose_file=True):
         self.x_aper = x_aper

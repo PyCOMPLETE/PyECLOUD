@@ -55,6 +55,12 @@ from numpy import squeeze, array,diff, max, sum, sqrt,\
                   logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
 import scipy.io as sio
 
+# python3 compatibility
+try:
+    range = xrange
+except NameError:
+    pass
+
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey,
                  flag_verbose_file=False, flag_verbose_stdout=False):
@@ -120,7 +126,7 @@ class polyg_cham_geom_object:
 #    def is_outside(self, x_mp, y_mp):
 #        N_pts=len(x_mp)
 #        flag_inside=array(N_pts*[True])
-#        for ii in xrange(self.N_edg):
+#        for ii in range(self.N_edg):
 #            flag_inside[flag_inside]=((y_mp[flag_inside]-self.Vy[ii])*(self.Vx[ii+1]-self.Vx[ii])\
 #                                      -(x_mp[flag_inside]-self.Vx[ii])*(self.Vy[ii+1]-self.Vy[ii]))>0
 #

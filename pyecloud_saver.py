@@ -54,9 +54,19 @@ import scipy.io as sio
 import numpy as np
 import os
 from . import hist_for as histf
-import pickle
 import time
 
+# python3 compatibility, cPickle faster in python2 but non existant in python3
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+# python3 compatibility
+try:
+    range = xrange
+except NameError:
+    pass
 
 me=9.10938291e-31;
 qe=1.602176565e-19;
@@ -387,7 +397,7 @@ class pyecloud_saver:
 
 
         if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
-            ii_curr_dec=int(beamtim.ii_curr/self.dec_fact_out)
+            ii_curr_dec=beamtim.ii_curr//self.dec_fact_out
             self.Nel_imp_time[ii_curr_dec] = self.Nel_impact_last_step_group
             self.Nel_emit_time[ii_curr_dec] = self.Nel_emit_last_step_group
             self.En_imp_eV_time[ii_curr_dec] = self.En_imp_last_step_group_eV

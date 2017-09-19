@@ -288,7 +288,7 @@ class MP_system:
             indices_nonzero_cells=np.sort(indices_nonzero_cells)
 
 
-            vect_dens=dict(list(zip(indices_nonzero_cells,np.zeros(len(indices_nonzero_cells)))))
+            vect_dens=dict(zip(indices_nonzero_cells,np.zeros(len(indices_nonzero_cells))))
             #lil_matrix((Nx_reg*Ny_reg*Nvx_reg*Nvy_reg*Nvz_reg,1));#allocate a sparse matrix
             #
 
@@ -296,7 +296,7 @@ class MP_system:
                 index_curr=indexes[i_mp]
                 vect_dens[index_curr]=vect_dens[index_curr]+self.nel_mp[i_mp];
 
-            nonzero_cells=np.array(list(map(vect_dens.get,indices_nonzero_cells)))
+            nonzero_cells=np.array(map(vect_dens.get,indices_nonzero_cells))
 
 
             #%% retrieve indices of nonempty cells

@@ -107,7 +107,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     filen_main_outp = 'Pyecltest'
 
     # Override config values with kwargs
-    for attr, value in list(kwargs.items()):
+    for attr, value in kwargs.items():
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
         if attr == 'filen_main_outp':
             filen_main_outp = value

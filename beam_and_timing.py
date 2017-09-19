@@ -103,7 +103,7 @@ class beam_and_timing:
                 if '.mat' in filling_pattern_file:
                     dict_fillp = sio.loadmat(filling_pattern_file)
                     ppb_vect = np.squeeze(dict_fillp['ppb_vect'])
-                    if 'sigmaz_vect' in list(dict_fillp.keys()):
+                    if 'sigmaz_vect' in dict_fillp.keys():
                         sigmaz_vect = np.squeeze(dict_fillp['sigmaz_vect'])
                 else:
                     f=open(filling_pattern_file)
