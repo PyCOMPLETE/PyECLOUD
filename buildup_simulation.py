@@ -1,5 +1,4 @@
-#!/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/python
-
+from __future__ import division, print_function
 #----------------------------------------------------------------------
 #
 #                           CERN

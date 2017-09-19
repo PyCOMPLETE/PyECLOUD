@@ -1,3 +1,4 @@
+from __future__ import division, print_function
 import numpy
 from distutils.core import setup
 from distutils.extension import Extension

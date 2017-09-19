@@ -1,3 +1,4 @@
+from __future__ import division, print_function
 from scipy.constants import m_p
 
 parameters_dict = {

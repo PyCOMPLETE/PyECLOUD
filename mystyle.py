@@ -1,3 +1,4 @@
+from __future__ import division, print_function
 from matplotlib import rc, rcdefaults, RcParams
 import pylab as pl
 from colorsys import hsv_to_rgb
