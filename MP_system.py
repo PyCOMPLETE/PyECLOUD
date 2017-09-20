@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.4.0
+#                   PyECLOUD Version 6.4.1
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -460,7 +460,6 @@ class MP_system:
 
         if y_min is None:
             y_min = -self.chamb.y_aper
-
 
         v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
 

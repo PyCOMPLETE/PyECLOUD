@@ -108,12 +108,12 @@ class impact_management_perfect_absorber(impact_management):
             ## impact management
             N_mp_old=N_mp
 
-            # check flag_impact array has right size (if not regenerate it)
-            if len(self.flag_impact) != len(x_mp):
-                self.flag_impact = np.array(len(x_mp)*[False])
+            #~ # check flag_impact array has right size (if not regenerate it)
+            #~ if len(self.flag_impact) != len(x_mp):
+                #~ self.flag_impact = np.array(len(x_mp)*[False])
 
             # reset flag_impact array
-            self.flag_impact[:] = False
+            self.flag_impact = np.array(len(x_mp)*[False])
 
             # detect impact
             self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
