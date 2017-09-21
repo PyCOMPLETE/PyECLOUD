@@ -23,10 +23,10 @@ ms.mystyle(12)
 plt.rcParams['lines.markersize'] = 3
 
 
-regex_label = re.compile('sey_file_(.*cm)\.gz$')
+regex_label = re.compile('sey_file_(.*cm)\.mat$')
 main_dir = os.path.abspath(os.path.dirname(__file__))
 all_files = os.listdir(main_dir)
-plot_files = sorted(filter(lambda x: 'example' in x and x.endswith('.gz'), all_files))
+plot_files = sorted(filter(lambda x: 'example' in x and x.endswith('.mat'), all_files))
 
 xx_lin = np.exp(np.linspace(np.log(0.1), np.log(1.8e3), int(1e3)))
 
