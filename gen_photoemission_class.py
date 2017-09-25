@@ -61,19 +61,16 @@ import sec_emission
 
 qm=qe/me
 
-class _lognormal(object):
+class _gen_energy_base(object):
     def __init__(self, e_pe_sigma, e_pe_max):
         self.e_pe_sigma = e_pe_sigma
         self.e_pe_max = e_pe_max
 
+class _lognormal(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         return random.lognormal(self.e_pe_max, self.e_pe_sigma, N_int_new_MP)
 
-class _gaussian(object):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-
+class _gaussian(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         En_gen = random.randn(N_int_new_MP)*self.e_pe_sigma + self.e_pe_max
         flag_negat = (En_gen<0.)
@@ -84,23 +81,15 @@ class _gaussian(object):
             N_neg = sum(flag_negat)
         return En_gen
 
-class _rect(object):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-
+class _rect(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         return self.e_pe_max + (random.rand(N_int_new_MP)-0.5)*self.e_pe_sigma
 
-class _mono(object):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-
+class _mono(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         return np.ones(N_int_new_MP)*self.e_pe_max
 
-class _lorentz(object):
+class _lorentz(_gen_energy_base):
     def __init__(self, e_pe_sigma, e_pe_max):
         self.e_pe_sigma = e_pe_sigma
         self.e_pe_max = e_pe_max
