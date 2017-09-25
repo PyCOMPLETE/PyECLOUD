@@ -61,50 +61,77 @@ import sec_emission
 
 qm=qe/me
 
+class _lognormal(object):
+    def __init__(self, e_pe_sigma, e_pe_max):
+        self.e_pe_sigma = e_pe_sigma
+        self.e_pe_max = e_pe_max
+
+    def __call__(self, N_int_new_MP):
+        return random.lognormal(self.e_pe_max, self.e_pe_sigma, N_int_new_MP)
+
+class _gaussian(object):
+    def __init__(self, e_pe_sigma, e_pe_max):
+        self.e_pe_sigma = e_pe_sigma
+        self.e_pe_max = e_pe_max
+
+    def __call__(self, N_int_new_MP):
+        En_gen = random.randn(N_int_new_MP)*self.e_pe_sigma + self.e_pe_max
+        flag_negat = (En_gen<0.)
+        N_neg = sum(flag_negat)
+        while(N_neg>0):
+            En_gen[flag_negat] = random.randn(N_neg)*self.e_pe_sigma +self.e_pe_max   #in eV
+            flag_negat = (En_gen<0.)
+            N_neg = sum(flag_negat)
+        return En_gen
+
+class _rect(object):
+    def __init__(self, e_pe_sigma, e_pe_max):
+        self.e_pe_sigma = e_pe_sigma
+        self.e_pe_max = e_pe_max
+
+    def __call__(self, N_int_new_MP):
+        return self.e_pe_max + (random.rand(N_int_new_MP)-0.5)*self.e_pe_sigma
+
+class _mono(object):
+    def __init__(self, e_pe_sigma, e_pe_max):
+        self.e_pe_sigma = e_pe_sigma
+        self.e_pe_max = e_pe_max
+
+    def __call__(self, N_int_new_MP):
+        return np.ones(N_int_new_MP)*self.e_pe_max
+
+class _lorentz(object):
+    def __init__(self, e_pe_sigma, e_pe_max):
+        self.e_pe_sigma = e_pe_sigma
+        self.e_pe_max = e_pe_max
+        self.xx_min = stats.cauchy.cdf(0, e_pe_max, e_pe_sigma)
+        self.xx_max = 1 # set this to something else if you want to cut
+
+    def __call__(self, N_int_new_MP):
+        xx_rand = random.rand(N_int_new_MP)*(self.xx_max-self.xx_min) + self.xx_min
+        return stats.cauchy.ppf(xx_rand, self.e_pe_max, self.e_pe_sigma)
+
+
 class photoemission_base(object):
+
 
     @staticmethod
     def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
 
         if energy_distribution == 'lognormal':
-
-            def get_energy(N_int_new_MP):
-                return random.lognormal(e_pe_max, e_pe_sigma, N_int_new_MP)
-
+            get_energy = _lognormal
         elif energy_distribution == 'gaussian':
-
-            def get_energy(N_int_new_MP):
-                En_gen = random.randn(N_int_new_MP)*e_pe_sigma + e_pe_max
-                flag_negat = (En_gen<0.)
-                N_neg = sum(flag_negat)
-                while(N_neg>0):
-                    En_gen[flag_negat] = random.randn(N_neg)*e_pe_sigma + e_pe_max   #in eV
-                    flag_negat = (En_gen<0.)
-                    N_neg = sum(flag_negat)
-                return En_gen
-
+            get_energy = _gaussian
         elif energy_distribution == 'rect':
-
-            def get_energy(N_int_new_MP):
-                return e_pe_max + (random.rand(N_int_new_MP)-0.5)*e_pe_sigma
-
+            get_energy = _rect
         elif energy_distribution == 'mono':
-
-            def get_energy(N_int_new_MP):
-                return np.ones(N_int_new_MP)*e_pe_max
-
+            get_energy = _mono
         elif energy_distribution == 'lorentz':
-
-            xx_min = stats.cauchy.cdf(0, e_pe_max, e_pe_sigma)
-            xx_max = 1 # set this to something else if you want to cut
-
-            def get_energy(N_int_new_MP):
-                xx_rand = random.rand(N_int_new_MP)*(xx_max-xx_min) + xx_min
-                return stats.cauchy.ppf(xx_rand, e_pe_max, e_pe_sigma)
+            get_energy = _lorentz
         else:
             raise ValueError('Energy distribution %s is invalid!' % energy_distribution)
 
-        return get_energy
+        return get_energy(e_pe_sigma, e_pe_max)
 
     def get_number_new_mps(self, k_pe_st, lambda_t, Dt, nel_mp_ref):
 
