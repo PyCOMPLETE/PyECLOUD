@@ -17,13 +17,7 @@ parser.add_argument('-o', help='Path where to save the figure')
 parser.add_argument('--noshow', help='Do not make a plot', action='store_true')
 args = parser.parse_args()
 
-try:
-    from RcParams import init_pyplot
-    init_pyplot()
-except ImportError:
-    pass
-
-
+ms.mystyle(12)
 plt.close('all')
 
 Dt = 5e-13
@@ -54,15 +48,18 @@ sp2 = plt.subplot(2,2,1)
 sp2.set_title('At y = 0')
 sp2.set_xlabel('x [m]')
 sp2.set_ylabel('B_y [T]')
+sp2.grid(True)
+
 sp3 = plt.subplot(2,2,2)
 sp3.set_title('At x = 0')
 sp3.set_xlabel('y [m]')
 sp3.set_ylabel('B_x [T]')
+sp3.grid(True)
 
 
 angles = np.pi / 4. * np.array([0,1,2,3,4], dtype=float)
 for angle_ctr, angle in enumerate(angles):
-    ms.figure('Angle %.1f' % angle)
+    ms.figure('Angle %.1f' % angle, figsize=(16,12))
     angle_deg = angle/np.pi *180
     plt.suptitle('Angle = %.2f deg' % angle_deg)
     for order, title in enumerate(['Dipole', 'Quadrupole', 'Sextupole', 'Octupole']):
@@ -115,18 +112,21 @@ for angle_ctr, angle in enumerate(angles):
         bx = del_vy / Dt * m_e / vz_mpB / (-q_e)
 
         sp_ctr = order + 1
-        sp = plt.subplot(2,2,sp_ctr)
+        sp = plt.subplot(4,4,sp_ctr)
         #title2 = title + ' B_multip = %s' % B_multip
         sp.set_title(title)
         sp.set_xlabel('x [m]')
-        sp.set_ylabel('y [m]')
 
         len_ = np.sqrt(bx**2+by**2)
         if title == 'Dipole':
-            outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, pivot='middle', color='black')
+            outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, len_, pivot='middle')
+            bar = plt.colorbar(outp)
+            sp.set_ylabel('y [m]')
         else:
             outp = sp.quiver(x_mpB, y_mpB, bx/len_, by/len_, len_, pivot='middle')
-            plt.colorbar(outp)
+            bar = plt.colorbar(outp)
+
+        bar.set_ticks([])
 
         lim = 1.2 * np.max(xx_raw)
         sp.set_xlim(-lim, lim)
@@ -148,13 +148,16 @@ for angle_ctr, angle in enumerate(angles):
 
     sp2.set_ylim(-1.1,1.1)
     sp3.set_ylim(-1.1,1.1)
-    sp3.legend(loc='upper left', bbox_to_anchor=(1,1))
+    #sp3.legend(loc='upper left', bbox_to_anchor=(1,1))
+sp3.legend(loc='upper right', framealpha=0.5)
 
 if args.o:
     for num in plt.get_fignums():
         fig = plt.figure(num)
         plt.suptitle('')
-        fig.savefig(os.path.expanduser(args.o +'_%i.png' % num), dpi=200)
+        if fig != fig2:
+            fig.subplots_adjust(wspace=0.1)
+        fig.savefig(os.path.expanduser(args.o +'_%i.png' % num))
 
 if not args.noshow:
     plt.show()
