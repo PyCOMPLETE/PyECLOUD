@@ -55,22 +55,22 @@ from boris_cython import boris_step_multipole
 
 class pusher_Boris_multipole():
 
-    def __init__(self, Dt, N_sub_steps=1, B_multip = [], B_skew=None):
+    def __init__(self, Dt, N_sub_steps=1, B_multip=None, B_skew=None):
 
 
         self.N_sub_steps = N_sub_steps
         self.Dt = Dt
 
         if Dt is None or N_sub_steps is None:
-             self.Dtt = None
+            self.Dtt = None
         else:
             self.Dtt = Dt / float(N_sub_steps)
 
-        if len(B_multip) == 0:
-            B_multip = np.array([0], dtype=float)
+        if B_multip is None or len(B_multip) == 0:
+            B_multip = np.array([0.], dtype=float)
 
         # B_multip are derivatives of B_field
-        # B_field are field strengths at x=1 m
+        # B_field are field strengths at x=1 m, y=0
         factorial = np.array([math.factorial(ii) for ii in xrange(len(B_multip))], dtype=float)
         self.B_field = np.array(B_multip, dtype=float) / factorial
         if B_skew is None:
@@ -95,7 +95,7 @@ class pusher_Boris_multipole():
             vyn1 = MP_e.vy_mp[0:MP_e.N_mp]
             vzn1 = MP_e.vz_mp[0:MP_e.N_mp]
 
-            if  Ez_n!=0.:
+            if Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')
 
             boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_field, self.B_field_skew,
@@ -116,7 +116,7 @@ class pusher_Boris_multipole():
             vzn1 = MP_e.vz_mp[0:MP_e.N_mp]
 
 
-            if  Ez_n!=0.:
+            if Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')
 
             boris_step_multipole(N_sub_steps, Dt_substep, self.B_field, self.B_field_skew,

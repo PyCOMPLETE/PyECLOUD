@@ -47,13 +47,13 @@ fig2 = ms.figure('Fields at x or y = 0')
 sp2 = plt.subplot(2,2,1)
 sp2.set_title('At y = 0')
 sp2.set_xlabel('x [m]')
-sp2.set_ylabel('B_y [T]')
+sp2.set_ylabel(r'$B_y$ [T]')
 sp2.grid(True)
 
 sp3 = plt.subplot(2,2,2)
 sp3.set_title('At x = 0')
 sp3.set_xlabel('y [m]')
-sp3.set_ylabel('B_x [T]')
+sp3.set_ylabel(r'$B_x$ [T]')
 sp3.grid(True)
 
 
