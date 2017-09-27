@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import scipy.io as sio
+import scipy.interpolate as interp
 
 class SEY_model_from_file(object):
 
@@ -51,6 +52,8 @@ class SEY_model_from_file(object):
         self.extrapolate_grad       = extrapolate_grad
         self.extrapolate_const      = extrapolate_const
 
+        self.interp_obj             = interp.interp1d(energy_eV, sey_parameter)
+
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
 
         delta = np.zeros_like(E_impact_eV, dtype=float)
@@ -81,7 +84,9 @@ class SEY_model_from_file(object):
         return self.sey_parameter[index_int] + index_remainder*self.sey_diff[index_int]
 
     def interp_regular(self, energy_eV):
-        #This fails if the input is not in ascending order.
-        #return np.interp(energy_eV, self.energy_eV, self.sey_parameter)
-        raise ValueError('Warning! Do not use interp_regular!')
+        return np.interp(energy_eV, self.energy_eV, self.sey_parameter)
+
+    def interp_scipy(self, energy_eV):
+        # Which of the three methods is fastest?
+        return self.interp_obj(energy_eV)
 
