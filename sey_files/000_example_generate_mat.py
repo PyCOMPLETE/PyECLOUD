@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append('../') 
 
-import create_equally_spaced_file as cesf
+import resample_sey as rss
 import sec_emission_model_from_file as semf
 
 fname_txt_file = 'sey_table_not_uniform.txt'
@@ -18,7 +18,7 @@ data_energy_eV = data_table[:, 0]
 data_SEY = data_table[:, 1]
 
 ###  Resample data
-dict_resampled = cesf.resample_sey_data(energy_eV_samples=data_energy_eV, 
+dict_resampled = rss.resample_sey_data(energy_eV_samples=data_energy_eV, 
                     sey_true_samples=data_SEY, sey_elast_samples = data_SEY*0., 
                     uniform_dE=delta_E_unif_eV, range_extrapolate_right=range_for_extrap_eV)
                     
