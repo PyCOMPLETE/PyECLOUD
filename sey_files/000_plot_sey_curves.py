@@ -4,17 +4,16 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 
-import create_equally_spaced_file as cesf
+import create_equally_spaced_file as cesf   
+
+import sys
+sys.path.append('../..') # Containst the PyECLOUD directory
 
 import PyECLOUD.sec_emission_model_from_file as sem
 import PyECLOUD.sec_emission_model_ECLOUD as sem_e
+import PyECLOUD.mystyle as ms
 
-try:
-    import PyECLOUD.mystyle as ms
-except ImportError:
-    import sys
-    sys.path.append('../..')
-    import PyECLOUD.mystyle as ms
+
 
 
 plt.close('all')
