@@ -2,7 +2,37 @@ from __future__ import division, print_function
 import numpy as np
 import scipy.io as sio
 
-def main(sey_file, range_extrapolate_right, delta_e, max_sey, output_file):
+
+def resample_sey_data(energy_eV_samples, sey_samples, uniform_dE, range_extrapolate_right):
+
+    energy_eV_0 = np.array(energy_eV_samples, dtype=float)
+    sey_parameter_0 = np.array(sey_samples, dtype=float)
+    
+
+    # Build equally spaced arrays that are used by the interp function
+    energy_eV = np.arange(energy_eV_0.min(), energy_eV_0.max()+uniform_dE*.5, uniform_dE)
+    sey_parameter = np.interp(energy_eV, energy_eV_0, sey_parameter_0)
+
+    # Find fit parameters for energies that extend the measured ranges
+    mask_xx_fit = energy_eV_0 > (energy_eV.max() - range_extrapolate_right)
+    xx_fit = energy_eV_0[mask_xx_fit]
+    if len(xx_fit) < 2:
+        raise ValueError('Range for SEY fit is too small! You may have to increase the range_extrapolate_right parameter!')
+    yy_fit = sey_parameter_0[mask_xx_fit]
+    extrapolate_grad, extrapolate_const = np.polyfit(xx_fit, yy_fit, 1)
+    
+    resampled = {
+        'extrapolate_grad': extrapolate_grad,
+        'extrapolate_const': extrapolate_const,
+        'energy_eV': energy_eV,
+        'sey_parameter': sey_parameter,
+        }
+        
+    return resampled
+
+
+
+def generate_sey_mat_from_txt(sey_file, range_extrapolate_right, delta_e, max_sey, output_file):
     """
     - sey file is the path to a file of the correct format, either an absolute path or in the sey_files/SEY-LE_SEY folder.
         See the example files in sey_files/SEY-LE_SEY for the format that should be used for input files.
@@ -67,5 +97,5 @@ if __name__ == '__main__':
     parser.add_argument('--max-sey', type=float, help='Set the maximum SEY. Values larger than the minimum of the curve are shifted accordingly')
     args = parser.parse_args()
 
-    main(args.input, args.range_extrapolate_right, args.delta, args.max_sey, args.output)
+    generate_sey_mat_from_txt(args.input, args.range_extrapolate_right, args.delta, args.max_sey, args.output)
 
