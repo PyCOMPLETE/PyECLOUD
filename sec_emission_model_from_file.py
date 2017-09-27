@@ -86,6 +86,9 @@ class SEY_model_from_file(object):
         delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV[mask_fit]
         delta_elast[mask_fit] = self.extrapolate_const_elast + self.extrapolate_grad_elast * E_impact_eV[mask_fit]
         
+        delta_true[delta_true<1e-10] = 0. # We get rid of negative values
+        delta_elast[delta_elast<1e-10] = 0. # We get rid of negative values
+        
         if self.flag_factor_costheta:
             factor_costheta = np.exp(0.5*(1.-costheta_impact))
         else:
