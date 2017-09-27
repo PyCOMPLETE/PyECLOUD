@@ -12,20 +12,23 @@ class SEY_model_from_file(object):
         - if flag_factor_costheta is True, the SEY is increased depending on the angle with which the electrons are hitting.
             Set to None or False to disable.
         """
+        if type(sey_file) is dict:
+            sey_properties = sey_file
+        else:
+            # Search for file with given name, either as an absolute path or in the dedicated folder
+            # Absolute path has precedence.
+            candidate_files = [
+                os.path.expanduser(sey_file),
+                os.path.abspath(os.path.dirname(__file__)) + '/sey_files/' + sey_file,
+            ]
+            existing_files = filter(os.path.isfile, candidate_files)
+            if not existing_files:
+                raise ValueError('SEY file %s is not found' % sey_file)
+            sey_file_real = existing_files[0]
+            print('Secondary emission from file %s' % sey_file_real)
 
-        # Search for file with given name, either as an absolute path or in the dedicated folder
-        # Absolute path has precedence.
-        candidate_files = [
-            os.path.expanduser(sey_file),
-            os.path.abspath(os.path.dirname(__file__)) + '/sey_files/' + sey_file,
-        ]
-        existing_files = filter(os.path.isfile, candidate_files)
-        if not existing_files:
-            raise ValueError('SEY file %s is not found' % sey_file)
-        sey_file_real = existing_files[0]
-        print('Secondary emission from file %s' % sey_file_real)
-
-        sey_properties = sio.loadmat(sey_file)
+            sey_properties = sio.loadmat(sey_file)
+        
         energy_eV = sey_properties['energy_eV'].squeeze()
         sey_parameter = sey_properties['sey_parameter'].squeeze()
         extrapolate_grad = float(sey_properties['extrapolate_grad'].squeeze())
