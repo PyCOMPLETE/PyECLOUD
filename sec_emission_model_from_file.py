@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import scipy.io as sio
+from numpy.random import rand
 
 class SEY_model_from_file(object):
 
@@ -28,11 +29,25 @@ class SEY_model_from_file(object):
             print('Secondary emission from file %s' % sey_file_real)
 
             sey_properties = sio.loadmat(sey_file)
+            
+            
+            resampled = {
+        'energy_eV': energy_eV,
+        'sey_true': sey_true,
+        'sey_elast': sey_elast,   
+        'extrapolate_grad_true': extrapolate_grad_true,
+        'extrapolate_const_true': extrapolate_const_true,
+        'extrapolate_grad_elast': extrapolate_grad_elast,
+        'extrapolate_const_elast': extrapolate_const_elast,
+        }
         
         energy_eV = sey_properties['energy_eV'].squeeze()
-        sey_parameter = sey_properties['sey_parameter'].squeeze()
-        extrapolate_grad = float(sey_properties['extrapolate_grad'].squeeze())
-        extrapolate_const = float(sey_properties['extrapolate_const'].squeeze())
+        sey_true = sey_properties['sey_true'].squeeze()
+        sey_elast = sey_properties['sey_elast'].squeeze()
+        extrapolate_grad_true = float(sey_properties['extrapolate_grad_true'].squeeze())
+        extrapolate_const_true = float(sey_properties['extrapolate_const_true'].squeeze())
+        extrapolate_grad_elast = float(sey_properties['extrapolate_grad_elast'].squeeze())
+        extrapolate_const_elast = float(sey_properties['extrapolate_const_elast'].squeeze())
 
         diff_e = np.round(np.diff(energy_eV), 3)
         delta_e = diff_e[0]
@@ -41,38 +56,58 @@ class SEY_model_from_file(object):
 
         # sey_diff is needed by the interp function
         # A 0 is appended because this last element is never needed but the array must have the correct shape
-        self.sey_diff = np.append(np.diff(sey_parameter), 0.)
+        self.sey_true_diff = np.append(np.diff(sey_true), 0.)
+        self.sey_elast_diff = np.append(np.diff(sey_elast), 0.)
+        
 
         # This merely populates the object namespace
         self.energy_eV              = energy_eV
-        self.sey_parameter          = sey_parameter
+        self.sey_true               = sey_true
+        self.sey_elast              = sey_elast
         self.sey_file               = sey_file
         self.flag_factor_costheta   = flag_factor_costheta
         self.energy_eV_min          = energy_eV.min()
         self.energy_eV_max          = energy_eV.max()
         self.delta_e                = delta_e
-        self.extrapolate_grad       = extrapolate_grad
-        self.extrapolate_const      = extrapolate_const
-
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-
-        delta = np.zeros_like(E_impact_eV, dtype=float)
-
+        self.extrapolate_grad_true  = extrapolate_grad_true
+        self.extrapolate_const_true = extrapolate_const_true
+        self.extrapolate_grad_elast  = extrapolate_grad_elast
+        self.extrapolate_const_elast = extrapolate_const_elast
+        
+    def SEY_values(self, E_impact_eV, costheta_impact):
+        delta_true = np.zeros_like(E_impact_eV, dtype=float)
+        delta_elast= np.zeros_like(E_impact_eV, dtype=float)
+        
         mask_fit = (E_impact_eV > self.energy_eV_max)
         mask_regular = ~mask_fit
 
-        delta[mask_regular] = self.interp(E_impact_eV[mask_regular])
-        delta[mask_fit] = self.extrapolate_const + self.extrapolate_grad * E_impact_eV[mask_fit]
-
+        delta_true[mask_regular], delta_elast[mask_regular] = self.interp(E_impact_eV[mask_regular])
+        
+        delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV[mask_fit]
+        delta_elast[mask_fit] = self.extrapolate_const_elast + self.extrapolate_grad_elast * E_impact_eV[mask_fit]
+        
         if self.flag_factor_costheta:
             factor_costheta = np.exp(0.5*(1.-costheta_impact))
         else:
             factor_costheta = 1.
+            
+        delta = delta_true*factor_costheta + delta_elast
+        
+        ref_frac=0.*delta
+        mask_non_zero=(delta>0)
+        ref_frac[mask_non_zero]=delta_elast[mask_non_zero]/delta[mask_non_zero]
+        
+        return delta, ref_frac
+        
 
-        # The concept of reflected electrons is not honored
-        ref_frac = np.zeros_like(E_impact_eV, dtype=bool)
+    def SEY_process(self, nel_impact,E_impact_eV, costheta_impact, i_impact):
+        
+        yiel, ref_frac = self.SEY_values(E_impact_eV, costheta_impact)
+        flag_elast=(rand(len(ref_frac))<ref_frac);
+        flag_truesec=~(flag_elast);
+        nel_emit=nel_impact*yiel;
 
-        return nel_impact*delta*factor_costheta, ref_frac, ~ref_frac
+        return nel_emit, flag_elast, flag_truesec
 
     def interp(self, energy_eV):
         """
@@ -81,7 +116,7 @@ class SEY_model_from_file(object):
         index_float = (energy_eV - self.energy_eV_min)/self.delta_e
         index_remainder, index_int = np.modf(index_float)
         index_int = index_int.astype(int)
-        return self.sey_parameter[index_int] + index_remainder*self.sey_diff[index_int]
+        return self.sey_true[index_int] + index_remainder*self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder*self.sey_elast_diff[index_int]
 
     def interp_regular(self, energy_eV):
         #This fails if the input is not in ascending order.

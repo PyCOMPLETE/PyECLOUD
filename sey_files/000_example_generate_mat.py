@@ -18,7 +18,8 @@ data_energy_eV = data_table[:, 0]
 data_SEY = data_table[:, 1]
 
 ###  Resample data
-dict_resampled = cesf.resample_sey_data(energy_eV_samples=data_energy_eV, sey_samples=data_SEY, 
+dict_resampled = cesf.resample_sey_data(energy_eV_samples=data_energy_eV, 
+                    sey_true_samples=data_SEY, sey_elast_samples = data_SEY*0., 
                     uniform_dE=delta_E_unif_eV, range_extrapolate_right=range_for_extrap_eV)
                     
                     
@@ -45,9 +46,15 @@ sey_test, refl, notrefl = se_obj.SEY_process(nel_impact=nel_impact,E_impact_eV=e
 # Plots!
 plt.close('all')
 plt.figure(1)
-plt.plot(dict_resampled['energy_eV'], dict_resampled['sey_parameter'], 'r.-')
+sp1 = plt.subplot(2,1,1) 
+plt.plot(dict_resampled['energy_eV'], dict_resampled['sey_true'], 'r.-')
 plt.plot(data_energy_eV, data_SEY, 'o')
 plt.plot(ene_test_eV, sey_test, 'g')
+sp2 = plt.subplot(2,1,2, sharex=sp1) 
+plt.plot(dict_resampled['energy_eV'], dict_resampled['sey_elast'], 'r.-')
+plt.plot(data_energy_eV, data_SEY*0, 'o')
+#~ plt.plot(ene_test_eV, sey_test, 'g')
+
 
 plt.show()
 
