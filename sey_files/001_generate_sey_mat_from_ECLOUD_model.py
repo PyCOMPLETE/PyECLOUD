@@ -7,8 +7,8 @@ sys.path.append('../')
 import sec_emission_model_ECLOUD as seme
 import sec_emission_model_from_file as semf
 
-Emax = 300.
-del_max = 1.5
+Emax = 332.
+del_max = 1.700000
 R0 = 0.7
 
 costheta = 1.
@@ -32,6 +32,11 @@ dict_resampled = rss.resample_sey_data(energy_eV_samples=E_samples_eV,
                     sey_true_samples=delta_true, sey_elast_samples = delta_elast, 
                     uniform_dE=dE_resample_eV, range_extrapolate_right=range_for_extrap_eV)
                     
+### Save resampled data
+import scipy.io as sio
+sio.savemat('sey_data_resampling_ecloud_model.mat',dict_resampled,oned_as='row')
+
+
 # Create SecEmission object (as used in simulation)
 se_obj = semf.SEY_model_from_file(sey_file=dict_resampled, flag_factor_costheta=True)
 

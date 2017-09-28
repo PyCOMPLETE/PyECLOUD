@@ -212,10 +212,13 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     N_min_Dh_main = None
 
     # secondary emission from file
-
     sey_file, flag_factor_costheta = [None]*2
 
 
+    # Default values for SEY from file
+    Emax = None
+    del_max = None
+    R0 = None
 
     f=open(pyecl_input_folder+'/'+simulation_param_file)
     exec(f.read())

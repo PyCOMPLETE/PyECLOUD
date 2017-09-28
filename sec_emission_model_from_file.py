@@ -30,16 +30,9 @@ class SEY_model_from_file(object):
 
             sey_properties = sio.loadmat(sey_file)
             
-            
-            resampled = {
-        'energy_eV': energy_eV,
-        'sey_true': sey_true,
-        'sey_elast': sey_elast,   
-        'extrapolate_grad_true': extrapolate_grad_true,
-        'extrapolate_const_true': extrapolate_const_true,
-        'extrapolate_grad_elast': extrapolate_grad_elast,
-        'extrapolate_const_elast': extrapolate_const_elast,
-        }
+        
+        if flag_factor_costheta not in [True, False]:
+            raise ValueError('SEY_model_from_file:\nIn this mode flag_factor_costheta must be explicitely specified')
         
         energy_eV = sey_properties['energy_eV'].squeeze()
         sey_true = sey_properties['sey_true'].squeeze()
