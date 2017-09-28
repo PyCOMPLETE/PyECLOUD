@@ -45,15 +45,44 @@ costheta_impact = ene_test_eV*0.+1.
 
 sey_test, refl, notrefl = se_obj.SEY_process(nel_impact=nel_impact,E_impact_eV=ene_test_eV, 
                             costheta_impact = costheta_impact, i_impact=None)
+                            
+                            
+E_test_refl_frac = list(np.linspace(0, 100, 100)) + list(np.linspace(100, 3000, 100))
+
+
+N_this = 10000
+
+delta_true_montecarlo = []
+delta_elast_montecarlo = []
+for E_this in E_test_refl_frac:
+    nel_impact_this = np.ones(N_this)
+    ene_test_eV_this = np.ones(N_this)*E_this
+    sey_this, refl_this, notrefl_this = se_obj.SEY_process(nel_impact=nel_impact_this,E_impact_eV=ene_test_eV_this, 
+                                costheta_impact = costheta_impact, i_impact=None)
+    N_refl_this = np.sum(refl_this)
+    N_true_this = np.sum(notrefl_this)
+
+    delta_true_this = sey_this[0] * float(N_true_this)/float(N_this)
+    delta_elast_this = sey_this[0] * float(N_refl_this)/float(N_this)
+    
+    delta_true_montecarlo.append(delta_true_this)
+    delta_elast_montecarlo.append(delta_elast_this)
+
+
 
 
 plt.close('all')
 plt.figure(1)
 sp1 = plt.subplot(1,1,1) 
-sp1.plot(E_samples_eV, delta, 'ob')
-plt.plot(ene_test_eV, sey_test, 'b')
-sp1.plot(E_samples_eV, delta_true, 'r')
-sp1.plot(E_samples_eV, delta_elast, 'g')
+sp1.plot(E_samples_eV, delta, 'ob', label='from ECLOUD mdl')
+plt.plot(ene_test_eV, sey_test, 'b', label='from From-File mdl')
+sp1.plot(E_samples_eV, delta_true, 'r', label='sample true')
+sp1.plot(E_samples_eV, delta_elast, 'g', label='sample elast')
 
+sp1.plot(E_test_refl_frac, delta_true_montecarlo, 'vr', label='MC true')
+sp1.plot(E_test_refl_frac, delta_elast_montecarlo, 'vg', label='MC elast')
+
+sp1.legend(loc='best')
+sp1.grid('on')
 
 plt.show()
