@@ -26,7 +26,7 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation_folder')
-parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
+parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017. Default is 3D.', choices=('2D', '3D'), default='3D')
 args = parser.parse_args()
 if args.folder:
     sim_folder = args.folder
