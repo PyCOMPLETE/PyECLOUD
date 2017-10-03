@@ -55,7 +55,6 @@ import beam_and_timing as beatim
 
 from geom_impact_ellip import ellip_cham_geom_object
 
-import sec_emission
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
@@ -130,6 +129,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     # photoemission parameters
     photoem_flag = 0
     inv_CDF_refl_photoem_file = -1
+    inv_CDF_all_photoem_file = -1
     k_pe_st = -1
     refl_frac = -1
     alimit= -1
@@ -138,6 +138,8 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     x0_refl = -1
     y0_refl = -1
     out_radius = -1
+    energy_distribution = 'gaussian'
+    flag_continuous_emission = False
 
     # gas ionization parameters
     gas_ion_flag = 0
@@ -291,9 +293,12 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
         En_hist_max,
         photoem_flag,
         inv_CDF_refl_photoem_file,
+        inv_CDF_all_photoem_file,
         k_pe_st,
         refl_frac,
         alimit,
+        energy_distribution,
+        flag_continuous_emission,
         e_pe_sigma,
         e_pe_max,
         x0_refl,
@@ -367,8 +372,6 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     )
 
 
-
-
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     (
         b_par,
@@ -418,9 +421,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         En_hist_max,
         photoem_flag,
         inv_CDF_refl_photoem_file,
+        inv_CDF_all_photoem_file,
         k_pe_st,
         refl_frac,
         alimit,
+        energy_distribution,
+        flag_continuous_emission,
         e_pe_sigma,
         e_pe_max,
         x0_refl,
@@ -494,14 +500,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         ) = read_parameter_files(pyecl_input_folder)
 
 
-
     for attr in kwargs.keys():
             print 'Ecloud init. From kwargs: %s = %s'%(attr, repr(kwargs[attr]))
             tmpattr = kwargs[attr]
             exec('%s=tmpattr'%attr)
-
-
-
 
 
     ##########################################
@@ -604,9 +606,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
 
 
-    if photoem_flag==1:
-        phemiss=gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
-                                  x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, photoelectron_angle_distribution)
+    if photoem_flag == 1:
+        phemiss = gpc.photoemission(inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit,
+                x0_refl, y0_refl, out_radius, chamb, phem_resc_fac, energy_distribution, photoelectron_angle_distribution, beamtim, flag_continuous_emission)
+    elif photoem_flag in (2, 'from_file'):
+        phemiss = gpc.photoemission_from_file(inv_CDF_all_photoem_file, chamb, phem_resc_fac, energy_distribution, e_pe_sigma,
+                                              e_pe_max, k_pe_st, out_radius, photoelectron_angle_distribution, beamtim, flag_continuous_emission)
     else:
         phemiss=None
 

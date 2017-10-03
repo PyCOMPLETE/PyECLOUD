@@ -148,12 +148,12 @@ class BuildupSimulation(object):
 
 
             ## photoemission (main and secondary beams)
-            if(photoem_flag==1):
+            if (photoem_flag != 0):
                 lam_curr_phem = beamtim.lam_t_curr
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
                         lam_curr_phem += sec_beam.lam_t_curr
-                MP_e = phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
+                phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
 
             ## Compute space charge field
