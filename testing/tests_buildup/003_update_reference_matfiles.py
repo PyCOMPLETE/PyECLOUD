@@ -1,5 +1,9 @@
+import sys
 import shutil
 import os
+
+if raw_input('Continue replace all reference files? y/n ') not in ('y','yes'):
+    sys.exit()
 
 all_sim_folders = [
     'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization',
@@ -23,7 +27,7 @@ for folder in all_sim_folders:
         shutil.copy(mat_file, ref_file)
         print('%s replaced by %s' % (ref_file, mat_file))
 
-
+# OLD STUFF:
 #for folder in all_sim_folders:
 #    ref_file = folder + '/Pyecltest_ref.mat'
 #    new_ref_file = folder + '/Pyecltest_3D_ref.mat'
