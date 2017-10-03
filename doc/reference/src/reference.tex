@@ -89,6 +89,8 @@ This document describes the main input and output parameters for the PyECLOUD co
 \section{Input files}
 \subsection{Simulation parameters}
 
+This input file has to be named \textbf{simulation\_parameters.input}.
+
 \renewcommand*{\arraystretch}{1.4}
 \begin{longtable}
 {p{0.42\textwidth}p{0.53\textwidth}}
@@ -218,6 +220,7 @@ Target number of MPs obtained after a soft regeneration.\\
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Saving settings}
 }\\ \hline
+    \textbf{dec\_fact\_out} & Output is saved only for every nth time step. \\ \hline
 \textbf{Dx\_hist}& 	[m] Defines the binning for the saving of the horizontal histograms.\\ \hline
 \textbf{r\_center}&	[m] Radius of a circle around the (0, 0) point (center of the chamber) for the calculation of the local central density.\\ \hline
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
@@ -581,34 +584,46 @@ Still 'cosine\_2D' is kept as default for backwards compatibility.
 \section{Output}
 The main PyECLOUD output is in a single~.mat file (by default called `Pyecltest.mat'). It can be opened in python, for example using the myloadmat\_to\_obj module in the main PyECLOUD folder.
 
-The file contains arrays of different shape. Defining $N\_{\mathrm{steps}}$ the number of time steps in the simulation, $N\_{\mathrm{pass}}$ the number of bunch passages and $N\_{\mathrm{bins}}$ the number of bins in the horizontal plane used to produce histograms, the main output variables have the following shapes: \newline
+The file contains arrays of different shape.
+The time steps in the simulation are spaced by Dt from the simulation parameters input file.
+However the output is only saved every nth time step, where n is specified by dec\_fact\_out.
+The number of these steps is denoted $N\_{\mathrm{step}}$ in the following.
+Defining $N\_{\mathrm{pass}}$ the number of bunch passages and $N\_{\mathrm{bins}}$ the number of bins in the horizontal plane used to produce histograms, the main output variables have the following shapes:
 
-Variables saved at each time step:
-\begin{itemize}
-\item t($N\_{\mathrm{steps}}$)
-\item En\_emit\_eV\_time($N\_{\mathrm{steps}}$)
-\item En\_imp\_eV\_time($N\_{\mathrm{steps}}$)
-\item En\_kin\_eV\_time($N\_{\mathrm{steps}}$)
-\item Nel\_emit\_time($N\_{\mathrm{steps}}$)
-\item Nel\_imp\_time($N\_{\mathrm{steps}}$)
-\item Nel\_timep($N\_{\mathrm{steps}}$)
-\item cen\_density($N\_{\mathrm{steps}}$)
-\item lam\_t\_array($N\_{\mathrm{steps}}$)
-\end{itemize}
+\begin{longtable}
+    {p{0.35\textwidth}p{0.05\textwidth}p{0.53\textwidth}}
+    \hline\endfirsthead\hline\endhead
+    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
+    \textbf{Variables saved at every time step}}
+    \\ \hline
+    t($N\_{\mathrm{steps}}$) & [s] & The time at all time steps where the output is saved.  \\ \hline
+    En\_emit\_eV\_time($N\_{\mathrm{steps}}$)& [eV] & Combined energy of all electrons emitted since the last step. \\\hline
+    En\_imp\_eV\_time($N\_{\mathrm{steps}}$)& [eV] & Combined energy of all electrons impacted since the last step. \\\hline
+    En\_kin\_eV\_time($N\_{\mathrm{steps}}$)& [eV]& Combined kinetic energy of all electrons currently in the chamber. \\\hline
+    Nel\_emit\_time($N\_{\mathrm{steps}}$)  & & Number of electrons emitted since the last step.\\\hline
+    Nel\_imp\_time($N\_{\mathrm{steps}}$)   & & Number of electrons impacted since the last step.\\\hline
+    Nel\_timep($N\_{\mathrm{steps}}$)       & & Number of electrons currently in the chamber.\\\hline
+    cen\_density($N\_{\mathrm{steps}}$)& [$\frac{1}{\mathrm{m}^3}$]& Electron density in a sphere around the center of the chamber with radius r\_center. \\\hline
+    lam\_t\_array($N\_{\mathrm{steps}}$)& [?] & Current line density of the beam charge.\\\hline
+\end{longtable}
 
-Variables saved at each bunch passage (and related axes):
-\begin{itemize}
-\item t\_hist($N\_{\mathrm{pass}}$)
-\item xg\_hist($N\_{\mathrm{bins}}$ )
-\item N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$)
-\item N\_mp\_impact\_pass($N\_{\mathrm{pass}}$)
-\item N\_mp\_pass($N\_{\mathrm{pass}}$)
-\item N\_mp\_ref\_pass($N\_{\mathrm{pass}}$)
-\item energ\_eV\_impact\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
-\item nel\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
-\item nel\_impact\_hist\_scrub($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
-\item nel\_impact\_hist\_tot($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ )
-\end{itemize}
+\begin{longtable}
+    {p{0.35\textwidth}p{0.05\textwidth}p{0.53\textwidth}}
+    \hline\endfirsthead\hline\endhead
+    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
+    \textbf{Variables saved at each bunch passage}}
+    t\_hist($N\_{\mathrm{pass}}$) & & \\\hline
+    xg\_hist($N\_{\mathrm{bins}}$ ) & & \\\hline
+    N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$) & & \\\hline
+    N\_mp\_impact\_pass($N\_{\mathrm{pass}}$) & & \\\hline
+    N\_mp\_pass($N\_{\mathrm{pass}}$) & & \\\hline
+    N\_mp\_ref\_pass($N\_{\mathrm{pass}}$) & & \\\hline
+    energ\_eV\_impact\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & \\\hline
+    nel\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & \\\hline
+    nel\_impact\_hist\_scrub($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & \\\hline
+    nel\_impact\_hist\_tot($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & \\\hline
+ & & \\\hline
+\end{longtable}
 
 Example plots, for one of the simulations in the PyECLOUD test suite, are produced by the script:
 

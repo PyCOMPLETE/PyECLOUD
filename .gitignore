@@ -30,3 +30,7 @@ test_multipole
 *STDERR
 *STDOUT
 .ropeproject
+*.bak
+*.inputc
+*.beamc
+*.out
