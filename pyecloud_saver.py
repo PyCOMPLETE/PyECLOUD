@@ -65,9 +65,9 @@ except ImportError:
     import pickle
 
 
-me=9.10938291e-31;
-qe=1.602176565e-19;
-qm=qe/me;
+me=9.10938291e-31
+qe=1.602176565e-19
+qm=qe/me
 
 class pyecloud_saver:
 
@@ -428,18 +428,18 @@ class pyecloud_saver:
             self.En_emit_last_step_group_eV = 0
 
 
-            self.Nel_time[ii_curr_dec]=sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[ii_curr_dec]=sum(0.5/qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
+            self.Nel_time[ii_curr_dec]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
+            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5/qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
             flag_center[MP_e.N_mp:]=False
-            self.cen_density[ii_curr_dec]=sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_center*self.r_center)
+            self.cen_density[ii_curr_dec]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_center*self.r_center)
 
             if self.flag_el_dens_probes:
                 for ii in xrange(self.N_el_dens_probes):
                     flag_center=((MP_e.x_mp-self.x_el_dens_probes[ii])**2 + (MP_e.y_mp-self.y_el_dens_probes[ii])**2)<self.r_el_dens_probes[ii]**2;
                     flag_center[MP_e.N_mp:]=False
-                    self.el_dens_at_probes[ii, ii_curr_dec]=sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
+                    self.el_dens_at_probes[ii, ii_curr_dec]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
 
 
             if self.flag_detailed_MP_info==1:
@@ -463,7 +463,7 @@ class pyecloud_saver:
 
                     self.nel_hist_det_line=0.0*self.nel_hist_det_line
 
-                    if sum(mask_det_hist)>0:
+                    if np.sum(mask_det_hist)>0:
                         #print 'here 2'
                         histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp][mask_det_hist],MP_e.nel_mp[0:MP_e.N_mp][mask_det_hist],
                                            self.bias_x_hist_det, self.Dx_hist_det, self.nel_hist_det_line)
@@ -512,33 +512,33 @@ class pyecloud_saver:
                     'En_imp_eV_time':       self.En_imp_eV_time,
                     'En_emit_eV_time':      self.En_emit_eV_time,
                     'En_g_hist':            impact_man.En_g_hist,
-                    'En_hist':              self.En_hist, # not documented
-                    't_En_hist':            self.t_En_hist, # not documented
+                    'En_hist':              self.En_hist,
+                    't_En_hist':            self.t_En_hist,
                     'lam_t_array':          self.lam_t_array_dec,
-                    'b_spac':               beamtim.b_spac, # not documented
-                    't_sc_video':           np.array(self.t_sc_video), # not documented
-                    'U_sc_eV':              np.array(self.U_sc_eV), # not documented
+                    'b_spac':               beamtim.b_spac,
+                    't_sc_video':           np.array(self.t_sc_video),
+                    'U_sc_eV':              np.array(self.U_sc_eV),
                     'En_kin_eV_time':       self.En_kin_eV_time,
                     'N_mp_impact_pass':     self.N_mp_impact_pass,
                     'N_mp_corrected_pass':  self.N_mp_corrected_pass,
                     'N_mp_pass':            self.N_mp_pass,
-                    'N_mp_time':            self.N_mp_time, # not documented
-                    'N_mp_ref_pass':        self.N_mp_ref_pass, # not documented
-                    'nel_hist_impact_seg':  self.nel_hist_impact_seg, # not documented
-                    'energ_eV_impact_seg':  self.energ_eV_impact_seg, # not documented
-                    't_sec_beams':          self.t_sec_beams, # not documented
-                    'sec_beam_profiles':    self.sec_beam_profiles, # not documented
-                    'el_dens_at_probes':    self.el_dens_at_probes, # not documented
-                    'x_el_dens_probes':     self.x_el_dens_probes, # not documented
-                    'y_el_dens_probes':     self.y_el_dens_probes, # not documented
-                    'r_el_dens_probes':     self.r_el_dens_probes, # not documented
-                    'nel_hist_det':         self.nel_hist_det, # not documented
-                    'xg_hist_det':          self.xg_hist_det, # not documented
-                    'dec_fact_out':         self.dec_fact_out, # not documented
+                    'N_mp_time':            self.N_mp_time,
+                    'N_mp_ref_pass':        self.N_mp_ref_pass,
+                    'nel_hist_impact_seg':  self.nel_hist_impact_seg,
+                    'energ_eV_impact_seg':  self.energ_eV_impact_seg,
+                    't_sec_beams':          self.t_sec_beams,
+                    'sec_beam_profiles':    self.sec_beam_profiles,
+                    'el_dens_at_probes':    self.el_dens_at_probes,
+                    'x_el_dens_probes':     self.x_el_dens_probes,
+                    'y_el_dens_probes':     self.y_el_dens_probes,
+                    'r_el_dens_probes':     self.r_el_dens_probes,
+                    'nel_hist_det':         self.nel_hist_det,
+                    'xg_hist_det':          self.xg_hist_det,
+                    'dec_fact_out':         self.dec_fact_out,
                 }
             if self.flag_cos_angle_hist:
-                    saved_dict['cos_angle_hist'] = self.cos_angle_hist # not documented
-                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle # not documented
+                    saved_dict['cos_angle_hist'] = self.cos_angle_hist
+                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle
 
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
@@ -546,7 +546,7 @@ class pyecloud_saver:
             # logfile and progressfile
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
-            string_tolog= timestr+(' pass. %d/%d Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
+            string_tolog= timestr+(' pass. %d/%d Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
 
 
 #             flog=open(self.logfile_path,'a')
