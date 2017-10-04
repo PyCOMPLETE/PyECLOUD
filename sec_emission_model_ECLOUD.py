@@ -53,7 +53,7 @@ from numpy import sqrt, exp
 from numpy.random import rand
 import numpy as np
 
-def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale, flag_costheta_Emax_shift):
+def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
 
     if flag_costheta_delta_scale:
         del_max_tilde=del_max*exp(0.5*(1.-costheta));

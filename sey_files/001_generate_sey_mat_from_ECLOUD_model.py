@@ -12,10 +12,16 @@ del_max = 1.700000
 R0 = 0.7
 
 costheta = 1.
-E_samples_eV = np.linspace(0, 2000, 500)
 
-dE_resample_eV = 1.
+E_max_samples = 10000.#2000
+N_samples = 100000 #500
+
+dE_resample_eV = 0.2
 range_for_extrap_eV = 100
+
+E_samples_eV = np.linspace(0, E_max_samples, N_samples)
+
+
 
 # Get curves from standard ECLOUD model
 obec = seme.SEY_model_ECLOUD(Emax=Emax, del_max=del_max, R0=R0)
@@ -43,7 +49,7 @@ se_obj = semf.SEY_model_from_file(sey_file=dict_resampled, flag_factor_costheta=
 
 # Test impacts
 N_ele_test = 10000
-ene_eV_max_test = 3000.
+ene_eV_max_test = 10000.
 ene_test_eV = np.linspace(0., ene_eV_max_test, N_ele_test)
 nel_impact = ene_test_eV*0.+1.
 costheta_impact = ene_test_eV*0.+1.

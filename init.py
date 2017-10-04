@@ -219,6 +219,9 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     Emax = None
     del_max = None
     R0 = None
+    
+    flag_costheta_delta_scale = True
+    flag_costheta_Emax_shift=True
 
     f=open(pyecl_input_folder+'/'+simulation_param_file)
     exec(f.read())
@@ -375,6 +378,8 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
         flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
+        flag_costheta_delta_scale,
+        flag_costheta_Emax_shift,
     )
 
 
@@ -502,6 +507,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
+        flag_costheta_delta_scale,
+        flag_costheta_Emax_shift,
         ) = read_parameter_files(pyecl_input_folder)
 
 
@@ -590,6 +597,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
             raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
 
     if switch_model==0 or switch_model=='ECLOUD':
+        kwargs['flag_costheta_delta_scale'] = flag_costheta_delta_scale
+        kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift   
         sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':
         sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0,**kwargs)
