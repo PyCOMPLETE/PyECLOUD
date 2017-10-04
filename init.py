@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                          PyECLOUD Version 6.4.0
+#                          PyECLOUD Version 6.4.1
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -77,7 +77,6 @@ import gen_photoemission_class as gpc
 
 import parse_beam_file as pbf
 import input_parameters_format_specification as inp_spec
-
 
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
@@ -230,9 +229,14 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         resgasion=None
 
 
-    if cc.photoem_flag:
+    if cc.photoem_flag == 1:
         phemiss=gpc.photoemission(cc.inv_CDF_refl_photoem_file, cc.k_pe_st, cc.refl_frac, cc.e_pe_sigma, cc.e_pe_max, cc.alimit,
-                                  cc.x0_refl, cc.y0_refl, cc.out_radius, chamb, cc.phem_resc_fac, cc.photoelectron_angle_distribution)
+                                  cc.x0_refl, cc.y0_refl, cc.out_radius, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.photoelectron_angle_distribution,
+                                  beamtim, cc.flag_continuous_emission)
+
+    elif cc.photoem_flag in (2, 'from_file'):
+        phemiss = gpc.photoemission_from_file(cc.inv_CDF_all_photoem_file, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.e_pe_sigma,
+                                              cc.e_pe_max, cc.k_pe_st, cc.out_radius, cc.photoelectron_angle_distribution, beamtim, cc.flag_continuous_emission)
     else:
         phemiss=None
 

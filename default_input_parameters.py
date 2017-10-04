@@ -129,6 +129,7 @@ parameters_dict = {
             # Photoemission
             'photoem_flag'                      : 0,
             'inv_CDF_refl_photoem_file'         : -1,
+            'inv_CDF_all_photoem_file'          : -1,
             'k_pe_st'                           : -1,
             'refl_frac'                         : -1,
             'alimit'                            : -1,
@@ -139,6 +140,9 @@ parameters_dict = {
             'out_radius'                        : -1,
             'phem_resc_fac'                     : 0.9999,
             'photoelectron_angle_distribution'  : 'cosine_2D',
+            'energy_distribution'               : 'gaussian',
+            'flag_continuous_emission'          : False,
+
 
             # Uniform initial distribution
             'init_unif_flag'        : 0,
