@@ -60,6 +60,8 @@ from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
+from sec_emission_model_from_file import SEY_model_from_file
+
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
@@ -211,6 +213,11 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     target_grid = None
     N_nodes_discard = None
     N_min_Dh_main = None
+
+    # secondary emission from file
+
+    sey_file, flag_factor_costheta = [None]*2
+
 
 
     f=open(pyecl_input_folder+'/'+simulation_param_file)
@@ -367,6 +374,8 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
+        sey_file,
+        flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
     )
@@ -495,6 +504,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
+        sey_file,
+        flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
         ) = read_parameter_files(pyecl_input_folder)
@@ -590,6 +601,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_cos_le(Emax,del_max,R0,**kwargs)
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+    elif switch_model == 'from_file':
+        sey_mod = SEY_model_from_file(sey_file, flag_factor_costheta)
 
 
     flag_seg = (flag_hist_impact_seg==1)

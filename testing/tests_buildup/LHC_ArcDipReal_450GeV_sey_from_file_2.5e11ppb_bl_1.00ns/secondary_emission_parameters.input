@@ -1,0 +1,21 @@
+# secondary emission model
+Emax=332.;
+del_max = 1.700000
+R0 = 0.7
+switch_model = 'from_file'
+
+# hilleret model for sec. emission
+E_th=35.;
+sigmafit =1.0828;
+mufit = 1.6636;
+
+switch_no_increase_energy=0
+thresh_low_energy=-1
+
+scrub_en_th=20.#eV
+
+sey_file = 'merged_Beam_Screen_V2_sample_17cm_Top.txt'
+R0_file = 0.7
+range_extrapolate_right = 400
+delta_e = 0.1
+flag_factor_costheta = True
