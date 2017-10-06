@@ -60,6 +60,8 @@ from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
+from sec_emission_model_from_file import SEY_model_from_file
+
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
@@ -212,6 +214,17 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     N_nodes_discard = None
     N_min_Dh_main = None
 
+    # secondary emission from file
+    sey_file, flag_factor_costheta = [None]*2
+
+
+    # Default values for SEY from file
+    Emax = None
+    del_max = None
+    R0 = None
+    
+    flag_costheta_delta_scale = True
+    flag_costheta_Emax_shift=True
 
     f=open(pyecl_input_folder+'/'+simulation_param_file)
     exec(f.read())
@@ -367,8 +380,12 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
+        sey_file,
+        flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
+        flag_costheta_delta_scale,
+        flag_costheta_Emax_shift,
     )
 
 
@@ -495,8 +512,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
+        sey_file,
+        flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
+        flag_costheta_delta_scale,
+        flag_costheta_Emax_shift,
         ) = read_parameter_files(pyecl_input_folder)
 
 
@@ -581,6 +602,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
             raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
 
     if switch_model==0 or switch_model=='ECLOUD':
+        kwargs['flag_costheta_delta_scale'] = flag_costheta_delta_scale
+        kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift   
         sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':
         sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0,**kwargs)
@@ -590,6 +613,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_cos_le(Emax,del_max,R0,**kwargs)
     elif switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(Emax,del_max,R0)
+    elif switch_model == 'from_file':
+        sey_mod = SEY_model_from_file(sey_file, flag_factor_costheta)
 
 
     flag_seg = (flag_hist_impact_seg==1)
