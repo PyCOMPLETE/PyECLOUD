@@ -79,8 +79,7 @@ import gen_photoemission_class as gpc
 import parse_beam_file as pbf
 import input_parameters_format_specification as inp_spec
 
-def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
-
+def read_parameter_files(pyecl_input_folder='./', **kwargs):
     simulation_param_file = 'simulation_parameters.input'
     config_dict = {}
 
@@ -102,6 +101,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     beam_beam = inp_spec.import_module_from_file('beam_beam', os.path.join(pyecl_input_folder, beam_parameters_file))
     inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
+
+    return config_dict
+
+
+def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
+
+    config_dict = read_parameter_files(pyecl_input_folder)
 
     # Override config values with kwargs
     for attr, value in kwargs.items():

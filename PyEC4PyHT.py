@@ -50,32 +50,26 @@
 #     all references.
 #----------------------------------------------------------------------
 
+import numpy as np
+from scipy.constants import c, e, m_e
 
+import myloadmat_to_obj as mlm
 
 from geom_impact_ellip import ellip_cham_geom_object
-import geom_impact_poly as gip
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
-import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
 
 import MP_system as MPs
 import space_charge_class as scc
 import impact_management_class as imc
 
-import gas_ionization_class as gic
-import gen_photoemission_class as gpc
-
 import init
 
 
-
-import numpy as np
-from scipy.constants import c, e, m_e
 
 
 class MP_light(object):
@@ -84,8 +78,8 @@ class MP_light(object):
 
 
 class Ecloud(object):
-    def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices = False,
-                slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
+    def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
+                 slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
 
 
         print 'PyECLOUD Version 6.4.1'
@@ -98,241 +92,134 @@ class Ecloud(object):
         self.pyecl_input_folder = pyecl_input_folder
         self.kwargs = kwargs
 
-        (
-        b_par,
-        x_aper,
-        y_aper,
-        B,
-        gas_ion_flag,
-        P_nTorr,
-        sigma_ion_MBarn,
-        Temp_K,
-        unif_frac,
-        E_init_ion,
-        Emax,
-        del_max,
-        R0, E_th,
-        sigmafit,
-        mufit,
-        Dt,
-        t_end,
-        lam_th,
-        t_ion,
-        N_mp_max,
-        N_mp_regen,
-        N_mp_after_regen,
-        fact_split,
-        fact_clean,
-        nel_mp_ref_0,
-        Nx_regen,
-        Ny_regen,
-        Nvx_regen,
-        Nvy_regen,
-        Nvz_regen,
-        regen_hist_cut,
-        N_mp_regen_low,
-        Dt_sc,
-        Dh_sc,
-        t_sc_ON,
-        Dx_hist,
-        r_center,
-        scrub_en_th,
-        progress_path,
-        logfile_path,
-        flag_movie,
-        flag_sc_movie,
-        Dt_En_hist,
-        Nbin_En_hist,
-        En_hist_max,
-        photoem_flag,
-        inv_CDF_refl_photoem_file,
-        k_pe_st,
-        refl_frac,
-        alimit,
-        e_pe_sigma,
-        e_pe_max,
-        x0_refl,
-        y0_refl,
-        out_radius,
-        switch_model,
-        switch_no_increase_energy,
-        thresh_low_energy,
-        save_mp_state_time_file,
-        init_unif_flag,
-        Nel_init_unif,
-        E_init_unif,
-        x_max_init_unif,
-        x_min_init_unif,
-        y_max_init_unif,
-        y_min_init_unif,
-        chamb_type,
-        filename_chm,
-        flag_detailed_MP_info,
-        flag_hist_impact_seg,
-        track_method,
-        secondary_angle_distribution,
-        photoelectron_angle_distribution,
-        B0x,
-        B0y,
-        B0z,
-        B_map_file,
-        Bz_map_file,
-        N_sub_steps,
-        fact_Bmap,
-        B_zero_thrhld,
-        N_mp_soft_regen,
-        N_mp_after_soft_regen,
-        flag_verbose_file,
-        flag_verbose_stdout,
-        flag_presence_sec_beams,
-        sec_b_par_list,
-        phem_resc_fac,
-        dec_fac_secbeam_prof,
-        el_density_probes,
-        save_simulation_state_time_file,
-        x_min_hist_det,
-        x_max_hist_det,
-        y_min_hist_det,
-        y_max_hist_det,
-        Dx_hist_det,
-        dec_fact_out,
-        stopfile,
-        sparse_solver,
-        B_multip,
-        B_skew,
-        PyPICmode,
-        filename_init_MP_state,
-        init_unif_edens_flag,
-        init_unif_edens,
-        E_init_unif_edens,
-        x_max_init_unif_edens,
-        x_min_init_unif_edens,
-        y_max_init_unif_edens,
-        y_min_init_unif_edens,
-        flag_assume_convex,
-        E0,
-        s_param,
-        filen_main_outp,
-        f_telescope,
-        target_grid,
-        N_nodes_discard,
-        N_min_Dh_main,
-        flag_cos_angle_hist,
-        cos_angle_width,
-        ) = init.read_parameter_files(pyecl_input_folder, skip_beam_files=True)
+        config_dict = init.read_parameter_files(pyecl_input_folder, skip_beam_files=True)
 
-        for attr in kwargs.keys():
-            print 'Ecloud init. From kwargs: %s = %s'%(attr, repr(kwargs[attr]))
-            tmpattr = kwargs[attr]
-            exec('%s=tmpattr'%attr)
+        # Override config values with kwargs
+        for attr, value in kwargs.items():
+            if attr in ('x_beam_offset', 'y_beam_offset'):
+                continue
+            print('Ecloud init. From kwargs: %s = %r' % (attr, value))
+            if attr in config_dict:
+                config_dict[attr] = value
+            else:
+                print('Warning! What exactly does %s do? It is not part of any config file.' % attr)
+                exec('%s=value') % attr
+
+        cc = mlm.obj_from_dict(config_dict)
 
         #pyeclsaver=pysav.pyecloud_saver(logfile_path)
 
 
-        if switch_model=='ECLOUD_nunif':
+        if cc.switch_model=='ECLOUD_nunif':
             flag_non_unif_sey = 1
         else:
             flag_non_unif_sey = 0
 
-        if chamb_type=='ellip':
-            chamb=ellip_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file)
-        elif chamb_type=='polyg' or chamb_type=='polyg_cython':
+        if cc.chamb_type=='ellip':
+            chamb=ellip_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file)
+        elif cc.chamb_type in ('polyg', 'polyg_cython'):
                 import geom_impact_poly_fast_impact as gipfi
-                chamb=gipfi.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-                                             flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout, flag_assume_convex=flag_assume_convex)
-        elif chamb_type=='polyg_numpy':
+                chamb=gipfi.polyg_cham_geom_object(cc.filename_chm, cc.flag_non_unif_sey, flag_verbose_file=cc.flag_verbose_file,
+                                                   flag_verbose_stdout=cc.flag_verbose_stdout, flag_assume_convex=cc.flag_assume_convex)
+        elif cc.chamb_type=='polyg_numpy':
             raise ValueError("chamb_type='polyg_numpy' not supported anymore")
             #~ chamb=gip.polyg_cham_geom_object(filename_chm, flag_non_unif_sey,
-                             #~ flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
-        elif chamb_type=='rect':
+            #~ flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+        elif cc.chamb_type=='rect':
             import geom_impact_rect_fast_impact as girfi
-            chamb =  girfi.rect_cham_geom_object(x_aper, y_aper, flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
+            chamb = girfi.rect_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file,
+                                                flag_verbose_stdout=cc.flag_verbose_stdout)
         else:
             raise ValueError('Chamber type not recognized (choose: ellip/rect/polyg)')
 
 
-        MP_e=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
-                           N_mp_regen_low, N_mp_regen, N_mp_after_regen,
-                           Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb,
-                           N_mp_soft_regen=N_mp_soft_regen, N_mp_after_soft_regen=N_mp_after_soft_regen, charge=MP_e_charge, mass=MP_e_mass)
+        MP_e=MPs.MP_system(cc.N_mp_max, cc.nel_mp_ref_0, cc.fact_split, cc.fact_clean,
+                           cc.N_mp_regen_low, cc.N_mp_regen, cc.N_mp_after_regen,
+                           cc.Dx_hist, cc.Nx_regen, cc.Ny_regen, cc.Nvx_regen, cc.Nvy_regen, cc.Nvz_regen, cc.regen_hist_cut, cc.chamb,
+                           N_mp_soft_regen=cc.N_mp_soft_regen, N_mp_after_soft_regen=cc.N_mp_after_soft_regen, charge=MP_e_charge,
+                           mass=MP_e_mass)
 
 
 
-        if sparse_solver=='klu':
+        if cc.sparse_solver=='klu':
             print '''sparse_solver: 'klu' no longer supported --> going to PyKLU'''
-            sparse_solver='PyKLU'
+            cc.sparse_solver='PyKLU'
 
         if space_charge_obj is not None:
             spacech_ele = space_charge_obj
         else:
-            spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode,
-                                f_telescope = f_telescope, target_grid = target_grid, N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
+            spacech_ele = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard,
+                                           N_min_Dh_main=cc.N_min_Dh_main)
 
 
-        if switch_model==0 or switch_model=='ECLOUD':
-            sey_mod=SEY_model_ECLOUD(Emax,del_max,R0)
-        elif switch_model==1 or switch_model=='ACC_LOW':
-            sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0)
-        elif switch_model=='ECLOUD_nunif':
-            sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax,del_max,R0)
-        elif switch_model=='cos_low_ene':
-            sey_mod=SEY_model_cos_le(Emax,del_max,R0)
-        elif switch_model=='flat_low_ene':
-                sey_mod=SEY_model_flat_le(Emax,del_max,R0)
-        elif switch_model=='perfect_absorber':
-            sey_mod=None
+        if cc.switch_model in (0, 'ECLOUD'):
+            sey_mod = SEY_model_ECLOUD(cc.Emax, cc.del_max, cc.R0)
+        elif cc.switch_model in (1, 'ACC_LOW'):
+            sey_mod = SEY_model_acc_low_ene(cc.Emax, cc.del_max, cc.R0)
+        elif cc.switch_model == 'ECLOUD_nunif':
+            sey_mod = SEY_model_ECLOUD_non_unif(cc.chamb, cc.Emax, cc.del_max, cc.R0)
+        elif cc.switch_model == 'cos_low_ene':
+            sey_mod = SEY_model_cos_le(cc.Emax, cc.del_max, cc.R0)
+        elif cc.switch_model == 'flat_low_ene':
+                sey_mod = SEY_model_flat_le(cc.Emax, cc.del_max, cc.R0)
+        elif cc.switch_model == 'perfect_absorber':
+            sey_mod = None
 
 
-        flag_seg = (flag_hist_impact_seg==1)
+        flag_seg = (cc.flag_hist_impact_seg==1)
 
-        if switch_model=='perfect_absorber':
+        if cc.switch_model=='perfect_absorber':
             import perfect_absorber_class as pac
-            impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, 
-                flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
+            impact_man = pac.impact_management_perfect_absorber(
+                cc.switch_no_increase_energy, chamb, sey_mod, cc.E_th, cc.sigmafit,cc.mufit, cc.Dx_hist, cc.scrub_en_th,
+                cc.Nbin_En_hist, cc.En_hist_max, thresh_low_energy=cc.thresh_low_energy, flag_seg=flag_seg,
+                cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=cc.secondary_angle_distribution
+            )
         else:
-            impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
-                 flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
+            impact_man = imc.impact_management(
+                cc.switch_no_increase_energy, chamb, sey_mod, cc.E_th, cc.sigmafit, cc.mufit, cc.Dx_hist, cc.scrub_en_th,
+                cc.Nbin_En_hist, cc.En_hist_max, thresh_low_energy=cc.thresh_low_energy, flag_seg=flag_seg,
+                cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=cc.secondary_angle_distribution
+            )
 
 
-        if track_method == 'Boris':
-            dynamics=dynB.pusher_Boris(Dt, B0x, B0y, B0z, \
-                     B_map_file, fact_Bmap,  Bz_map_file,N_sub_steps=N_sub_steps)
+        if cc.track_method == 'Boris':
+            dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z, cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=cc.N_sub_steps)
         #~ elif track_method == 'StrongBdip':
             #~ dynamics=dyndip.pusher_dipole_magnet(Dt,B)
         #~ elif track_method == 'StrongBgen':
             #~ dynamics=dyngen.pusher_strong_B_generalized(Dt, B0x, B0y,  \
                      #~ B_map_file, fact_Bmap, B_zero_thrhld)
-        elif track_method == 'BorisMultipole':
+        elif cc.track_method == 'BorisMultipole':
             import dynamics_Boris_multipole as dynmul
-            dynamics=dynmul.pusher_Boris_multipole(Dt=Dt, N_sub_steps=N_sub_steps, B_multip = B_multip)
+            dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip)
         else:
             raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module""")
 
 
-        if init_unif_flag==1:
-            print "Adding inital %.2e electrons to the initial distribution"%Nel_init_unif
-            MP_e.add_uniform_MP_distrib(Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif)
+        if cc.init_unif_flag == 1:
+            print("Adding inital %.2e electrons to the initial distribution") % cc.Nel_init_unif
+            MP_e.add_uniform_MP_distrib(cc.Nel_init_unif, cc.E_init_unif, cc.x_max_init_unif, cc.x_min_init_unif,
+                                        cc.y_max_init_unif, cc.y_min_init_unif)
 
 
-        if init_unif_edens_flag==1:
-            print "Adding inital %.2e electrons/m^3 to the initial distribution"%init_unif_edens
-            MP_e.add_uniform_ele_density(n_ele=init_unif_edens, E_init=E_init_unif_edens,
-            x_max=x_max_init_unif_edens, x_min=x_min_init_unif_edens,
-            y_max=y_max_init_unif_edens, y_min=y_min_init_unif_edens)
+        if cc.init_unif_edens_flag == 1:
+            print("Adding inital %.2e electrons/m^3 to the initial distribution") % cc.init_unif_edens
+            MP_e.add_uniform_ele_density(n_ele=cc.init_unif_edens, E_init=cc.E_init_unif_edens, x_max=cc.x_max_init_unif_edens,
+                                         x_min=cc.x_min_init_unif_edens, y_max=cc.y_max_init_unif_edens, y_min=cc.y_min_init_unif_edens)
 
 
-        if filename_init_MP_state!=-1 and filename_init_MP_state is not None:
-            print "Adding inital electrons from: %s"%filename_init_MP_state
-            MP_e.add_from_file(filename_init_MP_state)
+        if cc.filename_init_MP_state not in (-1, None):
+            print("Adding inital electrons from: %s") % cc.filename_init_MP_state
+            MP_e.add_from_file(cc.filename_init_MP_state)
 
 
         self.x_beam_offset = 0.
         self.y_beam_offset = 0.
-        if 'x_beam_offset' in kwargs.keys():
+        if 'x_beam_offset' in kwargs:
             self.x_beam_offset = kwargs['x_beam_offset']
-        if 'y_beam_offset' in kwargs.keys():
+        if 'y_beam_offset' in kwargs:
             self.y_beam_offset = kwargs['y_beam_offset']
 
         # initialize proton density probes
@@ -348,8 +235,8 @@ class Ecloud(object):
             self.x_probes = []
             self.y_probes = []
             for ii_probe in xrange(self.N_probes):
-                self.x_probes.append(probes_position[ii_probe]['x'])
-                self.y_probes.append(probes_position[ii_probe]['y'])
+                self.x_probes.append(cc.probes_position[ii_probe]['x'])
+                self.y_probes.append(cc.probes_position[ii_probe]['y'])
 
             self.x_probes = np.array(self.x_probes)
             self.y_probes = np.array(self.y_probes)
