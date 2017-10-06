@@ -191,10 +191,10 @@ Target number of MPs obtained after a soft regeneration.\\
 }\\ \hline
 \textbf{Dt\_sc}&	[s] Time step for the update of the electron space charge field map.\\ \hline
 \textbf{Dh\_sc }&		[m] Grid size for the space charge PIC solver.\\ \hline
-\textbf{t\_sc\_ON}& [s] Electron space charge forces are neglected for t<t\_sc\_ON -- normally t\_sc\_ON=0.
-\\ \hline
-\textbf{sparse\_solver} & [optional] choices are 'klu', 'scipy\_slu' [default'
-\\ \hline
+\textbf{t\_sc\_ON}& [s] Electron space charge forces are neglected for t<t\_sc\_ON -- normally t\_sc\_ON=0. \\ \hline
+    \textbf{sparse\_solver} & [optional] choices are 'klu', 'scipy\_slu' [default] \\\hline
+    \textbf{PyPICmode} & [optional] Options are 'FiniteDifferences\_ShortleyWeller' [default], 'ShortleyWeller\_WithTelescopicGrids', 'FiniteDifferences\_Staircase'
+    \\ \hline
 \end{longtable}
 
 
@@ -279,15 +279,11 @@ Possible settings:
 \item chamb\_type = `polyg' or `polyg\_cython' for polygonal chamber profile.
 \end{enumerate}
 \\ \hline
-\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:}
-\\ \hline
-\textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile.
-\\ \hline
-\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:}
-\\ \hline
-\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile.
-\\
-\hline
+\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:} \\ \hline
+\textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile.  \\ \hline
+\multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:} \\ \hline
+\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile.  \\ \hline
+    \textbf{flag\_assume\_convex} & [optional] Default: True \\\hline
 \end{longtable}
 
 
@@ -315,11 +311,14 @@ Possible settings:
 \textbf{B\_map\_file} & Name of a .mat file containing the transverse field map.
 The case of a quadrupole magnet with unit gradient is embedded in the code and can be used setting: B\_map\_file = `analytic\_quadrupole\_unit\_grad'.
 \\ \hline
+\textbf{Bz\_map\_file} & Name of a .mat file containing the longitudinal field map. ???
+The case of a quadrupole magnet with unit gradient is embedded in the code and can be used setting: B\_map\_file = `analytic\_quadrupole\_unit\_grad'.
+\\ \hline
 \textbf{fact\_Bmap} &(optional -- default = 1.) \newline
 Scaling factor applied to the magnetic field map.
 \\ \hline
-\textbf{B0x, B0y} & (optional -- default = 0) \newline
-[T] Uniform transverse magnetic field added to the map.
+\textbf{B0x, B0y, B0z} & (optional -- default = 0) \newline
+[T] Uniform magnetic fields added to the map.
 \\ \hline
 \textbf{B\_zero\_thrld} & [T] Value below which the local magnetic field is approximated with 0.
 \\ \hline
@@ -553,8 +552,10 @@ Different secondary emission models:
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Secondary Electron Yield} (parametrized as described in G. Iadarola's thesis).}\\ \hline
 \textbf{Emax}&	Energy corresponding to the maximum SEY.\\ \hline
+    \textbf{s\_param} & Shape parameter of the true SEY curve. \\\hline
 \textbf{del\_max}& Maximum of the SEY curve.\\ \hline
-\textbf{R0}& 	Weight of the reflected electron component.\\ \hline
+\textbf{R0}& Weight of the reflected electron component.\\ \hline
+\textbf{E0} & Shape parameter of the reflected SEY curve. \\ \hline
 \textbf{E\_th}& 	Maximum energy for true secondary electrons.\\ \hline
 \textbf{sigmafit}& 	Sigma parameter of the lognormal distribution.\\ \hline
 \textbf{mufit}&Mu parameter of the lognormal distribution.\\
