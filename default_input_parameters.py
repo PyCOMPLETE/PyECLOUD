@@ -158,7 +158,7 @@ parameters_dict = {
             # Uniform initial density
             'init_unif_edens_flag'  : 0,
             'init_unif_edens'       : None,
-            'E_init_unif_edens'     : None,
+            'E_init_unif_edens'     : 0.,
             'x_max_init_unif_edens' : None,
             'x_min_init_unif_edens' : None,
             'y_max_init_unif_edens' : None,

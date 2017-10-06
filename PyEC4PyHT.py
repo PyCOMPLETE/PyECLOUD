@@ -69,13 +69,8 @@ import impact_management_class as imc
 
 import init
 
-
-
-
 class MP_light(object):
     pass
-
-
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
@@ -119,7 +114,7 @@ class Ecloud(object):
             chamb=ellip_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file)
         elif cc.chamb_type in ('polyg', 'polyg_cython'):
                 import geom_impact_poly_fast_impact as gipfi
-                chamb=gipfi.polyg_cham_geom_object(cc.filename_chm, cc.flag_non_unif_sey, flag_verbose_file=cc.flag_verbose_file,
+                chamb=gipfi.polyg_cham_geom_object(cc.filename_chm, flag_non_unif_sey, flag_verbose_file=cc.flag_verbose_file,
                                                    flag_verbose_stdout=cc.flag_verbose_stdout, flag_assume_convex=cc.flag_assume_convex)
         elif cc.chamb_type=='polyg_numpy':
             raise ValueError("chamb_type='polyg_numpy' not supported anymore")
@@ -135,7 +130,7 @@ class Ecloud(object):
 
         MP_e=MPs.MP_system(cc.N_mp_max, cc.nel_mp_ref_0, cc.fact_split, cc.fact_clean,
                            cc.N_mp_regen_low, cc.N_mp_regen, cc.N_mp_after_regen,
-                           cc.Dx_hist, cc.Nx_regen, cc.Ny_regen, cc.Nvx_regen, cc.Nvy_regen, cc.Nvz_regen, cc.regen_hist_cut, cc.chamb,
+                           cc.Dx_hist, cc.Nx_regen, cc.Ny_regen, cc.Nvx_regen, cc.Nvy_regen, cc.Nvz_regen, cc.regen_hist_cut, chamb,
                            N_mp_soft_regen=cc.N_mp_soft_regen, N_mp_after_soft_regen=cc.N_mp_after_soft_regen, charge=MP_e_charge,
                            mass=MP_e_mass)
 
