@@ -50,6 +50,7 @@
 #----------------------------------------------------------------------
 
 from __future__ import division, print_function
+import os
 import numpy as np
 from scipy.constants import c, e as qe
 
@@ -83,7 +84,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     simulation_param_file = 'simulation_parameters.input'
     config_dict = {}
 
-    simulation_parameters = inp_spec.import_module_from_file('simulation_parameters', pyecl_input_folder+'/'+simulation_param_file)
+    simulation_parameters = inp_spec.import_module_from_file('simulation_parameters', os.path.join(pyecl_input_folder, simulation_param_file))
     inp_spec.assert_module_has_parameters(simulation_parameters, 'simulation_parameters')
     inp_spec.update_config_dict(config_dict, simulation_parameters, 'simulation_parameters')
 
@@ -91,15 +92,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     secondary_emission_parameters_file = config_dict['secondary_emission_parameters_file']
     beam_parameters_file = config_dict['beam_parameters_file']
 
-    machine_parameters = inp_spec.import_module_from_file('machine_parameters', pyecl_input_folder+'/'+machine_param_file)
+    machine_parameters = inp_spec.import_module_from_file('machine_parameters', os.path.join(pyecl_input_folder, machine_param_file))
     inp_spec.assert_module_has_parameters(machine_parameters, 'machine_parameters')
     inp_spec.update_config_dict(config_dict, machine_parameters, 'machine_parameters')
 
-    secondary_emission_parameters = inp_spec.import_module_from_file('secondary_emission_parameters', pyecl_input_folder+'/'+secondary_emission_parameters_file)
+    secondary_emission_parameters = inp_spec.import_module_from_file('secondary_emission_parameters', os.path.join(pyecl_input_folder, secondary_emission_parameters_file))
     inp_spec.assert_module_has_parameters(secondary_emission_parameters, 'secondary_emission_parameters')
     inp_spec.update_config_dict(config_dict, secondary_emission_parameters, 'secondary_emission_parameters')
 
-    beam_beam = inp_spec.import_module_from_file('beam_beam', pyecl_input_folder+'/'+beam_parameters_file)
+    beam_beam = inp_spec.import_module_from_file('beam_beam', os.path.join(pyecl_input_folder, beam_parameters_file))
     inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
 
     # Probably promote this to an optional parameter in simulation_parameters.input
@@ -119,12 +120,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     cc = mlm.obj_from_dict(config_dict)
 
     flag_presence_sec_beams = len(cc.secondary_beams_file_list)>0
-    b_par = pbf.beam_descr_from_fil(pyecl_input_folder+'/'+cc.beam_parameters_file, cc.betafx, cc.Dx, cc.betafy, cc.Dy)
+    b_par = pbf.beam_descr_from_fil(os.path.join(pyecl_input_folder, cc.beam_parameters_file), cc.betafx, cc.Dx, cc.betafy, cc.Dy)
 
     sec_b_par_list=[]
     if flag_presence_sec_beams:
         for sec_b_file in cc.secondary_beams_file_list:
-            sec_b_par_list.append(pbf.beam_descr_from_fil(pyecl_input_folder+'/'+cc.sec_b_file, cc.betafx, cc.Dx, cc.betafy, cc.Dy))
+            sec_b_par_list.append(pbf.beam_descr_from_fil(os.path.join(pyecl_input_folder, sec_b_file), cc.betafx, cc.Dx, cc.betafy, cc.Dy))
 
     if cc.B==-1:
         cc.B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
