@@ -103,15 +103,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
     beam_beam = inp_spec.import_module_from_file('beam_beam', os.path.join(pyecl_input_folder, beam_parameters_file))
     inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
 
-    # Probably promote this to an optional parameter in simulation_parameters.input
-    filen_main_outp = 'Pyecltest'
-
     # Override config values with kwargs
     for attr, value in kwargs.items():
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
-        if attr == 'filen_main_outp':
-            filen_main_outp = value
-        elif attr in config_dict:
+        if attr in config_dict:
             config_dict[attr] = value
         else:
             print('Warning! What exactly does %s do? It is not part of any config file.' % attr)
@@ -247,7 +242,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=cc.dec_fac_secbeam_prof,
                  el_density_probes=cc.el_density_probes, save_simulation_state_time_file=cc.save_simulation_state_time_file,
                  x_min_hist_det=cc.x_min_hist_det, x_max_hist_det=cc.x_max_hist_det, y_min_hist_det=cc.y_min_hist_det, y_max_hist_det=cc.y_max_hist_det,
-                 Dx_hist_det=cc.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=filen_main_outp,
+                 Dx_hist_det=cc.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=cc.filen_main_outp,
                  flag_cos_angle_hist=cc.flag_cos_angle_hist, cos_angle_width=cc.cos_angle_width)
 
 
