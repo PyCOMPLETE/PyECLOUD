@@ -1,0 +1,75 @@
+# SIMULATION PARAMETERS
+
+machine_param_file='machine_parameters.input'
+secondary_emission_parameters_file='secondary_emission_parameters.input'
+beam_parameters_file='beam1.beam' 
+
+secondary_beams_file_list = ['beam2.beam']
+
+logfile_path = './logfile.txt'
+progress_path = './progress'
+stopfile = './stop'
+
+Dt = 1.000000e-11
+t_end=1e-9;       #s (no effect if log. profile is imported from file)
+
+import numpy as np
+dec_fact_out = int(np.round(5 * 25e-12/Dt))
+
+lam_th=1.e2        #e-/m
+Dx_hist=1.e-3      #m
+r_center=2.e-3     #m
+
+
+Dt_En_hist = 25e-9 #s
+Nbin_En_hist= 100
+En_hist_max= 1000.  #eV
+
+t_ion=100.;        #s
+
+N_mp_max=200000;   #size of allocated vectors 
+
+#Regen parameters
+
+N_mp_regen=80000;
+N_mp_regen_low=5000;
+N_mp_after_regen=10000;
+t_ON_regen_low=0.
+fact_split=1.5;
+fact_clean=1e-4;
+nel_mp_ref_0=1e8*3.14*0.055**2/10000/2.
+regen_hist_cut = 1.e-4
+
+N_mp_soft_regen = 35000
+N_mp_after_soft_regen = 25000
+
+
+# Number of bins
+Nx_regen=51;#it must be odd!
+Ny_regen=51;#it must be odd!
+Nvx_regen=51;#it must be odd!
+Nvy_regen=101;#it must be odd!
+Nvz_regen=51;#it must be odd!
+
+#Sp_ch params
+Dt_sc = 0.5e-9
+Dh_sc = 0.5e-3
+t_sc_ON=0e-9;		#s
+sparse_solver = 'klu'
+
+save_mp_state_time_file =  -1 
+
+flag_hist_impact_seg = 1
+
+flag_movie = 0             #1/0
+flag_sc_movie = 0             #1/0
+
+flag_verbose_file = False
+flag_verbose_stdout = False
+flag_detailed_MP_info = 0
+dec_fac_secbeam_prof=dec_fact_out
+
+el_density_probes = [{'x' : 9.295668e-03, 'y': 1.185062e-03, 'r_obs': 1e-3},{'x' : -1.689146e-02, 'y': -2.919428e-04, 'r_obs': 1e-3}]
+#	[\
+#	{'x' : .007, 'y': .004, 'r_obs': 1e-3},\
+#	{'x' : .007, 'y': -.004, 'r_obs': 1e-3}]

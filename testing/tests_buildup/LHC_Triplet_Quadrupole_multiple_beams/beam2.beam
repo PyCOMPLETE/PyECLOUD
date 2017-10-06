@@ -1,0 +1,29 @@
+# BEAM PARAMETERS
+energy_eV = 7.000000e+12
+nemittx = 2.08e-6*1.2
+nemitty = 2.08e-6*1.2   #m
+
+
+betafx = 2.182167e+04
+betafy = 6.519539e+03
+
+x_beam_pos = -1.689146e-02
+y_beam_pos = -2.919428e-04
+
+beam_field_file =-1
+Dh_beam_field=1.5e-4
+#save_beam_field_file_as = 'beam1field.mat'
+
+
+b_spac   = 25e-9     #s (to be specified also if you load the profile from file - 
+                     #   it is used as period for clean and save)
+fact_beam = 2.200000e+11
+
+
+flag_bunched_beam = 1 # 1: bunched beam 0:load profile from file  
+
+# to be filled in case of bunched beam
+sigmaz = 0.081 #1.ns
+t_offs = 2.5e-9
+
+filling_pattern_file = 1*(30*[1.]+5*[0])
