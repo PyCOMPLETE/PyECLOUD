@@ -512,33 +512,33 @@ class pyecloud_saver:
                     'En_imp_eV_time':       self.En_imp_eV_time,
                     'En_emit_eV_time':      self.En_emit_eV_time,
                     'En_g_hist':            impact_man.En_g_hist,
-                    'En_hist':              self.En_hist,
-                    't_En_hist':            self.t_En_hist,
+                    'En_hist':              self.En_hist, # not documented
+                    't_En_hist':            self.t_En_hist, # not documented
                     'lam_t_array':          self.lam_t_array_dec,
-                    'b_spac':               beamtim.b_spac,
-                    't_sc_video':           np.array(self.t_sc_video),
-                    'U_sc_eV':              np.array(self.U_sc_eV),
+                    'b_spac':               beamtim.b_spac, # not documented
+                    't_sc_video':           np.array(self.t_sc_video), # not documented
+                    'U_sc_eV':              np.array(self.U_sc_eV), # not documented
                     'En_kin_eV_time':       self.En_kin_eV_time,
                     'N_mp_impact_pass':     self.N_mp_impact_pass,
                     'N_mp_corrected_pass':  self.N_mp_corrected_pass,
                     'N_mp_pass':            self.N_mp_pass,
-                    'N_mp_time':            self.N_mp_time,
-                    'N_mp_ref_pass':        self.N_mp_ref_pass,
-                    'nel_hist_impact_seg':  self.nel_hist_impact_seg,
-                    'energ_eV_impact_seg':  self.energ_eV_impact_seg,
-                    't_sec_beams':          self.t_sec_beams,
-                    'sec_beam_profiles':    self.sec_beam_profiles,
-                    'el_dens_at_probes':    self.el_dens_at_probes,
-                    'x_el_dens_probes':     self.x_el_dens_probes,
-                    'y_el_dens_probes':     self.y_el_dens_probes,
-                    'r_el_dens_probes':     self.r_el_dens_probes,
-                    'nel_hist_det':         self.nel_hist_det,
-                    'xg_hist_det':          self.xg_hist_det,
-                    'dec_fact_out':         self.dec_fact_out,
+                    'N_mp_time':            self.N_mp_time, # not documented
+                    'N_mp_ref_pass':        self.N_mp_ref_pass, # not documented
+                    'nel_hist_impact_seg':  self.nel_hist_impact_seg, # not documented
+                    'energ_eV_impact_seg':  self.energ_eV_impact_seg, # not documented
+                    't_sec_beams':          self.t_sec_beams, # not documented
+                    'sec_beam_profiles':    self.sec_beam_profiles, # not documented
+                    'el_dens_at_probes':    self.el_dens_at_probes, # not documented
+                    'x_el_dens_probes':     self.x_el_dens_probes, # not documented
+                    'y_el_dens_probes':     self.y_el_dens_probes, # not documented
+                    'r_el_dens_probes':     self.r_el_dens_probes, # not documented
+                    'nel_hist_det':         self.nel_hist_det, # not documented
+                    'xg_hist_det':          self.xg_hist_det, # not documented
+                    'dec_fact_out':         self.dec_fact_out, # not documented
                 }
             if self.flag_cos_angle_hist:
-                    saved_dict['cos_angle_hist'] = self.cos_angle_hist
-                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle
+                    saved_dict['cos_angle_hist'] = self.cos_angle_hist # not documented
+                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle # not documented
 
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
