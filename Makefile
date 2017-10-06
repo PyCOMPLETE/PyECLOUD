@@ -3,7 +3,7 @@
 
 # On Arch Linux, the default python version is python3
 # Therefore, the command f2py2 has to be used for python2 programs such as PyECLOUD.
-# Ubuntu and Red Hat Linux use the other nomenclature where the default python version
+# Ubuntu and Red Hat Linux use the standerd convention where the default python version
 # is python2.
 
 ARCH_LINUX := $(shell grep "Arch Linux" /etc/os-release 2>/dev/null)
