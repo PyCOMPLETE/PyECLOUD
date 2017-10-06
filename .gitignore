@@ -32,4 +32,5 @@ test_multipole
 .ropeproject
 *.inputc
 *.beamc
-reference.out
+*.bak
+*.out
