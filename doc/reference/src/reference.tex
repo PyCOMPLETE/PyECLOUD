@@ -587,7 +587,7 @@ Still 'cosine\_2D' is kept as default for backwards compatibility.
 \newpage
 
 \section{Output}
-The main PyECLOUD output is in a single~.mat file (by default called `Pyecltest.mat'). It can be opened in python, for example using the myloadmat\_to\_obj module in the main PyECLOUD folder.
+The main PyECLOUD output is in a single~.mat file (by default called `Pyecltest.mat'). It can be opened in python, for example using the myloadmat\_to\_obj module in the main PyECLOUD folder, or usin the scipy.io module.
 
 The file contains arrays of different shape.
 The time steps in the simulation are spaced by Dt from the simulation parameters input file.
@@ -607,9 +607,10 @@ The number of these steps is denoted $N\_{\mathrm{step}}$ in the following.
     Nel\_emit\_time($N\_{\mathrm{steps}}$)  & & Number of electrons emitted since the last step.\\\hline
     Nel\_imp\_time($N\_{\mathrm{steps}}$)   & & Number of electrons impacted since the last step.\\\hline
     Nel\_timep($N\_{\mathrm{steps}}$)       & & Number of electrons currently in the chamber.\\\hline
-    cen\_density($N\_{\mathrm{steps}}$)& [$\frac{1}{\mathrm{m}^3}$]& Electron density in a sphere around the center of the chamber with radius r\_center. \\\hline
-    lam\_t\_array($N\_{\mathrm{steps}}$)& [?] & Current line density of the beam charge.\\\hline
+    cen\_density($N\_{\mathrm{steps}}$)& [$\mathrm{m}^{-3}$]& Electron density in a sphere around the center of the chamber with radius r\_center. \\\hline
+    lam\_t\_array($N\_{\mathrm{steps}}$)& [$\mathrm{m}^{-1}$] & Current line density of the beam charge.\\\hline
 \end{longtable}
+
 
 $N\_{\mathrm{pass}}$ is defined as the number of bunch passages.
 $N\_{\mathrm{bins}}$ is the number of bins in the horizontal plane used to produce related histograms.
@@ -620,18 +621,18 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
     \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
     \textbf{Variables saved at each bunch passage}}
     \\\hline
-    t\_hist($N\_{\mathrm{pass}}$) & [s] & The time where data for the bunch passages are saved.\\\hline
-    t\_En\_hist($N\_{\mathrm{pass}}$) & [s] & Identical with t\_hist.\\\hline
+    t\_hist($N\_{\mathrm{pass}}$) & [s] & The time at which data for the bunch passages are saved.\\\hline
+    t\_En\_hist($N\_{\mathrm{pass}}$) & [s] & The time at which the electron energy spectra are saved.\\\hline
     xg\_hist($N\_{\mathrm{bins}}$) & [m] & The $x$ coordinates corresponding to related histogram bins.\\\hline
     En\_hist($N_\mathrm{en}$) & [eV] & The energies corresponding to related histogram bins. \\\hline
     N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$) & & Number of times a MP tracking error occurred. \\\hline
     N\_mp\_impact\_pass($N\_{\mathrm{pass}}$) & & Number of MPs that impacted. \\\hline
     N\_mp\_pass($N\_{\mathrm{pass}}$) & & Number of current MPs.\\\hline
     N\_mp\_ref\_pass($N\_{\mathrm{pass}}$) & & Current reference MP size.\\\hline
-    energ\_eV\_impact\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & Electron impacts projected to the $x$-axis and sorted in bins (xg\_hist).\\\hline
-    nel\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & All electron positions projected to the $x$-axis and sorted in bins (xg\_hist).\\\hline
-    nel\_impact\_hist\_scrub($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & All electron impacts with an energy higher than scrub\_en\_th, projected to the $x$-axis and sorted in bins (xg\_hist).\\\hline
-    nel\_impact\_hist\_tot($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & All electron impacts, projected to the $x$-axis and sorted in bins.\\\hline
+    energ\_eV\_impact\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & Horizontal histogram of the energy deposited on the walls by the electrons.\\\hline
+    nel\_hist($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & Horizontal histogram of the electron positions.\\\hline
+    nel\_impact\_hist\_scrub($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & Horizontal histogram of the electron impacts with an energy higher than scrub\_en\_th.\\\hline
+    nel\_impact\_hist\_tot($N\_{\mathrm{pass}}$, $N\_{\mathrm{bins}}$ ) & & Horizontal histogram of all electron impacts.\\\hline
 \end{longtable}
 
 \begin{longtable}
@@ -640,19 +641,19 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
     \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
     \textbf{Other variables}}
     \\\hline
-    dec\_fact\_out & & Output is only saved every nth time step, where n corresponds to dec\_fact\_out.\\\hline
+    dec\_fact\_out & & Timestep output is only saved every nth time step, where n corresponds to dec\_fact\_out.\\\hline
     b\_spac & [s] & Bunch spacing used for simulation internals. \\\hline
-    t\_sc\_video & [s] & The time whenever the space charge forces are recomputed. \\\hline
+    t\_sc\_video & [s] & The times at which the space charge forces are recomputed. \\\hline
     U\_sc\_eV & & Not used. \\\hline
-    N\_mp\_time & [s] & Only used when flag\_detailed\_MP\_info is set. Specifies the time the respective files are saved. Is this still active?\\\hline
+    N\_mp\_time &  & Only used when flag\_detailed\_MP\_info. Save the total number of macroparticles at each time step. \\\hline
     nel\_hist\_impact\_seg & & Number of electrons that impacted on each chamber segment. Only used if flag\_hist\_impact\_seg is set. \\\hline
     energ\_eV\_impact\_seg & [eV] & Combined energy of all impacted electrons on each chamber segment. Only used if flag\_hist\_impact\_seg is set. \\\hline
     t\_sec\_beams & [s] & Time where information is stored on secondary beams. \\\hline
-    sec\_beam\_profiles & & Charge profile of secondary beams. \\\hline
-    el\_dens\_at\_probes & & Electron densities at locations specified with el\_density\_probes. \\\hline
+    sec\_beam\_profiles [$\mathrm{m}^{-1}$]& & Charge profile of secondary beams. \\\hline
+    el\_dens\_at\_probes & & [$\mathrm{m}^{-3}$]Electron densities at locations specified with el\_density\_probes. \\\hline
     x\_el\_dens\_probes & [m] & $x$ coordinates of electron density probes \\\hline
     y\_el\_dens\_probes & [m] & $y$ coordinates of electron density probes \\\hline
-    r\_el\_dens\_probes & [m] & Radii taken into account to measure electron density probes \\\hline
+    r\_el\_dens\_probes & [m] & Radii used to measure electron density probes \\\hline
     nel\_hist\_det & & Detailed electron histogram. Only used if flag\_hist\_det is set. \\\hline
     nel\_hist\_det & & Coordinates corresponding to the bins of nel\_hist\_det. Only used if flag\_hist\_det is set. \\\hline
     cos\_angle\_hist & & The cosine of the impact angles of all electrons. \\\hline
