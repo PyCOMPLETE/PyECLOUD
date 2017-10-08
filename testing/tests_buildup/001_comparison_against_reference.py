@@ -23,14 +23,18 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew_circular'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew'
-#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns'
-#sim_folder = './LHC_Octupole_6500GeV_sey1.65_2.5e11ppb_b1_1.00ns_skew'
+#sim_folder = 'LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
+#sim_folder = 'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
+#sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile'
+#sim_folder = 'LHC_Triplet_Quadrupole_multiple_beams'
+
+
 
 
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation folder')
-parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=('2D', '3D'), default='3D')
+parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017. Default is 3D.', choices=('2D', '3D'), default='3D')
 args = parser.parse_args()
 if args.folder:
     sim_folder = args.folder
@@ -74,7 +78,7 @@ for variab in out_var_curr:
 
 
 for ii,k in enumerate(out_var_curr):
-    if '__' in k:
+    if '__' in k or k == 'el_dens_at_probes':
         print('Skipped %s' % k)
         continue
 
@@ -224,7 +228,7 @@ print 'Saved comparison plots in:'
 print folder_plot
 
 print 'In ipython, you may call EOG() to view the results if EOG is installed.'
-EOG = lambda : os.system('eog %s/*%s*' % (folder_plot, args.angle_dist_func))
+EOG = lambda : os.system('eog %s/*%s* &' % (folder_plot, args.angle_dist_func))
         #~ #pl.show()
 
 

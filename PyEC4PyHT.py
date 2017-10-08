@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.4.1
+#                   PyECLOUD Version 6.5.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -88,7 +88,7 @@ class Ecloud(object):
                 slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
 
 
-        print 'PyECLOUD Version 6.4.1'
+        print 'PyECLOUD Version 6.5.0'
         print 'PyHEADTAIL module'
         print 'Initializing ecloud from folder: '+pyecl_input_folder
         self.slicer = slicer
@@ -146,9 +146,12 @@ class Ecloud(object):
         En_hist_max,
         photoem_flag,
         inv_CDF_refl_photoem_file,
+        inv_CDF_all_photoem_file,
         k_pe_st,
         refl_frac,
         alimit,
+        energy_distribution,
+        flag_continuous_emission,
         e_pe_sigma,
         e_pe_max,
         x0_refl,
@@ -217,8 +220,12 @@ class Ecloud(object):
         target_grid,
         N_nodes_discard,
         N_min_Dh_main,
+        sey_file,
+        flag_factor_costheta,
         flag_cos_angle_hist,
         cos_angle_width,
+        flag_costheta_delta_scale,
+        flag_costheta_Emax_shift,
         ) = init.read_parameter_files(pyecl_input_folder, skip_beam_files=True)
 
         for attr in kwargs.keys():
@@ -270,6 +277,8 @@ class Ecloud(object):
 
 
         if switch_model==0 or switch_model=='ECLOUD':
+            kwargs['flag_costheta_delta_scale'] = flag_costheta_delta_scale
+            kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift
             sey_mod=SEY_model_ECLOUD(Emax,del_max,R0)
         elif switch_model==1 or switch_model=='ACC_LOW':
             sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0)

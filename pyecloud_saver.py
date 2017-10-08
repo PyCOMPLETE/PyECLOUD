@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.4.1
+#                   PyECLOUD Version 6.5.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -50,28 +50,56 @@
 #     all references.
 #----------------------------------------------------------------------
 
+from __future__ import print_function
 import scipy.io as sio
 import numpy as np
 import os
+import subprocess
 import hist_for as histf
-import cPickle
 import time
+try:
+    # cPickle is faster in python2
+    import cPickle as pickle
+except ImportError:
+    # No cPickle in python3
+    import pickle
 
 
-me=9.10938291e-31;
-qe=1.602176565e-19;
-qm=qe/me;
+me=9.10938291e-31
+qe=1.602176565e-19
+qm=qe/me
 
 class pyecloud_saver:
 
     def __init__(self, logfile_path):
+        print('Starting pyecloud_saver init.')
         self.logfile_path = logfile_path
-        print 'Starting pyecloud_saver init.'
-        flog=open(self.logfile_path,'w')
-        flog.write('PyECLOUD Version 6.4.1\n')
         timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-        flog.write('Simulation started on %s\n'%timestr)
-        flog.close()
+
+        # These git commands return the hash and the branch of the specified git directory.
+        path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
+        cmd_hash = 'git --git-dir %s rev-parse HEAD' % path_to_git
+        cmd_branch = 'git --git-dir %s rev-parse --abbrev-ref HEAD' % path_to_git
+
+        try:
+            git_hash = 'git hash: %s' % (subprocess.check_output(cmd_hash.split()).split()[0])
+        except Exception as e:
+            git_hash = 'Retrieving git hash failed'
+            print(e)
+        print(git_hash)
+
+        try:
+            git_branch = 'git branch: %s' % (subprocess.check_output(cmd_branch.split()).split()[0])
+        except Exception as e:
+            git_branch = 'Retrieving git branch failed'
+            print(e)
+        print(git_branch)
+
+        with open(self.logfile_path,'w') as flog:
+            flog.write('PyECLOUD Version 6.5.0\n')
+            flog.write('%s\n' % git_hash)
+            flog.write('%s\n' % git_branch)
+            flog.write('Simulation started on %s\n' % timestr)
 
 
     def start_observing(self, MP_e, beamtim, impact_man,
@@ -83,7 +111,7 @@ class pyecloud_saver:
                  save_simulation_state_time_file = -1,
                  x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
                  filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop'):
-        print 'Start pyecloud_saver observation'
+        print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
@@ -139,6 +167,7 @@ class pyecloud_saver:
         if flag_cos_angle_hist:
             N_angles = int(1./ cos_angle_width)+1
             self.cos_angle_hist = np.zeros((self.N_En_hist, N_angles),float)
+            self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
 
         #Space charge electrostatic energy
         self.t_sc_video=[]
@@ -257,7 +286,7 @@ class pyecloud_saver:
 
 
 
-        print 'Done init pyecloud_saver.'
+        print('Done init pyecloud_saver.')
         flog=open(self.logfile_path,'a')
         timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
         flog.write('Initialization finished on %s\n'%timestr)
@@ -275,7 +304,7 @@ class pyecloud_saver:
                     sio.savemat(filename_MP_state,{'tt':beamtim.tt_curr,'N_mp':MP_e.N_mp, 'x_mp':MP_e.x_mp[0:MP_e.N_mp], 'y_mp':MP_e.y_mp[0:MP_e.N_mp], 'z_mp':MP_e.z_mp[0:MP_e.N_mp],\
                                                     'vx_mp':MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp':MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp':MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp':MP_e.nel_mp[0:MP_e.N_mp]},oned_as='row')
 
-                    print 'Save MP state on ' + filename_MP_state
+                    print('Save MP state on ' + filename_MP_state)
                     self.i_obs=self.i_obs+1
 
         #Simulation state save
@@ -309,11 +338,11 @@ class pyecloud_saver:
 
                     with open(filename_simulation_state, 'wb') as fid:
                         # use best protocol available
-                        cPickle.dump(dict_state, fid, protocol=-1)
+                        pickle.dump(dict_state, fid, protocol=-1)
 
                     spacech_ele.PyPICobj.luobj = temp_luobj
 
-                    print 'Save simulation state on ' + filename_simulation_state
+                    print('Save simulation state on ' + filename_simulation_state)
                     self.i_obs_sim=self.i_obs_sim+1
 
         # Energy histogram saver
@@ -346,9 +375,9 @@ class pyecloud_saver:
                 self.rho_video=np.array(self.rho_video)
                 self.t_video=np.array(self.t_video)
                 filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
-                print 'Saving %s'%filename_rho
+                print('Saving %s'%filename_rho)
                 sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
-                print 'Done'
+                print('Done')
                 self.rho_video=[]
                 self.t_video=[]
 
@@ -369,10 +398,10 @@ class pyecloud_saver:
                 self.efy_video=np.array(self.efy_video)
                 self.t_efield_video=np.array(self.t_efield_video)
                 filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
-                print 'Saving %s'%filename_efield
+                print('Saving %s'%filename_efield)
                 sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
                                           'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
-                print 'Done'
+                print('Done')
                 self.efx_video=[]
                 self.efy_video=[]
                 self.t_efield_video=[]
@@ -399,18 +428,18 @@ class pyecloud_saver:
             self.En_emit_last_step_group_eV = 0
 
 
-            self.Nel_time[ii_curr_dec]=sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[ii_curr_dec]=sum(0.5/qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
+            self.Nel_time[ii_curr_dec]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
+            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5/qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
             flag_center[MP_e.N_mp:]=False
-            self.cen_density[ii_curr_dec]=sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_center*self.r_center)
+            self.cen_density[ii_curr_dec]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_center*self.r_center)
 
             if self.flag_el_dens_probes:
                 for ii in xrange(self.N_el_dens_probes):
                     flag_center=((MP_e.x_mp-self.x_el_dens_probes[ii])**2 + (MP_e.y_mp-self.y_el_dens_probes[ii])**2)<self.r_el_dens_probes[ii]**2;
                     flag_center[MP_e.N_mp:]=False
-                    self.el_dens_at_probes[ii, ii_curr_dec]=sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
+                    self.el_dens_at_probes[ii, ii_curr_dec]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
 
 
             if self.flag_detailed_MP_info==1:
@@ -434,7 +463,7 @@ class pyecloud_saver:
 
                     self.nel_hist_det_line=0.0*self.nel_hist_det_line
 
-                    if sum(mask_det_hist)>0:
+                    if np.sum(mask_det_hist)>0:
                         #print 'here 2'
                         histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp][mask_det_hist],MP_e.nel_mp[0:MP_e.N_mp][mask_det_hist],
                                            self.bias_x_hist_det, self.Dx_hist_det, self.nel_hist_det_line)
@@ -509,6 +538,7 @@ class pyecloud_saver:
                 }
             if self.flag_cos_angle_hist:
                     saved_dict['cos_angle_hist'] = self.cos_angle_hist
+                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle
 
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
@@ -516,7 +546,7 @@ class pyecloud_saver:
             # logfile and progressfile
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
-            string_tolog= timestr+(' pass. %d/%d Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
+            string_tolog= timestr+(' pass. %d/%d Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
 
 
 #             flog=open(self.logfile_path,'a')
@@ -526,9 +556,9 @@ class pyecloud_saver:
                 with open(self.logfile_path,'a') as flog:
                     flog.write(string_tolog)
             except IOError as err:
-                print 'Got: ',err
-                print 'while trying to write the following line on logfile:'
-                print string_tolog
+                print('Got: ',err)
+                print('while trying to write the following line on logfile:')
+                print(string_tolog)
 
 #             flog=open(self.progress_path,'w')
 #             flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
@@ -537,9 +567,9 @@ class pyecloud_saver:
                 with open(self.progress_path,'w') as flog:
                     flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
             except IOError as err:
-                print 'Got: ',err
-                print 'while trying to write the following line on progress file:'
-                print '%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))
+                print('Got: ',err)
+                print('while trying to write the following line on progress file:')
+                print('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot)))
 
 
             #stop simulation

@@ -1,0 +1,46 @@
+import numpy as np
+# MACHINE PARAMETERS (HL-LHC Triplet)
+
+# Choose chamb_type='ellip'/ 'polyg'
+chamb_type = 'polyg_cython'
+flag_assume_convex = False
+
+#For polygonal chamber
+filename_chm = 'chamb_PyEC_BSHL_Q23.mat'
+
+# Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [0.000000e+00, 1.307043e+02]
+
+
+# gas ionization parameters
+gas_ion_flag = 0
+P_nTorr=12.;
+sigma_ion_MBarn=2.;
+Temp_K=300.;
+unif_frac=0.1
+E_init_ion=0.1;   #in eV
+
+# photoemission parameters
+photoem_flag = 0
+inv_CDF_refl_photoem_file = 'unif_no_file'
+k_pe_st=0.0001233
+refl_frac=1.
+alimit=10.*np.pi/180.
+e_pe_sigma=5. #in eV
+e_pe_max=7.   #in eV  
+x0_refl=0. #no effect since uniform seeding
+y0_refl=0. #no effect since uniform seeding
+out_radius = .1
+phem_resc_fac=0.995
+
+
+# initial uniform electron density
+init_unif_edens_flag=1
+init_unif_edens=1e8
+E_init_unif_edens = 1.
+
+
+betafx = 6538.04*1e9
+betafy = 21755.15*1e9
