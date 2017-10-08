@@ -26,6 +26,7 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
 #sim_folder = 'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile'
+#sim_folder = 'LHC_Triplet_Quadrupole_multiple_beams'
 
 
 
@@ -77,7 +78,7 @@ for variab in out_var_curr:
 
 
 for ii,k in enumerate(out_var_curr):
-    if '__' in k:
+    if '__' in k or k == 'el_dens_at_probes':
         print('Skipped %s' % k)
         continue
 
@@ -227,7 +228,7 @@ print 'Saved comparison plots in:'
 print folder_plot
 
 print 'In ipython, you may call EOG() to view the results if EOG is installed.'
-EOG = lambda : os.system('eog %s/*%s*' % (folder_plot, args.angle_dist_func))
+EOG = lambda : os.system('eog %s/*%s* &' % (folder_plot, args.angle_dist_func))
         #~ #pl.show()
 
 

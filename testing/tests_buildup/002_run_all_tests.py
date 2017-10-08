@@ -21,6 +21,7 @@ all_sim_folders = [
     'LHC_Sextupole_450GeV_sey1.65_2.5e11ppb_bl_1.00ns_skew',
     'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns',
     'LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
+    'LHC_Triplet_Quadrupole_multiple_beams'
 ]
 
 if args.all:
