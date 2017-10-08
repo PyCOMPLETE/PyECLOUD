@@ -1,0 +1,27 @@
+#!/bin/bash
+
+PYECLOUDPATH=/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/pyecloud/
+CURRDIR=/afs/cern.ch/work/e/ecldcode/sim_workspace_cython/LHC_arc_dip_quad_sigmaz_scan/simulations/LHC_ArcDipReal_450GeV_sey1.60_2.5e11ppb_bl_1.00ns
+export CURRDIR
+
+source /afs/cern.ch/work/k/kli/public/venv_py27_slc6/bin/activate
+which python
+
+PYTHONPATH=$PYECLOUDPATH
+export PYTHONPATH
+echo $PYTHONPATH
+
+
+# Copy input and executable
+cp ${PYECLOUDPATH}/main.py .
+
+cp ${CURRDIR}/*.input .
+cp ${CURRDIR}/*.beam .
+cp ${CURRDIR}/*.mat .
+
+
+#execute beam generation
+python main.py
+
+#save result
+cp Pyecltest.mat ${CURRDIR}

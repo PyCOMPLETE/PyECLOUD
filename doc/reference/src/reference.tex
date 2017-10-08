@@ -543,6 +543,7 @@ Different secondary emission models:
 \item switch\_model = `ECLOUD\_nunif' for the model used in ECLOUD, with sey info in the chamber shape file.
 \item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
 \item switch\_model = `flat\_low\_ene' for flat low energy dependence.
+\item switch\_model = `from\_file` for interpolation of a user-specified curve.
 \end{enumerate}\\ 
 \hline
 \end{longtable}
@@ -550,7 +551,7 @@ Different secondary emission models:
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
 \multicolumn{2}{p{.97\textwidth}}{
-\textbf{Secondary Electron Yield} (parametrized as described in G. Iadarola's thesis).}\\ \hline
+\textbf{Secondary Electron Yield} These are the parameters for the `ECLOUD` model, as described in G. Iadarola's thesis.}\\ \hline
 \textbf{Emax}&	Energy corresponding to the maximum SEY.\\ \hline
 \textbf{del\_max}& Maximum of the SEY curve.\\ \hline
 \textbf{R0}& 	Weight of the reflected electron component.\\ \hline
@@ -565,6 +566,10 @@ Different secondary emission models:
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Other parameters}}\\ \hline
+\textbf{sey\_file} & Needed for secondary emission model `from\_file`.
+    Path to a file that specifies the reflected and true secondary emission yields for different energies.
+    An example can be found in the subfolder sey\_files in the PyECLOUD code.\\\hline
+\textbf{flag\_factor\_costheta} & If enabled, the true secondary emission yield is amplified depending on the impact angle relative to the surface normal. \\\hline
 \textbf{switch\_no\_increase\_energy}&	switch\_no\_increase\_energy = 1 checks that the true secondaries do not have more energy than the corresponding impacting electrons.
 Typically this feature is NOT enabled.\\ \hline
 \textbf{thresh\_low\_energy}&	Maximum energy for which the energy check is performed.\\ \hline

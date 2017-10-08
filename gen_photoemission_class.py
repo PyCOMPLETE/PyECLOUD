@@ -74,11 +74,11 @@ class _gaussian(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         En_gen = random.randn(N_int_new_MP)*self.e_pe_sigma + self.e_pe_max
         flag_negat = (En_gen<0.)
-        N_neg = sum(flag_negat)
+        N_neg = np.sum(flag_negat)
         while(N_neg>0):
             En_gen[flag_negat] = random.randn(N_neg)*self.e_pe_sigma +self.e_pe_max   #in eV
             flag_negat = (En_gen<0.)
-            N_neg = sum(flag_negat)
+            N_neg = np.sum(flag_negat)
         return En_gen
 
 class _rect(_gen_energy_base):
