@@ -275,17 +275,26 @@ class Ecloud(object):
             spacech_ele = scc.space_charge(chamb, Dh_sc, Dt_sc=Dt_sc, sparse_solver=sparse_solver, PyPICmode=PyPICmode,
                                 f_telescope = f_telescope, target_grid = target_grid, N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main)
 
+        sey_model_kwargs = {}
+        if E0 is not None:
+            sey_model_kwargs.update({'E0':E0})
+            #If E0 is not provided use default value for each object
+        if s_param is not None:
+            if switch_model==0 or switch_model=='ECLOUD':
+                sey_model_kwargs.update({'s':s_param})
+            else:
+                raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
 
         if switch_model==0 or switch_model=='ECLOUD':
-            kwargs['flag_costheta_delta_scale'] = flag_costheta_delta_scale
-            kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift
-            sey_mod=SEY_model_ECLOUD(Emax,del_max,R0)
+            sey_model_kwargs['flag_costheta_delta_scale'] = flag_costheta_delta_scale
+            sey_model_kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift
+            sey_mod=SEY_model_ECLOUD(Emax,del_max,R0, **sey_model_kwargs)
         elif switch_model==1 or switch_model=='ACC_LOW':
-            sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0)
+            sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0, **sey_model_kwargs)
         elif switch_model=='ECLOUD_nunif':
-            sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax,del_max,R0)
+            sey_mod=SEY_model_ECLOUD_non_unif(chamb, Emax,del_max,R0, **sey_model_kwargs)
         elif switch_model=='cos_low_ene':
-            sey_mod=SEY_model_cos_le(Emax,del_max,R0)
+            sey_mod=SEY_model_cos_le(Emax,del_max,R0, **sey_model_kwargs)
         elif switch_model=='flat_low_ene':
                 sey_mod=SEY_model_flat_le(Emax,del_max,R0)
         elif switch_model=='perfect_absorber':
@@ -297,7 +306,7 @@ class Ecloud(object):
         if switch_model=='perfect_absorber':
             import perfect_absorber_class as pac
             impact_man = pac.impact_management_perfect_absorber(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy, 
+                Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=thresh_low_energy,
                 flag_seg=flag_seg, cos_angle_width=cos_angle_width, secondary_angle_distribution=secondary_angle_distribution)
         else:
             impact_man=imc.impact_management(switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
@@ -357,8 +366,8 @@ class Ecloud(object):
             self.x_probes = []
             self.y_probes = []
             for ii_probe in xrange(self.N_probes):
-                self.x_probes.append(probes_position[ii_probe]['x'])
-                self.y_probes.append(probes_position[ii_probe]['y'])
+                self.x_probes.append(self.probes_position[ii_probe]['x'])
+                self.y_probes.append(self.probes_position[ii_probe]['y'])
 
             self.x_probes = np.array(self.x_probes)
             self.y_probes = np.array(self.y_probes)
