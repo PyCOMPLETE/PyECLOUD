@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                          PyECLOUD Version 6.4.1
+#                          PyECLOUD Version 6.5.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -64,6 +64,7 @@ from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
+from sec_emission_model_from_file import SEY_model_from_file
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
@@ -104,7 +105,6 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
         inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
 
     return config_dict
-
 
 def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
@@ -207,9 +207,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         else:
             raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
 
-    if cc.switch_model==0 or cc.switch_model=='ECLOUD':
+    if cc.switch_model in (0, 'ECLOUD'):
+        kwargs['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
+        kwargs['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
         sey_mod=SEY_model_ECLOUD(cc.Emax,cc.del_max,cc.R0,**kwargs)
-    elif cc.switch_model==1 or cc.switch_model=='ACC_LOW':
+    elif cc.switch_model in (1, 'ACC_LOW'):
         sey_mod=SEY_model_acc_low_ene(cc.Emax,cc.del_max,cc.R0,**kwargs)
     elif cc.switch_model=='ECLOUD_nunif':
         sey_mod=SEY_model_ECLOUD_non_unif(chamb, cc.Emax,cc.del_max,cc.R0,**kwargs)
@@ -217,6 +219,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         sey_mod=SEY_model_cos_le(cc.Emax,cc.del_max,cc.R0,**kwargs)
     elif cc.switch_model=='flat_low_ene':
         sey_mod=SEY_model_flat_le(cc.Emax,cc.del_max,cc.R0)
+    elif cc.switch_model == 'from_file':
+        sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)
 
 
     flag_seg = (cc.flag_hist_impact_seg==1)

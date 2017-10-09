@@ -8,7 +8,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.4.1
+#                   PyECLOUD Version 6.5.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -61,6 +61,7 @@ from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
+from sec_emission_model_from_file import SEY_model_from_file
 import dynamics_Boris_f2py as dynB
 
 import MP_system as MPs
@@ -77,7 +78,7 @@ class Ecloud(object):
                  slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
 
 
-        print 'PyECLOUD Version 6.4.1'
+        print 'PyECLOUD Version 6.5.0'
         print 'PyHEADTAIL module'
         print 'Initializing ecloud from folder: '+pyecl_input_folder
         self.slicer = slicer
@@ -149,6 +150,8 @@ class Ecloud(object):
 
 
         if cc.switch_model in (0, 'ECLOUD'):
+            kwargs['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
+            kwargs['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
             sey_mod = SEY_model_ECLOUD(cc.Emax, cc.del_max, cc.R0)
         elif cc.switch_model in (1, 'ACC_LOW'):
             sey_mod = SEY_model_acc_low_ene(cc.Emax, cc.del_max, cc.R0)
@@ -160,6 +163,8 @@ class Ecloud(object):
                 sey_mod = SEY_model_flat_le(cc.Emax, cc.del_max, cc.R0)
         elif cc.switch_model == 'perfect_absorber':
             sey_mod = None
+        elif cc.switch_model == 'from_file':
+            sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)
 
 
         flag_seg = (cc.flag_hist_impact_seg==1)
