@@ -1,4 +1,4 @@
-
+from __future__ import division, print_function
 import sys
 import os
 import time
@@ -16,8 +16,10 @@ def assert_module_has_parameters(module, module_name):
         optional_parameters = set(optional_parameters.keys())
 
     # Filter out (a) builtin python variables and (b) imported modules
-    module_contents = [x for x in dir(module) if (not x.startswith('_'))]
-    module_contents = set([x for x in module_contents if (not isinstance(getattr(module, x), types.ModuleType))])
+    module_contents = set()
+    for attr in dir(module):
+        if (not attr.startswith('_')) and (not isinstance(getattr(module, attr), types.ModuleType)):
+            module_contents.add(attr)
 
     allowed_parameters = mandatory_parameters | optional_parameters
 
@@ -29,6 +31,19 @@ def assert_module_has_parameters(module, module_name):
     if extra_parameters:
         raise PyECLOUD_ConfigException('Error! These parameters should not be in %s: %r' % (module_name, extra_parameters))
 
+def update_module(module, new_module):
+    """
+    Similar as the dict.update method, but for modules.
+    Some entries are skipped.
+    """
+    for attr in dir(new_module):
+        value = getattr(new_module, attr)
+        if attr.startswith('_') or isinstance(value, types.ModuleType):
+            continue
+        elif hasattr(module, attr):
+            raise PyECLOUD_ConfigException('Parameter %s is specified in %s and %s!' % (attr, module.__name__, new_module.__name__))
+        else:
+            setattr(module, attr, value)
 
 def update_config_dict(config_dict, module, module_name, verbose=True):
 
@@ -45,15 +60,12 @@ def update_config_dict(config_dict, module, module_name, verbose=True):
 
     for parameter, default_value in optional_parameters.items():
         if hasattr(module, parameter):
-            if parameter in config_dict and parameter != 't_ion':
+            if parameter in config_dict:
                 raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
             value = getattr(module, parameter)
         else:
             if parameter in config_dict:
-                if parameter == 't_ion':
-                    continue
-                else:
-                    raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
+                raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
             value = default_value
         config_dict[parameter] = value
         if verbose:
@@ -68,7 +80,7 @@ def import_module_from_file(module_name, file_name):
     # The importlib.util method requires the file name to end with '.py'.
     # Also, loading the module from a temporary directory does not leave any .pyc files.
     dir_name = '/tmp/PyECLOUD_%i' % os.getpid()
-    real_module_name = module_name + '_%f' % time.time()
+    real_module_name = module_name + '_%s' % str(time.time()).replace('.','_')
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
 
