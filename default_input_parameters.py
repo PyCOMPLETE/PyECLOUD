@@ -72,7 +72,6 @@ parameters_dict = {
             'y_max_hist_det': None,
             'Dx_hist_det': None,
 
-            # Undocumented
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
 
@@ -164,9 +163,7 @@ parameters_dict = {
             'y_max_init_unif_edens' : None,
             'y_min_init_unif_edens' : None,
 
-            # Undocumented
             'flag_assume_convex': True,
-            't_ion': -1 # not in documentation, default value arbitrary
         },
     },
     'beam_beam': {
@@ -249,13 +246,11 @@ parameters_dict = {
             'Emax': None,
             'del_max': None,
             'R0': None,
+            'E0': None,
+            's_param': None,
             
             # Choice of model
             'switch_model': 0,
-
-            # Undocumented
-            'E0': None,
-            's_param': None,
 
             # Other parameters
             'secondary_angle_distribution': 'cosine_2D',
@@ -266,5 +261,14 @@ parameters_dict = {
             'flag_costheta_delta_scale': True,
         },
     },
+    'combined_simulations_secondaryEmission_machine_parameters': {
+        'mandatory': set(),
+        'optional': {},
+    }
 }
+
+for key in ('secondary_emission_parameters', 'machine_parameters', 'simulation_parameters'):
+    parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['mandatory'].update(parameters_dict[key]['mandatory'])
+    parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['optional'].update(parameters_dict[key]['optional'])
+
 

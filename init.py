@@ -85,20 +85,18 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     config_dict = {}
 
     simulation_parameters = inp_spec.import_module_from_file('simulation_parameters', os.path.join(pyecl_input_folder, simulation_param_file))
-    inp_spec.assert_module_has_parameters(simulation_parameters, 'simulation_parameters')
-    inp_spec.update_config_dict(config_dict, simulation_parameters, 'simulation_parameters')
-
-    machine_param_file = config_dict['machine_param_file']
-    secondary_emission_parameters_file = config_dict['secondary_emission_parameters_file']
-    beam_parameters_file = config_dict['beam_parameters_file']
+    machine_param_file = simulation_parameters.machine_param_file
+    secondary_emission_parameters_file = simulation_parameters.secondary_emission_parameters_file
+    beam_parameters_file = simulation_parameters.beam_parameters_file
 
     machine_parameters = inp_spec.import_module_from_file('machine_parameters', os.path.join(pyecl_input_folder, machine_param_file))
-    inp_spec.assert_module_has_parameters(machine_parameters, 'machine_parameters')
-    inp_spec.update_config_dict(config_dict, machine_parameters, 'machine_parameters')
-
     secondary_emission_parameters = inp_spec.import_module_from_file('secondary_emission_parameters', os.path.join(pyecl_input_folder, secondary_emission_parameters_file))
-    inp_spec.assert_module_has_parameters(secondary_emission_parameters, 'secondary_emission_parameters')
-    inp_spec.update_config_dict(config_dict, secondary_emission_parameters, 'secondary_emission_parameters')
+
+    inp_spec.update_module(simulation_parameters, machine_parameters)
+    inp_spec.update_module(simulation_parameters, secondary_emission_parameters)
+
+    inp_spec.assert_module_has_parameters(simulation_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
+    inp_spec.update_config_dict(config_dict, simulation_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
 
     if not skip_beam_files:
         beam_beam = inp_spec.import_module_from_file('beam_beam', os.path.join(pyecl_input_folder, beam_parameters_file))
