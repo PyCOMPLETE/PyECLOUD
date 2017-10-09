@@ -195,29 +195,24 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
                  flag_secodary_beam=True, t_primary_beam=beamtim.t,
                  Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file=(cc.progress_path+('_mapgen_sec_%d' % ii))))
 
-    kwargs = {}
-
+    # Use of sey_model_kwargs is deprecated. The SEY models besides ECLOUD and from_file should at some point be updated.
+    sey_model_kwargs = {}
     if cc.E0 is not None:
-        kwargs.update({'E0':cc.E0})
+        sey_model_kwargs.update({'E0':cc.E0})
         #If E0 is not provided use default value for each object
 
-    if cc.s_param is not None:
-        if cc.switch_model==0 or cc.switch_model=='ECLOUD':
-            kwargs.update({'s':cc.s_param})
-        else:
-            raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
+    if cc.s_param is not None and cc.switch_model not in (0, 'ECLOUD'):
+        raise ValueError('s parameter can be changed only in the ECLOUD sec. emission model!')
 
     if cc.switch_model in (0, 'ECLOUD'):
-        kwargs['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
-        kwargs['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
-        sey_mod=SEY_model_ECLOUD(cc.Emax,cc.del_max,cc.R0,**kwargs)
+        sey_mod=SEY_model_ECLOUD(cc.Emax, cc.del_max, cc.R0, cc.E0, cc.s_param, cc.flag_costheta_delta_scale, cc.flag_costheta_Emax_shift)
     elif cc.switch_model in (1, 'ACC_LOW'):
-        sey_mod=SEY_model_acc_low_ene(cc.Emax,cc.del_max,cc.R0,**kwargs)
-    elif cc.switch_model=='ECLOUD_nunif':
-        sey_mod=SEY_model_ECLOUD_non_unif(chamb, cc.Emax,cc.del_max,cc.R0,**kwargs)
-    elif cc.switch_model=='cos_low_ene':
-        sey_mod=SEY_model_cos_le(cc.Emax,cc.del_max,cc.R0,**kwargs)
-    elif cc.switch_model=='flat_low_ene':
+        sey_mod=SEY_model_acc_low_ene(cc.Emax,cc.del_max,cc.R0,**sey_model_kwargs)
+    elif cc.switch_model == 'ECLOUD_nunif':
+        sey_mod=SEY_model_ECLOUD_non_unif(chamb, cc.Emax,cc.del_max,cc.R0,**sey_model_kwargs)
+    elif cc.switch_model == 'cos_low_ene':
+        sey_mod=SEY_model_cos_le(cc.Emax,cc.del_max,cc.R0,**sey_model_kwargs)
+    elif cc.switch_model == 'flat_low_ene':
         sey_mod=SEY_model_flat_le(cc.Emax,cc.del_max,cc.R0)
     elif cc.switch_model == 'from_file':
         sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)

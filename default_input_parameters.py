@@ -234,9 +234,6 @@ parameters_dict = {
         'mandatory': {
 
             # Secondray Electron Yield
-            'Emax',
-            'del_max',
-            'R0',
             'E_th',
             'sigmafit',
             'mufit',
@@ -252,8 +249,11 @@ parameters_dict = {
             'switch_model': 0,
 
             # Undocumented
-            'E0': None,
-            's_param': None,
+            'E0': 150.,
+            's_param': 1.35,
+            'Emax': None,
+            'del_max': None,
+            'R0': None,
 
             # Other parameters
             'secondary_angle_distribution': 'cosine_2D',
