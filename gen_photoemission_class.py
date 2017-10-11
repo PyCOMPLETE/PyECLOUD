@@ -242,7 +242,7 @@ class photoemission_from_file(photoemission_base):
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
         if not self.flag_unif:
             mat = sio.loadmat(inv_CDF_all_photoem_file)
-            self.inv_CDF = mat['inv_CDF'].squeeze()
+            self.u_sam = mat['u_sam'].squeeze()
             self.angles = mat['angles'].squeeze()
 
         self.k_pe_st = k_pe_st
@@ -267,7 +267,7 @@ class photoemission_from_file(photoemission_base):
                 theta_gen = random.rand(Nint_new_MP)*2*np.pi
             else:
                 cdf_gen = random.rand(Nint_new_MP)
-                theta_gen = np.interp(cdf_gen, self.inv_CDF, self.angles)
+                theta_gen = np.interp(cdf_gen, self.u_sam, self.angles)
 
             x_out = self.out_radius*np.cos(theta_gen)
             y_out = self.out_radius*np.sin(theta_gen)
