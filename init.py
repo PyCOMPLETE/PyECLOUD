@@ -111,8 +111,8 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
 
     track_method= 'StrongBdip'
 
-    secondary_angle_distribution = 'cosine_2D'
-    photoelectron_angle_distribution = 'cosine_2D'
+    secondary_angle_distribution = 'undefined'
+    photoelectron_angle_distribution = 'undefined'
 
     B = 0.   #Tesla (if B=-1 computed from energy and bending radius)
     bm_totlen= -1 #m
@@ -222,7 +222,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files = False):
     Emax = None
     del_max = None
     R0 = None
-    
+
     flag_costheta_delta_scale = True
     flag_costheta_Emax_shift=True
 
@@ -603,7 +603,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
 
     if switch_model==0 or switch_model=='ECLOUD':
         kwargs['flag_costheta_delta_scale'] = flag_costheta_delta_scale
-        kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift   
+        kwargs['flag_costheta_Emax_shift'] = flag_costheta_Emax_shift
         sey_mod=SEY_model_ECLOUD(Emax,del_max,R0,**kwargs)
     elif switch_model==1 or switch_model=='ACC_LOW':
         sey_mod=SEY_model_acc_low_ene(Emax,del_max,R0,**kwargs)
