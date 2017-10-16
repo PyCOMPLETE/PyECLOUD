@@ -75,7 +75,7 @@ import init
 class MP_light(object):
     pass
     
-extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset'}
+extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
@@ -146,8 +146,8 @@ class Ecloud(object):
             self.x_probes = []
             self.y_probes = []
             for ii_probe in xrange(self.N_probes):
-                self.x_probes.append(cc.probes_position[ii_probe]['x'])
-                self.y_probes.append(cc.probes_position[ii_probe]['y'])
+                self.x_probes.append(self.probes_position[ii_probe]['x'])
+                self.y_probes.append(self.probes_position[ii_probe]['y'])
 
             self.x_probes = np.array(self.x_probes)
             self.y_probes = np.array(self.y_probes)
