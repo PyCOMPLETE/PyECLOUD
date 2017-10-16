@@ -46,7 +46,7 @@ parameters_dict = {
         },
         'optional':{
             # Secondary beams
-            'secondary_beams_file_list': [],
+            'secondary_beams_file_list': (),
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
@@ -64,7 +64,7 @@ parameters_dict = {
             'flag_verbose_file': False,
             'flag_verbose_stdout': False,
             'dec_fac_secbeam_prof': 1,
-            'el_density_probes': [],
+            'el_density_probes': (),
             'save_simulation_state_time_file': -1,
             'x_min_hist_det': None,
             'y_min_hist_det': None,
@@ -248,7 +248,7 @@ parameters_dict = {
             'R0': None,
             'E0': None,
             's_param': None,
-            
+
             # Choice of model
             'switch_model': 0,
 

@@ -16,22 +16,22 @@ def assert_module_has_parameters(module, module_name):
     for attr in dir(module):
         if (not attr.startswith('_')) and (not isinstance(getattr(module, attr), types.ModuleType)):
             module_contents.add(attr)
-            
+
     # Verify validity of provided module w.r.t. parameters_dict
-    mandatory_parameters = parameters_dict[module_name]['mandatory'] 
+    mandatory_parameters = parameters_dict[module_name]['mandatory']
     optional_parameters = set(parameters_dict[module_name]['optional'].keys())
-    
+
     allowed_parameters = set.union(mandatory_parameters, optional_parameters)
-    
+
     extra_parameters = set.difference(module_contents, allowed_parameters)
     if extra_parameters:
         raise PyECLOUD_ConfigException('Error! These parameters should not be in %s: %r' % (module_name, extra_parameters))
-    
+
     missing_parameters = set.difference(mandatory_parameters, module_contents)
     if missing_parameters:
         raise PyECLOUD_ConfigException('Error! These mandatory parameters are not provided by %s: %r' % (module_name, missing_parameters))
 
-    
+
 
 def update_module(module, new_module):
     """
@@ -61,7 +61,7 @@ def update_config_dict(config_dict, module, module_name, verbose=False):
             print('%s: %s = %s' % (module_name, parameter, value))
 
     for parameter, default_value in optional_parameters.items(): # iterates on keys and values of the dictionary
-        
+
         if hasattr(module, parameter): # the parameter is specified in the input file
             value = getattr(module, parameter)
         else: # the parameter is not specified in the input file (default to be used)
@@ -70,10 +70,10 @@ def update_config_dict(config_dict, module, module_name, verbose=False):
         # Check for duplicates
         if parameter in config_dict:
             raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
-        
+
         # Upadate config dictionary
         config_dict[parameter] = value
-        
+
         if verbose:
             print('%s: %s = %r' % (module_name, parameter, value))
 

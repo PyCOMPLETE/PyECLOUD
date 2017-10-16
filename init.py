@@ -86,7 +86,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
 
     # Parse simulation_parameters.input
     input_parameters = inp_spec.import_module_from_file('simulation_parameters', os.path.join(pyecl_input_folder, simulation_param_file))
-    
+
     # Get names of other input files
     machine_param_file = input_parameters.machine_param_file
     secondary_emission_parameters_file = input_parameters.secondary_emission_parameters_file
@@ -102,7 +102,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
 
     # Check validity of input files
     inp_spec.assert_module_has_parameters(input_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
-    
+
     # Create config_dict with all allowed input parameters (not specified are set to default)
     config_dict = {}
     inp_spec.update_config_dict(config_dict, input_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
@@ -114,10 +114,10 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
 
     return config_dict
 
-def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False, 
+def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
             skip_pyeclsaver=False, skip_spacech_ele=False, ignore_kwargs={}, **kwargs):
 
-    config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files = skip_beam)
+    config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
 
     # Override config values with kwargs
     for attr, value in kwargs.items():
@@ -128,7 +128,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             config_dict[attr] = value
         else:
             raise inp_spec.PyECLOUD_ConfigException('What exactly does %s do? It is not an expected input.' % attr)
-            
+
 
     cc = mlm.obj_from_dict(config_dict)
 
@@ -179,8 +179,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                        cc.Dx_hist, cc.Nx_regen, cc.Ny_regen, cc.Nvx_regen, cc.Nvy_regen, cc.Nvz_regen, cc.regen_hist_cut, chamb,
                        N_mp_soft_regen=cc.N_mp_soft_regen, N_mp_after_soft_regen=cc.N_mp_after_soft_regen)
 
-   
-   
+
+
     if not skip_beam:
         beamtim=beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.beam_field_file,cc.lam_th,
                      b_spac=b_par.b_spac, sigmaz=b_par.sigmaz,t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
@@ -189,7 +189,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                      chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                      x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
                      Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=(cc.progress_path+'_mapgen'))
-                     
+
         sec_beams_list=[]
         if flag_presence_sec_beams:
             N_sec_beams = len(sec_b_par_list)
@@ -207,7 +207,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         beamtim = None
         sec_beams_list=[]
-        
+
 
 
     if not skip_spacech_ele:
@@ -218,9 +218,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                             f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
     else:
         spacech_ele = None
-    
-        
-    
+
+
+
 
     kwargs_secem = {}
 
@@ -284,7 +284,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         phemiss=None
 
-    
+
     if not skip_pyeclsaver:
         pyeclsaver.start_observing(MP_e, beamtim, impact_man,
                      cc.r_center, cc.Dt_En_hist, cc.logfile_path, cc.progress_path, flag_detailed_MP_info=cc.flag_detailed_MP_info,
