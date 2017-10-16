@@ -233,10 +233,7 @@ parameters_dict = {
     'secondary_emission_parameters': {
         'mandatory': {
 
-            # Secondray Electron Yield
-            'Emax',
-            'del_max',
-            'R0',
+            # Secondray Electron Energy Spectrum
             'E_th',
             'sigmafit',
             'mufit',
@@ -248,6 +245,11 @@ parameters_dict = {
         },
         'optional': {
 
+            # Secondray Electron Yield
+            'Emax': None,
+            'del_max': None,
+            'R0': None,
+            
             # Choice of model
             'switch_model': 0,
 
