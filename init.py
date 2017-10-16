@@ -115,12 +115,14 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     return config_dict
 
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False, 
-            skip_pyeclsaver=False, skip_spacech_ele=False, **kwargs):
+            skip_pyeclsaver=False, skip_spacech_ele=False, ignore_kwargs={}, **kwargs):
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files = skip_beam)
 
     # Override config values with kwargs
     for attr, value in kwargs.items():
+        if attr in ignore_kwargs:
+            continue
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
         if attr in config_dict:
             config_dict[attr] = value
@@ -138,9 +140,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if flag_presence_sec_beams:
             for sec_b_file in cc.secondary_beams_file_list:
                 sec_b_par_list.append(pbf.beam_descr_from_fil(os.path.join(pyecl_input_folder, sec_b_file), cc.betafx, cc.Dx, cc.betafy, cc.Dy))
-
-
-
+    else:
+        flag_presence_sec_beams = False
+        sec_b_par_list = []
 
     ##########################################
 
@@ -341,5 +343,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             phemiss,
             flag_presence_sec_beams,
             sec_beams_list,
+            config_dict
             )
 
