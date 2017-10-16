@@ -10,26 +10,28 @@ class PyECLOUD_ConfigException(Exception):
     pass
 
 def assert_module_has_parameters(module, module_name):
-    mandatory_parameters = parameters_dict[module_name]['mandatory']
-    optional_parameters = parameters_dict[module_name]['optional']
-    if isinstance(optional_parameters, dict):
-        optional_parameters = set(optional_parameters.keys())
 
-    # Filter out (a) builtin python variables and (b) imported modules
+    # Filter out (a) underscorred variables and (b) imported modules
     module_contents = set()
     for attr in dir(module):
         if (not attr.startswith('_')) and (not isinstance(getattr(module, attr), types.ModuleType)):
             module_contents.add(attr)
-
-    allowed_parameters = mandatory_parameters | optional_parameters
-
-    missing_parameters = mandatory_parameters - module_contents
+            
+    # Verify validity of provided module w.r.t. parameters_dict
+    mandatory_parameters = parameters_dict[module_name]['mandatory'] 
+    optional_parameters = set(parameters_dict[module_name]['optional'].keys())
+    
+    allowed_parameters = set.union(mandatory_parameters, optional_parameters)
+    
+    extra_parameters = set.difference(module_contents, allowed_parameters)
+    if extra_parameters:
+        raise PyECLOUD_ConfigException('Error! These parameters should not be in %s: %r' % (module_name, extra_parameters))
+    
+    missing_parameters = set.difference(mandatory_parameters, module_contents)
     if missing_parameters:
         raise PyECLOUD_ConfigException('Error! These mandatory parameters are not provided by %s: %r' % (module_name, missing_parameters))
 
-    extra_parameters = module_contents - allowed_parameters
-    if extra_parameters:
-        raise PyECLOUD_ConfigException('Error! These parameters should not be in %s: %r' % (module_name, extra_parameters))
+    
 
 def update_module(module, new_module):
     """
@@ -45,7 +47,7 @@ def update_module(module, new_module):
         else:
             setattr(module, attr, value)
 
-def update_config_dict(config_dict, module, module_name, verbose=True):
+def update_config_dict(config_dict, module, module_name, verbose=False):
 
     mandatory_parameters = parameters_dict[module_name]['mandatory']
     optional_parameters = parameters_dict[module_name]['optional']
@@ -58,18 +60,22 @@ def update_config_dict(config_dict, module, module_name, verbose=True):
         if verbose:
             print('%s: %s = %s' % (module_name, parameter, value))
 
-    for parameter, default_value in optional_parameters.items():
-        if hasattr(module, parameter):
-            if parameter in config_dict:
-                raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
+    for parameter, default_value in optional_parameters.items(): # iterates on keys and values of the dictionary
+        
+        if hasattr(module, parameter): # the parameter is specified in the input file
             value = getattr(module, parameter)
-        else:
-            if parameter in config_dict:
-                raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
+        else: # the parameter is not specified in the input file (default to be used)
             value = default_value
+
+        # Check for duplicates
+        if parameter in config_dict:
+            raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
+        
+        # Upadate config dictionary
         config_dict[parameter] = value
+        
         if verbose:
-            print('%s: %s = %s' % (module_name, parameter, value))
+            print('%s: %s = %r' % (module_name, parameter, value))
 
 
 def import_module_from_file(module_name, file_name):
@@ -85,7 +91,7 @@ def import_module_from_file(module_name, file_name):
         os.mkdir(dir_name)
 
     try:
-        new_file_name = dir_name+'/temp_file_%s.py' % (str(time.time()).replace('.','_'))
+        new_file_name = dir_name+'/temp_file_%s.py' % (module_name+'_'+str(time.time())).replace('.','_')
         shutil.copy(file_name, new_file_name)
 
         if sys.version_info.major == 2:

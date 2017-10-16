@@ -82,22 +82,32 @@ import input_parameters_format_specification as inp_spec
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
-    config_dict = {}
 
-    simulation_parameters = inp_spec.import_module_from_file('simulation_parameters', os.path.join(pyecl_input_folder, simulation_param_file))
-    machine_param_file = simulation_parameters.machine_param_file
-    secondary_emission_parameters_file = simulation_parameters.secondary_emission_parameters_file
-    beam_parameters_file = simulation_parameters.beam_parameters_file
 
+    # Parse simulation_parameters.input
+    input_parameters = inp_spec.import_module_from_file('simulation_parameters', os.path.join(pyecl_input_folder, simulation_param_file))
+    
+    # Get names of other input files
+    machine_param_file = input_parameters.machine_param_file
+    secondary_emission_parameters_file = input_parameters.secondary_emission_parameters_file
+    beam_parameters_file = input_parameters.beam_parameters_file
+
+    # Parse other input files
     machine_parameters = inp_spec.import_module_from_file('machine_parameters', os.path.join(pyecl_input_folder, machine_param_file))
     secondary_emission_parameters = inp_spec.import_module_from_file('secondary_emission_parameters', os.path.join(pyecl_input_folder, secondary_emission_parameters_file))
 
-    inp_spec.update_module(simulation_parameters, machine_parameters)
-    inp_spec.update_module(simulation_parameters, secondary_emission_parameters)
+    # Update input_parameters object with parameters from other files
+    inp_spec.update_module(input_parameters, machine_parameters)
+    inp_spec.update_module(input_parameters, secondary_emission_parameters)
 
-    inp_spec.assert_module_has_parameters(simulation_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
-    inp_spec.update_config_dict(config_dict, simulation_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
+    # Check validity of input files
+    inp_spec.assert_module_has_parameters(input_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
+    
+    # Create config_dict with all allowed input parameters (not specified are set to default)
+    config_dict = {}
+    inp_spec.update_config_dict(config_dict, input_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
 
+    # Check validity of main beam input file (not yet used at this stage)
     if not skip_beam_files:
         beam_beam = inp_spec.import_module_from_file('beam_beam', os.path.join(pyecl_input_folder, beam_parameters_file))
         inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
@@ -114,8 +124,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', **kwargs):
         if attr in config_dict:
             config_dict[attr] = value
         else:
-            print('Warning! What exactly does %s do? It is not part of any config file.' % attr)
-            exec('%s=value') % attr
+            raise inp_spec.PyECLOUD_ConfigException('What exactly does %s do? It is not an expected input.' % attr)
+            
 
     cc = mlm.obj_from_dict(config_dict)
 
