@@ -13,7 +13,7 @@ import geom_impact_ellip
 import gen_photoemission_class
 import sec_emission as se
 
-import LHCMeasurementTools.mystyle as ms
+import mystyle as ms
 
 plt.close('all')
 ms.mystyle()
