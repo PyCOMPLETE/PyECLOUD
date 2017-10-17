@@ -54,33 +54,16 @@ import numpy as np
 from scipy.constants import c, e, m_e
 
 import myloadmat_to_obj as mlm
-
-from geom_impact_ellip import ellip_cham_geom_object
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
-from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
-from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
-from sec_emission_model_cos_low_ener import SEY_model_cos_le
-from sec_emission_model_flat_low_ener import SEY_model_flat_le
-from sec_emission_model_from_file import SEY_model_from_file
-import dynamics_Boris_f2py as dynB
-
-import MP_system as MPs
-import space_charge_class as scc
-import impact_management_class as imc
-
 import init
-
-
 
 class MP_light(object):
     pass
-    
+
 extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
-
 
         print 'PyECLOUD Version 6.5.1'
         print 'PyHEADTAIL module'
@@ -94,37 +77,35 @@ class Ecloud(object):
 
         (
         beamtim,
-        MP_e, 
+        MP_e,
         dynamics,
-        impact_man, 
+        impact_man,
         pyeclsaver,
-        gas_ion_flag, 
-        resgasion, 
-        t_ion, 
+        gas_ion_flag,
+        resgasion,
+        t_ion,
         spacech_ele,
-        t_sc_ON, 
-        photoem_flag, 
+        t_sc_ON,
+        photoem_flag,
         phemiss,
         flag_presence_sec_beams,
-        sec_beams_list, 
+        sec_beams_list,
         config_dict
-        ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True, 
-            skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None), 
+        ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True,
+            skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None),
             ignore_kwargs=extra_allowed_kwargs, **kwargs)
-        
+
         cc = mlm.obj_from_dict(config_dict)
 
         if space_charge_obj is not None:
             spacech_ele = space_charge_obj
-       
+
         if cc.track_method == 'Boris':
             pass
         elif cc.track_method == 'BorisMultipole':
             pass
         else:
             raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module""")
-
-
 
         self.x_beam_offset = 0.
         self.y_beam_offset = 0.
@@ -313,8 +294,8 @@ class Ecloud(object):
         Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 
         ## Total electric field on electrons
-        Ex_n=Ex_sc_n+Ex_n_beam;
-        Ey_n=Ey_sc_n+Ey_n_beam;
+        Ex_n=Ex_sc_n+Ex_n_beam
+        Ey_n=Ey_sc_n+Ey_n_beam
 
         ## save position before motion step
         old_pos=MP_e.get_positions()
@@ -461,179 +442,4 @@ class Ecloud(object):
             raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
         return Ecloud(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder, self.flag_clean_slices,
                 self.slice_by_slice_mode, space_charge_obj=self.spacech_ele, **self.kwargs)
-
-
-'''
-def read_parameter_files_pyhdtl(pyecl_input_folder):
-    switch_model=0
-    simulation_param_file=pyecl_input_folder+'/simulation_parameters.input'
-
-    save_mp_state_time_file = -1
-
-    stopfile = 'stop'
-
-    dec_fact_out = 1
-
-    init_unif_flag = 0
-    Nel_init_unif = None
-    E_init_unif = 0.
-    x_max_init_unif = None
-    x_min_init_unif = None
-    y_max_init_unif = None
-    y_min_init_unif = None
-
-    chamb_type = 'ellip'
-    filename_chm = None
-
-    x_aper = None
-    y_aper = None
-    flag_detailed_MP_info=0
-    flag_hist_impact_seg = 0
-
-    track_method= 'StrongBdip'
-
-    B = 0.   #Tesla (if B=-1 computed from energy and bending radius)
-    bm_totlen= -1 #m
-
-
-    B0x = 0.
-    B0y = 0.
-    B0z = 0.
-    B_map_file = None
-    Bz_map_file = None
-    N_sub_steps = 1
-    fact_Bmap = 1.
-    B_zero_thrhld = None
-
-
-    # photoemission parameters
-    photoem_flag = 0
-    inv_CDF_refl_photoem_file = -1
-    k_pe_st = -1
-    refl_frac = -1
-    alimit= -1
-    e_pe_sigma = -1
-    e_pe_max = -1
-    x0_refl = -1
-    y0_refl = -1
-    out_radius = -1
-
-    # gas ionization parameters
-    gas_ion_flag = 0
-    P_nTorr=-1
-    sigma_ion_MBarn=-1
-    Temp_K=-1
-    unif_frac=-1
-    E_init_ion=-1
-
-    N_mp_soft_regen = None
-    N_mp_after_soft_regen = None
-    Dx = 0.
-    Dy = 0.
-    betafx = None
-    betafy = None
-
-
-    flag_verbose_file=False
-    flag_verbose_stdout=False
-
-    secondary_beams_file_list = []
-
-    phem_resc_fac = 0.9999
-
-    dec_fac_secbeam_prof=1
-
-    el_density_probes=[]
-
-    save_simulation_state_time_file = -1
-
-    # detailed histogram
-    x_min_hist_det=None
-    x_max_hist_det=None
-    y_min_hist_det=None
-    y_max_hist_det=None
-    Dx_hist_det=None
-
-    sparse_solver = 'scipy_slu'
-
-    B_multip = []
-
-    PyPICmode = 'FiniteDifferences_ShortleyWeller'
-
-    filename_init_MP_state = None
-
-    # uniform initial density
-    init_unif_edens_flag = 0
-    init_unif_edens = None
-    E_init_unif_edens= 0.
-    x_max_init_unif_edens = None
-    x_min_init_unif_edens = None
-    y_max_init_unif_edens = None
-    y_min_init_unif_edens = None
-
-    flag_assume_convex = True
-
-
-    # multigrid parameters
-    f_telescope = None
-    target_grid = None
-    N_nodes_discard = None
-    N_min_Dh_main = None
-
-
-    f=open(simulation_param_file)
-    exec(f.read())
-    f.close()
-
-
-    f=open(pyecl_input_folder+'/'+machine_param_file)
-    exec(f.read())
-    f.close()
-
-    f=open(pyecl_input_folder+'/'+secondary_emission_parameters_file)
-    exec(f.read())
-    f.close()
-
-    b_par = None# = pbf.beam_descr_from_fil(beam_parameters_file, betafx, Dx, betafy, Dy)
-
-    flag_presence_sec_beams = False
-    #~ if len(secondary_beams_file_list)>0:
-        #~ flag_presence_sec_beams = True
-
-    sec_b_par_list=[]
-    #~ if flag_presence_sec_beams:
-        #~ for sec_b_file in secondary_beams_file_list:
-            #~ sec_b_par_list.append(pbf.beam_descr_from_fil(sec_b_file, betafx, Dx, betafy, Dy))
-
-    if B==-1:
-        B   = 2*pi*b_par.beta_rel*b_par.energy_J/(c*qe*bm_totlen)
-
-
-    return b_par, x_aper, y_aper, B,\
-    gas_ion_flag, P_nTorr, sigma_ion_MBarn, Temp_K, unif_frac, E_init_ion,\
-    Emax, del_max, R0, E_th, sigmafit, mufit,\
-    Dt, t_end, lam_th, t_ion, N_mp_max,\
-    N_mp_regen, N_mp_after_regen, fact_split, fact_clean, nel_mp_ref_0,\
-    Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen,regen_hist_cut,\
-    N_mp_regen_low,\
-    Dt_sc, Dh_sc, t_sc_ON,Dx_hist,r_center, scrub_en_th,\
-    progress_path,  logfile_path, flag_movie, flag_sc_movie,\
-    Dt_En_hist, Nbin_En_hist,En_hist_max, \
-    photoem_flag, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, alimit, e_pe_sigma,\
-    e_pe_max,x0_refl, y0_refl, out_radius, \
-    switch_model, switch_no_increase_energy, thresh_low_energy, save_mp_state_time_file, \
-    init_unif_flag, Nel_init_unif, E_init_unif, x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif,\
-    chamb_type, filename_chm, flag_detailed_MP_info, flag_hist_impact_seg,\
-    track_method, B0x, B0y, B0z, B_map_file,  Bz_map_file, N_sub_steps, fact_Bmap, B_zero_thrhld,\
-    N_mp_soft_regen, N_mp_after_soft_regen,\
-    flag_verbose_file, flag_verbose_stdout,\
-    flag_presence_sec_beams, sec_b_par_list, phem_resc_fac, dec_fac_secbeam_prof, el_density_probes, save_simulation_state_time_file,\
-    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det, dec_fact_out, stopfile, sparse_solver, B_multip,\
-    PyPICmode, filename_init_MP_state,\
-    init_unif_edens_flag, init_unif_edens, E_init_unif_edens,\
-    x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens, y_min_init_unif_edens, flag_assume_convex,\
-    f_telescope, target_grid, N_nodes_discard, N_min_Dh_main
-'''
-
-
 
