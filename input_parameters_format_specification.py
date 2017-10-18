@@ -11,6 +11,13 @@ class PyECLOUD_ConfigException(Exception):
 
 def assert_module_has_parameters(module, module_name):
 
+    # Format error message
+    err_msg = ''
+    if module_name == 'combined_simulations_secondaryEmission_machine_parameters':
+        nice_module_name = 'simulation_parameters or secondary_emission_parameters or machine_parameters'
+    else:
+        nice_module_name = module_name
+
     # Filter out (a) underscorred variables and (b) imported modules
     module_contents = set()
     for attr in dir(module):
@@ -25,13 +32,14 @@ def assert_module_has_parameters(module, module_name):
 
     extra_parameters = set.difference(module_contents, allowed_parameters)
     if extra_parameters:
-        raise PyECLOUD_ConfigException('Error! These parameters should not be in %s: %r' % (module_name, extra_parameters))
+        err_msg += 'Error! These parameters should not be in %s: %r' % (nice_module_name, extra_parameters)
 
     missing_parameters = set.difference(mandatory_parameters, module_contents)
     if missing_parameters:
-        raise PyECLOUD_ConfigException('Error! These mandatory parameters are not provided by %s: %r' % (module_name, missing_parameters))
+        err_msg += '\nError! These mandatory parameters are not provided by %s: %r' % (nice_module_name, missing_parameters)
 
-
+    if err_msg:
+        raise PyECLOUD_ConfigException(err_msg)
 
 def update_module(module, new_module):
     """
@@ -76,7 +84,6 @@ def update_config_dict(config_dict, module, module_name, verbose=False):
 
         if verbose:
             print('%s: %s = %r' % (module_name, parameter, value))
-
 
 def import_module_from_file(module_name, file_name):
     # Load any file as a python module. This function works for python2 and python3.
