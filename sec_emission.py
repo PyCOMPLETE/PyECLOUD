@@ -65,9 +65,9 @@ def hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit, E_th, En_i
         Nabove_th = np.sum(flag_above_th)
 
         while Nabove_th>0:
-            en_eV[flag_above_th]=lognormal(mufit,sigmafit,Nabove_th);
-            flag_above_th=(en_eV>E_th);
-            Nabove_th = np.sum(flag_above_th);
+            en_eV[flag_above_th]=lognormal(mufit,sigmafit,Nabove_th)
+            flag_above_th=(en_eV>E_th)
+            Nabove_th = np.sum(flag_above_th)
 
     elif switch_no_increase_energy==1:
 
@@ -85,12 +85,12 @@ def hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit, E_th, En_i
         while(N_neg>0):
             en_eV_le[flag_negat]=randn(N_neg)  #in eV
             flag_negat=np.logical_or(en_eV_le<0., en_eV_le>4.)
-            N_neg=np.sum(flag_negat);
+            N_neg=np.sum(flag_negat)
         sigma_le=En_impact_eV[flag_low_energy]/4.
         en_eV_le=(en_eV_le+2.)*sigma_le
 
         #generate high energy
-        en_eV_he=lognormal(mufit,sigmafit,N_high_ene);
+        en_eV_he=lognormal(mufit,sigmafit,N_high_ene)
         flag_above_th = np.logical_or(en_eV_he>E_th,(en_eV_he-En_impact_eV[flag_high_energy])>0)
         Nabove_th = np.sum(flag_above_th)
 
@@ -148,8 +148,10 @@ def get_angle_dist_func(string):
         print('Using cosine_3D emission angle distribution.')
         return velocities_angle_cosine_3D
     elif string == 'cosine_2D':
-        print('Warning! The 2D emission angle distribution is used!')
-        time.sleep(5)
+        print("""Warning! The 2D emission angle distribution is used!
+See presentation by P. Dijkstal on the angle of emission of generated electrons:
+https://indico.cern.ch/event/673160/""")
+        time.sleep(3)
         return velocities_angle_cosine_2D
     else:
         raise ValueError("The emission angle distribution must be specified with either 'cosine_2D' or 'cosine_3D'!")

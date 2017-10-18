@@ -16,3 +16,6 @@ scrub_en_th=20.#eV
 
 E0 = 200
 s_param = 1.5
+
+
+secondary_angle_distribution = 'cosine_3D'

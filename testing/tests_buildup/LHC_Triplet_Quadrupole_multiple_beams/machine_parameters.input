@@ -44,3 +44,6 @@ E_init_unif_edens = 1.
 
 betafx = 6538.04*1e9
 betafy = 21755.15*1e9
+
+
+photoelectron_angle_distribution = 'cosine_3D'
