@@ -215,3 +215,30 @@ class photoemission_from_file(photoemission_base):
 
         return MP_e
 
+class photoemission_per_segment(photoemission_base):
+
+    def __init__(self, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
+                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim, flag_continuous_emission):
+        print('Start photoemission per segment init')
+        self.k_pe_st = k_pe_st
+        self.out_radius = out_radius
+        self.chamb = chamb
+        self.resc_fac = resc_fac
+        self.flag_continuous_emission = flag_continuous_emission
+        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        print('Done photoemission init')
+
+    def generate(self, MP_e, lambda_t, Dt):
+
+        Nint_new_MP = self.get_number_new_mps(self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref)
+        if Nint_new_MP > 0:
+
+            x_out = self.out_radius*np.cos(theta_gen)
+            y_out = self.out_radius*np.sin(theta_gen)
+
+            x_in = y_in = np.zeros(Nint_new_MP)
+            self.gen_energy_and_set_MPs(Nint_new_MP, x_in, y_in, x_out, y_out, MP_e)
+
+        return MP_e
+
