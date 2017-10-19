@@ -150,7 +150,7 @@ class photoemission_base(object):
 
 class photoemission(photoemission_base):
 
-    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max,alimit, x0_refl,
+    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max, alimit, x0_refl,
                  y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution,
                  beamtim, flag_continuous_emission):
 

@@ -11,7 +11,6 @@ import scipy.stats as stats
 import MP_system
 import geom_impact_ellip
 import gen_photoemission_class
-import sec_emission as se
 
 import mystyle as ms
 
@@ -59,7 +58,8 @@ chamb = geom_impact_ellip.ellip_cham_geom_object(1.,1.)
 MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, chamb)
 
 
-phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb, 0.995, args.energy_dist, se.velocities_angle_cosine_3D)
+phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01,
+                                                chamb, 0.995, args.energy_dist, 'cosine_3D', None, False)
 
 phemiss.generate(MP_e, 1, 1)
 
