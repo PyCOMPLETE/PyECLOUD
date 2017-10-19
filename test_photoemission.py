@@ -18,37 +18,39 @@ import mystyle as ms
 plt.close('all')
 ms.mystyle()
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-o', help='Define output of plots')
 parser.add_argument('--noshow', action='store_true')
 parser.add_argument('--energy-dist', choices=['gaussian', 'lognormal', 'lorentz'], default='gaussian')
+parser.add_argument('--angle-dist', choices=['cosine_2D', 'cosine_3D'], default='cosine_3D')
 args = parser.parse_args()
 
 
 def lognormal(xx, mu, sig):
-    fact = 1/(xx*sig*np.sqrt(2*np.pi))*np.exp(-(np.log(xx)-mu)**2/(2*sig**2))
-    return fact
+    return 1/(xx*sig*np.sqrt(2*np.pi))*np.exp(-(np.log(xx)-mu)**2/(2*sig**2))
 
 def gauss(xx, mu, sig):
-    fact = 1/(sig*np.sqrt(2*np.pi))*np.exp(-(xx-mu)**2/(2*sig**2))
-    return fact
+    return 1/(sig*np.sqrt(2*np.pi))*np.exp(-(xx-mu)**2/(2*sig**2))
 
 def lorentz(xx, mu, sig):
     return stats.cauchy.pdf(xx, mu, sig)
 
+def x_angle_dist(angle_dist,x):
+    if angle_dist == 'cosine_2D':
+        return np.cos(x)
+    elif angle_dist == 'cosine_3D':
+        return np.sin(2*x)
+
+# Sample size of generated photoelectrons
 N_mp_max = int(1e6)
 k_pe_st = 1/c*N_mp_max
-refl_frac= 3.8e-2
+refl_frac= 20e-2
 nel_mp_ref = 1
 alimit = 0.05
 
 if args.energy_dist == 'lorentz':
     mu, sig = 0.64, 3.7
 elif args.energy_dist == 'lognormal':
-
-    #sig2 = np.sqrt(np.log(sig**2/mu**2 +1))
-    #mu2 = np.log(mu) - sig2**2/2
     sig = np.sqrt(np.log(5**2/7**2 +1))
     mu = np.log(7) - sig**2/2
 else:
@@ -60,7 +62,7 @@ MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0
 
 
 phemiss = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01,
-                                                chamb, 0.995, args.energy_dist, 'cosine_3D', None, False)
+                                                chamb, 0.995, args.energy_dist, args.angle_dist, None, False)
 
 phemiss.generate(MP_e, 1, 1)
 
@@ -73,7 +75,6 @@ angles = np.arctan(yy/xx)
 velocities = np.array([MP_e.vx_mp, MP_e.vy_mp, MP_e.vz_mp]).T
 energies = np.sum(velocities**2, axis=1)*m_e/2/e
 vx, vy, vz = MP_e.vx_mp, MP_e.vy_mp, MP_e.vz_mp
-#angles_v = np.pi/2 - np.arctan(vy/vx) + angles
 cos_normal = -(xx*vx + yy*vy) / (np.sqrt(vx**2+vy**2+vz**2) * np.sqrt(xx**2+yy**2))
 angles_v = np.arccos(cos_normal)
 
@@ -122,7 +123,7 @@ sp.grid(True)
 sp.set_title('Histogram of velocity vector\nrel. to normal')
 sp.set_xlabel(r'$\theta$ [rad]')
 sp.hist(angles_v, bins=40, normed=True)
-sp.plot(xx_a[xx_a>0], np.sin(2*xx_a[xx_a>0]), color='g', lw=3)
+sp.plot(xx_a[xx_a>0], x_angle_dist(args.angle_dist, xx_a[xx_a>0]), color='g', lw=3)
 
 arr = lambda x: np.array(x, dtype=float)
 my_chamb_dict = {
@@ -134,25 +135,36 @@ my_chamb_dict['y_sem_ellip_insc'] = 0.98*my_chamb_dict['Vy'].max()
 
 my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
 
-chamb = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, distance_new_phem=1e-5, flag_counter_clockwise_chamb=False)
+N_mp_gen = int(1e5)
+chamb = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, distance_new_phem=1e-2, flag_counter_clockwise_chamb=False)
+MP_e = MP_system.MP_system(N_mp_gen, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, chamb)
 
-fig = ms.figure('Photoemission in non-convex chamber')
-sp = plt.subplot(2,2,1)
+k_pe_st = 1/c*N_mp_gen
+phem_seg = gen_photoemission_class.photoemission_per_segment(chamb, 'gaussian', sig, mu, k_pe_st, args.angle_dist)
+phem_seg.generate(MP_e, 1, 1)
+
 xx = my_chamb_dict['Vx'].squeeze()
 yy = my_chamb_dict['Vy'].squeeze()
 xx = list(xx) + [xx[0]]
 yy = list(yy) + [yy[0]]
 
-sp.plot(xx, yy, marker='o')
-sp.set_xlim(1.1*min(xx), 1.1*max(xx))
-sp.set_ylim(1.1*min(yy), 1.1*max(yy))
+fig = ms.figure('Photoemission in non-convex chamber')
+sp = plt.subplot(2,2,1)
+sp.set_title('Chamber')
+sp2 = plt.subplot(2,2,2)
+sp2.set_title('Generated MPs')
+
+for sp_ in sp, sp2:
+    sp_.plot(xx, yy, marker='o')
+    sp_.set_xlim(1.1*min(xx), 1.1*max(xx))
+    sp_.set_ylim(1.1*min(yy), 1.1*max(yy))
 
 
-N_mp_gen = int(1e5)
-x_new_mp, y_new_mp, _, _ = chamb.get_photoelectron_positions(N_mp_gen)
-sp.plot(x_new_mp, y_new_mp, color='red', ls='None', marker='x')
-
-
+#x_new_mp, y_new_mp, _, _ = chamb.get_photoelectron_positions(N_mp_gen)
+positions = MP_e.get_positions()
+x_new_mp = positions.x_mp
+y_new_mp = positions.y_mp
+sp2.plot(x_new_mp, y_new_mp, color='red', ls='None', marker='x')
 
 if args.o:
     plt.suptitle('')

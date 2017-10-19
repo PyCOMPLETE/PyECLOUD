@@ -218,16 +218,16 @@ class photoemission_from_file(photoemission_base):
 
 class photoemission_per_segment(photoemission_base):
 
-    def __init__(self, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
-                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim, flag_continuous_emission):
+    def __init__(self, chamb, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st,
+                 photoelectron_angle_distribution, mean_lambda=0, flag_continuous_emission=False):
         print('Start photoemission per segment init')
         self.k_pe_st = k_pe_st
-        self.out_radius = out_radius
         self.chamb = chamb
-        self.resc_fac = resc_fac
         self.flag_continuous_emission = flag_continuous_emission
         self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        if self.flag_continuous_emission:
+            self.mean_lambda = mean_lambda
         print('Done photoemission init')
 
     def generate(self, MP_e, lambda_t, Dt):
