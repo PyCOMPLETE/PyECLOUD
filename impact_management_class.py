@@ -58,7 +58,7 @@ import seg_impact as segi
 class impact_management(object):
     def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
                  Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy, flag_seg,
-                 cos_angle_width, secondary_angle_distribution):
+                 cos_angle_width, flag_cos_angle_hist, secondary_angle_distribution):
 
         print 'Start impact man. init.'
 
@@ -89,9 +89,11 @@ class impact_management(object):
         self.En_g_hist=np.linspace(0.,En_hist_max, Nbin_En_hist) #hist. grid
         self.DEn_hist=self.En_g_hist[1]-self.En_g_hist[0]     #hist. step
 
-        self.cos_angle_width = cos_angle_width
-        N_angles = int(1./ cos_angle_width)+1
-        self.cos_angle_hist  = np.zeros(N_angles, float)
+        self.flag_cos_angle_hist = flag_cos_angle_hist
+        if self.flag_cos_angle_hist:
+            self.cos_angle_width = cos_angle_width
+            N_angles = int(1./ cos_angle_width)+1
+            self.flag_cos_angle_hist  = np.zeros(N_angles, float)
 
         self.xg_hist = xg_hist
         self.Nxg_hist = Nxg_hist
@@ -228,7 +230,8 @@ class impact_management(object):
                 histf.compute_hist(x_emit, nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                 # angle histogram
-                histf.compute_hist(costheta_impact, nel_impact, 0., self.cos_angle_width, self.cos_angle_hist)
+                if self.flag_cos_angle_hist:
+                    histf.compute_hist(costheta_impact, nel_impact, 0., self.cos_angle_width, self.cos_angle_hist)
 
                 if flag_seg:
                     segi.update_seg_impact(i_found,nel_impact,self.nel_hist_impact_seg)#riga incriminata???
