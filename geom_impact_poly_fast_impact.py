@@ -101,7 +101,7 @@ class polyg_cham_geom_object:
             _Vy = np.append(Vy, [Vy[0]])
             self.seg_diff_x = seg_diff_x = _Vx[1:] - _Vx[:-1]
             self.seg_diff_y = seg_diff_y = _Vy[1:] - _Vy[:-1]
-            self.cdf_bins = np.concatenate(([0], self.phem_cdf))
+            self.cdf_bins = np.append([0], self.phem_cdf)
 
             _len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
             self.normal_vect_x = seg_diff_y / _len_segments
