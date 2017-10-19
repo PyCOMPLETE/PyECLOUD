@@ -54,73 +54,13 @@ import numpy as np
 import numpy.random as random
 
 import scipy.io as sio
-import scipy.stats as stats
 from scipy.constants import e as qe, m_e as me, c
 
 import sec_emission
 
 qm=qe/me
 
-class _gen_energy_base(object):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-
-class _lognormal(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        return random.lognormal(self.e_pe_max, self.e_pe_sigma, N_int_new_MP)
-
-class _gaussian(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        En_gen = random.randn(N_int_new_MP)*self.e_pe_sigma + self.e_pe_max
-        flag_negat = (En_gen<0.)
-        N_neg = np.sum(flag_negat)
-        while(N_neg>0):
-            En_gen[flag_negat] = random.randn(N_neg)*self.e_pe_sigma +self.e_pe_max   #in eV
-            flag_negat = (En_gen<0.)
-            N_neg = np.sum(flag_negat)
-        return En_gen
-
-class _rect(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        return self.e_pe_max + (random.rand(N_int_new_MP)-0.5)*self.e_pe_sigma
-
-class _mono(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        return np.ones(N_int_new_MP)*self.e_pe_max
-
-class _lorentz(_gen_energy_base):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-        self.xx_min = stats.cauchy.cdf(0, e_pe_max, e_pe_sigma)
-        self.xx_max = 1 # set this to something else if you want to cut
-
-    def __call__(self, N_int_new_MP):
-        xx_rand = random.rand(N_int_new_MP)*(self.xx_max-self.xx_min) + self.xx_min
-        return stats.cauchy.ppf(xx_rand, self.e_pe_max, self.e_pe_sigma)
-
-
 class photoemission_base(object):
-
-
-    @staticmethod
-    def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
-
-        if energy_distribution == 'lognormal':
-            get_energy = _lognormal
-        elif energy_distribution == 'gaussian':
-            get_energy = _gaussian
-        elif energy_distribution == 'rect':
-            get_energy = _rect
-        elif energy_distribution == 'mono':
-            get_energy = _mono
-        elif energy_distribution == 'lorentz':
-            get_energy = _lorentz
-        else:
-            raise ValueError('Energy distribution %s is invalid!' % energy_distribution)
-
-        return get_energy(e_pe_sigma, e_pe_max)
 
     def get_number_new_mps(self, k_pe_st, lambda_t, Dt, nel_mp_ref):
 
@@ -146,7 +86,6 @@ class photoemission_base(object):
         vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
 
         MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
-
 
 class photoemission(photoemission_base):
 
@@ -188,7 +127,7 @@ class photoemission(photoemission_base):
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
             raise ValueError('x0_refl, y0_refl is outside of the chamber!')
 
-        self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
 
         print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 
@@ -232,7 +171,6 @@ class photoemission(photoemission_base):
 
         return MP_e
 
-
 class photoemission_from_file(photoemission_base):
 
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
@@ -254,7 +192,7 @@ class photoemission_from_file(photoemission_base):
         if flag_continuous_emission:
             self.mean_curr = np.mean(beamtim.lam_t_array)
 
-        self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
         print('Done photoemission init')
 
