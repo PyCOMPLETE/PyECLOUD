@@ -57,8 +57,8 @@ from scipy.constants import c, e as qe
 import myloadmat_to_obj as mlm
 
 import beam_and_timing as beatim
-import geom_impact_poly_fast_impact as gipfi
 from geom_impact_ellip import ellip_cham_geom_object
+import geom_impact_poly_fast_impact as gipfi
 import geom_impact_rect_fast_impact as girfi
 
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD

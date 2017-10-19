@@ -62,7 +62,7 @@ def rect_cham_geom_object(x_aper, y_aper, flag_verbose_file=False, flag_verbose_
             'Vy':na([y_aper, y_aper, -y_aper, -y_aper]),
             'x_sem_ellip_insc':0.99*x_aper,
             'y_sem_ellip_insc':0.99*y_aper},
-        flag_non_unif_sey = False,
+        flag_non_unif_sey=False,
         flag_verbose_file=flag_verbose_file, flag_verbose_stdout=flag_verbose_stdout)
 
     chamber.chamb_type='rect'
