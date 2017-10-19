@@ -10,6 +10,7 @@ import scipy.stats as stats
 
 import MP_system
 import geom_impact_ellip
+import geom_impact_poly_fast_impact as gipfi
 import gen_photoemission_class
 import sec_emission as se
 
@@ -122,6 +123,34 @@ sp.set_title('Histogram of velocity vector\nrel. to normal')
 sp.set_xlabel(r'$\theta$ [rad]')
 sp.hist(angles_v, bins=40, normed=True)
 sp.plot(xx_a[xx_a>0], np.sin(2*xx_a[xx_a>0]), color='g', lw=3)
+
+arr = lambda x: np.array(x, dtype=float)
+my_chamb_dict = {
+    'Vx': arr([-1,-1,1,1,1.1,1.1,1,1]),
+    'Vy': arr([1,-1,-1,-0.3,-0.5,0.5,0.3,1]),
+}
+my_chamb_dict['x_sem_ellip_insc'] = 0.98*my_chamb_dict['Vx'].max()
+my_chamb_dict['y_sem_ellip_insc'] = 0.98*my_chamb_dict['Vy'].max()
+
+my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
+
+chamb = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, distance_new_phem=1e-5, flag_counter_clockwise_chamb=False)
+
+fig = ms.figure('Photoemission in non-convex chamber')
+sp = plt.subplot(2,2,1)
+xx = my_chamb_dict['Vx'].squeeze()
+yy = my_chamb_dict['Vy'].squeeze()
+xx = list(xx) + [xx[0]]
+yy = list(yy) + [yy[0]]
+
+sp.plot(xx, yy, marker='o')
+sp.set_xlim(1.1*min(xx), 1.1*max(xx))
+sp.set_ylim(1.1*min(yy), 1.1*max(yy))
+
+
+N_mp_gen = int(1e5)
+x_new_mp, y_new_mp, _, _ = chamb.get_photoelectron_positions(N_mp_gen)
+sp.plot(x_new_mp, y_new_mp, color='red', ls='None', marker='x')
 
 
 

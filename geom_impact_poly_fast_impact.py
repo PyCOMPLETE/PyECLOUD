@@ -50,17 +50,21 @@
 #----------------------------------------------------------------------
 
 
-
+from __future__ import division
 from numpy import squeeze, array,diff, max, sum, sqrt,\
                   arctan2, sin, cos
 import scipy.io as sio
 import numpy as np
+import numpy.random as random
 
 import geom_impact_poly_cython as gipc
 
+class PyECLOUD_ChamberException(Exception):
+    pass
+
 class polyg_cham_geom_object:
-    def __init__(self, filename_chm, flag_non_unif_sey,
-                 flag_verbose_file=False, flag_verbose_stdout=False, flag_assume_convex=True):
+    def __init__(self, filename_chm, flag_non_unif_sey, flag_verbose_file=False, flag_verbose_stdout=False,
+                 flag_assume_convex=True, flag_counter_clockwise_chamb=True, distance_new_phem=1e-5):
 
 
         print 'Polygonal chamber - cython implementation'
@@ -80,6 +84,30 @@ class polyg_cham_geom_object:
             self.del_max_segments = squeeze(dict_chm['del_max_segments'])
             self.R0_segments = squeeze(dict_chm['R0_segments'])
             self.Emax_segments = squeeze(dict_chm['Emax_segments'])
+
+        if 'phem_cdf' in dict_chm:
+            self.phem_cdf = squeeze(dict_chm['phem_cdf'])
+            if self.phem_cdf[-1] != 1:
+                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict does not end with 1.')
+            if np.any(np.diff(self.phem_cdf) < 0):
+                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict is not monotonically increasing.')
+
+            _Vx = np.append(Vx, [Vx[0]])
+            _Vy = np.append(Vy, [Vy[0]])
+            self.seg_diff_x = seg_diff_x = _Vx[1:] - _Vx[:-1]
+            self.seg_diff_y = seg_diff_y = _Vy[1:] - _Vy[:-1]
+            self.cdf_bins = np.concatenate(([0], self.phem_cdf))
+
+            self.phem_outside_last_time = 0
+            self.distance_new_phem = distance_new_phem
+
+            len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
+            self.normal_vect_x = seg_diff_y / len_segments
+            self.normal_vect_y = -seg_diff_x / len_segments
+            if not flag_counter_clockwise_chamb:
+                self.normal_vect_x *= -1
+                self.normal_vect_y *= -1
+
 
         self.N_vert=len(Vx)
 
@@ -127,7 +155,7 @@ class polyg_cham_geom_object:
 
         if self.flag_assume_convex:
             if not(self.is_convex()):
-                raise ValueError(
+                raise PyECLOUD_ChamberException(
                     'The polygon looks not convex!!!!\nIn this case you can use the general algorithm (probably slower) by setting:\nflag_assume_convex = False')
             self.cythonisoutside = gipc.is_outside_convex
             print 'Assuming convex polygon'
@@ -300,4 +328,30 @@ class polyg_cham_geom_object:
 
             # If we got this far, the polygon is convex.
             return True
+
+    def get_photoelectron_positions(self, N_mp_gen):
+        N_mp_gen += self.phem_outside_last_time
+        x_new_mp = np.empty(N_mp_gen)
+        y_new_mp = np.empty(N_mp_gen)
+        norm_x_new_mp = np.empty(N_mp_gen)
+        norm_y_new_mp = np.empty(N_mp_gen)
+
+        N_mp_segment, _ = np.histogram(random.rand(N_mp_gen), self.cdf_bins)
+
+        N_mp_curr = 0
+        for i_seg, N_mp_seg in enumerate(N_mp_segment):
+            N_mp_after = N_mp_curr + N_mp_seg
+            rr = random.rand(N_mp_seg)
+            x_new_mp[N_mp_curr:N_mp_after] = self.Vx[i_seg] + rr*self.seg_diff_x[i_seg] + self.normal_vect_x[i_seg]*self.distance_new_phem
+            y_new_mp[N_mp_curr:N_mp_after] = self.Vy[i_seg] + rr*self.seg_diff_y[i_seg] + self.normal_vect_y[i_seg]*self.distance_new_phem
+            norm_x_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_x[i_seg]
+            norm_y_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_y[i_seg]
+            N_mp_curr = N_mp_after
+
+        phem_inside = ~self.is_outside(x_new_mp, y_new_mp)
+        self.phem_outside_last_time = np.sum(~phem_inside)
+        if self.phem_outside_last_time:
+            print('Outside of chamber + %i!' % self.phem_outside_last_time)
+
+        return x_new_mp[phem_inside], y_new_mp[phem_inside], norm_x_new_mp[phem_inside], norm_y_new_mp[phem_inside]
 

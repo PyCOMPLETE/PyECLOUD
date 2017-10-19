@@ -73,6 +73,7 @@ class photoemission_base(object):
         return int(Nint_new_MP+int(random.rand()<rest))
 
     def gen_energy_and_set_MPs(self, Nint_new_MP, x_in, y_in, x_out, y_out, MP_e):
+        # Assumes convex_chamber
 
         #generate points and normals
         z_in = z_out = np.zeros_like(x_out, float)
@@ -233,12 +234,12 @@ class photoemission_per_segment(photoemission_base):
 
         Nint_new_MP = self.get_number_new_mps(self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref)
         if Nint_new_MP > 0:
+            x_new_mp, y_new_mp, Norm_x, Norm_y = self.chamb.get_photoelectron_positions(Nint_new_MP)
+            Nint_new_MP = x_new_mp.size
+            En_gen = self.get_energy(Nint_new_MP) #in eV
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
 
-            x_out = self.out_radius*np.cos(theta_gen)
-            y_out = self.out_radius*np.sin(theta_gen)
-
-            x_in = y_in = np.zeros(Nint_new_MP)
-            self.gen_energy_and_set_MPs(Nint_new_MP, x_in, y_in, x_out, y_out, MP_e)
+            MP_e.add_new_MPs(x_new_mp.size, MP_e.nel_mp_ref, x_new_mp, y_new_mp, 0., vx_gen, vy_gen, vz_gen)
 
         return MP_e
 
