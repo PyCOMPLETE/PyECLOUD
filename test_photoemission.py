@@ -68,7 +68,7 @@ my_chamb_dict['y_sem_ellip_insc'] = 0.98*my_chamb_dict['Vy'].max()
 
 my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
 
-chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, distance_new_phem=1e-2, flag_counter_clockwise_chamb=False)
+chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, distance_new_phem=1e-10, flag_counter_clockwise_chamb=False)
 
 phem_seg = gen_photoemission_class.photoemission_per_segment(chamb_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
 
@@ -104,7 +104,7 @@ for phem, chamb, N_mp_max in [
     sp.grid(True)
     sp.set_xlabel('x')
     sp.set_ylabel('y')
-    sp.set_title('Positions of new MPs')
+    sp.set_title('Positions of %.1e new MPs' % len(xx))
     if phem is phem_elip:
         circ = plt.Circle([0,0],1, fill=False, color='black')
         sp.add_artist(circ)
@@ -156,28 +156,13 @@ for phem, chamb, N_mp_max in [
         xx = list(xx) + [xx[0]]
         yy = list(yy) + [yy[0]]
 
-#fig = ms.figure('Photoemission in non-convex chamber')
-#sp = plt.subplot(2,2,1)
-#sp.set_title('Chamber')
-#sp2 = plt.subplot(2,2,2)
-#sp2.set_title('Generated MPs')
-#
-#for sp_ in sp, sp2:
-#    sp_.plot(xx, yy, marker='o')
-#    sp_.set_xlim(1.1*min(xx), 1.1*max(xx))
-#    sp_.set_ylim(1.1*min(yy), 1.1*max(yy))
-#
-#
-##x_new_mp, y_new_mp, _, _ = chamb.get_photoelectron_positions(N_mp_max)
-#positions = MP_e.get_positions()
-#x_new_mp = positions.x_mp
-#y_new_mp = positions.y_mp
-#sp2.plot(x_new_mp, y_new_mp, color='red', ls='None', marker='x')
-#
+
 if args.o:
-    plt.suptitle('')
-    plt.subplots_adjust(hspace=0.4)
-    plt.savefig(os.path.expanduser(args.o))
+    for num in plt.get_fignums():
+        fig = plt.figure(num)
+        plt.suptitle('')
+        plt.subplots_adjust(hspace=0.4)
+        plt.savefig(os.path.expanduser(args.o+'_%i.png' % num))
 
 if not args.noshow:
     plt.show()
