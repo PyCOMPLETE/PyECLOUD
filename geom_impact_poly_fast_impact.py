@@ -142,22 +142,34 @@ class polyg_cham_geom_object:
 
         # For photoemission from segment
         if 'phem_cdf' in dict_chm:
-            self.phem_cdf = squeeze(dict_chm['phem_cdf'])
+            phem_cdf = dict_chm['phem_cdf'].squeeze()
 
             # Make sure phem_cdf has correct shape
-            if self.phem_cdf[-1] != 1:
+            if phem_cdf[-1] != 1:
                 raise PyECLOUD_ChamberException('phem_cdf of chamb_dict does not end with 1.')
-            if np.any(np.diff(self.phem_cdf) < 0):
+            if np.any(np.diff(phem_cdf) < 0):
                 raise PyECLOUD_ChamberException('phem_cdf of chamb_dict is not monotonically increasing.')
 
-            # Needed to calculate histograms and positions later
-            self.seg_diff_x = seg_diff_x = Vx[1:] - Vx[:-1]
-            self.seg_diff_y = seg_diff_y = Vy[1:] - Vy[:-1]
-            self.cdf_bins = np.append([0], self.phem_cdf)
+            # Optionally use distinct photoemission chamber segments
+            # This allows for a finer resolution of photoemission per segment, without increasing the computational
+            # burden on the is_outside and impact_point_and_normalfunctions.
+            if 'phem_Vx' in dict_chm:
+                phem_Vx = dict_chm['phem_Vx'].squeeze()
+                phem_Vy = dict_chm['phem_Vy'].squeeze()
+                phem_Vx = np.append(phem_Vx, phem_Vx[0])
+                phem_Vy = np.append(phem_Vy, phem_Vy[0])
+            else:
+                phem_Vx = Vx
+                phem_Vy = Vy
 
-            _len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
-            self.normal_vect_x = seg_diff_y / _len_segments
-            self.normal_vect_y = -seg_diff_x / _len_segments
+            # Needed to calculate histograms and positions later
+            self.seg_diff_x = seg_diff_x = np.diff(Vx)
+            self.seg_diff_y = seg_diff_y = np.diff(Vy)
+            self.cdf_bins = np.append(0, phem_cdf)
+
+            len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
+            self.normal_vect_x = seg_diff_y / len_segments
+            self.normal_vect_y = -seg_diff_x / len_segments
 
             # Chamber corners are defined clockwise or counter-clockwise.
             # This has an effect of the direction of the normal vector
