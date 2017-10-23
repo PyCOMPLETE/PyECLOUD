@@ -64,7 +64,7 @@ class PyECLOUD_ChamberException(ValueError):
 
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey, flag_verbose_file=False, flag_verbose_stdout=False,
-                 flag_assume_convex=True, flag_counter_clockwise_chamb=True, distance_new_phem=1e-5):
+                 flag_assume_convex=True, flag_counter_clockwise_chamb=True):
 
 
         print('Polygonal chamber - cython implementation')
@@ -85,38 +85,6 @@ class polyg_cham_geom_object:
             self.R0_segments = squeeze(dict_chm['R0_segments'])
             self.Emax_segments = squeeze(dict_chm['Emax_segments'])
 
-        # For photoemission from segment
-        if 'phem_cdf' in dict_chm:
-            self.phem_cdf = squeeze(dict_chm['phem_cdf'])
-            self.distance_new_phem = distance_new_phem
-
-            # Make sure phem_cdf has correct shape
-            if self.phem_cdf[-1] != 1:
-                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict does not end with 1.')
-            if np.any(np.diff(self.phem_cdf) < 0):
-                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict is not monotonically increasing.')
-
-            # Needed to calculate histograms and positions later
-            _Vx = np.append(Vx, [Vx[0]])
-            _Vy = np.append(Vy, [Vy[0]])
-            self.seg_diff_x = seg_diff_x = _Vx[1:] - _Vx[:-1]
-            self.seg_diff_y = seg_diff_y = _Vy[1:] - _Vy[:-1]
-            self.cdf_bins = np.append([0], self.phem_cdf)
-
-            _len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
-            self.normal_vect_x = seg_diff_y / _len_segments
-            self.normal_vect_y = -seg_diff_x / _len_segments
-
-            # Chamber corners are defined clockwise or counter-clockwise.
-            # This has an effect of the direction of the normal vector
-            if not flag_counter_clockwise_chamb:
-                self.normal_vect_x *= -1
-                self.normal_vect_y *= -1
-
-            # MP positions have to be inside chamber -> add normal_vector*distance_new_phem to position
-            self.phem_x0 = Vx + self.normal_vect_x*self.distance_new_phem
-            self.phem_y0 = Vy + self.normal_vect_y*self.distance_new_phem
-
 
         self.N_vert=len(Vx)
 
@@ -128,8 +96,8 @@ class polyg_cham_geom_object:
         Vx.append(Vx[0])
         Vy.append(Vy[0])
 
-        Vx=array(Vx)
-        Vy=array(Vy)
+        Vx=array(Vx, float)
+        Vy=array(Vy, float)
 
         Nx=-diff(Vy,1)
         Ny=diff(Vx,1)
@@ -171,6 +139,31 @@ class polyg_cham_geom_object:
         else:
             self.cythonisoutside = gipc.is_outside_nonconvex
             print('No assumption on the convexity of the polygon')
+
+        # For photoemission from segment
+        if 'phem_cdf' in dict_chm:
+            self.phem_cdf = squeeze(dict_chm['phem_cdf'])
+
+            # Make sure phem_cdf has correct shape
+            if self.phem_cdf[-1] != 1:
+                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict does not end with 1.')
+            if np.any(np.diff(self.phem_cdf) < 0):
+                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict is not monotonically increasing.')
+
+            # Needed to calculate histograms and positions later
+            self.seg_diff_x = seg_diff_x = Vx[1:] - Vx[:-1]
+            self.seg_diff_y = seg_diff_y = Vy[1:] - Vy[:-1]
+            self.cdf_bins = np.append([0], self.phem_cdf)
+
+            _len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
+            self.normal_vect_x = seg_diff_y / _len_segments
+            self.normal_vect_y = -seg_diff_x / _len_segments
+
+            # Chamber corners are defined clockwise or counter-clockwise.
+            # This has an effect of the direction of the normal vector
+            if not flag_counter_clockwise_chamb:
+                self.normal_vect_x *= -1
+                self.normal_vect_y *= -1
 
 
     def is_outside(self, x_mp, y_mp):
@@ -359,19 +352,11 @@ class polyg_cham_geom_object:
             if N_mp_seg != 0:
                 N_mp_after = N_mp_curr + N_mp_seg
                 rr = random.rand(N_mp_seg)
-                x_new_mp[N_mp_curr:N_mp_after] = self.phem_x0[i_seg] + rr*self.seg_diff_x[i_seg]
-                y_new_mp[N_mp_curr:N_mp_after] = self.phem_y0[i_seg] + rr*self.seg_diff_y[i_seg]
+                x_new_mp[N_mp_curr:N_mp_after] = self.Vx[i_seg] + rr*self.seg_diff_x[i_seg]
+                y_new_mp[N_mp_curr:N_mp_after] = self.Vy[i_seg] + rr*self.seg_diff_y[i_seg]
                 norm_x_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_x[i_seg]
                 norm_y_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_y[i_seg]
                 N_mp_curr = N_mp_after
-        assert N_mp_curr == N_mp_gen
-
-        # Some MPs may be outside of the chamber -> recursion until all are inside
-        phem_outside = self.is_outside(x_new_mp, y_new_mp)
-        n_phem_outside = np.sum(phem_outside)
-        if n_phem_outside != 0:
-            x_new_mp[phem_outside], y_new_mp[phem_outside], norm_x_new_mp[phem_outside], norm_y_new_mp[phem_outside] =\
-                self.get_photoelectron_positions(n_phem_outside)
 
         return x_new_mp, y_new_mp, norm_x_new_mp, norm_y_new_mp
 

@@ -68,7 +68,7 @@ my_chamb_dict['y_sem_ellip_insc'] = 0.98*my_chamb_dict['Vy'].max()
 
 my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
 
-chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, distance_new_phem=1e-10, flag_counter_clockwise_chamb=False)
+chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, flag_counter_clockwise_chamb=False, flag_verbose_stdout=True)
 
 phem_seg = gen_photoemission_class.photoemission_per_segment(chamb_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
 
