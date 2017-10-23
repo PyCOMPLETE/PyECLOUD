@@ -151,12 +151,6 @@ for phem, chamb, N_mp_max in [
         sp.hist(angles_v, bins=40, normed=True)
         sp.plot(xx_a[xx_a>0], x_angle_dist(args.angle_dist, xx_a[xx_a>0]), color='g', lw=3)
 
-        xx = my_chamb_dict['Vx'].squeeze()
-        yy = my_chamb_dict['Vy'].squeeze()
-        xx = list(xx) + [xx[0]]
-        yy = list(yy) + [yy[0]]
-
-
 if args.o:
     for num in plt.get_fignums():
         fig = plt.figure(num)

@@ -51,8 +51,7 @@
 
 
 from __future__ import division, print_function
-from numpy import squeeze, array,diff, max, sum, sqrt,\
-                  arctan2, sin, cos
+from numpy import squeeze, array,diff, max, sum, sqrt, arctan2, sin, cos
 import scipy.io as sio
 import numpy as np
 import numpy.random as random
