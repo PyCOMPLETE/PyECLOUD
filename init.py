@@ -156,13 +156,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Init chamber
     flag_non_unif_sey = (cc.switch_model == 'ECLOUD_unif')
+    chamber_kwargs = {
+        'flag_verbose_file': cc.flag_verbose_file,
+        'flag_verbose_stdout': cc.flag_verbose_stdout,
+        'flag_assume_convex': cc.flag_assume_convex,
+        'flag_counter_clockwise_chamb': cc.flag_counter_clockwise_chamb,
+    }
+
     if cc.chamb_type=='ellip':
         chamb=ellip_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file)
     elif cc.chamb_type in ('polyg', 'polyg_cython'):
-        chamb=gipfi.polyg_cham_geom_object(cc.filename_chm, flag_non_unif_sey,
-                                     flag_verbose_file=cc.flag_verbose_file, flag_verbose_stdout=cc.flag_verbose_stdout, flag_assume_convex=cc.flag_assume_convex)
+        chamb=gipfi.polyg_cham_geom_object(cc.filename_chm, flag_non_unif_sey, **chamber_kwargs)
     elif cc.chamb_type=='rect':
-        chamb = girfi.rect_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file, flag_verbose_stdout=cc.flag_verbose_stdout)
+        chamb = girfi.rect_cham_geom_object(cc.x_aper, cc.y_aper, **chamber_kwargs)
     else:
         raise inp_spec.PyECLOUD_ConfigException('Chamber type not recognized (choose: ellip/rect/polyg)')
 
