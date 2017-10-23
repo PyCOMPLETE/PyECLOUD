@@ -1,5 +1,8 @@
 from scipy.constants import m_p
 
+# To be safe, only use immutable python types as default values in the parameters_dict.
+# This most importantly excludes python lists. Tuples may be used in their place.
+
 parameters_dict = {
     'simulation_parameters': {
         'mandatory': {

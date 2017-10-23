@@ -257,13 +257,21 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         resgasion=None
 
+    if 'mean_lambda' in kwargs:
+        mean_lambda = kwargs['mean_lambda']
+    else:
+        mean_lambda = np.mean(beamtim.lam_t_array)
+
     if cc.photoem_flag == 1:
         phemiss=gpc.photoemission(cc.inv_CDF_refl_photoem_file, cc.k_pe_st, cc.refl_frac, cc.e_pe_sigma, cc.e_pe_max, cc.alimit,
                                   cc.x0_refl, cc.y0_refl, cc.out_radius, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.photoelectron_angle_distribution,
-                                  beamtim, cc.flag_continuous_emission)
+                                  mean_lambda, cc.flag_continuous_emission)
     elif cc.photoem_flag in (2, 'from_file'):
         phemiss = gpc.photoemission_from_file(cc.inv_CDF_all_photoem_file, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.e_pe_sigma,
-                                              cc.e_pe_max, cc.k_pe_st, cc.out_radius, cc.photoelectron_angle_distribution, beamtim, cc.flag_continuous_emission)
+                                              cc.e_pe_max, cc.k_pe_st, cc.out_radius, cc.photoelectron_angle_distribution, mean_lambda, cc.flag_continuous_emission)
+    elif cc.photoem_flag in (3, 'per_segment'):
+        phemiss = gpc.photoemission_per_segment(chamb, cc.energy_distribution, cc.e_pe_sigma, cc.e_pe_max, cc.k_pe_st,
+                                                cc.photoelectron_angle_distribution, mean_lambda, cc.flag_continuous_emission)
     else:
         phemiss=None
 

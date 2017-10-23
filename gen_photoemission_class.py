@@ -92,7 +92,7 @@ class photoemission(photoemission_base):
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max, alimit, x0_refl,
                  y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution,
-                 beamtim, flag_continuous_emission):
+                 mean_lambda=0, flag_continuous_emission=False):
 
         print('Start photoemission init.')
 
@@ -118,7 +118,7 @@ class photoemission(photoemission_base):
         self.flag_continuous_emission = flag_continuous_emission
 
         if flag_continuous_emission:
-            self.mean_lambda = np.mean(beamtim.lam_t_array)
+            self.mean_lambda = mean_lambda
 
         if y0_refl != 0.:
             raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
@@ -175,7 +175,7 @@ class photoemission(photoemission_base):
 class photoemission_from_file(photoemission_base):
 
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
-                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim, flag_continuous_emission):
+                 k_pe_st, out_radius, photoelectron_angle_distribution, mean_lambda=0, flag_continuous_emission=False):
         print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
 
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
@@ -191,7 +191,7 @@ class photoemission_from_file(photoemission_base):
         self.flag_continuous_emission = flag_continuous_emission
 
         if flag_continuous_emission:
-            self.mean_curr = np.mean(beamtim.lam_t_array)
+            self.mean_lambda = mean_lambda
 
         self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
