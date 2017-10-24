@@ -97,7 +97,7 @@ class photoemission(photoemission_base):
         print('Start photoemission init.')
 
         if not chamb.is_convex():
-            raise ValueError('This photoemission module is only valid for a convex chamber!')
+            print('Warning! This photoemission module is not suited for a non-convex chamber!')
 
         if inv_CDF_refl_photoem_file == 'unif_no_file':
             self.flag_unif = True
@@ -182,7 +182,7 @@ class photoemission_from_file(photoemission_base):
         print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
 
         if not chamb.is_convex():
-            raise ValueError('This photoemission module is only valid for a convex chamber!')
+            print('Warning! This photoemission module is not suited for a non-convex chamber!')
 
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
         if not self.flag_unif:

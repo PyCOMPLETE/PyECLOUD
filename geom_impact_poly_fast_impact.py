@@ -62,6 +62,10 @@ class PyECLOUD_ChamberException(ValueError):
     pass
 
 class polyg_cham_geom_object:
+
+    # Distance of generated photoelecron MP relative to surface
+    distance_new_phem = 1e-12
+
     def __init__(self, filename_chm, flag_non_unif_sey, flag_verbose_file=False, flag_verbose_stdout=False,
                  flag_assume_convex=True, flag_counter_clockwise_chamb=True):
 
@@ -176,9 +180,11 @@ class polyg_cham_geom_object:
                 self.normal_vect_x *= -1
                 self.normal_vect_y *= -1
 
+            self.phem_x0 = phem_Vx[:-1] + self.distance_new_phem*self.normal_vect_x
+            self.phem_y0 = phem_Vy[:-1] + self.distance_new_phem*self.normal_vect_y
+
 
     def is_outside(self, x_mp, y_mp):
-        #~ return gipc.is_outside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
         return self.cythonisoutside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
 
 
@@ -349,8 +355,8 @@ class polyg_cham_geom_object:
         output: positions and normal vectors for every generated macroparticle
         """
         # Only meaningful for photoemission from segment
-        x_new_mp = np.empty(N_mp_gen)
-        y_new_mp = np.empty(N_mp_gen)
+        x_new_mp = np.zeros(N_mp_gen)
+        y_new_mp = np.zeros(N_mp_gen)
         norm_x_new_mp = np.empty(N_mp_gen)
         norm_y_new_mp = np.empty(N_mp_gen)
 
@@ -362,12 +368,30 @@ class polyg_cham_geom_object:
         for i_seg, N_mp_seg in enumerate(N_mp_segment):
             if N_mp_seg != 0:
                 N_mp_after = N_mp_curr + N_mp_seg
-                rr = random.rand(N_mp_seg)
-                x_new_mp[N_mp_curr:N_mp_after] = self.Vx[i_seg] + rr*self.seg_diff_x[i_seg]
-                y_new_mp[N_mp_curr:N_mp_after] = self.Vy[i_seg] + rr*self.seg_diff_y[i_seg]
+                # The output of this call to _get_photoelectron_segment does not have to be assigned
+                self._get_photoelectron_segment(N_mp_seg, x_new_mp[N_mp_curr:N_mp_after], y_new_mp[N_mp_curr:N_mp_after], i_seg)
                 norm_x_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_x[i_seg]
                 norm_y_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_y[i_seg]
                 N_mp_curr = N_mp_after
 
         return x_new_mp, y_new_mp, norm_x_new_mp, norm_y_new_mp
+
+    def _get_photoelectron_segment(self, N_mp, x_new_mp, y_new_mp, i_seg):
+        """
+        Potentially recursive function.
+        It makes sure that no MPs are generated outside of the chamber.
+        In unsuitable chamber designs, it may run into the recursion limit and crash.
+        But that would be due to unsuitable chamber designs.
+        """
+        rr = random.rand(N_mp)
+        x_new_mp[:] = self.phem_x0[i_seg] + rr*self.seg_diff_x[i_seg]
+        y_new_mp[:] = self.phem_y0[i_seg] + rr*self.seg_diff_y[i_seg]
+
+        flag_outside = self.is_outside(x_new_mp, y_new_mp)
+        n_mp_outside = np.sum(flag_outside)
+        if n_mp_outside != 0:
+            print('%i out of %i MPs were generated outside!' % (n_mp_outside, N_mp))
+            # Because of advanced numpy array indexing, the output of this call has to be explicitly assigned
+            x_new_mp[flag_outside], y_new_mp[flag_outside] = self._get_photoelectron_segment(n_mp_outside, x_new_mp[flag_outside], y_new_mp[flag_outside], i_seg)
+        return x_new_mp, y_new_mp
 
