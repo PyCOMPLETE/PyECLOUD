@@ -118,13 +118,13 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     return config_dict
 
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
-            skip_pyeclsaver=False, skip_spacech_ele=False, ignore_kwargs={}, **kwargs):
+            skip_pyeclsaver=False, skip_spacech_ele=False, ignore_kwargs=(), **kwargs):
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
 
     # Override config values with kwargs
     for attr, value in kwargs.items():
-        if attr in ignore_kwargs:
+        if attr in ignore_kwargs or attr in ('mean_lambda',):
             continue
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
         if attr in config_dict:
@@ -245,7 +245,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     elif cc.switch_model == 'perfect_absorber':
         sey_mod = None
     else:
-        raise ValueError('switch_model not recognized!')
+        raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
     # Init impact management
     flag_seg = (cc.flag_hist_impact_seg==1)

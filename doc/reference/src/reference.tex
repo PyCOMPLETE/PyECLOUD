@@ -285,8 +285,10 @@ Possible settings:
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:} \\ \hline
 \textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile.  \\ \hline
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:} \\ \hline
-\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile.
-    If the photoemission mode 'per\_segment' is used, the chamber file must also contain the cumulative distribution function of the emission probability for each segment.\\ \hline
+\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile. \\\hline
+\textbf{filename\_chm\_photoem} & Name of file containing horizontal and vertical vertexes of the chamber profile that is used for the photoemission mode 'per\_segment'.
+    The chamber file must also contain the cumulative distribution function of the emission probability for each segment.
+    The vertexes of this chamber must lie on the edges of the main chamber.\\ \hline
     \textbf{flag\_assume\_convex} & [optional] Default: True \\\hline
     \textbf{flag\_counter\_clockwise\_chamb} & [optional] Default: True. Only needed for the photoemission model 'per\_segment'. It specifies the order in which the vertexes are defined. \\\hline
 \end{longtable}
