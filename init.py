@@ -276,10 +276,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         phemiss = gpc.photoemission_from_file(cc.inv_CDF_all_photoem_file, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.e_pe_sigma,
                                               cc.e_pe_max, cc.k_pe_st, cc.out_radius, cc.photoelectron_angle_distribution, mean_lambda, cc.flag_continuous_emission)
     elif cc.photoem_flag in (3, 'per_segment'):
-        phemiss = gpc.photoemission_per_segment(chamb, cc.energy_distribution, cc.e_pe_sigma, cc.e_pe_max, cc.k_pe_st,
+        chamb_phemiss = gipfi.polyg_cham_photoemission(cc.filename_chm_photoem, cc.flag_counter_clockwise_chamb)
+        if not chamb_phemiss.vertexes_are_subset(chamb):
+            raise gipfi.PyECLOUD_ChamberException('Chambers for secondary emission and photoemission do not have the same shape!')
+        phemiss = gpc.photoemission_per_segment(chamb_phemiss, cc.energy_distribution, cc.e_pe_sigma, cc.e_pe_max, cc.k_pe_st,
                                                 cc.photoelectron_angle_distribution, mean_lambda, cc.flag_continuous_emission)
     else:
-        phemiss=None
+        phemiss = None
 
     # Real saver init
     if not skip_pyeclsaver:

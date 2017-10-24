@@ -178,7 +178,7 @@ class photoemission(photoemission_base):
 class photoemission_from_file(photoemission_base):
 
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
-                 k_pe_st, out_radius, photoelectron_angle_distribution, mean_lambda=0, flag_continuous_emission=False):
+                 k_pe_st, out_radius, photoelectron_angle_distribution, mean_lambda=None, flag_continuous_emission=False):
         print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
 
         if not chamb.is_convex():
@@ -225,7 +225,7 @@ class photoemission_from_file(photoemission_base):
 class photoemission_per_segment(photoemission_base):
 
     def __init__(self, chamb, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st,
-                 photoelectron_angle_distribution, mean_lambda=0, flag_continuous_emission=False):
+                 photoelectron_angle_distribution, mean_lambda=None, flag_continuous_emission=False):
         print('Start photoemission per segment init')
         self.k_pe_st = k_pe_st
         self.chamb = chamb

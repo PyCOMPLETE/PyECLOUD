@@ -51,7 +51,7 @@
 
 
 from __future__ import division, print_function
-from numpy import squeeze, array,diff, max, sum, sqrt, arctan2, sin, cos
+from numpy import sum, arctan2, sin, cos
 import scipy.io as sio
 import numpy as np
 import numpy.random as random
@@ -63,62 +63,63 @@ class PyECLOUD_ChamberException(ValueError):
 
 class polyg_cham_geom_object(object):
 
+    chamb_type = 'polyg'
+
     def __init__(self, filename_chm, flag_non_unif_sey, flag_verbose_file=False, flag_verbose_stdout=False,
-                 flag_assume_convex=True, flag_counter_clockwise_chamb=True):
+                 flag_assume_convex=True):
 
 
         print('Polygonal chamber - cython implementation')
 
         if type(filename_chm)==str:
-            dict_chm=sio.loadmat(filename_chm)
+            dict_chm = sio.loadmat(filename_chm)
         else:
-            dict_chm=filename_chm
+            dict_chm = filename_chm
         self.dict_chm = dict_chm
 
-        Vx=squeeze(dict_chm['Vx'])
-        Vy=squeeze(dict_chm['Vy'])
-        cx=float(squeeze(dict_chm['x_sem_ellip_insc']))
-        cy=float(squeeze(dict_chm['y_sem_ellip_insc']))
+        Vx = dict_chm['Vx'].squeeze()
+        Vy = dict_chm['Vy'].squeeze()
+        cx = float(dict_chm['x_sem_ellip_insc'].squeeze())
+        cy = float(dict_chm['y_sem_ellip_insc'].squeeze())
 
-        if flag_non_unif_sey==1:
-            self.del_max_segments = squeeze(dict_chm['del_max_segments'])
-            self.R0_segments = squeeze(dict_chm['R0_segments'])
-            self.Emax_segments = squeeze(dict_chm['Emax_segments'])
+        if flag_non_unif_sey == 1:
+            self.del_max_segments = dict_chm['del_max_segments'].squeeze()
+            self.R0_segments = dict_chm['R0_segments'].squeeze()
+            self.Emax_segments = dict_chm['Emax_segments'].squeeze()
 
 
-        self.N_vert=len(Vx)
+        self.N_vert = len(Vx)
 
-        N_edg=len(Vx)
+        N_edg = len(Vx)
 
-        Vx=list(Vx)
-        Vy=list(Vy)
+        Vx = list(Vx)
+        Vy = list(Vy)
 
         Vx.append(Vx[0])
         Vy.append(Vy[0])
 
-        Vx=array(Vx, float)
-        Vy=array(Vy, float)
+        Vx = np.array(Vx, float)
+        Vy = np.array(Vy, float)
 
-        Nx=-diff(Vy,1)
-        Ny=diff(Vx,1)
+        Nx = -np.diff(Vy,1)
+        Ny = np.diff(Vx,1)
 
-        norm_N=sqrt(Nx**2+Ny**2)
-        Nx=Nx/norm_N
-        Ny=Ny/norm_N
+        norm_N = np.sqrt(Nx**2+Ny**2)
+        Nx = Nx/norm_N
+        Ny = Ny/norm_N
 
-        self.x_aper = max(np.abs(Vx))
-        self.y_aper = max(np.abs(Vy))
-        self.Vx=Vx
-        self.Vy=Vy
-        self.Nx=Nx
-        self.Ny=Ny
-        self.N_edg=N_edg
-        self.cx=cx
-        self.cy=cy
+        self.x_aper = np.max(np.abs(Vx))
+        self.y_aper = np.max(np.abs(Vy))
+        self.Vx = Vx
+        self.Vy = Vy
+        self.Nx = Nx
+        self.Ny = Ny
+        self.N_edg = N_edg
+        self.cx = cx
+        self.cy = cy
 
-        self.N_mp_impact=0
-        self.N_mp_corrected=0
-        self.chamb_type='polyg'
+        self.N_mp_impact = 0
+        self.N_mp_corrected = 0
 
         self.flag_verbose_stdout = flag_verbose_stdout
         self.flag_verbose_file = flag_verbose_file
@@ -163,7 +164,7 @@ class polyg_cham_geom_object(object):
             y_int[mask_not_found] = y_in[mask_not_found]
 
             #compute some kind of normal ....
-            par_cross=arctan2(self.cx*y_in[mask_not_found],self.cy*x_int[mask_not_found])
+            par_cross = arctan2(self.cx*y_in[mask_not_found],self.cy*x_int[mask_not_found])
 
             Dx=-self.cx*sin(par_cross)
             Dy=self.cy*cos(par_cross)
@@ -352,6 +353,10 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
     distance_new_phem = 1e-14
 
     def __init__(self, filename_chm, flag_counter_clockwise_chamb):
+
+        if flag_counter_clockwise_chamb is None:
+            raise PyECLOUD_ChamberException('flag_counter_clockwise_chamb must be specified!')
+
         if isinstance(filename_chm, dict):
             dict_chm = filename_chm
         else:
@@ -386,11 +391,10 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         if np.any(len_segments == 0):
             raise PyECLOUD_ChamberException('Some segments have length 0!')
 
-        self.normal_vect_x = seg_diff_y / len_segments
-        self.normal_vect_y = -seg_diff_x / len_segments
-
         # Chamber corners are defined clockwise or counter-clockwise.
         # This has an effect of the direction of the normal vector
+        self.normal_vect_x = seg_diff_y / len_segments
+        self.normal_vect_y = -seg_diff_x / len_segments
         if not flag_counter_clockwise_chamb:
             self.normal_vect_x *= -1
             self.normal_vect_y *= -1
@@ -404,10 +408,6 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         else:
             self.cythonisoutside = gipc.is_outside_nonconvex
             print('No assumption on the convexity of the polygon')
-
-
-    def impact_point_and_normal(self, *args, **kwargs):
-        raise PyECLOUD_ChamberException('No impact point method for this object.')
 
     def get_photoelectron_positions(self, N_mp_gen):
         """
@@ -433,14 +433,14 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
             if N_mp_seg != 0:
                 N_mp_after = N_mp_curr + N_mp_seg
                 # The output of this call to _get_photoelectron_segment does not have to be assigned
-                self._get_photoelectron_segment(N_mp_seg, x_new_mp[N_mp_curr:N_mp_after], y_new_mp[N_mp_curr:N_mp_after], i_seg)
+                self._get_photoelectron_position_segment(N_mp_seg, x_new_mp[N_mp_curr:N_mp_after], y_new_mp[N_mp_curr:N_mp_after], i_seg)
                 norm_x_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_x[i_seg]
                 norm_y_new_mp[N_mp_curr:N_mp_after] = self.normal_vect_y[i_seg]
                 N_mp_curr = N_mp_after
 
         return x_new_mp, y_new_mp, norm_x_new_mp, norm_y_new_mp
 
-    def _get_photoelectron_segment(self, N_mp, x_new_mp, y_new_mp, i_seg):
+    def _get_photoelectron_position_segment(self, N_mp, x_new_mp, y_new_mp, i_seg):
         """
         Potentially recursive function.
         It makes sure that no MPs are generated outside of the chamber.
@@ -452,7 +452,7 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         y_new_mp[:] = self.phem_y0[i_seg] + rr*self.seg_diff_y[i_seg]
 
         flag_outside = self.is_outside(x_new_mp, y_new_mp)
-        n_mp_outside = np.sum(flag_outside)
+        n_mp_outside = sum(flag_outside)
         if n_mp_outside != 0:
             # This code branch should practically never be reached.
             # This depends on the choice of self.distance_new_phem.
@@ -461,7 +461,7 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
             print('%i out of %i MPs were generated outside! -> recursion' % (n_mp_outside, N_mp))
 
             # Because of advanced numpy array indexing, the output of this call has to be explicitly assigned.
-            x_new_mp[flag_outside], y_new_mp[flag_outside] = self._get_photoelectron_segment(n_mp_outside, x_new_mp[flag_outside], y_new_mp[flag_outside], i_seg)
+            x_new_mp[flag_outside], y_new_mp[flag_outside] = self._get_photoelectron_position_segment(n_mp_outside, x_new_mp[flag_outside], y_new_mp[flag_outside], i_seg)
 
         return x_new_mp, y_new_mp
 

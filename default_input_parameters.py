@@ -99,7 +99,8 @@ parameters_dict = {
             'x_aper': None,
             'y_aper': None,
             'filename_chm': None,
-            'flag_counter_clockwise_chamb': True,
+            'filename_chm_photoem': None,
+            'flag_counter_clockwise_chamb': None,
 
             # Tracking and magnetic field
             'track_method': 'StrongBdip',
