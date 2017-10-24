@@ -68,9 +68,10 @@ my_chamb_dict['y_sem_ellip_insc'] = 0.98*my_chamb_dict['Vy'].max()
 
 my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
 
-chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, flag_counter_clockwise_chamb=False, flag_verbose_stdout=True)
+chamb_seg= gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, flag_counter_clockwise_chamb=False, flag_verbose_stdout=True)
+chamb_photo_seg = gipfi.polyg_cham_photoemission(my_chamb_dict, flag_counter_clockwise_chamb=False)
 
-phem_seg = gen_photoemission_class.photoemission_per_segment(chamb_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
+phem_seg = gen_photoemission_class.photoemission_per_segment(chamb_photo_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
 
 
 
@@ -78,9 +79,9 @@ chamb_elip = geom_impact_ellip.ellip_cham_geom_object(1.,1.)
 phem_elip = gen_photoemission_class.photoemission('unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb_elip, 0.995, args.energy_dist, args.angle_dist, None, False)
 
 
-for phem, chamb, N_mp_max in [
-    (phem_elip, chamb_elip, int(1e6)),
-    (phem_seg, chamb_seg, int(1e3)),
+for phem, chamb, chamb_photo, N_mp_max in [
+    (phem_elip, chamb_elip, chamb_elip, int(1e6)),
+    (phem_seg, chamb_seg, chamb_photo_seg, int(1e3)),
 ]:
 
     MP_e = MP_system.MP_system(N_mp_max, nel_mp_ref, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, chamb)

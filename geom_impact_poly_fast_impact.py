@@ -61,10 +61,7 @@ import geom_impact_poly_cython as gipc
 class PyECLOUD_ChamberException(ValueError):
     pass
 
-class polyg_cham_geom_object:
-
-    # Distance of generated photoelecron MP relative to surface
-    distance_new_phem = 1e-12
+class polyg_cham_geom_object(object):
 
     def __init__(self, filename_chm, flag_non_unif_sey, flag_verbose_file=False, flag_verbose_stdout=False,
                  flag_assume_convex=True, flag_counter_clockwise_chamb=True):
@@ -142,46 +139,6 @@ class polyg_cham_geom_object:
         else:
             self.cythonisoutside = gipc.is_outside_nonconvex
             print('No assumption on the convexity of the polygon')
-
-        # For photoemission from segment
-        if 'phem_cdf' in dict_chm:
-            phem_cdf = dict_chm['phem_cdf'].squeeze()
-
-            # Make sure phem_cdf has correct shape
-            if phem_cdf[-1] != 1:
-                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict does not end with 1.')
-            if np.any(np.diff(phem_cdf) < 0):
-                raise PyECLOUD_ChamberException('phem_cdf of chamb_dict is not monotonically increasing.')
-
-            # Optionally use distinct photoemission chamber segments
-            # This allows for a finer resolution of photoemission per segment, without increasing the computational
-            # burden on the is_outside and impact_point_and_normalfunctions.
-            if 'phem_Vx' in dict_chm:
-                phem_Vx = dict_chm['phem_Vx'].squeeze()
-                phem_Vy = dict_chm['phem_Vy'].squeeze()
-                phem_Vx = np.append(phem_Vx, phem_Vx[0])
-                phem_Vy = np.append(phem_Vy, phem_Vy[0])
-            else:
-                phem_Vx = Vx
-                phem_Vy = Vy
-
-            # Needed to calculate histograms and positions later
-            self.seg_diff_x = seg_diff_x = np.diff(Vx)
-            self.seg_diff_y = seg_diff_y = np.diff(Vy)
-            self.cdf_bins = np.append(0, phem_cdf)
-
-            len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
-            self.normal_vect_x = seg_diff_y / len_segments
-            self.normal_vect_y = -seg_diff_x / len_segments
-
-            # Chamber corners are defined clockwise or counter-clockwise.
-            # This has an effect of the direction of the normal vector
-            if not flag_counter_clockwise_chamb:
-                self.normal_vect_x *= -1
-                self.normal_vect_y *= -1
-
-            self.phem_x0 = phem_Vx[:-1] + self.distance_new_phem*self.normal_vect_x
-            self.phem_y0 = phem_Vy[:-1] + self.distance_new_phem*self.normal_vect_y
 
 
     def is_outside(self, x_mp, y_mp):
@@ -348,11 +305,78 @@ class polyg_cham_geom_object:
             # If we got this far, the polygon is convex.
             return True
 
+
+
+class polyg_cham_photoemission(polyg_cham_geom_object):
+
+    # Distance of generated photoelecron MP relative to surface
+    distance_new_phem = 1e-12
+
+    def __init__(self, filename_chm, flag_counter_clockwise_chamb):
+        if isinstance(filename_chm, dict):
+            dict_chm = filename_chm
+        else:
+            dict_chm = sio.loadmat(filename_chm)
+        phem_cdf = dict_chm['phem_cdf'].squeeze()
+
+        # Make sure phem_cdf has correct shape
+        if phem_cdf[-1] != 1:
+            raise PyECLOUD_ChamberException('phem_cdf of chamb_dict does not end with 1.')
+        if np.any(np.diff(phem_cdf) < 0):
+            raise PyECLOUD_ChamberException('phem_cdf of chamb_dict is not monotonically increasing.')
+
+        # Optionally use distinct photoemission chamber segments
+        # This allows for a finer resolution of photoemission per segment, without increasing the computational
+        # burden on the is_outside and impact_point_and_normalfunctions.
+        Vx = dict_chm['Vx'].squeeze()
+        Vy = dict_chm['Vy'].squeeze()
+        self.Vx = Vx
+        self.Vy = Vy
+
+        # Needed for cythonisoutside
+        self.N_edg = len(Vx)
+        self.cx = float(dict_chm['x_sem_ellip_insc'].squeeze())
+        self.cy = float(dict_chm['y_sem_ellip_insc'].squeeze())
+
+        # Needed to calculate histograms and positions later
+        _Vx = np.append(Vx, Vx[0])
+        _Vy = np.append(Vy, Vy[0])
+        self.seg_diff_x = seg_diff_x = np.diff(_Vx)
+        self.seg_diff_y = seg_diff_y = np.diff(_Vy)
+        self.cdf_bins = np.append(0, phem_cdf)
+
+        len_segments = np.sqrt(seg_diff_x**2  + seg_diff_y**2)
+        self.normal_vect_x = seg_diff_y / len_segments
+        self.normal_vect_y = -seg_diff_x / len_segments
+
+        # Chamber corners are defined clockwise or counter-clockwise.
+        # This has an effect of the direction of the normal vector
+        if not flag_counter_clockwise_chamb:
+            self.normal_vect_x *= -1
+            self.normal_vect_y *= -1
+
+        self.phem_x0 = self.Vx + self.distance_new_phem*self.normal_vect_x
+        self.phem_y0 = self.Vy + self.distance_new_phem*self.normal_vect_y
+
+        if self.is_convex():
+            self.cythonisoutside = gipc.is_outside_convex
+            print('Assuming convex polygon')
+        else:
+            self.cythonisoutside = gipc.is_outside_nonconvex
+            print('No assumption on the convexity of the polygon')
+
+
+    def impact_point_and_normal(self, *args, **kwargs):
+        raise PyECLOUD_ChamberException('No impact point method for this object.')
+
     def get_photoelectron_positions(self, N_mp_gen):
         """
         input: N_mp_gen - Number of MPs for which positions and normal vectors are to be calculated
         The cdf that is part of the chamber definition is used to generate the output
         output: positions and normal vectors for every generated macroparticle
+
+        The MP positions are shifted towards the inner part of the chamber by a length defined in
+        self.distance_new_phem
         """
         # Only meaningful for photoemission from segment
         x_new_mp = np.zeros(N_mp_gen)
@@ -390,8 +414,12 @@ class polyg_cham_geom_object:
         flag_outside = self.is_outside(x_new_mp, y_new_mp)
         n_mp_outside = np.sum(flag_outside)
         if n_mp_outside != 0:
-            print('%i out of %i MPs were generated outside!' % (n_mp_outside, N_mp))
-            # Because of advanced numpy array indexing, the output of this call has to be explicitly assigned
+            # This code branch should practically never be reached.
+            # This depends on the choice of self.distance_new_phem
+            print('%i out of %i MPs were generated outside! -> recursion' % (n_mp_outside, N_mp))
+            # Because of advanced numpy array indexing, the output of this call has to be explicitly assigned.
             x_new_mp[flag_outside], y_new_mp[flag_outside] = self._get_photoelectron_segment(n_mp_outside, x_new_mp[flag_outside], y_new_mp[flag_outside], i_seg)
+
         return x_new_mp, y_new_mp
+
 
