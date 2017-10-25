@@ -60,7 +60,6 @@ for ele in machine.one_turn_map:
 						x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 						init_unif_edens_flag=init_unif_edens_flag,
 						init_unif_edens=init_unif_edens, 
-						N_MP_ele_init=N_MP_ele_init,
 						N_mp_max=N_mp_max,
 						nel_mp_ref_0=nel_mp_ref_0,
 						B_multip=B_multip, slice_by_slice_mode=True)
@@ -100,7 +99,6 @@ ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer,
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
 				init_unif_edens=init_unif_edens, 
-				N_MP_ele_init=N_MP_ele_init,
 				N_mp_max=N_mp_max,
 				nel_mp_ref_0=nel_mp_ref_0,
 				B_multip=B_multip, slice_by_slice_mode=False)

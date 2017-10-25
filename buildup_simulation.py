@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.5.1
+#                   PyECLOUD Version 6.6.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -59,11 +59,11 @@ import cPickle
 class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', **kwargs):
 
-        print 'PyECLOUD Version 6.5.1'
+        print 'PyECLOUD Version 6.6.0'
         beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
                 gas_ion_flag, resgasion, t_ion, \
                 spacech_ele,t_sc_ON, photoem_flag, phemiss,\
-                flag_presence_sec_beams, sec_beams_list=init.read_input_files_and_init_components(\
+                flag_presence_sec_beams, sec_beams_list, config_dict =init.read_input_files_and_init_components(\
                                                             pyecl_input_folder=pyecl_input_folder, **kwargs)
 
         self.beamtim = beamtim

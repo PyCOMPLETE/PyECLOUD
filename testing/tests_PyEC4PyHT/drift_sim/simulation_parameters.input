@@ -1,4 +1,5 @@
 # SIMULATION PARAMETERS
+import numpy as np
 
 machine_param_file='machine_parameters.input'
 secondary_emission_parameters_file='secondary_emission_parameters.input'
