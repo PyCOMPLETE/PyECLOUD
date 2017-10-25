@@ -117,6 +117,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
 
     return config_dict
 
+other_ignore_kwargs = ('mean_lambda',)
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
             skip_pyeclsaver=False, skip_spacech_ele=False, ignore_kwargs=(), **kwargs):
 
@@ -124,7 +125,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Override config values with kwargs
     for attr, value in kwargs.items():
-        if attr in ignore_kwargs or attr in ('mean_lambda',):
+        if attr in ignore_kwargs or attr in other_ignore_kwargs:
             continue
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
         if attr in config_dict:
