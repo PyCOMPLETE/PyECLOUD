@@ -148,11 +148,27 @@ def get_angle_dist_func(string):
         print('Using cosine_3D emission angle distribution.')
         return velocities_angle_cosine_3D
     elif string == 'cosine_2D':
-        print("""Warning! The 2D emission angle distribution is used!
-See presentation by P. Dijkstal on the angle of emission of generated electrons:
-https://indico.cern.ch/event/673160/""")
+        print("""
+Warning! The 2D emission angle distribution is used!
+The 'cosine_3D' distribution is more appropriate. This can be enabled by
+setting in the machine parameter input file:
+"photoelectron_angle_distribution = 'cosine_3D'"
+and in the secondary emission input file:
+"secondary_angle_distribution = 'cosine_3D'"
+See presentation by P. Dijkstal on the angle of emission of generated 
+electrons: https://indico.cern.ch/event/673160/
+""")
         time.sleep(3)
         return velocities_angle_cosine_2D
     else:
-        raise ValueError("The emission angle distribution must be specified with either 'cosine_2D' or 'cosine_3D'!")
+        raise ValueError("""
+The emission angle distribution must be specified!
+To use the cosine_3D distribution (most appropriate) set in the 
+machine parameter input file:
+"photoelectron_angle_distribution = 'cosine_3D'"
+and in the secondary emission input file:
+"secondary_angle_distribution = 'cosine_3D'"
+In case you want to use the cosine_2D distribution, to have the same 
+behavior as in PyECLOUD 6.6.0 or earlier replace 'cosine_3D' with 
+'cosine_2D'""")
 
