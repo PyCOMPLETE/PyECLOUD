@@ -38,3 +38,4 @@ e_pe_sigma = 5. #in eV
 e_pe_max = 7.   #in eV 
 out_radius = 0.024
 energy_distribution = 'gaussian'
+photoelectron_angle_distribution = 'cosine_3D'

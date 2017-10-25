@@ -43,3 +43,6 @@ x0_refl = 0.0215
 y0_refl = 0.
 out_radius = 0.024
 energy_distribution = 'gaussian'
+
+
+photoelectron_angle_distribution = 'cosine_3D'
