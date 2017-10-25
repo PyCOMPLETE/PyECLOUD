@@ -276,4 +276,3 @@ for key in ('secondary_emission_parameters', 'machine_parameters', 'simulation_p
     parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['mandatory'].update(parameters_dict[key]['mandatory'])
     parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['optional'].update(parameters_dict[key]['optional'])
 
-
