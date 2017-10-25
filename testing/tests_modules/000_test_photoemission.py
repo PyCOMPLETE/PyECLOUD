@@ -197,10 +197,10 @@ def test_model_2():
     ])
 
     phem_pdf = []
-    for seg_ctr, (seg_x, seg_y) in enumerate(zip(chamb_segment_x[:-1], chamb_segment_y[:-1])):
+    for seg_ctr, (seg_x, seg_y) in enumerate(zip(chamb_segment_x, chamb_segment_y)):
         angle_0 = np.arctan2(seg_y, seg_x) % np.pi
 
-        seg_ctr_1 = seg_ctr+1
+        seg_ctr_1 = (seg_ctr+1) % len(chamb_segment_x)
         angle_1 = np.arctan2(chamb_segment_y[seg_ctr_1], chamb_segment_x[seg_ctr_1]) % np.pi
 
         if angle_0 > angle_1:
@@ -219,9 +219,14 @@ def test_model_2():
     }
 
     chamb_phem = gipfi.polyg_cham_photoemission(phem_chamb_dict, flag_counter_clockwise_chamb=True)
+    if chamb_phem.vertexes_are_subset(chamb_rect):
+        print('Vertexes are compatible -> Good!')
+    else:
+        raise ValueError('Vertexes of the two chambers are not compatible!')
 
     phem_segment = gen_photoemission_class.photoemission_per_segment(
         chamb_phem, args.energy_dist, sig, mu, k_pe_st, args.angle_dist, None, None)
+
 
 
     sp = plt.subplot(2,2,3)
