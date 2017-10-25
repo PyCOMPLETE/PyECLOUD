@@ -424,7 +424,7 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         norm_x_new_mp = np.empty(N_mp_gen)
         norm_y_new_mp = np.empty(N_mp_gen)
 
-        # Divide new MPs into segments according to the cdf
+        # Distributing new MPs into segments according to the cdf
         N_mp_segment, _ = np.histogram(random.rand(N_mp_gen), self.cdf_bins)
 
         # The MPs in each segment are distributed evenly along the segment
