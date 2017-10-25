@@ -54,11 +54,12 @@ import numpy as np
 import numpy.random as random
 
 import scipy.io as sio
-from scipy.constants import e as qe, m_e as me, c
+from scipy.constants import c
 
 import sec_emission
 
-qm=qe/me
+class PyECLOUD_PhotoemissionException(ValueError):
+    pass
 
 class photoemission_base(object):
 
@@ -124,12 +125,12 @@ class photoemission(photoemission_base):
             self.mean_lambda = mean_lambda
 
         if y0_refl != 0.:
-            raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
+            raise PyECLOUD_PhotoemissionException('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
 
         x0_refl_np_arr = np.array([x0_refl])
         y0_refl_np_arr = np.array([y0_refl])
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
-            raise ValueError('x0_refl, y0_refl is outside of the chamber!')
+            raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
 
         self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
 
@@ -179,16 +180,27 @@ class photoemission_from_file(photoemission_base):
 
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
                  k_pe_st, out_radius, photoelectron_angle_distribution, mean_lambda=None, flag_continuous_emission=False):
-        print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
+        if isinstance(inv_CDF_all_photoem_file, str):
+            print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
+        elif isinstance(inv_CDF_all_photoem_file, dict):
+            print('Start photoemission init from dict.')
 
         if not chamb.is_convex():
             print('Warning! This photoemission module is not suited for a non-convex chamber!')
 
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
         if not self.flag_unif:
-            mat = sio.loadmat(inv_CDF_all_photoem_file)
-            self.u_sam = mat['u_sam'].squeeze()
-            self.angles = mat['angles'].squeeze()
+            if isinstance(inv_CDF_all_photoem_file, dict):
+                mat = inv_CDF_all_photoem_file
+            else:
+                mat = sio.loadmat(inv_CDF_all_photoem_file)
+            self.u_sam = u_sam= np.squeeze(mat['u_sam'])
+            self.angles = np.squeeze(mat['angles'])
+
+            if u_sam[-1] != 1:
+                raise PyECLOUD_PhotoemissionException('u_sam of CDF must end on 1!')
+            if np.any(np.diff(u_sam) < 0):
+                raise PyECLOUD_PhotoemissionException('u_sam of CDF must be monotonically increasing!')
 
         self.k_pe_st = k_pe_st
         self.out_radius = out_radius

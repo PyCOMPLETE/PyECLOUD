@@ -79,8 +79,8 @@ class polyg_cham_geom_object(object):
 
         Vx = dict_chm['Vx'].squeeze()
         Vy = dict_chm['Vy'].squeeze()
-        cx = float(dict_chm['x_sem_ellip_insc'].squeeze())
-        cy = float(dict_chm['y_sem_ellip_insc'].squeeze())
+        cx = float(np.squeeze(dict_chm['x_sem_ellip_insc']))
+        cy = float(np.squeeze(dict_chm['y_sem_ellip_insc']))
 
         if flag_non_unif_sey == 1:
             self.del_max_segments = dict_chm['del_max_segments'].squeeze()
@@ -377,8 +377,8 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
 
         # Needed for cythonisoutside
         self.N_edg = len(orig_Vx)
-        self.cx = float(dict_chm['x_sem_ellip_insc'].squeeze())
-        self.cy = float(dict_chm['y_sem_ellip_insc'].squeeze())
+        self.cx = float(np.squeeze(dict_chm['x_sem_ellip_insc']))
+        self.cy = float(np.squeeze(dict_chm['y_sem_ellip_insc']))
 
         # Needed to calculate histograms and positions later
         self.Vx = Vx = np.append(orig_Vx, orig_Vx[0])

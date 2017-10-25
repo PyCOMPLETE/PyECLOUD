@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function
 import sys
 import os
 import argparse
@@ -12,6 +12,7 @@ import scipy.stats as stats
 if '../../' not in sys.path: sys.path.append('../../')
 import MP_system
 import geom_impact_ellip
+import geom_impact_rect_fast_impact as girfi
 import geom_impact_poly_fast_impact as gipfi
 import gen_photoemission_class
 
@@ -67,6 +68,11 @@ else:
 # Have local variables for each module, to not mix them up
 
 ## Photoemission model '1' (traditional)
+# This test is for a circular chamber.
+# Here it is easy to test the angular emission distribution of the photoelectrons,
+# since the normal vector of the surface is the particle position.
+# It is also easy to show the theoretical function of the spatial distribution together
+# with a histogram of the actual positions using the module.
 def test_model_1():
 
     alimit = 0.05
@@ -94,8 +100,8 @@ def test_model_1():
 
     sp = plt.subplot(2,2,1)
     sp.grid(True)
-    sp.set_xlabel('x')
-    sp.set_ylabel('y')
+    sp.set_xlabel('X dimension')
+    sp.set_ylabel('Y dimension')
     sp.set_title('Positions of %.1e new MPs' % len(xx))
     circ = plt.Circle([0,0],1, fill=False, color='black')
     sp.add_artist(circ)
@@ -104,7 +110,7 @@ def test_model_1():
     sp = plt.subplot(2,2,2)
     sp.grid(True)
     sp.set_title('Histogram of angles\nrel. to center')
-    sp.set_xlabel('Angle [rad]')
+    sp.set_xlabel('Angles [rad]')
     sp.set_yscale('log')
     sp.hist(angles, bins=40, normed=True)
 
@@ -133,6 +139,50 @@ def test_model_1():
 
     sp.plot(xx,yy, color='g', lw=3)
 
+# Photoemission model 'from_file' (2)
+def test_model_2():
+    # Generate a sinusoidal-squared distribution on a square chamber.
+    # This also tests the rectangular chamber module
+    chamber_width = 1.
+    chamb_rect = girfi.rect_cham_geom_object(chamber_width, chamber_width, False)
+    N_mp_max = int(1e6)
+
+    n_dist = int(1e3)
+    angles = np.linspace(-np.pi, np.pi, n_dist)
+    dist = np.cumsum(np.sin(angles)**2)
+    dist /= dist.max()
+    dist_dict = {
+        'angles': angles,
+        'u_sam': dist,
+    }
+
+    phem_rect = gen_photoemission_class.photoemission_from_file(
+        dist_dict, chamb_rect, 0.99, args.energy_dist, sig, mu, k_pe_st, 1.01*np.sqrt(2), args.angle_dist, None, None)
+
+    MP_e = init_mp(N_mp_max, chamb_rect)
+    phem_rect.generate(MP_e, 1/c*N_mp_max, 1)
+
+    sp = plt.subplot(2,2,1)
+    sp.grid(True)
+    sp.set_xlabel('X dimension')
+    sp.set_ylabel('Y dimension')
+    sp.set_title('Positions of %.1e new MPs' % len(MP_e.x_mp))
+    sp.plot(chamb_rect.Vx, chamb_rect.Vy)
+    sp.plot(MP_e.x_mp, MP_e.y_mp, ls='None', marker='.')
+
+    angles_generated = np.arctan2(MP_e.y_mp, MP_e.x_mp)
+    hist, bins = np.histogram(angles_generated, n_dist)
+    factor_hist = np.trapz(hist, angles)
+
+    sp = plt.subplot(2,2,2)
+    sp.grid(True)
+    sp.set_xlabel('Angles [rad]')
+    sp.set_ylabel('Normalized # generated')
+    sp.set_title('Sin$^2$ distribution')
+    sp.plot(angles, np.sin(angles)**2/np.pi, color='g',lw=3)
+    sp.step(angles, hist/factor_hist, color='b')
+
+
 ## Photoemission model 'per_segment' (3)
 def test_model_3():
     # Non-convex chamber
@@ -144,7 +194,6 @@ def test_model_3():
     my_chamb_dict['y_sem_ellip_insc'] = 0.98*my_chamb_dict['Vy'].max()
 
     my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
-    assert my_chamb_dict['phem_cdf'][-1] == 1
 
     chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, flag_verbose_stdout=True)
     chamb_photo_seg = gipfi.polyg_cham_photoemission(my_chamb_dict, flag_counter_clockwise_chamb=False)
@@ -163,8 +212,8 @@ def test_model_3():
     sp.set_ylabel('y')
     sp.set_title('Positions of %.1e new MPs' % N_mp_max)
     sp.plot(chamb_seg.Vx, chamb_seg.Vy)
-    sp.set_xlim(1.1*min(chamb_seg.Vx), 1.1*max(chamb_seg.Vx))
-    sp.set_ylim(1.1*min(chamb_seg.Vy), 1.1*max(chamb_seg.Vy))
+    sp.set_xlim(1.1*np.min(chamb_seg.Vx), 1.1*np.max(chamb_seg.Vx))
+    sp.set_ylim(1.1*np.min(chamb_seg.Vy), 1.1*np.max(chamb_seg.Vy))
     sp.plot(MP_e.x_mp, MP_e.y_mp, '.')
 
 # Call tests
@@ -172,6 +221,8 @@ ms.figure("Test Photoemission module 'photemission'")
 test_model_1()
 ms.figure("Test Photoemission module 'photemission_per_segment'")
 test_model_3()
+ms.figure("Test Photoemission module 'photemission_from_file' and 'per_segment'")
+test_model_2()
 
 if args.o:
     for num in plt.get_fignums():
