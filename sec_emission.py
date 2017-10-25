@@ -155,20 +155,23 @@ setting in the machine parameter input file:
 "photoelectron_angle_distribution = 'cosine_3D'"
 and in the secondary emission input file:
 "secondary_angle_distribution = 'cosine_3D'"
-See presentation by P. Dijkstal on the angle of emission of generated 
-electrons: https://indico.cern.ch/event/673160/
+For more info, see presentation by P. Dijkstal on the angle of emission 
+of generated electrons (https://indico.cern.ch/event/673160/).
 """)
         time.sleep(3)
         return velocities_angle_cosine_2D
     else:
         raise ValueError("""
 The emission angle distribution must be specified!
-To use the cosine_3D distribution (most appropriate) set in the 
+To use the cosine_3D distribution (most appropriate) set in the
 machine parameter input file:
 "photoelectron_angle_distribution = 'cosine_3D'"
 and in the secondary emission input file:
 "secondary_angle_distribution = 'cosine_3D'"
-In case you want to use the cosine_2D distribution, to have the same 
-behavior as in PyECLOUD 6.6.0 or earlier replace 'cosine_3D' with 
-'cosine_2D'""")
+In case you want to use the cosine_2D distribution, to have the same
+behavior as in PyECLOUD 6.6.0 or earlier replace 'cosine_3D' with
+'cosine_2D'.
+For more info, see presentation by P. Dijkstal on the angle of emission
+of generated electrons (https://indico.cern.ch/event/673160/).
+""")
 
