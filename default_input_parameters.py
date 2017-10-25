@@ -139,7 +139,7 @@ parameters_dict = {
             'y0_refl'                           : -1,
             'out_radius'                        : -1,
             'phem_resc_fac'                     : 0.9999,
-            'photoelectron_angle_distribution'  : 'cosine_2D',
+            'photoelectron_angle_distribution'  : 'undefined',
             'energy_distribution'               : 'gaussian',
             'flag_continuous_emission'          : False,
 
@@ -253,7 +253,7 @@ parameters_dict = {
             'switch_model': 0,
 
             # Other parameters
-            'secondary_angle_distribution': 'cosine_2D',
+            'secondary_angle_distribution': 'undefined',
             # SEY from file
             'sey_file': None,
             'flag_factor_costheta': True,

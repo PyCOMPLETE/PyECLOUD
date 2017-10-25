@@ -56,3 +56,15 @@ for folder in all_sim_folders:
 #    old_mat = folder +'/Pyecltest_3D_ref.mat'
 #    new_mat = folder +'/Pyecltest_angle3D_ref.mat'
 #    shutil.move(old_mat, new_mat)
+
+#dist = 'cosine_3D'
+#for sim in all_sim_folders:
+#    filename = 'secondary_emission_parameters.input'
+#    with open(os.path.join(sim, filename), 'a') as f:
+#        f.write("\n\nsecondary_angle_distribution = '%s'\n" % dist)
+#    print('Modified %s in %s' % (filename, sim))
+#    filename = 'machine_parameters.input'
+#    with open(os.path.join(sim, filename), 'a') as f:
+#        f.write("\n\nphotoelectron_angle_distribution = '%s'\n" % dist)
+#    print('Modified %s in %s' % (filename, sim))
+#
