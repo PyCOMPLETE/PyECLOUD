@@ -178,10 +178,79 @@ def test_model_2():
     sp.grid(True)
     sp.set_xlabel('Angles [rad]')
     sp.set_ylabel('Normalized # generated')
-    sp.set_title('Sin$^2$ distribution')
+    sp.set_title('Sin$^2$ distribution - from file')
     sp.plot(angles, np.sin(angles)**2/np.pi, color='g',lw=3)
     sp.step(angles, hist/factor_hist, color='b')
 
+    chamb_segment_x = np.concatenate([
+        (np.linspace(-1,1, 100))[:-1],
+        (np.ones(100, float))[:-1],
+        (np.linspace(1,-1, 100))[:-1],
+        (np.ones(100, float)*-1)[:-1],
+    ])
+
+    chamb_segment_y = np.concatenate([
+        (np.ones(100, float)*-1)[:-1],
+        (np.linspace(-1,1, 100))[:-1],
+        (np.ones(100, float))[:-1],
+        (np.linspace(1,-1, 100))[:-1],
+    ])
+
+    phem_pdf = []
+    for seg_ctr, (seg_x, seg_y) in enumerate(zip(chamb_segment_x[:-1], chamb_segment_y[:-1])):
+        angle_0 = np.arctan2(seg_y, seg_x) % np.pi
+
+        seg_ctr_1 = seg_ctr+1
+        angle_1 = np.arctan2(chamb_segment_y[seg_ctr_1], chamb_segment_x[seg_ctr_1]) % np.pi
+
+        if angle_0 > angle_1:
+            angle_0 -= np.pi
+        phem_pdf.append(integrate.quad(lambda x: np.sin(x)**2/np.pi, angle_0, angle_1)[0])
+
+    phem_cdf = np.cumsum(phem_pdf, dtype=float)
+    phem_cdf /= phem_cdf[-1]
+
+    phem_chamb_dict = {
+        'Vx': chamb_segment_x,
+        'Vy': chamb_segment_y,
+        'x_sem_ellip_insc': np.sqrt(2)*1.01,
+        'y_sem_ellip_insc': np.sqrt(2)*1.01,
+        'phem_cdf': phem_cdf,
+    }
+
+    chamb_phem = gipfi.polyg_cham_photoemission(phem_chamb_dict, flag_counter_clockwise_chamb=True)
+
+    phem_segment = gen_photoemission_class.photoemission_per_segment(
+        chamb_phem, args.energy_dist, sig, mu, k_pe_st, args.angle_dist, None, None)
+
+
+    sp = plt.subplot(2,2,3)
+    sp.grid(True)
+    sp.set_xlabel('X dimension')
+    sp.set_ylabel('Y dimension')
+    sp.set_title('Chamber vertexes')
+    sp.set_ylim(-1.1,1.1)
+    sp.set_xlim(-1.1,1.1)
+    sp.plot(chamb_rect.Vx, chamb_rect.Vy, lw=3, marker='o', label='Rect')
+    sp.plot(chamb_phem.Vx, chamb_phem.Vy, ls='None', marker='.', label='Photoem.')
+    sp.legend(title='Chamber', loc='best')
+
+    MP_e = init_mp(N_mp_max, chamb_rect)
+    phem_segment.generate(MP_e, 1/c*N_mp_max, 1)
+
+    sp = plt.subplot(2,2,4)
+    sp.grid(True)
+    sp.set_xlabel('Angles [rad]')
+    sp.set_ylabel('Normalized # generated')
+    sp.set_title('Sin$^2$ distribution - per segment')
+
+
+    angles_generated = np.arctan2(MP_e.y_mp, MP_e.x_mp)
+    hist, bins = np.histogram(angles_generated, n_dist)
+    factor_hist = np.trapz(hist, angles)
+
+    sp.plot(angles, np.sin(angles)**2/np.pi, color='g',lw=3)
+    sp.step(angles, hist/factor_hist, color='b')
 
 ## Photoemission model 'per_segment' (3)
 def test_model_3():
