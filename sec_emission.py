@@ -240,3 +240,4 @@ def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
 
     return get_energy(e_pe_sigma, e_pe_max)
 
+

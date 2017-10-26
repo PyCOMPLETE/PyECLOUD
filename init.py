@@ -249,15 +249,14 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     # Init impact management
     flag_seg = (cc.flag_hist_impact_seg==1)
     if cc.switch_model=='perfect_absorber':
-        impact_man = pac.impact_management_perfect_absorber(
+        impact_man_class = pac.impact_management_perfect_absorber
+    else:
+        impact_man_class=imc.impact_management
+    
+    impact_man = impact_man_class(
             cc.switch_no_increase_energy, chamb, sey_mod, cc.E_th, cc.sigmafit,cc.mufit, cc.Dx_hist, cc.scrub_en_th,
             cc.Nbin_En_hist, cc.En_hist_max, thresh_low_energy=cc.thresh_low_energy, flag_seg=flag_seg,
-            cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=cc.secondary_angle_distribution
-        )
-    else:
-        impact_man=imc.impact_management(cc.switch_no_increase_energy, chamb, sey_mod, cc.E_th, cc.sigmafit, cc.mufit,
-                     cc.Dx_hist, cc.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max, thresh_low_energy=cc.thresh_low_energy,
-                     flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=cc.secondary_angle_distribution)
+            cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=cc.secondary_angle_distribution)
 
     # Init seeding processes, gas ionization or photoemission
     if cc.gas_ion_flag==1:
