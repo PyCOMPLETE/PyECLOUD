@@ -274,7 +274,7 @@ class impact_management(object):
                     N_mp_new = N_mp_old + n_add_total
 
                     # replace impacted MPs that are not reflected
-                    En_truesec_eV = sec_emission.hilleret_model2(
+                    En_truesec_eV = sec_emission.sec_energy_hilleret_model2(
                         switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
                     vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
                         N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
@@ -291,7 +291,7 @@ class impact_management(object):
                         E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
                         # Generate new MP properties, angles and energies
-                        En_truesec_eV_add = sec_emission.hilleret_model2(
+                        En_truesec_eV_add = sec_emission.sec_energy_hilleret_model2(
                             switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
                         vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
                             n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
