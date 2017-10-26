@@ -50,6 +50,8 @@
 #     all references.
 #----------------------------------------------------------------------
 
+import os
+import subprocess
 import numpy as np
 from scipy.constants import c, e, m_e
 
@@ -66,6 +68,25 @@ class Ecloud(object):
                  slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
 
         print 'PyECLOUD Version 6.6.0'
+
+        # These git commands return the hash and the branch of the specified git directory.
+        path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
+        cmd_hash = 'git --git-dir %s rev-parse HEAD' % path_to_git
+        cmd_branch = 'git --git-dir %s rev-parse --abbrev-ref HEAD' % path_to_git
+        try:
+            git_hash = 'git hash: %s' % (subprocess.check_output(cmd_hash.split()).split()[0])
+        except Exception as e:
+            git_hash = 'Retrieving git hash failed'
+            print(e)
+        print(git_hash)
+
+        try:
+            git_branch = 'git branch: %s' % (subprocess.check_output(cmd_branch.split()).split()[0])
+        except Exception as e:
+            git_branch = 'Retrieving git branch failed'
+            print(e)
+        print(git_branch)
+
         print 'PyHEADTAIL module'
         print 'Initializing ecloud from folder: '+pyecl_input_folder
         self.slicer = slicer
