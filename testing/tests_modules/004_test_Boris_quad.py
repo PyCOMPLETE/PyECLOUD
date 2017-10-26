@@ -1,12 +1,13 @@
-
-import dynamics_Boris_f2py as dynB
+import sys
 from numpy import array
+
+if '../../' not in sys.path: sys.path.append('../../')
+import dynamics_Boris_f2py as dynB
 import MP_system as MPs
 from geom_impact_ellip import ellip_cham_geom_object
-import numpy as np
 
 
-Dt=25e-10;
+Dt=25e-10
 N_steps=1000000
 B=0
 N_sub_steps=1
@@ -14,7 +15,7 @@ B_map_file='analytic_qaudrupole_unit_grad'
 fact_Bmap=12.*0.6
 
 
-dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0., \
+dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0.,
                             B_map_file, fact_Bmap, None,N_sub_steps=N_sub_steps)
 
 chamb=ellip_cham_geom_object(.02, .02)
@@ -86,9 +87,9 @@ MP_eB.N_mp = N_mp
 
 
 
-x_lisB=[];
-y_lisB=[];
-z_lisB=[];
+x_lisB=[]
+y_lisB=[]
+z_lisB=[]
 
 
 
@@ -100,7 +101,7 @@ for ii in range(N_steps):
 
 
 
-    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp]);
+    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
 
 
 
