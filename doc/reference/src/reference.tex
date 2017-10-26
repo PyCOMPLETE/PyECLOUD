@@ -285,8 +285,12 @@ Possible settings:
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `ellip' or  'rect' the following input variables must be provided:} \\ \hline
 \textbf{x\_aper, y\_aper} & Horizontal and vertical semi-apertures of the transverse chamber profile.  \\ \hline
 \multicolumn{2}{p{.97\textwidth}}{When chamb\_type = `polyg' the following input variable must be provided:} \\ \hline
-\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile.  \\ \hline
+\textbf{filename\_chm} & Name of file containing horizontal and vertical vertexes of the chamber profile. \\\hline
+\textbf{filename\_chm\_photoem} & Name of file containing horizontal and vertical vertexes of the chamber profile that is used for the photoemission mode 'per\_segment'.
+    The chamber file must also contain the cumulative distribution function of the emission probability for each segment.
+    The vertexes of this chamber must lie on the edges of the main chamber.\\ \hline
     \textbf{flag\_assume\_convex} & [optional] Default: True \\\hline
+    \textbf{flag\_counter\_clockwise\_chamb} & [optional] Default: True. Only needed for the photoemission model 'per\_segment'. It specifies the order in which the vertexes are defined. \\\hline
 \end{longtable}
 
 
@@ -382,7 +386,7 @@ Scaling factor applied to the magnetic field map.
 \multicolumn{2}{p{.97\textwidth}}{\textbf{Photoemission parameters} (if generation by photoemission is not desired, the following parameters can be omitted).}
 \\ \hline
 \textbf{photoem\_flag} & (optional -- default=0) \newline
-    (0 $\Rightarrow$ Off, 1 $\Rightarrow$ On, 2 or 'from\_file' $\Rightarrow$ From file) Enables primary electron generation by photoemission.
+    (0 $\Rightarrow$ Off, 1 $\Rightarrow$ traditional, 2 or 'from\_file' $\Rightarrow$ From file, 3 or 'per\_segment' $\Rightarrow$ Part of chamber definition) Enables primary electron generation by photoemission.
 \\ \hline
 \textbf{k\_pe\_st} & [m$^{-1}$] Number of photoelectrons to be generated per proton and per unit length.
 \\ \hline
