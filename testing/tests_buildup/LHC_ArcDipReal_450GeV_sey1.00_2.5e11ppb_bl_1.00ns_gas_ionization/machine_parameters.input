@@ -32,3 +32,6 @@ E_init_ion=0.1;   #in eV
 
  
 
+
+
+photoelectron_angle_distribution = 'cosine_3D'
