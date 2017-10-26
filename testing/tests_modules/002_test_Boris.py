@@ -1,18 +1,20 @@
+import sys
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
 from numpy import array
+
+if '../../' not in sys.path: sys.path.append('../../')
 import MP_system as MPs
 from geom_impact_ellip import ellip_cham_geom_object
 
-Dt=25e-12;
+Dt=25e-12
 N_steps=10000
 B=0.1
 N_sub_steps=10
 
 dynamicsd=dyndip.pusher_dipole_magnet(Dt,B)
-dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0., \
-                 None, None, None,N_sub_steps=N_sub_steps)
+dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0.,
+                            None, None, None,N_sub_steps=N_sub_steps)
 
 chamb=ellip_cham_geom_object(.02, .02)
 N_mp_max = 1000
@@ -77,13 +79,13 @@ MP_ed.N_mp = N_mp
 
 
 
-x_lisB=[];
-y_lisB=[];
-z_lisB=[];
+x_lisB=[]
+y_lisB=[]
+z_lisB=[]
 
-x_lisd=[];
-y_lisd=[];
-z_lisd=[];
+x_lisd=[]
+y_lisd=[]
+z_lisd=[]
 
 
 for ii in range(N_steps):
@@ -96,9 +98,9 @@ for ii in range(N_steps):
     y_lisd.append(MP_ed.y_mp.copy())
     z_lisd.append(MP_ed.z_mp.copy())
 
-    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp]);
+    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
 
-    MP_ed = dynamicsd.step(MP_ed,Ex_n[0:N_mp],Ey_n[0:N_mp]);
+    MP_ed = dynamicsd.step(MP_ed,Ex_n[0:N_mp],Ey_n[0:N_mp])
 
 
 

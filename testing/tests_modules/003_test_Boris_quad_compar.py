@@ -1,14 +1,16 @@
+import sys
+from numpy import array
 
+if '../../' not in sys.path: sys.path.append('../../')
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
-from numpy import array
 import MP_system as MPs
 from geom_impact_ellip import ellip_cham_geom_object
 import numpy as np
 
 
 #test E
-Dt=25e-13;
+Dt=25e-13
 N_steps=100000
 B=0
 N_sub_steps=1
@@ -94,10 +96,10 @@ vz_mpB=array([223792.460031])
 
 
 
-dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0., \
+dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0.,
                             B_map_file, fact_Bmap, None,N_sub_steps=N_sub_steps)
 
-dynamicsGen= dyngen.pusher_strong_B_generalized(Dt, 0., B, \
+dynamicsGen= dyngen.pusher_strong_B_generalized(Dt, 0., B,
                  B_map_file, fact_Bmap, 1e-6)
 
 chamb=ellip_cham_geom_object(.02, .02)
@@ -151,13 +153,13 @@ MP_eg.vz_mp = vz_mpB.copy()
 MP_eg.N_mp = N_mp
 
 
-x_lisB=[];
-y_lisB=[];
-z_lisB=[];
+x_lisB=[]
+y_lisB=[]
+z_lisB=[]
 
-x_lisg=[];
-y_lisg=[];
-z_lisg=[];
+x_lisg=[]
+y_lisg=[]
+z_lisg=[]
 
 for ii in range(N_steps):
     if np.mod(ii, 10000)==0:
@@ -171,8 +173,8 @@ for ii in range(N_steps):
     y_lisg.append(MP_eg.y_mp.copy())
     z_lisg.append(MP_eg.z_mp.copy())
 
-    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp]);
-    MP_eg = dynamicsGen.step(MP_eg,Ex_n[0:N_mp],Ey_n[0:N_mp]);
+    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
+    MP_eg = dynamicsGen.step(MP_eg,Ex_n[0:N_mp],Ey_n[0:N_mp])
 
 
 

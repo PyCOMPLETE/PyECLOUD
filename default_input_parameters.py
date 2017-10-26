@@ -1,5 +1,8 @@
 from scipy.constants import m_p
 
+# To be safe, only use immutable python types as default values in the parameters_dict.
+# This most importantly excludes python lists. Tuples may be used in their place.
+
 parameters_dict = {
     'simulation_parameters': {
         'mandatory': {
@@ -96,6 +99,8 @@ parameters_dict = {
             'x_aper': None,
             'y_aper': None,
             'filename_chm': None,
+            'filename_chm_photoem': None,
+            'flag_counter_clockwise_chamb': None,
 
             # Tracking and magnetic field
             'track_method': 'StrongBdip',
@@ -270,5 +275,4 @@ parameters_dict = {
 for key in ('secondary_emission_parameters', 'machine_parameters', 'simulation_parameters'):
     parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['mandatory'].update(parameters_dict[key]['mandatory'])
     parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['optional'].update(parameters_dict[key]['optional'])
-
 
