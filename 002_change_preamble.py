@@ -1,27 +1,63 @@
-import sys
 import os
 
 before_preamble = 0
 in_preamble = 1
 after_preamble = 2
-in_change = 3
 
-begin_preamble_line = \
-    '#----------------------------------------------------------------------'
-new_preamble_line = \
-    '#-Begin-preamble-------------------------------------------------------'
+id_preamble_begin = '#-Begin-preamble----'
+id_preamble_end = '#-End-preamble--------'
 
-end_preamble_line = begin_preamble_line
-new_end_preamble_line = \
+preamble_new = """#-Begin-preamble-------------------------------------------------------
 #
-#-End-preamble---------------------------------------------------------
+#                           CERN
+#
+#     European Organization for Nuclear Research
+#
+#
+#     This file is part of the code:
+#
+#                   PyECLOUD Version 6.7.0
+#
+#
+#     Main author:          Giovanni IADAROLA
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.iadarola@cern.ch
+#
+#     Author list:          Eleanora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#
+#
+#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
+#     appropriate  legal  protection  of  this  computer program and
+#     associated documentation reserved  in  all  countries  of  the
+#     world.
+#
+#     Organizations collaborating with CERN may receive this program
+#     and documentation freely and without charge.
+#
+#     CERN undertakes no obligation  for  the  maintenance  of  this
+#     program,  nor responsibility for its correctness,  and accepts
+#     no liability whatsoever resulting from its use.
+#
+#     Program  and documentation are provided solely for the use  of
+#     the organization to which they are distributed.
+#
+#     This program  may  not  be  copied  or  otherwise  distributed
+#     without  permission. This message must be retained on this and
+#     any other authorized copies.
+#
+#     The material cannot be sold. CERN should be  given  credit  in
+#     all references.
+#
+#-End-preamble---------------------------------------------------------"""
 
-to_add = [
-    '#     Author list:          Eleanora Belli',
-    '#                           Philipp Dijkstal',
-    '#                           Lotta Mether',
-    '#                           Annalisa Romano',
-]
+new_preamble_lines = preamble_new.split('\n')
+
 
 
 for dirpath, _, filenames in os.walk('.'):
@@ -29,49 +65,44 @@ for dirpath, _, filenames in os.walk('.'):
 
     python_files = [x for x in full_paths if x.endswith('.py')]
     for path in python_files:
+
+        if os.path.abspath(path) == os.path.abspath(__file__):
+            continue
+
         with open(path, 'r') as f:
             content = f.read()
 
-        if 'European Organization for Nuclear Research' in content:
-            print(path)
-        else:
+        if new_preamble_lines[0] not in content:
             continue
+
+        print(path)
 
         lines = content.split('\n')
 
-        prev_line, prev2_line = None, None
+        prev_line = None
         new_lines = []
-        status = after_preamble
+        status = before_preamble
 
         for line in lines:
             if status == before_preamble:
-                if begin_preamble_line in line:
-                    line = new_preamble_line
-                    status = after_preamble
+                if id_preamble_begin in line:
+                    status = in_preamble
+                    new_lines.extend(new_preamble_lines)
             elif status == in_preamble:
-                if 'Author and contact' in line:
-                    line = line.replace('Author and contact:', 'Main author:       ')
-                if 'RUMOLO' in line:
-                    status = in_change
-                    new_lines.extend(to_add)
-            elif status == in_change:
-                if 'rumolo@cern.ch' in prev2_line:
+                if id_preamble_end in prev_line:
                     status = after_preamble
             elif status == after_preamble:
-                if new_end_preamble_line in line:
-                    new_lines.append('#')
-                    line = new_end_preamble_line
+                pass
 
-            if status != in_change:
+
+            if status != in_preamble:
                 new_lines.append(line)
 
-            prev2_line = prev_line
             prev_line = line
 
         new_lines = [x+'\n' for ctr, x in enumerate(new_lines) if ctr+1 != len(new_lines)]
 
-        #new_file = './test.py'
         with open(path, 'w') as f:
             f.writelines(new_lines)
-
+        print('Modified %s' % path)
 
