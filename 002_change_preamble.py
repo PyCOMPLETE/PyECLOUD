@@ -6,6 +6,16 @@ in_preamble = 1
 after_preamble = 2
 in_change = 3
 
+begin_preamble_line = \
+    '#----------------------------------------------------------------------'
+new_preamble_line = \
+    '#-Begin-preamble-------------------------------------------------------'
+
+end_preamble_line = begin_preamble_line
+new_end_preamble_line = \
+#
+#-End-preamble---------------------------------------------------------
+
 to_add = [
     '#     Author list:          Eleanora Belli',
     '#                           Philipp Dijkstal',
@@ -31,12 +41,13 @@ for dirpath, _, filenames in os.walk('.'):
 
         prev_line, prev2_line = None, None
         new_lines = []
-        status = before_preamble
+        status = after_preamble
 
         for line in lines:
             if status == before_preamble:
-                if line.startswith('#-------'):
-                    status = in_preamble
+                if begin_preamble_line in line:
+                    line = new_preamble_line
+                    status = after_preamble
             elif status == in_preamble:
                 if 'Author and contact' in line:
                     line = line.replace('Author and contact:', 'Main author:       ')
@@ -47,7 +58,9 @@ for dirpath, _, filenames in os.walk('.'):
                 if 'rumolo@cern.ch' in prev2_line:
                     status = after_preamble
             elif status == after_preamble:
-                pass
+                if new_end_preamble_line in line:
+                    new_lines.append('#')
+                    line = new_end_preamble_line
 
             if status != in_change:
                 new_lines.append(line)
