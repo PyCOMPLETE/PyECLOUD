@@ -8,7 +8,8 @@
 
 \usepackage{placeins}
 
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
 
 
 \usepackage[english]{babel}
@@ -36,6 +37,9 @@
 \newcommand{\HRule}[1]{\hfill \rule{0.2\linewidth}{#1}}
 
 \definecolor{Gray}{gray}{0.90}
+
+
+
 
 \begin{document}
 
@@ -433,7 +437,9 @@ If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have u
     \multicolumn{2}{p{.97\textwidth}}{\textbf{The coordinates of all generated photoelectrons is specified from a file}}
     \\
     \hline
-    \textbf{inv\_CDF\_all\_photoem\_file} & See inv\_CDF\_refl\_photoem\_file, but for all photons. If it is set to 'unif\_no\_file', the photoelectron generation is uniform over the whole surface.
+    \textbf{inv\_CDF\_all\_photoem\_file} & See inv\_CDF\_refl\_photoem\_file, but for all photons.
+    If it is set to 'unif\_no\_file', the photoelectron generation is uniform over the whole surface.
+    Example scripts to generate a file with the correct format can be found in the folder \url{PyECLOUD/other/photoemission\_angular\_distribution}.
 \end{longtable}
 
 
