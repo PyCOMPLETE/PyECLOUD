@@ -1,10 +1,12 @@
 from __future__ import division
+import sys
 import os
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
+if '../../' not in sys.path: sys.path.append('../../')
 import dynamics_Boris_multipole as dbu
 from geom_impact_ellip import ellip_cham_geom_object
 import MP_system as MPs

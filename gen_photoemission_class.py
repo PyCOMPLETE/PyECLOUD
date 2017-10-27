@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.6.0
+#                   PyECLOUD Version 6.7.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -54,73 +54,14 @@ import numpy as np
 import numpy.random as random
 
 import scipy.io as sio
-import scipy.stats as stats
-from scipy.constants import e as qe, m_e as me, c
+from scipy.constants import c
 
 import sec_emission
 
-qm=qe/me
-
-class _gen_energy_base(object):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-
-class _lognormal(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        return random.lognormal(self.e_pe_max, self.e_pe_sigma, N_int_new_MP)
-
-class _gaussian(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        En_gen = random.randn(N_int_new_MP)*self.e_pe_sigma + self.e_pe_max
-        flag_negat = (En_gen<0.)
-        N_neg = np.sum(flag_negat)
-        while(N_neg>0):
-            En_gen[flag_negat] = random.randn(N_neg)*self.e_pe_sigma +self.e_pe_max   #in eV
-            flag_negat = (En_gen<0.)
-            N_neg = np.sum(flag_negat)
-        return En_gen
-
-class _rect(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        return self.e_pe_max + (random.rand(N_int_new_MP)-0.5)*self.e_pe_sigma
-
-class _mono(_gen_energy_base):
-    def __call__(self, N_int_new_MP):
-        return np.ones(N_int_new_MP)*self.e_pe_max
-
-class _lorentz(_gen_energy_base):
-    def __init__(self, e_pe_sigma, e_pe_max):
-        self.e_pe_sigma = e_pe_sigma
-        self.e_pe_max = e_pe_max
-        self.xx_min = stats.cauchy.cdf(0, e_pe_max, e_pe_sigma)
-        self.xx_max = 1 # set this to something else if you want to cut
-
-    def __call__(self, N_int_new_MP):
-        xx_rand = random.rand(N_int_new_MP)*(self.xx_max-self.xx_min) + self.xx_min
-        return stats.cauchy.ppf(xx_rand, self.e_pe_max, self.e_pe_sigma)
-
+class PyECLOUD_PhotoemissionException(ValueError):
+    pass
 
 class photoemission_base(object):
-
-
-    @staticmethod
-    def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
-
-        if energy_distribution == 'lognormal':
-            get_energy = _lognormal
-        elif energy_distribution == 'gaussian':
-            get_energy = _gaussian
-        elif energy_distribution == 'rect':
-            get_energy = _rect
-        elif energy_distribution == 'mono':
-            get_energy = _mono
-        elif energy_distribution == 'lorentz':
-            get_energy = _lorentz
-        else:
-            raise ValueError('Energy distribution %s is invalid!' % energy_distribution)
-
-        return get_energy(e_pe_sigma, e_pe_max)
 
     def get_number_new_mps(self, k_pe_st, lambda_t, Dt, nel_mp_ref):
 
@@ -133,6 +74,7 @@ class photoemission_base(object):
         return int(Nint_new_MP+int(random.rand()<rest))
 
     def gen_energy_and_set_MPs(self, Nint_new_MP, x_in, y_in, x_out, y_out, MP_e):
+        # Assumes convex_chamber
 
         #generate points and normals
         z_in = z_out = np.zeros_like(x_out, float)
@@ -147,14 +89,16 @@ class photoemission_base(object):
 
         MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
 
-
 class photoemission(photoemission_base):
 
     def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max, alimit, x0_refl,
                  y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution,
-                 beamtim, flag_continuous_emission):
+                 beamtim=None, flag_continuous_emission=False):
 
         print('Start photoemission init.')
+
+        if not chamb.is_convex():
+            print('Warning! This photoemission module is not suited for a non-convex chamber!')
 
         if inv_CDF_refl_photoem_file == 'unif_no_file':
             self.flag_unif = True
@@ -181,14 +125,14 @@ class photoemission(photoemission_base):
             self.mean_lambda = np.mean(beamtim.lam_t_array)
 
         if y0_refl != 0.:
-            raise ValueError('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
+            raise PyECLOUD_PhotoemissionException('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
 
         x0_refl_np_arr = np.array([x0_refl])
         y0_refl_np_arr = np.array([y0_refl])
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
-            raise ValueError('x0_refl, y0_refl is outside of the chamber!')
+            raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
 
-        self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
 
         print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 
@@ -232,18 +176,26 @@ class photoemission(photoemission_base):
 
         return MP_e
 
-
 class photoemission_from_file(photoemission_base):
 
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
-                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim, flag_continuous_emission):
-        print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
+                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim=None, flag_continuous_emission=False):
+        if isinstance(inv_CDF_all_photoem_file, str):
+            print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
+        elif isinstance(inv_CDF_all_photoem_file, dict):
+            print('Start photoemission init from dict.')
+
+        if not chamb.is_convex():
+            print('Warning! This photoemission module is not suited for a non-convex chamber!')
 
         self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
         if not self.flag_unif:
-            mat = sio.loadmat(inv_CDF_all_photoem_file)
-            self.u_sam = mat['u_sam'].squeeze()
-            self.angles = mat['angles'].squeeze()
+            if isinstance(inv_CDF_all_photoem_file, dict):
+                mat = inv_CDF_all_photoem_file
+            else:
+                mat = sio.loadmat(inv_CDF_all_photoem_file)
+            self.u_sam = np.squeeze(mat['u_sam'])
+            self.angles = np.squeeze(mat['angles'])
 
         self.k_pe_st = k_pe_st
         self.out_radius = out_radius
@@ -252,9 +204,9 @@ class photoemission_from_file(photoemission_base):
         self.flag_continuous_emission = flag_continuous_emission
 
         if flag_continuous_emission:
-            self.mean_curr = np.mean(beamtim.lam_t_array)
+            self.mean_lambda = np.mean(beamtim.lam_t_array)
 
-        self.get_energy = self.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
         self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
         print('Done photoemission init')
 
@@ -274,6 +226,32 @@ class photoemission_from_file(photoemission_base):
 
             x_in = y_in = np.zeros(Nint_new_MP)
             self.gen_energy_and_set_MPs(Nint_new_MP, x_in, y_in, x_out, y_out, MP_e)
+
+        return MP_e
+
+class photoemission_per_segment(photoemission_base):
+
+    def __init__(self, chamb, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st,
+                 photoelectron_angle_distribution, beamtim=None, flag_continuous_emission=False):
+        print('Start photoemission per segment init')
+        self.k_pe_st = k_pe_st
+        self.chamb = chamb
+        self.flag_continuous_emission = flag_continuous_emission
+        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        if self.flag_continuous_emission:
+            self.mean_lambda = np.mean(beamtim.lam_t_array)
+        print('Done photoemission init')
+
+    def generate(self, MP_e, lambda_t, Dt):
+
+        Nint_new_MP = self.get_number_new_mps(self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref)
+        if Nint_new_MP > 0:
+            x_new_mp, y_new_mp, Norm_x, Norm_y = self.chamb.get_photoelectron_positions(Nint_new_MP)
+            En_gen = self.get_energy(Nint_new_MP) #in eV
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
+
+            MP_e.add_new_MPs(x_new_mp.size, MP_e.nel_mp_ref, x_new_mp, y_new_mp, 0., vx_gen, vy_gen, vz_gen)
 
         return MP_e
 

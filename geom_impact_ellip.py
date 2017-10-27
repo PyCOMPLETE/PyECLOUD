@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.6.0
+#                   PyECLOUD Version 6.7.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -67,6 +67,9 @@ class ellip_cham_geom_object:
 
     def is_outside(self, x_mp, y_mp):
         return (((x_mp/self.x_aper)**2 + (y_mp/self.y_aper)**2)>=1);
+
+    def is_convex(self):
+        return True
 
     def impact_point_and_normal(self, x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=0.99, flag_robust=True):
 
