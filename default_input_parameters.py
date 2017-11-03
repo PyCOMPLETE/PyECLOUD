@@ -195,6 +195,7 @@ parameters_dict = {
         },
         'optional': {
             # Basic definitions
+            'q_part': qe,
             'm0_part': m_p,
             'Dp_p': 0.,
             'nemittx': None,
