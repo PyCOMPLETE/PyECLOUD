@@ -176,7 +176,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     MP_e=MPs.MP_system(cc.N_mp_max, cc.nel_mp_ref_0, cc.fact_split, cc.fact_clean,
                        cc.N_mp_regen_low, cc.N_mp_regen, cc.N_mp_after_regen,
                        cc.Dx_hist, cc.Nx_regen, cc.Ny_regen, cc.Nvx_regen, cc.Nvy_regen, cc.Nvz_regen, cc.regen_hist_cut, chamb,
-                       N_mp_soft_regen=cc.N_mp_soft_regen, N_mp_after_soft_regen=cc.N_mp_after_soft_regen)
+                       N_mp_soft_regen=cc.N_mp_soft_regen, N_mp_after_soft_regen=cc.N_mp_after_soft_regen, charge=cc.charge, mass=cc.mass)
 
     # Init beam and timing
     if not skip_beam:
