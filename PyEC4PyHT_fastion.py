@@ -64,29 +64,23 @@ class MP_light(object):
 
 class Ecloud_fastion(Ecloud):
 
-    def __init__(self, L_ecloud, slicer, Dt_ref, MP_e_mass, MP_e_charge, pyecl_input_folder = './',
+    def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder = './',
                 flag_clean_slices = False, slice_by_slice_mode = False, space_charge_obj = None,
                 beam_monitor = None, include_cloud_sc = False, ionize_only_first_bunch = False, **kwargs):
 
 
         super(Ecloud_fastion, self).__init__(L_ecloud, slicer, Dt_ref, pyecl_input_folder = pyecl_input_folder,
                                                 flag_clean_slices = flag_clean_slices, slice_by_slice_mode = slice_by_slice_mode,
-                                                space_charge_obj = space_charge_obj, MP_e_mass = MP_e_mass,
-                                                MP_e_charge = MP_e_charge, **kwargs)
+                                                space_charge_obj = space_charge_obj, **kwargs)
 
         self.beam_monitor = beam_monitor
-        self.gas_ion_flag = kwargs['gas_ion_flag']
         self.include_cloud_sc = include_cloud_sc
         self.ionize_only_first_bunch = ionize_only_first_bunch
 
         self.MP_e_field_state = self.spacech_ele.PyPICobj.get_state_object()
         self.MP_p_field_state = self.spacech_ele.PyPICobj.get_state_object()
 
-        if self.gas_ion_flag == 1:
-            chamb = self.impact_man.chamb
-            gas_ionization = residual_gas_ionization(kwargs['unif_frac'], kwargs['P_nTorr'], kwargs['sigma_ion_MBarn'],
-                                kwargs['Temp_K'], chamb, kwargs['E_init_ion'])
-            self.gas_ionization = gas_ionization
+        self.gas_ionization = self.resgasion
 
 
 
