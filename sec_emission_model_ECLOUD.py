@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -10,20 +10,17 @@
 #                   PyECLOUD Version 6.7.0
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Author list:          Eleanora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -47,7 +44,8 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 from numpy import sqrt, exp
 from numpy.random import rand
@@ -59,12 +57,12 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
         del_max_tilde=del_max*exp(0.5*(1.-costheta));
     else:
         del_max_tilde=del_max
-    
-    if flag_costheta_Emax_shift:    
+
+    if flag_costheta_Emax_shift:
         E_max_tilde=Emax*(1.+0.7*(1.-costheta));
     else:
         E_max_tilde=Emax
-    
+
     x=E/E_max_tilde;
 
     true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
@@ -92,7 +90,7 @@ class SEY_model_ECLOUD:
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
             yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s,
-                                        flag_costheta_delta_scale=self.flag_costheta_delta_scale, 
+                                        flag_costheta_delta_scale=self.flag_costheta_delta_scale,
                                         flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
             flag_elast=(rand(len(ref_frac))<ref_frac);
             flag_truesec=~(flag_elast);
