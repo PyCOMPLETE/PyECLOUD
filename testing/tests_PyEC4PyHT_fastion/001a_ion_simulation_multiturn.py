@@ -104,35 +104,36 @@ Dh_y = y_aper/125.
 Dh_sc = [Dh_x, Dh_y]
 
 
-# find filled slices and make filled buncher
-slices = beam.get_slices(machine.buncher)
-machine.buncher.add_statistics(sliceset=slices, beam=beam, statistics=True)
+# find bunch slots and make bunch spacing wide slicer
+bunch_slots = beam.get_slices(machine.buncher)
+machine.buncher.add_statistics(sliceset=bunch_slots, beam=beam, statistics=True)
 
-mask_filled = slices.n_macroparticles_per_slice > 0
-n_filled = np.sum(mask_filled)
-z_cuts_filled = (np.min(slices.z_bins[mask_filled]), np.max(slices.z_bins[np.append(mask_filled, True)]))
+mask_filled_slots = bunch_slots.n_macroparticles_per_slice > 0
+n_filled_slots = np.sum(mask_filled_slots)
+z_cuts_filled_slots = (np.min(bunch_slots.z_bins[mask_filled_slots]), 
+                       np.max(bunch_slots.z_bins[np.append(mask_filled_slots, True)]))
 
-filled_buncher = UniformBinSlicer(n_filled, z_cuts=z_cuts_filled)
-filled_slices = beam.get_slices(filled_buncher)
-filled_buncher.add_statistics(sliceset=filled_slices, beam=beam, statistics=True)
+bunch_slicer = UniformBinSlicer(n_filled_slots, z_cuts=z_cuts_filled_slots)
+bunch_slices = beam.get_slices(bunch_slicer)
+bunch_slicer.add_statistics(sliceset=bunch_slices, beam=beam, statistics=True)
 
 
 # define a beam monitor 
 from PyHEADTAIL.monitors.monitors import SliceMonitor
 beam_monitor = SliceMonitor(filename='bunch_evolution_A%d_%db_%dips_%dturns_%.2fnTorr'%(A, n_bunches, n_segments, n_turns, P_nTorr), 
-				n_steps = n_turns+1, slicer=filled_buncher, write_buffer_every=5)
+                            n_steps = n_turns+1, slicer=bunch_slicer, write_buffer_every=5)
 
 
 # initialize ion cloud with single kick per bunch
 import PyECLOUD.PyEC4PyHT_fastion as PyEC4PyHTfi
-ecloud_sk = PyEC4PyHTfi.Ecloud_fastion(L_ecloud=machine.circumference/n_segments, slicer=machine.buncher, 
+ecloud_sk = PyEC4PyHTfi.Ecloud_fastion(L_ecloud=machine.circumference/n_segments, slicer=bunch_slicer, 
 			Dt_ref=Dt_ref, pyecl_input_folder='./pyecloud_config', beam_monitor=None, 
 			chamb_type = chamb_type, PyPICmode = 'FFT_OpenBoundary',
 			x_aper=x_aper, y_aper=y_aper,
 			filename_chm=filename_chm, Dh_sc=Dh_sc,
 			init_unif_edens_flag=init_unif_edens_flag,
 			init_unif_edens=init_unif_edens,
-                        mass=ion_mass, charge=ion_charge,
+            mass=ion_mass, charge=ion_charge,
 			gas_ion_flag=gas_ion_flag, unif_frac=unif_frac, 
 			P_nTorr=P_nTorr, sigma_ion_MBarn=sigma_ion_MBarn, 
 			Temp_K=Temp_K, E_init_ion=E_init_ion,
