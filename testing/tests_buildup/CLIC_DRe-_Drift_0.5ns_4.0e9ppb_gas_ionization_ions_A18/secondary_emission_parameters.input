@@ -1,0 +1,16 @@
+# secondary emission model
+
+Emax = 0.
+del_max = 0.
+R0 = 0.
+switch_model = 'perfect_absorber'
+
+# hilleret model for sec. emission
+E_th = 0.
+sigmafit = 0.
+mufit = 0.
+
+switch_no_increase_energy = 0
+thresh_low_energy = -1
+
+scrub_en_th = 0.        #eV

@@ -65,7 +65,7 @@ extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
-                 slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
+                 slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
 
         print 'PyECLOUD Version 6.7.0'
 
@@ -162,6 +162,9 @@ class Ecloud(object):
         self.dynamics = dynamics
         self.impact_man = impact_man
         self.spacech_ele = spacech_ele
+
+        self.gas_ion_flag = gas_ion_flag
+        self.resgasion = resgasion
 
         self.save_ele_distributions_last_track = False
         self.save_ele_potential_and_field = False

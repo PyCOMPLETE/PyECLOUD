@@ -126,13 +126,13 @@ beam_monitor = SliceMonitor(filename='bunch_evolution_A%d_%db_%dips_%dturns_%.2f
 # initialize ion cloud with single kick per bunch
 import PyECLOUD.PyEC4PyHT_fastion as PyEC4PyHTfi
 ecloud_sk = PyEC4PyHTfi.Ecloud_fastion(L_ecloud=machine.circumference/n_segments, slicer=machine.buncher, 
-			Dt_ref=Dt_ref, MP_e_mass=ion_mass, MP_e_charge=ion_charge,
-			pyecl_input_folder='./pyecloud_config', beam_monitor=beam_monitor, 
+			Dt_ref=Dt_ref, pyecl_input_folder='./pyecloud_config', beam_monitor=beam_monitor, 
 			chamb_type = chamb_type, PyPICmode = 'FFT_OpenBoundary',
 			x_aper=x_aper, y_aper=y_aper,
 			filename_chm=filename_chm, Dh_sc=Dh_sc,
 			init_unif_edens_flag=init_unif_edens_flag,
 			init_unif_edens=init_unif_edens, 
+                        mass=ion_mass, charge=ion_charge,
 			gas_ion_flag=gas_ion_flag, unif_frac=unif_frac, 
 			P_nTorr=P_nTorr, sigma_ion_MBarn=sigma_ion_MBarn, 
 			Temp_K=Temp_K, E_init_ion=E_init_ion,

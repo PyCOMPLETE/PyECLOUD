@@ -1,4 +1,4 @@
-from scipy.constants import m_p
+from scipy.constants import m_p, m_e, e as qe
 
 # To be safe, only use immutable python types as default values in the parameters_dict.
 # This most importantly excludes python lists. Tuples may be used in their place.
@@ -123,6 +123,10 @@ parameters_dict = {
             'Dx': 0.,
             'Dy': 0.,
 
+            # Cloud particles
+            'charge': -qe,
+            'mass'  : m_e,
+
             # Residual gas ionization
             'gas_ion_flag'      : 0,
             'P_nTorr'           : -1,
@@ -191,6 +195,7 @@ parameters_dict = {
         },
         'optional': {
             # Basic definitions
+            'q_part': qe,
             'm0_part': m_p,
             'Dp_p': 0.,
             'nemittx': None,

@@ -59,6 +59,7 @@ class beam_descr_from_fil:
         self.x_beam_pos = cc.x_beam_pos
         self.y_beam_pos = cc.y_beam_pos
 
+        self.q_part = cc.q_part
         self.m0_part = cc.m0_part
         self.energy_eV = cc.energy_eV
         self.energy_J = energy_J
