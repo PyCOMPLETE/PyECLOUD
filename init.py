@@ -171,7 +171,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         raise inp_spec.PyECLOUD_ConfigException('Chamber type not recognized (choose: ellip/rect/polyg)')
 
-
     # Init MP system
     MP_e=MPs.MP_system(cc.N_mp_max, cc.nel_mp_ref_0, cc.fact_split, cc.fact_clean,
                        cc.N_mp_regen_low, cc.N_mp_regen, cc.N_mp_after_regen,
@@ -217,34 +216,35 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         spacech_ele = None
 
     # Init secondary emission object
-    kwargs_secem = {}
-    if cc.E0 is not None:
-        kwargs_secem.update({'E0':cc.E0})
-        #If E0 is not provided use default value for each object
-    if cc.s_param is not None:
-        if cc.switch_model==0 or cc.switch_model=='ECLOUD':
-            kwargs_secem.update({'s':cc.s_param})
-        else:
-            raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
-
-    if cc.switch_model in (0, 'ECLOUD'):
-        kwargs_secem['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
-        kwargs_secem['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
-        sey_mod=SEY_model_ECLOUD(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-    elif cc.switch_model in (1, 'ACC_LOW'):
-        sey_mod=SEY_model_acc_low_ene(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-    elif cc.switch_model == 'ECLOUD_nunif':
-        sey_mod=SEY_model_ECLOUD_non_unif(chamb, cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-    elif cc.switch_model == 'cos_low_ene':
-        sey_mod=SEY_model_cos_le(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-    elif cc.switch_model == 'flat_low_ene':
-        sey_mod=SEY_model_flat_le(cc.Emax,cc.del_max,cc.R0)
-    elif cc.switch_model == 'from_file':
-        sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)
-    elif cc.switch_model == 'perfect_absorber':
+    if cc.switch_model == 'perfect_absorber':
         sey_mod = None
     else:
-        raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
+        kwargs_secem = {}
+        if cc.E0 is not None:
+            kwargs_secem.update({'E0':cc.E0})
+            #If E0 is not provided use default value for each object
+            if cc.s_param is not None:
+                if cc.switch_model==0 or cc.switch_model=='ECLOUD':
+                    kwargs_secem.update({'s':cc.s_param})
+                else:
+                    raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
+
+        if cc.switch_model in (0, 'ECLOUD'):
+            kwargs_secem['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
+            kwargs_secem['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
+            sey_mod=SEY_model_ECLOUD(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
+        elif cc.switch_model in (1, 'ACC_LOW'):
+            sey_mod=SEY_model_acc_low_ene(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
+        elif cc.switch_model == 'ECLOUD_nunif':
+            sey_mod=SEY_model_ECLOUD_non_unif(chamb, cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
+        elif cc.switch_model == 'cos_low_ene':
+            sey_mod=SEY_model_cos_le(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
+        elif cc.switch_model == 'flat_low_ene':
+            sey_mod=SEY_model_flat_le(cc.Emax,cc.del_max,cc.R0)
+        elif cc.switch_model == 'from_file':
+            sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)
+        else:
+            raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
     # Init impact management
     flag_seg = (cc.flag_hist_impact_seg==1)
