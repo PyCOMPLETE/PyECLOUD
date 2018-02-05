@@ -159,6 +159,32 @@ class space_charge:
         self.flag_recomputed_sc=flag_recompute
 
 
+    def recompute_spchg_efield_modes(self, MP_e, t_curr=None, force=False, spchg_mode='scatter_and_solve', flag_add=False):
+
+        flag_recompute=True
+        if self.flag_decimate:
+            flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
+
+        if flag_recompute or force:
+            # scatter and solve
+            if spchg_mode == 'scatter_and_solve':
+                self.t_last_recom = t_curr
+
+                self.PyPICobj.scatter_and_solve(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
+                #~ U_sc_eV_stp = -0.5*eps0*np.sum(b*phi)*self.Dh*self.Dh/qe
+            # scatter
+            elif spchg_mode == 'scatter':
+                # New time step
+                self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge, flag_add=flag_add)
+                flag_recompute = False
+            # solve
+            elif spchg_mode == 'solve':
+                self.t_last_recom = t_curr
+                self.PyPICobj.solve()
+
+        self.flag_recomputed_sc=flag_recompute
+
+
     #@profile
     def compute_spchg_efield_from_rho(self, rho, flag_verbose = True):
         self.PyPICobj.solve(rho = rho, flag_verbose = flag_verbose)
