@@ -82,7 +82,9 @@ import gas_ionization_class as gic
 import gen_photoemission_class as gpc
 
 import parse_beam_file as pbf
+import parse_cloud_file as pcf
 import input_parameters_format_specification as inp_spec
+import cloud_manager as cman
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
@@ -154,8 +156,22 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         pyeclsaver = None
 
+    # Parse additional cloud files
+    flag_multiple_clouds = len(cc.additional_clouds_file_list) > 0
+
+    cloud_par_list = []
+    # Make parameter object for default cloud from config dict
+    cloud_par_list.append(pcf.cloud_descr_from_file(cloudfilename=None, default_param_obj=cc))
+    if flag_multiple_clouds:
+        # Get parameter object for additional clouds (unspecified optional parameters set from general config dict)
+        for add_cloud_file in cc.additional_clouds_file_list:
+            cloud_par_list.append(pcf.cloud_descr_from_file(cloudfilename=os.path.join(pyecl_input_folder, add_cloud_file), default_param_obj=cc))
+
     # Init chamber
-    flag_non_unif_sey = (cc.switch_model == 'ECLOUD_unif')
+    flag_non_unif_sey = False
+    for cloud_par in cloud_par_list:
+        if cloud_par.cc.switch_model == "ECLOUD_unif":
+            flag_non_unif_sey = True
     chamber_kwargs = {
         'flag_verbose_file': cc.flag_verbose_file,
         'flag_verbose_stdout': cc.flag_verbose_stdout,
@@ -170,12 +186,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         chamb = girfi.rect_cham_geom_object(cc.x_aper, cc.y_aper, flag_non_unif_sey, **chamber_kwargs)
     else:
         raise inp_spec.PyECLOUD_ConfigException('Chamber type not recognized (choose: ellip/rect/polyg)')
-
-    # Init MP system
-    MP_e=MPs.MP_system(cc.N_mp_max, cc.nel_mp_ref_0, cc.fact_split, cc.fact_clean,
-                       cc.N_mp_regen_low, cc.N_mp_regen, cc.N_mp_after_regen,
-                       cc.Dx_hist, cc.Nx_regen, cc.Ny_regen, cc.Nvx_regen, cc.Nvy_regen, cc.Nvz_regen, cc.regen_hist_cut, chamb,
-                       N_mp_soft_regen=cc.N_mp_soft_regen, N_mp_after_soft_regen=cc.N_mp_after_soft_regen, charge=cc.charge, mass=cc.mass)
 
     # Init beam and timing
     if not skip_beam:
@@ -215,114 +225,148 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         spacech_ele = None
 
-    # Init secondary emission object
-    if cc.switch_model == 'perfect_absorber':
-        sey_mod = None
-    else:
-        kwargs_secem = {}
-        if cc.E0 is not None:
-            kwargs_secem.update({'E0':cc.E0})
-            #If E0 is not provided use default value for each object
-            if cc.s_param is not None:
-                if cc.switch_model==0 or cc.switch_model=='ECLOUD':
-                    kwargs_secem.update({'s':cc.s_param})
-                else:
-                    raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
+    # Loop over clouds to init all cloud-specific objects
+    cloud_list = []
+    for cloud_par in cloud_par_list:
+        ccc = cloud_par.cc
 
-        if cc.switch_model in (0, 'ECLOUD'):
-            kwargs_secem['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
-            kwargs_secem['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
-            sey_mod=SEY_model_ECLOUD(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-        elif cc.switch_model in (1, 'ACC_LOW'):
-            sey_mod=SEY_model_acc_low_ene(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-        elif cc.switch_model == 'ECLOUD_nunif':
-            sey_mod=SEY_model_ECLOUD_non_unif(chamb, cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-        elif cc.switch_model == 'cos_low_ene':
-            sey_mod=SEY_model_cos_le(cc.Emax,cc.del_max,cc.R0,**kwargs_secem)
-        elif cc.switch_model == 'flat_low_ene':
-            sey_mod=SEY_model_flat_le(cc.Emax,cc.del_max,cc.R0)
-        elif cc.switch_model == 'from_file':
-            sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)
+        print('Initialize cloud %s:' % (ccc.cloudname))
+
+        # Init saver for all but default cloud
+        if ccc.cloudname != 'default':
+            if not skip_pyeclsaver:
+                pyeclsaver=pysav.pyecloud_saver(ccc.logfile_path)
+            else:
+                pyeclsaver = None
+
+        # Init MP system
+        MP_e = MPs.MP_system(ccc.N_mp_max, ccc.nel_mp_ref_0, ccc.fact_split, ccc.fact_clean,
+                             ccc.N_mp_regen_low, ccc.N_mp_regen, ccc.N_mp_after_regen,
+                             ccc.Dx_hist, ccc.Nx_regen, ccc.Ny_regen, ccc.Nvx_regen,
+                             ccc.Nvy_regen, ccc.Nvz_regen, ccc.regen_hist_cut, chamb,
+                             N_mp_soft_regen=ccc.N_mp_soft_regen, N_mp_after_soft_regen=ccc.N_mp_after_soft_regen,
+                             charge=ccc.charge, mass=ccc.mass)
+
+        # Init secondary emission object
+        if ccc.switch_model == 'perfect_absorber':
+            sey_mod = None
         else:
-            raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
+            kwargs_secem = {}
+            if ccc.E0 is not None:
+                kwargs_secem.update({'E0':ccc.E0})
+                #If E0 is not provided use default value for each object
+                if ccc.s_param is not None:
+                    if ccc.switch_model==0 or ccc.switch_model=='ECLOUD':
+                        kwargs_secem.update({'s':ccc.s_param})
+                    else:
+                        raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
 
-    # Init impact management
-    flag_seg = (cc.flag_hist_impact_seg==1)
-    if cc.switch_model=='perfect_absorber':
-        impact_man_class = pac.impact_management_perfect_absorber
-    else:
-        impact_man_class=imc.impact_management
+            if ccc.switch_model in (0, 'ECLOUD'):
+                kwargs_secem['flag_costheta_delta_scale'] = ccc.flag_costheta_delta_scale
+                kwargs_secem['flag_costheta_Emax_shift'] = ccc.flag_costheta_Emax_shift
+                sey_mod=SEY_model_ECLOUD(ccc.Emax,ccc.del_max,ccc.R0,**kwargs_secem)
+            elif ccc.switch_model in (1, 'ACC_LOW'):
+                sey_mod=SEY_model_acc_low_ene(ccc.Emax,ccc.del_max,ccc.R0,**kwargs_secem)
+            elif ccc.switch_model == 'ECLOUD_nunif':
+                sey_mod=SEY_model_ECLOUD_non_unif(chamb, ccc.Emax,ccc.del_max,ccc.R0,**kwargs_secem)
+            elif ccc.switch_model == 'cos_low_ene':
+                sey_mod=SEY_model_cos_le(ccc.Emax,ccc.del_max,ccc.R0,**kwargs_secem)
+            elif ccc.switch_model == 'flat_low_ene':
+                sey_mod=SEY_model_flat_le(ccc.Emax,ccc.del_max,ccc.R0)
+            elif ccc.switch_model == 'from_file':
+                sey_mod = SEY_model_from_file(ccc.sey_file, ccc.flag_factor_costheta)
+            else:
+                raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
+
+        # Init impact management
+        flag_seg = (ccc.flag_hist_impact_seg==1)
+        if ccc.switch_model=='perfect_absorber':
+            impact_man_class = pac.impact_management_perfect_absorber
+        else:
+            impact_man_class=imc.impact_management
+
+        impact_man = impact_man_class(
+                ccc.switch_no_increase_energy, chamb, sey_mod, ccc.E_th, ccc.sigmafit,ccc.mufit, ccc.Dx_hist, ccc.scrub_en_th,
+                cc.Nbin_En_hist, cc.En_hist_max, thresh_low_energy=ccc.thresh_low_energy, flag_seg=flag_seg,
+                cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=ccc.secondary_angle_distribution)
+
+        # Init gas ionization and photoemission
+        if ccc.gas_ion_flag==1:
+            resgasion=gic.residual_gas_ionization(ccc.unif_frac, ccc.P_nTorr, ccc.sigma_ion_MBarn,ccc.Temp_K,chamb,ccc.E_init_ion)
+        else:
+            resgasion=None
+
+        if ccc.photoem_flag == 1:
+            phemiss=gpc.photoemission(ccc.inv_CDF_refl_photoem_file, ccc.k_pe_st, ccc.refl_frac, ccc.e_pe_sigma, ccc.e_pe_max, ccc.alimit,
+                                      ccc.x0_refl, ccc.y0_refl, ccc.out_radius, chamb, ccc.phem_resc_fac, ccc.energy_distribution, ccc.photoelectron_angle_distribution,
+                                      beamtim, ccc.flag_continuous_emission)
+        elif ccc.photoem_flag in (2, 'from_file'):
+            phemiss = gpc.photoemission_from_file(ccc.inv_CDF_all_photoem_file, chamb, ccc.phem_resc_fac, ccc.energy_distribution, ccc.e_pe_sigma,
+                                                  ccc.e_pe_max, ccc.k_pe_st, ccc.out_radius, ccc.photoelectron_angle_distribution, beamtim, ccc.flag_continuous_emission)
+        elif ccc.photoem_flag in (3, 'per_segment'):
+            chamb_phemiss = gipfi.polyg_cham_photoemission(ccc.filename_chm_photoem, ccc.flag_counter_clockwise_chamb)
+            if not chamb_phemiss.vertexes_are_subset(chamb):
+                raise gipfi.PyECLOUD_ChamberException('Chambers for secondary emission and photoemission do not have the same shape!')
+            phemiss = gpc.photoemission_per_segment(chamb_phemiss, ccc.energy_distribution, ccc.e_pe_sigma, ccc.e_pe_max, ccc.k_pe_st,
+                                                    ccc.photoelectron_angle_distribution, beamtim, ccc.flag_continuous_emission)
+        else:
+            phemiss = None
+
+        # Real saver init
+        if not skip_pyeclsaver:
+            pyeclsaver.start_observing(MP_e, beamtim, impact_man,
+                         ccc.r_center, ccc.Dt_En_hist, ccc.logfile_path, ccc.progress_path, flag_detailed_MP_info=ccc.flag_detailed_MP_info,
+                         flag_movie=ccc.flag_movie, flag_sc_movie=ccc.flag_sc_movie, save_mp_state_time_file=ccc.save_mp_state_time_file,
+                         flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=ccc.dec_fac_secbeam_prof,
+                         el_density_probes=ccc.el_density_probes, save_simulation_state_time_file=ccc.save_simulation_state_time_file,
+                         x_min_hist_det=ccc.x_min_hist_det, x_max_hist_det=ccc.x_max_hist_det, y_min_hist_det=ccc.y_min_hist_det, y_max_hist_det=ccc.y_max_hist_det,
+                         Dx_hist_det=ccc.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=ccc.filen_main_outp,
+                         flag_cos_angle_hist=ccc.flag_cos_angle_hist, cos_angle_width=ccc.cos_angle_width)
+            print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp )
     
-    impact_man = impact_man_class(
-            cc.switch_no_increase_energy, chamb, sey_mod, cc.E_th, cc.sigmafit,cc.mufit, cc.Dx_hist, cc.scrub_en_th,
-            cc.Nbin_En_hist, cc.En_hist_max, thresh_low_energy=cc.thresh_low_energy, flag_seg=flag_seg,
-            cos_angle_width=cc.cos_angle_width, secondary_angle_distribution=cc.secondary_angle_distribution)
-
-    # Init seeding processes, gas ionization or photoemission
-    if cc.gas_ion_flag==1:
-        resgasion=gic.residual_gas_ionization(cc.unif_frac, cc.P_nTorr, cc.sigma_ion_MBarn,cc.Temp_K,chamb,cc.E_init_ion)
-    else:
-        resgasion=None
-
-    if cc.photoem_flag == 1:
-        phemiss=gpc.photoemission(cc.inv_CDF_refl_photoem_file, cc.k_pe_st, cc.refl_frac, cc.e_pe_sigma, cc.e_pe_max, cc.alimit,
-                                  cc.x0_refl, cc.y0_refl, cc.out_radius, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.photoelectron_angle_distribution,
-                                  beamtim, cc.flag_continuous_emission)
-    elif cc.photoem_flag in (2, 'from_file'):
-        phemiss = gpc.photoemission_from_file(cc.inv_CDF_all_photoem_file, chamb, cc.phem_resc_fac, cc.energy_distribution, cc.e_pe_sigma,
-                                              cc.e_pe_max, cc.k_pe_st, cc.out_radius, cc.photoelectron_angle_distribution, beamtim, cc.flag_continuous_emission)
-    elif cc.photoem_flag in (3, 'per_segment'):
-        chamb_phemiss = gipfi.polyg_cham_photoemission(cc.filename_chm_photoem, cc.flag_counter_clockwise_chamb)
-        if not chamb_phemiss.vertexes_are_subset(chamb):
-            raise gipfi.PyECLOUD_ChamberException('Chambers for secondary emission and photoemission do not have the same shape!')
-        phemiss = gpc.photoemission_per_segment(chamb_phemiss, cc.energy_distribution, cc.e_pe_sigma, cc.e_pe_max, cc.k_pe_st,
-                                                cc.photoelectron_angle_distribution, beamtim, cc.flag_continuous_emission)
-    else:
-        phemiss = None
-
-    # Real saver init
-    if not skip_pyeclsaver:
-        pyeclsaver.start_observing(MP_e, beamtim, impact_man,
-                     cc.r_center, cc.Dt_En_hist, cc.logfile_path, cc.progress_path, flag_detailed_MP_info=cc.flag_detailed_MP_info,
-                     flag_movie=cc.flag_movie, flag_sc_movie=cc.flag_sc_movie, save_mp_state_time_file=cc.save_mp_state_time_file,
-                     flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=cc.dec_fac_secbeam_prof,
-                     el_density_probes=cc.el_density_probes, save_simulation_state_time_file=cc.save_simulation_state_time_file,
-                     x_min_hist_det=cc.x_min_hist_det, x_max_hist_det=cc.x_max_hist_det, y_min_hist_det=cc.y_min_hist_det, y_max_hist_det=cc.y_max_hist_det,
-                     Dx_hist_det=cc.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=cc.filen_main_outp,
-                     flag_cos_angle_hist=cc.flag_cos_angle_hist, cos_angle_width=cc.cos_angle_width)
-
-    # Init electron tracker
-    if cc.track_method == 'Boris':
-        dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
-                 cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=cc.N_sub_steps)
-    elif cc.track_method == 'StrongBdip':
-        if cc.B==-1:
-            B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
-        dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B)
-    elif cc.track_method == 'StrongBgen':
-        dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
-                 cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
-    elif cc.track_method == 'BorisMultipole':
-        dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
-    else:
-        raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
+        # Init electron tracker
+        if cc.track_method == 'Boris':
+            dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
+                     cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=ccc.N_sub_steps)
+        elif cc.track_method == 'StrongBdip':
+            if cc.B==-1:
+                B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
+            dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B)
+        elif cc.track_method == 'StrongBgen':
+            dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
+                     cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
+        elif cc.track_method == 'BorisMultipole':
+            dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
+        else:
+            raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
 
 
-    # Initial electron density
-    if cc.init_unif_flag==1:
-        print("Adding inital %.2e electrons to the initial distribution" % cc.Nel_init_unif)
-        MP_e.add_uniform_MP_distrib(cc.Nel_init_unif, cc.E_init_unif, cc.x_max_init_unif, cc.x_min_init_unif, cc.y_max_init_unif, cc.y_min_init_unif)
+        # Initial electron density
+        if ccc.init_unif_flag==1:
+            print("Adding inital %.2e electrons to the initial distribution" % ccc.Nel_init_unif)
+            MP_e.add_uniform_MP_distrib(ccc.Nel_init_unif, ccc.E_init_unif, ccc.x_max_init_unif, ccc.x_min_init_unif, ccc.y_max_init_unif, ccc.y_min_init_unif)
 
-    if cc.init_unif_edens_flag==1:
-        print("Adding inital %.2e electrons/m^3 to the initial distribution" % cc.init_unif_edens)
-        MP_e.add_uniform_ele_density(n_ele=cc.init_unif_edens, E_init=cc.E_init_unif_edens,
-                x_max=cc.x_max_init_unif_edens, x_min=cc.x_min_init_unif_edens,
-                y_max=cc.y_max_init_unif_edens, y_min=cc.y_min_init_unif_edens)
+        if ccc.init_unif_edens_flag==1:
+            print("Adding inital %.2e electrons/m^3 to the initial distribution" % ccc.init_unif_edens)
+            MP_e.add_uniform_ele_density(n_ele=ccc.init_unif_edens, E_init=ccc.E_init_unif_edens,
+                    x_max=ccc.x_max_init_unif_edens, x_min=ccc.x_min_init_unif_edens,
+                    y_max=ccc.y_max_init_unif_edens, y_min=ccc.y_min_init_unif_edens)
 
-    if cc.filename_init_MP_state!=-1 and cc.filename_init_MP_state is not None:
-        print("Adding inital electrons from: %s" % cc.filename_init_MP_state)
-        MP_e.add_from_file(cc.filename_init_MP_state)
+        if ccc.filename_init_MP_state!=-1 and ccc.filename_init_MP_state is not None:
+            print("Adding inital electrons from: %s" % ccc.filename_init_MP_state)
+            MP_e.add_from_file(ccc.filename_init_MP_state)
 
+        cloud = cman.cloud_manager(ccc.cloudname, ccc, MP_e, impact_man, dynamics, pyeclsaver, ccc.gas_ion_flag, resgasion, ccc.t_ion, ccc.photoem_flag, phemiss)
+
+        cloud_list.append(cloud)
+
+
+    MP_e = cloud_list[0].MP_e
+    dynamics = cloud_list[0].dynamics
+    impact_man = cloud_list[0].impact_man
+    pyeclsaver = cloud_list[0].pyeclsaver
+    resgasion = cloud_list[0].resgasion
+    phemiss = cloud_list[0].phemiss
 
     return (beamtim,
             MP_e,
@@ -337,6 +381,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             phemiss,
             flag_presence_sec_beams,
             sec_beams_list,
-            config_dict
+            config_dict,
+            flag_multiple_clouds,
+            cloud_list
             )
 
