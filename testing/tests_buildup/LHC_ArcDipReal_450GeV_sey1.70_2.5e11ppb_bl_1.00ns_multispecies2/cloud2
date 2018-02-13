@@ -1,0 +1,51 @@
+# Cloud particles
+charge = -1.602176565e-19
+mass = 9.10938291e-31
+
+# Saving filename
+filen_main_outp = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multispecies2/Pyecltest_cloud2.mat'
+
+# Residual gas ionization flag
+gas_ion_flag = 0
+
+# Photoemission flag
+photoem_flag = 0
+
+# Uniform initial distribution flag
+init_unif_flag = 1
+
+# Uniform initial density flag
+init_unif_edens_flag = 0
+
+# Secondary emission model
+switch_model = 0
+
+N_mp_max=62500;   #size of allocated vectors 
+
+#Regen parameters
+
+N_mp_regen=200000;
+N_mp_regen_low=5000;
+N_mp_after_regen=10000;
+t_ON_regen_low=10.
+fact_split=1.5;
+fact_clean=1e-6;
+regen_hist_cut = 1.e-4
+
+N_mp_soft_regen = 15000
+N_mp_after_soft_regen = 5000
+
+nel_mp_ref_0= 0.5e8/(0.7*N_mp_soft_regen)   #e-/m
+
+
+# uniform initial distrib
+_x_aper = 2.300000e-02
+_y_aper = 1.800000e-02
+init_unif_flag=1
+Nel_init_unif=0.5e8
+E_init_unif=0.01;   #in eV
+x_max_init_unif =_x_aper
+x_min_init_unif =-_x_aper
+y_max_init_unif =_y_aper
+y_min_init_unif =-_y_aper
+ 
