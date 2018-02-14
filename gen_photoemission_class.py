@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -47,7 +47,7 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#-End-preamble---------------------------------------------------------
 
 from __future__ import division, print_function
 import numpy as np

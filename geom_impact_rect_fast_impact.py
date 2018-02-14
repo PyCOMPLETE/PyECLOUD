@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -47,7 +47,7 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#-End-preamble---------------------------------------------------------
 
 import geom_impact_poly_fast_impact as gipfi
 import numpy as np
