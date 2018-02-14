@@ -1,13 +1,14 @@
 import os
 
-begin =    '''#----------------------------------------------------------------------
-#
-#                           CERN
-#
-#     European Organization for Nuclear Research
-'''
+before_preamble = 0
+in_preamble = 1
+after_preamble = 2
 
-#-Begin-preamble-------------------------------------------------------
+
+id_preamble_begin = '#-Begin-preamble----'
+id_preamble_end = '#-End-preamble--------'
+
+preamble_new = """#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -55,7 +56,10 @@ begin =    '''#-----------------------------------------------------------------
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+#-End-preamble---------------------------------------------------------"""
+
+new_preamble_lines = preamble_new.split('\n')
+
 
 
 for dirpath, _, filenames in os.walk('.'):
@@ -69,24 +73,38 @@ for dirpath, _, filenames in os.walk('.'):
 
         with open(path, 'r') as f:
             content = f.read()
-            
-        if begin in content:
-            print(path)
-            content = content.replace(begin, newbegin)
-            
-            with open(path, 'w') as f:
-                f.write(content)
-                
-        if end in content:
-            print 'End to be changed:'
-            print(path)
-            content = content.replace(end, newend)
-            
-            with open(path, 'w') as f:
-                f.write(content)
-                
-        if '#--------------' in content:
-            print 'Test'
-            print(path)
-            
+
+        if new_preamble_lines[0] not in content:
+            continue
+
+        print(path)
+
+        lines = content.split('\n')
+
+        prev_line = None
+        new_lines = []
+        status = before_preamble
+
+        for line in lines:
+            if status == before_preamble:
+                if id_preamble_begin in line:
+                    status = in_preamble
+                    new_lines.extend(new_preamble_lines)
+            elif status == in_preamble:
+                if id_preamble_end in prev_line:
+                    status = after_preamble
+            elif status == after_preamble:
+                pass
+
+
+            if status != in_preamble:
+                new_lines.append(line)
+
+            prev_line = line
+
+        new_lines = [x+'\n' for ctr, x in enumerate(new_lines) if ctr+1 != len(new_lines)]
+
+        with open(path, 'w') as f:
+            f.writelines(new_lines)
+        print('Modified %s' % path)
 
