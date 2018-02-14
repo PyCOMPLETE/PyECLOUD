@@ -17,7 +17,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.1
 #
 #
 #     Main author:          Giovanni IADAROLA
