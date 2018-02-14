@@ -1,3 +1,6 @@
+raise ValueError("Not to be used to change the version!\nComment this line to change preamble.")
+
+
 import os
 
 before_preamble = 0
