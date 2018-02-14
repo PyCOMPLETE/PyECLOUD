@@ -155,7 +155,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         pyeclsaver = None
 
     # Init chamber
-    flag_non_unif_sey = (cc.switch_model == 'ECLOUD_unif')
+    flag_non_unif_sey = (cc.switch_model == 'ECLOUD_nunif')
     chamber_kwargs = {
         'flag_verbose_file': cc.flag_verbose_file,
         'flag_verbose_stdout': cc.flag_verbose_stdout,
