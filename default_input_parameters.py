@@ -4,6 +4,7 @@ from scipy.constants import m_p
 # This most importantly excludes python lists. Tuples may be used in their place.
 
 parameters_dict = {
+    'superparameters':{'pi'}, #are allowed anywhere and can be repeated (for backwards compatibility)
     'simulation_parameters': {
         'mandatory': {
 

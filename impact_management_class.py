@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -7,23 +7,21 @@
 #
 #     This file is part of the code:
 #
-#                  PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.1
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Contributors:         Eleanora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -47,10 +45,11 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 import numpy as np
-import sec_emission
+import electron_emission
 import hist_for as histf
 import seg_impact as segi
 
@@ -116,7 +115,7 @@ class impact_management(object):
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float)
 
-        self.angle_dist_func = sec_emission.get_angle_dist_func(secondary_angle_distribution)
+        self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
 
         print 'Done impact man. init.'
 
@@ -274,7 +273,7 @@ class impact_management(object):
                     N_mp_new = N_mp_old + n_add_total
 
                     # replace impacted MPs that are not reflected
-                    En_truesec_eV = sec_emission.sec_energy_hilleret_model2(
+                    En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
                         switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
                     vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
                         N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
@@ -291,7 +290,7 @@ class impact_management(object):
                         E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
                         # Generate new MP properties, angles and energies
-                        En_truesec_eV_add = sec_emission.sec_energy_hilleret_model2(
+                        En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
                             switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
                         vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
                             n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
