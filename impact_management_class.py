@@ -341,7 +341,7 @@ class impact_management(object):
 
         del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-
+        print('Extracting SEY curves...')
         for i_ct, ct in enumerate(cos_theta_test):
             print('%d/%d'%(i_ct+1, len(cos_theta_test))) 
             for i_ene, Ene in enumerate(E_impact_eV_test):
@@ -351,6 +351,7 @@ class impact_management(object):
                                 
                 del_true_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_truesec))/float(n_rep)
                 del_elast_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_elast))/float(n_rep)
-                
+        print('Done extracting SEY curves.')       
+        
         return del_true_mat, del_elast_mat
 
