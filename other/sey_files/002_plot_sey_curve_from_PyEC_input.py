@@ -8,6 +8,7 @@ import PyECLOUD.mystyle as ms
 
 
 pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0/'
+pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile'
 
 #~ config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=True)
 
