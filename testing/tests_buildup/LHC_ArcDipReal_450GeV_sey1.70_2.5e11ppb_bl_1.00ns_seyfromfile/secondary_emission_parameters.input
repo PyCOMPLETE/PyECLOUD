@@ -11,7 +11,7 @@
 
 switch_model='from_file'
 sey_file = 'sey_data_resampling_ecloud_model.mat'
-flag_factor_costheta = False
+flag_factor_costheta = True
 
 # hilleret model for sec. emission
 E_th=35.;

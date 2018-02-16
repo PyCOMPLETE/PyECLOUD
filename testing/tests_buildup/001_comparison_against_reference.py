@@ -171,6 +171,8 @@ for ii,k in enumerate(out_var_curr):
 
         except IOError as goterror:
                     print 'Skipped. Got:',  goterror
+        except IndexError as goterror:
+            print 'Skipped. Got:',  goterror
 
 
         if (k in out_var_ref) and  (dict_ref[k].shape!=()):
