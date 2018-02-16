@@ -6,7 +6,8 @@ sys.path.append('../../../')
 import PyECLOUD.myloadmat_to_obj as mlo
 import PyECLOUD.mystyle as ms
 
-pyecl_output_file = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0/Pyecltest_angle3D.mat'
+pyecl_output_file = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/Pyecltest_angle3D.mat'
+#~ pyecl_output_file = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0/Pyecltest_angle3D.mat'
 pyecl_output_file = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile/Pyecltest_angle3D.mat'
 
 

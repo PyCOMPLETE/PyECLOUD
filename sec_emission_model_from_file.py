@@ -1,3 +1,57 @@
+#-Begin-preamble-------------------------------------------------------
+#
+#                           CERN
+#
+#     European Organization for Nuclear Research
+#
+#
+#     This file is part of the code:
+#
+#                   PyECLOUD Version 6.7.1
+#
+#
+#     Main author:          Giovanni IADAROLA
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.iadarola@cern.ch
+#
+#     Contributors:         Eleanora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
+#
+#
+#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
+#     appropriate  legal  protection  of  this  computer program and
+#     associated documentation reserved  in  all  countries  of  the
+#     world.
+#
+#     Organizations collaborating with CERN may receive this program
+#     and documentation freely and without charge.
+#
+#     CERN undertakes no obligation  for  the  maintenance  of  this
+#     program,  nor responsibility for its correctness,  and accepts
+#     no liability whatsoever resulting from its use.
+#
+#     Program  and documentation are provided solely for the use  of
+#     the organization to which they are distributed.
+#
+#     This program  may  not  be  copied  or  otherwise  distributed
+#     without  permission. This message must be retained on this and
+#     any other authorized copies.
+#
+#     The material cannot be sold. CERN should be  given  credit  in
+#     all references.
+#
+#-End-preamble---------------------------------------------------------
+
+
+
+
+
 from __future__ import division, print_function
 import os
 
@@ -7,7 +61,7 @@ from numpy.random import rand
 
 class SEY_model_from_file(object):
 
-    def __init__(self, sey_file, flag_factor_costheta):
+    def __init__(self, sey_file, flag_costheta_delta_scale, flag_costheta_Emax_shift):
         """
         - sey file is the path to a mat file of the correct format, either an absolute path or in the sey_files folder.
         - if flag_factor_costheta is True, the SEY is increased depending on the angle with which the electrons are hitting.
@@ -29,10 +83,6 @@ class SEY_model_from_file(object):
             print('Secondary emission from file %s' % sey_file_real)
 
             sey_properties = sio.loadmat(sey_file)
-            
-        
-        if flag_factor_costheta not in [True, False]:
-            raise ValueError('SEY_model_from_file:\nIn this mode flag_factor_costheta must be explicitely specified')
         
         energy_eV = sey_properties['energy_eV'].squeeze()
         sey_true = sey_properties['sey_true'].squeeze()
@@ -58,7 +108,8 @@ class SEY_model_from_file(object):
         self.sey_true               = sey_true
         self.sey_elast              = sey_elast
         self.sey_file               = sey_file
-        self.flag_factor_costheta   = flag_factor_costheta
+        self.flag_costheta_delta_scale = flag_costheta_delta_scale
+        self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
         self.energy_eV_min          = energy_eV.min()
         self.energy_eV_max          = energy_eV.max()
         self.delta_e                = delta_e
@@ -68,26 +119,38 @@ class SEY_model_from_file(object):
         self.extrapolate_const_elast = extrapolate_const_elast
         
     def SEY_values(self, E_impact_eV, costheta_impact):
+        
         delta_true = np.zeros_like(E_impact_eV, dtype=float)
-        delta_elast= np.zeros_like(E_impact_eV, dtype=float)
+        delta_elast= np.zeros_like(E_impact_eV, dtype=float) 
         
         mask_fit = (E_impact_eV > self.energy_eV_max)
         mask_regular = ~mask_fit
-
+            
         delta_true[mask_regular], delta_elast[mask_regular] = self.interp(E_impact_eV[mask_regular])
-        
         delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV[mask_fit]
         delta_elast[mask_fit] = self.extrapolate_const_elast + self.extrapolate_grad_elast * E_impact_eV[mask_fit]
+        
+
+
+        if self.flag_costheta_Emax_shift:
+            # recompute Delta True
+            E_impact_eV_scaled = E_impact_eV/(1.+0.7*(1.-costheta_impact))
+    
+            mask_fit = (E_impact_eV_scaled > self.energy_eV_max)
+            mask_regular = ~mask_fit
+            
+            delta_true[mask_regular], _ = self.interp(E_impact_eV_scaled[mask_regular])
+            delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV_scaled[mask_fit]
+        
+        
+        if self.flag_costheta_delta_scale:
+            factor_costheta = np.exp(0.5*(1.-costheta_impact))
+            delta_true *= factor_costheta
         
         delta_true[delta_true<1e-10] = 0. # We get rid of negative values
         delta_elast[delta_elast<1e-10] = 0. # We get rid of negative values
         
-        if self.flag_factor_costheta:
-            factor_costheta = np.exp(0.5*(1.-costheta_impact))
-        else:
-            factor_costheta = 1.
-            
-        delta = delta_true*factor_costheta + delta_elast
+        delta = delta_true + delta_elast
         
         ref_frac=0.*delta
         mask_non_zero=(delta>0)

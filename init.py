@@ -243,7 +243,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     elif cc.switch_model == 'flat_low_ene':
         sey_mod=SEY_model_flat_le(cc.Emax,cc.del_max,cc.R0)
     elif cc.switch_model == 'from_file':
-        sey_mod = SEY_model_from_file(cc.sey_file, cc.flag_factor_costheta)
+        kwargs_secem['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
+        kwargs_secem['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
+        sey_mod = SEY_model_from_file(cc.sey_file, **kwargs_secem)
     elif cc.switch_model == 'perfect_absorber':
         sey_mod = None
     else:

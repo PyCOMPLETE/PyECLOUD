@@ -7,10 +7,9 @@ from PyECLOUD.init import read_parameter_files, read_input_files_and_init_compon
 import PyECLOUD.mystyle as ms
 
 
-pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0/'
-pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile'
-
-#~ config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=True)
+pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/'
+#~ pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0/'
+pyecl_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile/'
 
 beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
     gas_ion_flag, resgasion, t_ion, \
@@ -20,7 +19,7 @@ beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
             skip_pyeclsaver=True, skip_spacech_ele=True)
             
 
-n_rep = 1000
+n_rep = 10000
 E_impact_eV_test = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
 cos_theta_test = np.linspace(0, 1., 10)
 

@@ -262,7 +262,6 @@ parameters_dict = {
             'secondary_angle_distribution': 'undefined',
             # SEY from file
             'sey_file': None,
-            'flag_factor_costheta': True,
             'flag_costheta_Emax_shift': True,
             'flag_costheta_delta_scale': True,
         },
