@@ -164,7 +164,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     if cc.chamb_type == 'ellip':
         chamb = ellip_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file)
     elif cc.chamb_type in ('polyg', 'polyg_cython'):
-        chamb = gipfi.polyg_cham_geom_object(cc.filename_chm, flag_non_unif_sey, **chamber_kwargs)
+        if os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm):
+            filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm
+        else:
+            filename_chm_path = cc.filename_chm
+        chamb = gipfi.polyg_cham_geom_object(filename_chm_path, flag_non_unif_sey, **chamber_kwargs)
     elif cc.chamb_type == 'rect':
         chamb = girfi.rect_cham_geom_object(cc.x_aper, cc.y_aper, flag_non_unif_sey, **chamber_kwargs)
     else:
