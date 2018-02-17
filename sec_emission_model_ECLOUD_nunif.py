@@ -17,7 +17,7 @@
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#     Contributors:         Eleanora Belli
+#     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
 #                           Lotta Mether
 #                           Annalisa Romano
