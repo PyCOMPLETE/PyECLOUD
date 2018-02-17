@@ -245,7 +245,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     elif cc.switch_model == 'from_file':
         kwargs_secem['flag_costheta_delta_scale'] = cc.flag_costheta_delta_scale
         kwargs_secem['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
-        sey_mod = SEY_model_from_file(cc.sey_file, **kwargs_secem)
+        if os.path.isfile(pyecl_input_folder+'/'+cc.sey_file):
+            sey_file_path = pyecl_input_folder+'/'+cc.sey_file
+        else:
+            sey_file_path = cc.sey_file
+        sey_mod = SEY_model_from_file(sey_file_path, **kwargs_secem)
     elif cc.switch_model == 'perfect_absorber':
         sey_mod = None
     else:
