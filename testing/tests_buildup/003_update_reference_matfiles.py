@@ -22,10 +22,13 @@ all_sim_folders = [
     'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns',
     'LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns',
     'LHC_Triplet_Quadrupole_multiple_beams',
+    'LHC_TDIS_non_unif_sey',
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile',
 ]
 
 for folder in all_sim_folders:
-    for dim in 2, 3:
+    #for dim in 2, 3:
+    for dim in [3]:
         ref_file = folder + '/Pyecltest_angle%iD_ref.mat' % dim
         mat_file = folder + '/Pyecltest_angle%iD.mat' % dim
         if os.path.isfile(ref_file):

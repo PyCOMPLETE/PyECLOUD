@@ -130,7 +130,7 @@ for ii,k in enumerate(out_var_curr):
         sp1 = fig.add_subplot(gs1[0])
         sp1.set_title('curr_sim')
         pl.pcolormesh(dict_curr[k])
-        pl.tick_params(labelsize=10)
+        sp1.tick_params(labelsize=10)
         cbar=pl.colorbar()
         cbar.ax.tick_params(labelsize=10)
         cbar.formatter.set_powerlimits((0, 0))
@@ -139,12 +139,15 @@ for ii,k in enumerate(out_var_curr):
         print ii,k,'curr_sim'
 
         try:
+            ind_in_mat = n_pass
+            if k.startswith('sey_test_'):
+                ind_in_mat = 3
 
             #Plot number of e- for the reference passage
             sp3=fig.add_subplot(gs2[0])
-            sp3.plot(dict_curr[k][n_pass],'b', label='curr_sim')
+            sp3.plot(dict_curr[k][ind_in_mat],'b', label='curr_sim')
             sp3.legend(prop={'size':myfontsz},  loc='upper left')
-            sp3.set_title(' num pass equal to [%d]'%n_pass)
+            sp3.set_title('index equal to [%d]'%n_pass)
             sp3.tick_params(labelsize=10)
             ms.sciy()
 
@@ -153,7 +156,7 @@ for ii,k in enumerate(out_var_curr):
             sp4=fig.add_subplot(gs2[1])
             sp4.plot(np.sum(dict_curr[k], axis=0),'b', label='curr_sim')
             sp4.legend(prop={'size':myfontsz},  loc='upper left')
-            sp4.set_title('e- per slice')
+            #~ sp4.set_title('e- per slice')
             sp4.tick_params(labelsize=10)
             ms.sciy()
 
@@ -162,7 +165,7 @@ for ii,k in enumerate(out_var_curr):
             sp5=fig.add_subplot(gs2[2])
             sp5.plot(np.sum(dict_curr[k], axis=1),'b', label='curr_sim')
             sp5.legend(prop={'size':myfontsz},  loc='upper right')
-            sp5.set_title('e- per passage')
+            #~ sp5.set_title('e- per passage')
             sp5.tick_params(labelsize=10)
             ms.sciy()
 
@@ -171,6 +174,8 @@ for ii,k in enumerate(out_var_curr):
 
         except IOError as goterror:
                     print 'Skipped. Got:',  goterror
+        except IndexError as goterror:
+            print 'Skipped. Got:',  goterror
 
 
         if (k in out_var_ref) and  (dict_ref[k].shape!=()):
@@ -184,13 +189,17 @@ for ii,k in enumerate(out_var_curr):
             cbar.ax.tick_params(labelsize=10)
             cbar.formatter.set_powerlimits((0, 0))
             cbar.update_ticks()
+            sp2.tick_params(labelsize=10)
             ms.sciy()
             print ii,k,'ref_sim'
 
             try:
-
+                ind_in_mat = n_pass
+                if k.startswith('sey_test_'):
+                    ind_in_mat = 3
+                
                 #Plot number of e- for the reference passage
-                sp3.plot(dict_ref[k][n_pass],'r', label='ref_sim')
+                sp3.plot(dict_ref[k][ind_in_mat],'r', label='ref_sim')
                 sp3.legend(prop={'size':myfontsz},  loc='upper left')
                 ms.sciy()
 

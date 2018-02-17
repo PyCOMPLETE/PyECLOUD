@@ -331,4 +331,27 @@ class impact_management(object):
                     self.En_emit_last_step_eV += np.sum(En_truesec_eV_add*nel_mp_add)
 
         return MP_e
+    
+    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
+    
+        sey_mod = self.sey_mod
+        
+        nel_impact = 1. + 0.*E_impact_eV_test
+
+
+        del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        print('Extracting SEY curves...')
+        for i_ct, ct in enumerate(cos_theta_test):
+            print('%d/%d'%(i_ct+1, len(cos_theta_test))) 
+            for i_ene, Ene in enumerate(E_impact_eV_test):
+                
+                nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep), 
+                                E_impact_eV=Ene*np.ones(n_rep), costheta_impact=np.ones(n_rep)*ct, i_impact=np.array(n_rep*[0]))
+                                
+                del_true_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_truesec))/float(n_rep)
+                del_elast_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_elast))/float(n_rep)
+        print('Done extracting SEY curves.')       
+        
+        return del_true_mat, del_elast_mat
 
