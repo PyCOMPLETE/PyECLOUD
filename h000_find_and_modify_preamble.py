@@ -16,7 +16,7 @@ begin =    '''#-----------------------------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.1
+#                   PyECLOUD Version 6.7.2
 #
 #
 #     Main author:          Giovanni IADAROLA

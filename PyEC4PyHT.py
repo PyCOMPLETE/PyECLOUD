@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.1
+#                   PyECLOUD Version 6.7.2
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -65,7 +65,7 @@ class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
 
-        print 'PyECLOUD Version 6.7.1'
+        print 'PyECLOUD Version 6.7.2'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
