@@ -166,6 +166,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     elif cc.chamb_type in ('polyg', 'polyg_cython'):
         if os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm):
             filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm
+        elif os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm+'.mat'):
+            filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm+'.mat'
         else:
             filename_chm_path = cc.filename_chm
         chamb = gipfi.polyg_cham_geom_object(filename_chm_path, flag_non_unif_sey, **chamber_kwargs)
@@ -247,6 +249,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         kwargs_secem['flag_costheta_Emax_shift'] = cc.flag_costheta_Emax_shift
         if os.path.isfile(pyecl_input_folder+'/'+cc.sey_file):
             sey_file_path = pyecl_input_folder+'/'+cc.sey_file
+        elif os.path.isfile(pyecl_input_folder+'/'+cc.sey_file+'.mat'):
+            sey_file_path = pyecl_input_folder+'/'+cc.sey_file+'.mat'
         else:
             sey_file_path = cc.sey_file
         sey_mod = SEY_model_from_file(sey_file_path, **kwargs_secem)
