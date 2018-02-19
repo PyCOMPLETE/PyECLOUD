@@ -368,24 +368,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         cloud_list.append(cloud)
 
 
-    MP_e = cloud_list[0].MP_e
-    dynamics = cloud_list[0].dynamics
-    impact_man = cloud_list[0].impact_man
-    pyeclsaver = cloud_list[0].pyeclsaver
-    resgasion = cloud_list[0].resgasion
-    phemiss = cloud_list[0].phemiss
-
     return (beamtim,
-            MP_e,
-            dynamics,impact_man,
-            pyeclsaver,
-            cc.gas_ion_flag,
-            resgasion,
-            cc.t_ion,
             spacech_ele,
             cc.t_sc_ON,
-            cc.photoem_flag,
-            phemiss,
             flag_presence_sec_beams,
             sec_beams_list,
             config_dict,

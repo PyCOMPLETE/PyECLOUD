@@ -60,25 +60,13 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', **kwargs):
 
         print 'PyECLOUD Version 6.7.0'
-        beamtim,MP_e, dynamics,impact_man, pyeclsaver, \
-                gas_ion_flag, resgasion, t_ion, \
-                spacech_ele,t_sc_ON, photoem_flag, phemiss,\
-                flag_presence_sec_beams, sec_beams_list, config_dict,\
-                flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
+        beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
+        config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder, **kwargs)
 
         self.beamtim = beamtim
-        self.MP_e = MP_e
-        self.dynamics = dynamics
-        self.impact_man = impact_man
-        self.pyeclsaver = pyeclsaver
-        self.gas_ion_flag = gas_ion_flag
-        self.resgasion = resgasion
-        self.t_ion = t_ion
         self.spacech_ele = spacech_ele
         self.t_sc_ON = t_sc_ON
-        self.photoem_flag = photoem_flag
-        self.phemiss = phemiss
         self.flag_presence_sec_beams = flag_presence_sec_beams
         self.sec_beams_list = sec_beams_list
         self.flag_multiple_clouds = flag_multiple_clouds
