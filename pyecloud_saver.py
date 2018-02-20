@@ -65,9 +65,7 @@ except ImportError:
     import pickle
 
 
-me=9.10938291e-31
 qe=1.602176565e-19
-qm=qe/me
 
 class pyecloud_saver:
 
@@ -115,6 +113,7 @@ class pyecloud_saver:
 
         self.filen_main_outp = filen_main_outp
 
+        self.qm = qe/MP_e.mass
 
         # introduce decimation
         self.dec_fact_out = dec_fact_out
@@ -429,7 +428,7 @@ class pyecloud_saver:
 
 
             self.Nel_time[ii_curr_dec]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5/qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
+            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5/self.qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
             flag_center[MP_e.N_mp:]=False
