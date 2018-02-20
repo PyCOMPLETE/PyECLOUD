@@ -1,6 +1,3 @@
-import numpy as np
-from scipy.constants import c, e as qe
-
 from . import input_parameters_format_specification as inp_spec
 from . import myloadmat_to_obj as mlm
 
