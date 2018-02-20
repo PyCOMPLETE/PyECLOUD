@@ -57,6 +57,7 @@ import os
 import subprocess
 import hist_for as histf
 import time
+from scipy.constants import e as qe
 try:
     # cPickle is faster in python2
     import cPickle as pickle
@@ -64,8 +65,6 @@ except ImportError:
     # No cPickle in python3
     import pickle
 
-
-qe=1.602176565e-19
 
 class pyecloud_saver:
 
