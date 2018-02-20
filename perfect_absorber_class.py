@@ -51,7 +51,7 @@
 
 import hist_for as histf
 import numpy as np
-
+from scipy.constants import e as qe
 from impact_management_class import impact_management
 
 
@@ -87,7 +87,6 @@ class impact_management_perfect_absorber(impact_management):
             scrub_en_th = self.scrub_en_th
 
             me = MP_e.mass
-            qe = np.abs(MP_e.charge)
             qm = qe/me
 
             ## impact management

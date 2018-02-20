@@ -53,7 +53,7 @@ import numpy as np
 import sec_emission
 import hist_for as histf
 import seg_impact as segi
-
+from scipy.constants import e as qe
 
 class impact_management(object):
     def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
@@ -180,7 +180,6 @@ class impact_management(object):
             thresh_low_energy = self.thresh_low_energy
 
             me = MP_e.mass
-            qe = np.abs(MP_e.charge)
             qm = qe/me
 
             ## impact management
