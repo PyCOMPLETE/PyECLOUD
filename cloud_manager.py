@@ -50,7 +50,8 @@
 #----------------------------------------------------------------------
 
 class cloud_manager(object):
-    def __init__(self, cloudname, config_dict, MP_e, impact_man, dynamics, pyeclsaver, gas_ion_flag, resgasion, t_ion, photoem_flag, phemiss):
+    def __init__(self, cloudname, config_dict, MP_e, impact_man, dynamics, pyeclsaver,
+                 gas_ion_flag, resgasion, t_ion, photoem_flag, phemiss, pic_state):
         
         self.name = cloudname
         self.config_dict = config_dict
@@ -63,4 +64,5 @@ class cloud_manager(object):
         self.photoem_flag = photoem_flag
         self.phemiss = phemiss
         self.pyeclsaver = pyeclsaver
+        self.pic_state = pic_state
 

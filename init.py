@@ -314,6 +314,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             phemiss = None
 
+
         # Real saver init
         if not skip_pyeclsaver:
             pyeclsaver.start_observing(MP_e, beamtim, impact_man,
@@ -362,8 +363,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
-        cloud = cman.cloud_manager(thiscloud.cloudname, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, 
-                                   thiscloud.gas_ion_flag, resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss)
+        # Get PIC state
+        pic_state = spacech_ele.PyPICobj.get_state_object()
+
+        cloud = cman.cloud_manager(thiscloud.cloudname, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
+                                   resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, pic_state)
 
         cloud_list.append(cloud)
 
