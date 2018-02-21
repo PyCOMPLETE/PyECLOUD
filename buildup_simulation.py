@@ -54,6 +54,7 @@
 
 import init as init
 import cPickle
+import numpy as np
 
 
 class BuildupSimulation(object):
@@ -95,7 +96,7 @@ class BuildupSimulation(object):
 
 
             # Loop over clouds: gather fields, move, generate new MPs
-            for cloud in cloud_list:
+            for i_cloud, cloud in enumerate(cloud_list):
                 MP_e = cloud.MP_e
                 dynamics = cloud.dynamics
                 impact_man = cloud.impact_man
@@ -148,30 +149,21 @@ class BuildupSimulation(object):
                     phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
 
-                #~ # Compute space charge field
-                #~ if (beamtim.tt_curr>t_sc_ON):
-                    #~ flag_add = True
-                    #~ flag_solve = False
-                    #~ if cloud is cloud_list[0]:
-                        #~ flag_add = False # The first cloud resets the distributions
-                    #~ if cloud is cloud_list[-1]:
-                        #~ flag_solve = True # The last cloud computes the fiels
-                    #~ spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, pic_state=cloud.pic_state,
-                                                             #~ flag_solve=flag_solve, flag_add=flag_add)
-                                                             
-                                                             
                 # Compute space charge field
                 if (beamtim.tt_curr>t_sc_ON):
-					flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
-					flag_reset = cloud is cloud_list[0]
-					cloud_list[i_cloud].rho = sc.rho-np.sum([cl.rho for cl in  cloud_list[:i_cloud]))
-					
+                    flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
+                    flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
+                    spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, flag_solve=flag_solve, flag_reset=flag_reset)
+
+                    # Copy rho to cloud
+                    cloud.rho = spacech_ele.rho - np.sum([cl.rho for cl in cloud_list[:i_cloud]])
+
 
                 ## savings
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, rho = cloud.pic_state.rho)
+                                                            sec_beams_list, rho = cloud.rho)
 
                 ## every bunch passage
                 if beamtim.flag_new_bunch_pass:
@@ -185,8 +177,10 @@ class BuildupSimulation(object):
                     ## soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
 
+
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
+
 
             ## every bunch passage
             if t_end_sim is not None:
