@@ -291,8 +291,8 @@ class pyecloud_saver:
         flog.close()
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
-        dynamics,gas_ion_flag,resgasion,t_ion,
-        t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list):
+                dynamics,gas_ion_flag,resgasion,t_ion,
+                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, rho = None):
 
         #MP state save
         if self.flag_save_MP_state:
@@ -367,7 +367,10 @@ class pyecloud_saver:
                 self.rho_video=[]
                 self.t_video=[]
             if spacech_ele.flag_recomputed_sc:
-                self.rho_video.append(spacech_ele.rho)
+                if rho is not None:
+                    self.rho_video.append(rho)
+                else:
+                    self.rho_video.append(spacech_ele.rho)
                 self.t_video.append(beamtim.tt_curr)
             if beamtim.flag_new_bunch_pass:
                 self.rho_video=np.array(self.rho_video)
