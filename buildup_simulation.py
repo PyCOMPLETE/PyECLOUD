@@ -148,34 +148,27 @@ class BuildupSimulation(object):
                     phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
 
-            # Compute space charge field
-            if (beamtim.tt_curr>t_sc_ON):
+                # Compute space charge field
+                if (beamtim.tt_curr>t_sc_ON):
 
-                if flag_multiple_clouds:
-                    # Loop over clouds: scatter
-                    flag_add = False
-                    for cloud in cloud_list:
-                        ## Scatter to grid
-                        spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, spchg_mode='scatter', flag_add=flag_add)
-                        flag_add = True
-                    # Solve field
-                    spacech_ele.recompute_spchg_efield_modes(MP_e, t_curr=beamtim.tt_curr, spchg_mode='solve')
-                else:
-                    spacech_ele.recompute_spchg_efield_modes(MP_e, t_curr=beamtim.tt_curr, spchg_mode='scatter_and_solve')
+                    flag_add = True
+                    flag_solve = False
+                    if cloud is cloud_list[0]:
+                        flag_add = False
+                    if cloud is cloud_list[-1]:
+                        flag_solve = True
+                    spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, pic_state=cloud.pic_state,
+                                                             flag_solve=flag_solve, flag_add=flag_add)
 
 
-            # Loop over clouds: save
-            for cloud in cloud_list:
                 ## savings
-                cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics, cloud.gas_ion_flag,
-                                                cloud.resgasion, cloud.t_ion,t_sc_ON, cloud.photoem_flag, cloud.phemiss,
-                                                flag_presence_sec_beams, sec_beams_list)
+                cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
+                                                            cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
+                                                            cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
+                                                            sec_beams_list, rho = cloud.pic_state.rho)
 
-            ## every bunch passage
-            if beamtim.flag_new_bunch_pass:
-
-                # Loop over clouds: clean and regenerate
-                for cloud in cloud_list:
+                ## every bunch passage
+                if beamtim.flag_new_bunch_pass:
 
                     ## clean
                     cloud.MP_e.clean_small_MPs()
@@ -186,6 +179,7 @@ class BuildupSimulation(object):
                     ## soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
 
+            if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
 
             ## every bunch passage
