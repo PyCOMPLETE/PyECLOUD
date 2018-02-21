@@ -148,18 +148,24 @@ class BuildupSimulation(object):
                     phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
 
+                #~ # Compute space charge field
+                #~ if (beamtim.tt_curr>t_sc_ON):
+                    #~ flag_add = True
+                    #~ flag_solve = False
+                    #~ if cloud is cloud_list[0]:
+                        #~ flag_add = False # The first cloud resets the distributions
+                    #~ if cloud is cloud_list[-1]:
+                        #~ flag_solve = True # The last cloud computes the fiels
+                    #~ spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, pic_state=cloud.pic_state,
+                                                             #~ flag_solve=flag_solve, flag_add=flag_add)
+                                                             
+                                                             
                 # Compute space charge field
                 if (beamtim.tt_curr>t_sc_ON):
-
-                    flag_add = True
-                    flag_solve = False
-                    if cloud is cloud_list[0]:
-                        flag_add = False
-                    if cloud is cloud_list[-1]:
-                        flag_solve = True
-                    spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, pic_state=cloud.pic_state,
-                                                             flag_solve=flag_solve, flag_add=flag_add)
-
+					flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
+					flag_reset = cloud is cloud_list[0]
+					cloud_list[i_cloud].rho = sc.rho-np.sum([cl.rho for cl in  cloud_list[:i_cloud]))
+					
 
                 ## savings
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
