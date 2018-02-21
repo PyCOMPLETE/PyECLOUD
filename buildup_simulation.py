@@ -148,7 +148,6 @@ class BuildupSimulation(object):
                             lam_curr_phem += sec_beam.lam_t_curr
                     phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
-
                 # Compute space charge field
                 if (beamtim.tt_curr>t_sc_ON):
                     flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
@@ -157,7 +156,6 @@ class BuildupSimulation(object):
 
                     # Copy rho to cloud
                     cloud.rho = spacech_ele.rho - np.sum([cl.rho for cl in cloud_list[:i_cloud]])
-
 
                 ## savings
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
@@ -177,10 +175,8 @@ class BuildupSimulation(object):
                     ## soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
 
-
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
-
 
             ## every bunch passage
             if t_end_sim is not None:
