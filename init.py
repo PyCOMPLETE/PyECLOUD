@@ -230,10 +230,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     for cloud_par in cloud_par_list:
         thiscloud = cloud_par.cc
 
-        print('Initialize cloud %s:' % (thiscloud.cloudname))
+        print('Initialize cloud %s:' % (thiscloud.cloud_name))
 
         # Init saver for all but default cloud
-        if thiscloud.cloudname != 'default':
+        if cloud_par is not cloud_par_list[0]:
             if not skip_pyeclsaver:
                 pyeclsaver=pysav.pyecloud_saver(thiscloud.logfile_path)
             else:
@@ -366,7 +366,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         # Init empty rho for cloud
         rho = spacech_ele.rho*0.
 
-        cloud = cman.cloud_manager(thiscloud.cloudname, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
+        cloud = cman.cloud_manager(thiscloud.cloud_name, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
                                    resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
 
         cloud_list.append(cloud)
