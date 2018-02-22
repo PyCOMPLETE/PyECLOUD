@@ -157,6 +157,8 @@ class BuildupSimulation(object):
                     # Copy rho to cloud
                     cloud.rho = spacech_ele.rho - np.sum([cl.rho for cl in cloud_list[:i_cloud]])
 
+
+            for cloud in cloud_list:
                 ## savings
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
