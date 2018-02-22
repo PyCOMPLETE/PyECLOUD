@@ -363,11 +363,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
-        # Get PIC state
-        pic_state = spacech_ele.PyPICobj.get_state_object()
+        # Init empty rho for cloud
+        rho = spacech_ele.rho*0.
 
         cloud = cman.cloud_manager(thiscloud.cloudname, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
-                                   resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, pic_state)
+                                   resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
 
         cloud_list.append(cloud)
 

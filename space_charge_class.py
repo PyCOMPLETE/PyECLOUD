@@ -144,22 +144,7 @@ class space_charge:
 
 
     #@profile
-    def recompute_spchg_efield(self, MP_e, t_curr=None, force=False):
-
-        flag_recompute=True
-        if self.flag_decimate:
-            flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
-
-        if flag_recompute or force:
-            self.t_last_recom = t_curr
-
-            self.PyPICobj.scatter_and_solve(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
-            #~ U_sc_eV_stp = -0.5*eps0*np.sum(b*phi)*self.Dh*self.Dh/qe
-
-        self.flag_recomputed_sc=flag_recompute
-
-
-    def recompute_spchg_efield_modes(self, MP_e, t_curr=None, force=False, pic_state=None, flag_solve=True, flag_add=False):
+    def recompute_spchg_efield(self, MP_e, t_curr=None, force=False, flag_solve=True, flag_reset=True):
 
         flag_recompute=True
         if self.flag_decimate:
@@ -167,15 +152,13 @@ class space_charge:
 
         if flag_recompute or force:
             # scatter
-            self.scatter(MP_e, pic_state, flag_add)
-            flag_recompute = False
-
+            self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge, flag_add = not(flag_reset))
             # solve
             if flag_solve:
                 self.PyPICobj.solve()
                 self.t_last_recom = t_curr
-                flag_recompute = True
 
+            flag_recompute = flag_solve
         self.flag_recomputed_sc = flag_recompute
 
 
@@ -187,13 +170,3 @@ class space_charge:
     def get_sc_eletric_field(self, MP_e):
         Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
         return Ex_sc_n, Ey_sc_n
-
-
-    def scatter(self, MP_e, pic_state, flag_add):
-        if pic_state is not None:
-            pic_state.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
-            if not flag_add:
-                self.PyPICobj.rho = pic_state.rho*0.
-            self.PyPICobj.rho += pic_state.rho
-        else:
-            self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
