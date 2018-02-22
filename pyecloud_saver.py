@@ -320,16 +320,8 @@ class pyecloud_saver:
 
                     dict_state = {
                     'beamtim':beamtim,
-                    'MP_e':MP_e,
-                    'dynamics':dynamics,
-                    'impact_man':impact_man,
-                    'gas_ion_flag':gas_ion_flag,
-                    'resgasion':resgasion,
-                    't_ion':t_ion,
                     'spacech_ele':spacech_ele,
                     't_sc_ON':t_sc_ON,
-                    'photoem_flag':photoem_flag,
-                    'phemiss':phemiss,
                     'flag_presence_sec_beams':flag_presence_sec_beams,
                     'sec_beams_list':sec_beams_list,
                     'flag_multiple_clouds':flag_multiple_clouds,
