@@ -152,7 +152,7 @@ class BuildupSimulation(object):
                 if (beamtim.tt_curr>t_sc_ON):
                     flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                     flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
-                    spacech_ele.recompute_spchg_efield_modes(cloud.MP_e, t_curr=beamtim.tt_curr, flag_solve=flag_solve, flag_reset=flag_reset)
+                    spacech_ele.recompute_spchg_efield(cloud.MP_e, t_curr=beamtim.tt_curr, flag_solve=flag_solve, flag_reset=flag_reset)
 
                     # Copy rho to cloud
                     cloud.rho = spacech_ele.rho - np.sum([cl.rho for cl in cloud_list[:i_cloud]])
