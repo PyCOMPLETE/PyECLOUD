@@ -54,6 +54,9 @@ parameters_dict = {
             # Additional clouds
             'additional_clouds_file_list': (), 
 
+            # Name for default cloud
+            'cloud_name':None,
+
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
             'stopfile': 'stop',
@@ -284,9 +287,6 @@ parameters_dict = {
             # Cloud particles
             'charge',
             'mass',
-
-            # Saving filename
-            'filen_main_outp',
 
             # Residual gas ionization flag
             'gas_ion_flag',
