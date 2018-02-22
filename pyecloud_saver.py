@@ -292,7 +292,8 @@ class pyecloud_saver:
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics,gas_ion_flag,resgasion,t_ion,
-                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, rho = None):
+                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list,
+                flag_multiple_clouds, cloud_list, rho = None):
 
         #MP state save
         if self.flag_save_MP_state:
@@ -330,8 +331,9 @@ class pyecloud_saver:
                     'photoem_flag':photoem_flag,
                     'phemiss':phemiss,
                     'flag_presence_sec_beams':flag_presence_sec_beams,
-                    'sec_beams_list':sec_beams_list}
-
+                    'sec_beams_list':sec_beams_list,
+                    'flag_multiple_clouds':flag_multiple_clouds,
+                    'cloud_list':cloud_list}
 
 
                     with open(filename_simulation_state, 'wb') as fid:

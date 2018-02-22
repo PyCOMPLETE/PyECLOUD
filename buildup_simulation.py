@@ -163,7 +163,7 @@ class BuildupSimulation(object):
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, rho = cloud.rho)
+                                                            sec_beams_list, flag_multiple_clouds, cloud_list, rho = cloud.rho)
 
                 ## every bunch passage
                 if beamtim.flag_new_bunch_pass:
