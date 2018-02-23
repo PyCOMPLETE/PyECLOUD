@@ -370,7 +370,7 @@ class pyecloud_saver:
             self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
 
         #save rho video
-        if self.flag_video and self.last_cloud:
+        if self.flag_video and self.flag_last_cloud:
             if not os.path.exists('rho_video'):
                 os.makedirs('rho_video')
             if self.rho_video is None:
@@ -397,7 +397,7 @@ class pyecloud_saver:
                     self.rho_video_cloud = []
                     self.t_video_cloud = []
             if spacech_ele.flag_recomputed_sc:
-                if rho is None:
+                if rho_cloud is None:
                     print('Warning! No rho provided for saving.')
                 else:
                     self.rho_video_cloud.append(rho_cloud)
@@ -407,7 +407,7 @@ class pyecloud_saver:
                 self.t_video_cloud=np.array(self.t_video_cloud)
                 filename_rho='rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
                 print('Saving %s'%filename_rho)
-                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video_cloud},oned_as='row')
+                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video_cloud,'rho_video':self.rho_video_cloud},oned_as='row')
                 print('Done')
                 self.rho_video_cloud=[]
                 self.t_video_cloud=[]
