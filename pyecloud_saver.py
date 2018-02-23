@@ -107,12 +107,18 @@ class pyecloud_saver:
                  el_density_probes = [],
                  save_simulation_state_time_file = -1,
                  x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
-                 filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop'):
+                 filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop',
+                 flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
         self.qm = qe/MP_e.mass
+
+        # cloud info
+        self.flag_multiple_clouds = flag_multiple_clouds
+        self.cloud_name = cloud_name
+        self.flag_last_cloud = flag_last_cloud
 
         # introduce decimation
         self.dec_fact_out = dec_fact_out
@@ -175,6 +181,10 @@ class pyecloud_saver:
         self.flag_video=(flag_movie==1)
         self.rho_video=None
         self.t_video=None
+
+        #rho video cloud
+        self.rho_video_cloud=None
+        self.t_video_cloud=None
 
         #efield video
         self.flag_sc_video=(flag_sc_movie==1)
@@ -292,7 +302,7 @@ class pyecloud_saver:
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics,gas_ion_flag,resgasion,t_ion,
-                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, rho = None):
+                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, rho_cloud = None):
 
         #MP state save
         if self.flag_save_MP_state:
@@ -360,17 +370,14 @@ class pyecloud_saver:
             self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
 
         #save rho video
-        if self.flag_video:
+        if self.flag_video and self.last_cloud:
             if not os.path.exists('rho_video'):
                 os.makedirs('rho_video')
             if self.rho_video is None:
                 self.rho_video=[]
                 self.t_video=[]
             if spacech_ele.flag_recomputed_sc:
-                if rho is not None:
-                    self.rho_video.append(rho)
-                else:
-                    self.rho_video.append(spacech_ele.rho)
+                self.rho_video.append(spacech_ele.rho)
                 self.t_video.append(beamtim.tt_curr)
             if beamtim.flag_new_bunch_pass:
                 self.rho_video=np.array(self.rho_video)
@@ -381,6 +388,29 @@ class pyecloud_saver:
                 print('Done')
                 self.rho_video=[]
                 self.t_video=[]
+
+        # save rho video for cloud
+        if self.flag_video and self.flag_multiple_clouds:
+            if not os.path.exists('rho_video_%s'%(self.cloud_name)):
+                os.makedirs('rho_video_%s'%(self.cloud_name))
+            if self.rho_video_cloud is None:
+                    self.rho_video_cloud = []
+                    self.t_video_cloud = []
+            if spacech_ele.flag_recomputed_sc:
+                if rho is None:
+                    print('Warning! No rho provided for saving.')
+                else:
+                    self.rho_video_cloud.append(rho_cloud)
+                self.t_video_cloud.append(beamtim.tt_curr)
+            if beamtim.flag_new_bunch_pass:
+                self.rho_video_cloud=np.array(self.rho_video_cloud)
+                self.t_video_cloud=np.array(self.t_video_cloud)
+                filename_rho='rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
+                print('Saving %s'%filename_rho)
+                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video_cloud},oned_as='row')
+                print('Done')
+                self.rho_video_cloud=[]
+                self.t_video_cloud=[]
 
         #save efield video
         if self.flag_sc_video:
