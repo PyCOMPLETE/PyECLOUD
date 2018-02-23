@@ -317,6 +317,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Real saver init
         if not skip_pyeclsaver:
+            flag_last_cloud = cloud_par is cloud_par_list[-1]
             pyeclsaver.start_observing(MP_e, beamtim, impact_man,
                                        thiscloud.r_center, thiscloud.Dt_En_hist, thiscloud.logfile_path, thiscloud.progress_path, 
                                        flag_detailed_MP_info=thiscloud.flag_detailed_MP_info, flag_movie=thiscloud.flag_movie, 
@@ -326,7 +327,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        x_min_hist_det=thiscloud.x_min_hist_det, x_max_hist_det=thiscloud.x_max_hist_det, 
                                        y_min_hist_det=thiscloud.y_min_hist_det, y_max_hist_det=thiscloud.y_max_hist_det,
                                        Dx_hist_det=thiscloud.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thiscloud.filen_main_outp,
-                                       flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width)
+                                       flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
+                                       flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud)
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp )
     
         # Init electron tracker
