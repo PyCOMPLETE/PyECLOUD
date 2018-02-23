@@ -11,6 +11,7 @@ stopfile = 'stop'
 # Additional clouds
 additional_clouds_file_list = ['electron2.cloud', 'electron3.cloud']
 
+cloud_name = 'electron1'
 
 Dt = 2.500000e-11
 t_end=1e-9;       #s (no effect if log. profile is imported from file)
