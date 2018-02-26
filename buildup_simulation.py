@@ -163,7 +163,7 @@ class BuildupSimulation(object):
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, rho_cloud = cloud.rho)
+                                                            sec_beams_list, cloud_list, rho_cloud = cloud.rho)
 
                 ## every bunch passage
                 if beamtim.flag_new_bunch_pass:
@@ -186,7 +186,7 @@ class BuildupSimulation(object):
                     print 'Reached user defined t_end_sim --> Ending simulation'
                     break
 
-    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'):
+    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted') #, reset_pyeclsaver = True):
 
         print 'Realoading state from file: %s...'% filename_simulation_state
 
@@ -194,24 +194,27 @@ class BuildupSimulation(object):
             dict_state = cPickle.load(fid)
 
         self.beamtim = dict_state['beamtim']
-        self.MP_e = dict_state['MP_e']
-        self.dynamics = dict_state['dynamics']
-        self.impact_man = dict_state['impact_man']
-
-        self.gas_ion_flag = dict_state['gas_ion_flag']
-        self.resgasion = dict_state['resgasion']
-        self.t_ion = dict_state['t_ion']
         self.spacech_ele = dict_state['spacech_ele']
         self.t_sc_ON = dict_state['t_sc_ON']
-        self.photoem_flag = dict_state['photoem_flag']
-        self.phemiss = dict_state['phemiss']
         self.flag_presence_sec_beams = dict_state['flag_presence_sec_beams']
         self.sec_beams_list = dict_state['sec_beams_list']
 
-        if force_disable_save_simulation_state:
-            self.pyeclsaver.flag_save_simulation_state = False
+        self.flag_multiple_clouds = dict_state['flag_multiple_clouds']
 
-        self.pyeclsaver.filen_main_outp = filen_main_outp
+        for i_cloud, new_cloud in enumerate(self.cloud_list):
+            new_pyeclsaver = new_cloud.pyeclsaver
+            self.cloud_list[i_cloud] = dict_state['cloud_list'][i_cloud] # Replace new_cloud with saved cloud
+            cloud = self.cloud_list[i_cloud]
+
+            # if reset_pyeclsaver or cloud.pyeclsaver is None:
+            cloud.pyeclsaver = new_pyeclsaver
+
+            if force_disable_save_simulation_state:
+                cloud.pyeclsaver.flag_save_simulation_state = False
+
+            filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
+            filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
+            cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
