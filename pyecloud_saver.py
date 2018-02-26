@@ -319,37 +319,6 @@ class pyecloud_saver:
                     print('Save MP state on ' + filename_MP_state)
                     self.i_obs=self.i_obs+1
 
-        #Simulation state save
-        if self.flag_save_simulation_state:
-            if  self.i_obs_sim<self.N_obs_sim:
-                if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
-                    filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
-
-                    temp_luobj = spacech_ele.PyPICobj.luobj
-                    spacech_ele.luobj=None
-                    spacech_ele.PyPICobj.luobj=None
-
-                    #~ dynamics.get_B=None
-
-                    dict_state = {
-                    'beamtim':beamtim,
-                    'spacech_ele':spacech_ele,
-                    't_sc_ON':t_sc_ON,
-                    'flag_presence_sec_beams':flag_presence_sec_beams,
-                    'sec_beams_list':sec_beams_list,
-                    'flag_multiple_clouds':self.flag_multiple_clouds,
-                    'cloud_list':cloud_list}
-
-
-                    with open(filename_simulation_state, 'wb') as fid:
-                        # use best protocol available
-                        pickle.dump(dict_state, fid, protocol=-1)
-
-                    spacech_ele.PyPICobj.luobj = temp_luobj
-
-                    print('Save simulation state on ' + filename_simulation_state)
-                    self.i_obs_sim=self.i_obs_sim+1
-
         # Energy histogram saver
         if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
             self.En_hist[self.i_En_hist,:]=impact_man.En_hist_line
@@ -570,6 +539,41 @@ class pyecloud_saver:
 
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
+
+        #Simulation state save
+        if self.flag_save_simulation_state and self.flag_last_cloud:
+            if  self.i_obs_sim<self.N_obs_sim:
+                if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
+                    filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
+
+                    temp_luobj = spacech_ele.PyPICobj.luobj
+                    spacech_ele.luobj=None
+                    spacech_ele.PyPICobj.luobj=None
+
+                    #~ dynamics.get_B=None
+
+                    if not save_pyeclsaver_state:
+                        for cloud in cloud_list:
+                            cloud.pyeclsaver = None
+
+                    dict_state = {
+                    'beamtim':beamtim,
+                    'spacech_ele':spacech_ele,
+                    't_sc_ON':t_sc_ON,
+                    'flag_presence_sec_beams':flag_presence_sec_beams,
+                    'sec_beams_list':sec_beams_list,
+                    'flag_multiple_clouds':self.flag_multiple_clouds,
+                    'cloud_list':cloud_list}
+
+
+                    with open(filename_simulation_state, 'wb') as fid:
+                        # use best protocol available
+                        pickle.dump(dict_state, fid, protocol=-1)
+
+                    spacech_ele.PyPICobj.luobj = temp_luobj
+
+                    print('Save simulation state on ' + filename_simulation_state)
+                    self.i_obs_sim=self.i_obs_sim+1
 
             # logfile and progressfile
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
