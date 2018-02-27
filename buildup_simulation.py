@@ -187,7 +187,7 @@ class BuildupSimulation(object):
                     print 'Reached user defined t_end_sim --> Ending simulation'
                     break
 
-    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted') #, reset_pyeclsaver = True):
+    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'): #, reset_pyeclsaver = True):
 
         print 'Realoading state from file: %s...'% filename_simulation_state
 
