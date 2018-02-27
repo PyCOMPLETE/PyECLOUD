@@ -384,7 +384,6 @@ parameters_dict = {
             'secondary_angle_distribution': (),
 
             'sey_file': (),
-            'flag_factor_costheta': (),
             'flag_costheta_Emax_shift': (),
             'flag_costheta_delta_scale': (),
 
