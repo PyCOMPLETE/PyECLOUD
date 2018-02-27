@@ -14,7 +14,7 @@ import PyECLOUD.mystyle as ms
 pl.close('all')
 
 sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
-#sim_folder = 'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization'
+sim_folder = 'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multigrid'
 #sim_folder = 'LHC_ArcQuadReal_450GeV_sey1.65_2.5e11ppb_bl_1.00ns'
@@ -165,7 +165,7 @@ for ii,k in enumerate(out_var_curr):
             sp4.set_title('e- per slice', fontsize=titlesz)
             sp4.tick_params(labelsize=labelsz)
             ms.sciy()
-
+    
 
             #Plot number of e- for each passage
             sp5=fig.add_subplot(gs2[2])
@@ -223,7 +223,9 @@ for ii,k in enumerate(out_var_curr):
                 gs2.tight_layout(fig,rect=[0.45, 0, 1, 1], pad=1.08,h_pad=1.5)
 
             except IOError as goterror:
-                    print 'Skipped. Got:',  goterror
+                print 'Skipped. Got:',  goterror
+            except IndexError as goterror:
+                print 'Skipped. Got:',  goterror
 
         else:
             print '%s not  in reference'%k
