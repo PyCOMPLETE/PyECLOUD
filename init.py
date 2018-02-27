@@ -257,16 +257,18 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if thiscloud.switch_model == 'perfect_absorber':
             sey_mod = None
         else:
+
             kwargs_secem = {}
             if thiscloud.E0 is not None:
                 kwargs_secem.update({'E0':thiscloud.E0})
                 #If E0 is not provided use default value for each object
-                if thiscloud.s_param is not None:
-                    if thiscloud.switch_model==0 or thiscloud.switch_model=='ECLOUD':
-                        kwargs_secem.update({'s':thiscloud.s_param})
-                    else:
-                        raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
+            if thiscloud.s_param is not None:
+                if thiscloud.switch_model==0 or thiscloud.switch_model=='ECLOUD':
+                    kwargs_secem.update({'s':thiscloud.s_param})
+                else:
+                    raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
 
+           
             if thiscloud.switch_model in (0, 'ECLOUD'):
                 kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
                 kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
@@ -280,7 +282,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             elif thiscloud.switch_model == 'flat_low_ene':
                 sey_mod=SEY_model_flat_le(thiscloud.Emax,thiscloud.del_max,thiscloud.R0)
             elif thiscloud.switch_model == 'from_file':
-                sey_mod = SEY_model_from_file(thiscloud.sey_file, thiscloud.flag_factor_costheta)
+                kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
+                kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
+                if os.path.isfile(pyecl_input_folder+'/'+thiscloud.sey_file):
+                    sey_file_path = pyecl_input_folder+'/'+thiscloud.sey_file
+                elif os.path.isfile(pyecl_input_folder+'/'+thiscloud.sey_file+'.mat'):
+                    sey_file_path = pyecl_input_folder+'/'+thiscloud.sey_file+'.mat'
+                else:
+                    sey_file_path = thiscloud.sey_file
+                sey_mod = SEY_model_from_file(sey_file_path, **kwargs_secem)
             else:
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
