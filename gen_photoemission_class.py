@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -7,23 +7,21 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.2
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Contributors:         Eleonora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -47,7 +45,8 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 from __future__ import division, print_function
 import numpy as np
@@ -56,7 +55,7 @@ import numpy.random as random
 import scipy.io as sio
 from scipy.constants import c
 
-import sec_emission
+import electron_emission
 
 class PyECLOUD_PhotoemissionException(ValueError):
     pass
@@ -118,7 +117,7 @@ class photoemission(photoemission_base):
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
-        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        self.angle_dist_func = electron_emission.get_angle_dist_func(photoelectron_angle_distribution)
         self.flag_continuous_emission = flag_continuous_emission
 
         if flag_continuous_emission:
@@ -132,7 +131,7 @@ class photoemission(photoemission_base):
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
             raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
 
-        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
 
         print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 
@@ -206,8 +205,8 @@ class photoemission_from_file(photoemission_base):
         if flag_continuous_emission:
             self.mean_lambda = np.mean(beamtim.lam_t_array)
 
-        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
-        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.angle_dist_func = electron_emission.get_angle_dist_func(photoelectron_angle_distribution)
         print('Done photoemission init')
 
     def generate(self, MP_e, lambda_t, Dt):
@@ -237,8 +236,8 @@ class photoemission_per_segment(photoemission_base):
         self.k_pe_st = k_pe_st
         self.chamb = chamb
         self.flag_continuous_emission = flag_continuous_emission
-        self.get_energy = sec_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
-        self.angle_dist_func = sec_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.angle_dist_func = electron_emission.get_angle_dist_func(photoelectron_angle_distribution)
         if self.flag_continuous_emission:
             self.mean_lambda = np.mean(beamtim.lam_t_array)
         print('Done photoemission init')

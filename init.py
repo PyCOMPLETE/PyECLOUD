@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -7,23 +7,21 @@
 #
 #     This file is part of the code:
 #
-#                          PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.2
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Contributors:         Eleonora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -47,7 +45,8 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 from __future__ import division, print_function
 import os
@@ -170,8 +169,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     # Init chamber
     flag_non_unif_sey = False
     for cloud_par in cloud_par_list:
-        if cloud_par.cc.switch_model == "ECLOUD_unif":
+        if cloud_par.cc.switch_model == "ECLOUD_nunif":
             flag_non_unif_sey = True
+            
     chamber_kwargs = {
         'flag_verbose_file': cc.flag_verbose_file,
         'flag_verbose_stdout': cc.flag_verbose_stdout,
@@ -181,7 +181,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     if cc.chamb_type == 'ellip':
         chamb = ellip_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file)
     elif cc.chamb_type in ('polyg', 'polyg_cython'):
-        chamb = gipfi.polyg_cham_geom_object(cc.filename_chm, flag_non_unif_sey, **chamber_kwargs)
+        if os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm):
+            filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm
+        elif os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm+'.mat'):
+            filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm+'.mat'
+        else:
+            filename_chm_path = cc.filename_chm
+        chamb = gipfi.polyg_cham_geom_object(filename_chm_path, flag_non_unif_sey, **chamber_kwargs)
     elif cc.chamb_type == 'rect':
         chamb = girfi.rect_cham_geom_object(cc.x_aper, cc.y_aper, flag_non_unif_sey, **chamber_kwargs)
     else:

@@ -390,7 +390,7 @@ Scaling factor applied to the magnetic field map.
 \multicolumn{2}{p{.97\textwidth}}{\textbf{Photoemission parameters} (if generation by photoemission is not desired, the following parameters can be omitted).}
 \\ \hline
 \textbf{photoem\_flag} & (optional -- default=0) \newline
-    (0 $\Rightarrow$ Off, 1 $\Rightarrow$ traditional, 2 or 'from\_file' $\Rightarrow$ From file, 3 or 'per\_segment' $\Rightarrow$ Part of chamber definition) Enables primary electron generation by photoemission.
+    (0 $\Rightarrow$ Off, 1 $\Rightarrow$ traditional, 2 or 'from\_file' $\Rightarrow$ Angular distribution from file, 3 or 'per\_segment' $\Rightarrow$ Part of chamber definition) Enables primary electron generation by photoemission.
 \\ \hline
 \textbf{k\_pe\_st} & [m$^{-1}$] Number of photoelectrons to be generated per proton and per unit length.
 \\ \hline
@@ -584,7 +584,8 @@ Different secondary emission models:
 \textbf{sey\_file} & Needed for secondary emission model `from\_file`.
     Path to a file that specifies the reflected and true secondary emission yields for different energies.
     An example can be found in the subfolder sey\_files in the PyECLOUD code.\\\hline
-\textbf{flag\_factor\_costheta} & If enabled, the true secondary emission yield is amplified depending on the impact angle relative to the surface normal. \\\hline
+\textbf{flag\_costheta\_delta\_scale} & If enabled the SEY curve associated to true secondary electrons is scaled as a function of the angle of the impacting electron. Default is TRUE.\\ \hline
+\textbf{flag\_costheta\_Emax\_shift} & If enabled the SEY curve associated to true secondary electrons is shifted (chenge of energy scale) as a function of the angle of the impacting electron. Default is TRUE.\\ \hline
 \textbf{switch\_no\_increase\_energy}&	switch\_no\_increase\_energy = 1 checks that the true secondaries do not have more energy than the corresponding impacting electrons.
 Typically this feature is NOT enabled.\\ \hline
 \textbf{thresh\_low\_energy}&	Maximum energy for which the energy check is performed.\\ \hline

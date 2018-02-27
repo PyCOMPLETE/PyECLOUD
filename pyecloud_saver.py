@@ -1,5 +1,4 @@
-#----------------------------------------------------------------------
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -8,23 +7,21 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.2
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Contributors:         Eleonora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -48,7 +45,8 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 from __future__ import print_function
 import scipy.io as sio
@@ -93,7 +91,7 @@ class pyecloud_saver:
         print(git_branch)
 
         with open(self.logfile_path,'w') as flog:
-            flog.write('PyECLOUD Version 6.7.0\n')
+            flog.write('PyECLOUD Version 6.7.2\n')
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
@@ -299,6 +297,13 @@ class pyecloud_saver:
         timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
         flog.write('Initialization finished on %s\n'%timestr)
         flog.close()
+        
+        # extract SEY curves
+        n_rep = 10000
+        self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
+        self.sey_test_cos_theta = np.linspace(0, 1., 10)
+        self.sey_test_del_true_mat, self.sey_test_del_elast_mat = impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta)
+
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics,gas_ion_flag,resgasion,t_ion,
@@ -532,7 +537,13 @@ class pyecloud_saver:
                     'nel_hist_det':         self.nel_hist_det,
                     'xg_hist_det':          self.xg_hist_det,
                     'dec_fact_out':         self.dec_fact_out,
+                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV, 
+                    'sey_test_cos_theta':   self.sey_test_cos_theta,
+                    'sey_test_del_true_mat':self.sey_test_del_true_mat,
+                    'sey_test_del_elast_mat':self.sey_test_del_elast_mat,
                 }
+                
+    
             if self.flag_cos_angle_hist:
                     saved_dict['cos_angle_hist'] = self.cos_angle_hist
                     saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle

@@ -1,6 +1,6 @@
 #!/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/python
 
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -9,23 +9,21 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.2
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Contributors:         Eleonora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -49,7 +47,8 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 
 import init as init
@@ -60,11 +59,13 @@ import numpy as np
 class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', **kwargs):
 
-        print 'PyECLOUD Version 6.7.0'
+
+        print 'PyECLOUD Version 6.7.2'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder, **kwargs)
 
+        
         self.beamtim = beamtim
         self.spacech_ele = spacech_ele
         self.t_sc_ON = t_sc_ON

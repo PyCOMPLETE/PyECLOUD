@@ -4,6 +4,7 @@ from scipy.constants import m_p, m_e, e as qe
 # This most importantly excludes python lists. Tuples may be used in their place.
 
 parameters_dict = {
+    'superparameters':{'pi'}, #are allowed anywhere and can be repeated (for backwards compatibility)
     'simulation_parameters': {
         'mandatory': {
 
@@ -272,7 +273,6 @@ parameters_dict = {
             'secondary_angle_distribution': 'undefined',
             # SEY from file
             'sey_file': None,
-            'flag_factor_costheta': True,
             'flag_costheta_Emax_shift': True,
             'flag_costheta_delta_scale': True,
         },

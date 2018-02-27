@@ -28,7 +28,7 @@ def assert_module_has_parameters(module, module_name):
     mandatory_parameters = parameters_dict[module_name]['mandatory']
     optional_parameters = set(parameters_dict[module_name]['optional'].keys())
 
-    allowed_parameters = set.union(mandatory_parameters, optional_parameters)
+    allowed_parameters = set.union(mandatory_parameters, optional_parameters, parameters_dict['superparameters'])
 
     extra_parameters = set.difference(module_contents, allowed_parameters)
     if extra_parameters:
@@ -47,6 +47,9 @@ def update_module(module, new_module):
     Some entries are skipped.
     """
     for attr in dir(new_module):
+        
+        if attr=='pi': continue
+        
         value = getattr(new_module, attr)
         if attr.startswith('_') or isinstance(value, types.ModuleType):
             continue
@@ -123,6 +126,11 @@ def import_module_from_file(module_name, file_name):
     try:
         new_file_name = dir_name+'/temp_file_%s.py' % (module_name+'_'+str(time.time())).replace('.','_')
         shutil.copy(file_name, new_file_name)
+        
+        # As we use pi in many old input files
+        with open(new_file_name, 'r') as fid: content = fid.read()
+        content = "from numpy import pi\n\n"+content
+        with open(new_file_name, 'w') as fid: fid.write(content)
 
         if sys.version_info.major == 2:
             import imp

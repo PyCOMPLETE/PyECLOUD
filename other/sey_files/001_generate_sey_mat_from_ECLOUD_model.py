@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append('../../') 
+sys.path.append('../../../') 
 
-import sec_emission_model_ECLOUD as seme
-import sec_emission_model_from_file as semf
+import PyECLOUD.sec_emission_model_ECLOUD as seme
+import PyECLOUD.sec_emission_model_from_file as semf
 
 Emax = 332.
 del_max = 1.700000
