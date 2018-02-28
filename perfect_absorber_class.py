@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -7,23 +7,21 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.0
+#                   PyECLOUD Version 6.7.2
 #
 #
-#     Author and contact:   Giovanni IADAROLA
+#     Main author:          Giovanni IADAROLA
 #                           BE-ABP Group
 #                           CERN
 #                           CH-1211 GENEVA 23
 #                           SWITZERLAND
 #                           giovanni.iadarola@cern.ch
 #
-#                contact:   Giovanni RUMOLO
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.rumolo@cern.ch
-#
+#     Contributors:         Eleonora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -47,7 +45,8 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+#
+#-End-preamble---------------------------------------------------------
 
 import hist_for as histf
 import numpy as np
@@ -158,4 +157,20 @@ class impact_management_perfect_absorber(impact_management):
                 MP_e.N_mp = N_mp
 
         return MP_e
+        
+        
+    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
+    
+        sey_mod = self.sey_mod
+        
+        nel_impact = 1. + 0.*E_impact_eV_test
+
+
+        del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        print('Extracting SEY curves...')
+        print(':-P')
+        print('Done extracting SEY curves.')       
+        
+        return del_true_mat, del_elast_mat
 

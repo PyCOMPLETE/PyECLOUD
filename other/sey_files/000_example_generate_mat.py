@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append('../../') 
+sys.path.append('../../../') 
 
 import resample_sey as rss
-import sec_emission_model_from_file as semf
+import PyECLOUD.sec_emission_model_from_file as semf
 
 fname_txt_file = 'sey_table_not_uniform.txt'
 fname_unif_matfile = 'sey_unif.mat'
