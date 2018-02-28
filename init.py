@@ -51,7 +51,7 @@
 from __future__ import division, print_function
 import os
 import numpy as np
-from scipy.constants import c, e as qe
+from scipy.constants import c, m_e, e as qe
 
 import myloadmat_to_obj as mlm
 
@@ -352,12 +352,20 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
                      cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
+            #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
+            if not(np.abs(thiscloud.charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.mass - m_e)/m_e<1e-3):
+                raise ValueError('StrongBdip tracking method is implemented only for electrons!')
             if cc.B==-1:
                 B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
-            dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B)
+            else:
+                B = cc.B
+            dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B) 
         elif cc.track_method == 'StrongBgen':
-            dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
-                     cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
+            #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
+            if not(np.abs(thiscloud.charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.mass - m_e)/m_e<1e-3):
+                raise ValueError('StrongBgen tracking method is implemented only for electrons!')
+            dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y, 
+                        cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
         elif cc.track_method == 'BorisMultipole':
             dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
         else:
