@@ -275,7 +275,7 @@ class impact_management(object):
                     En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
                         switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
                     vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
-                        N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
+                        N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], MP_e.mass)
 
                     # Add new MPs
                     if n_add_total != 0:
@@ -292,7 +292,7 @@ class impact_management(object):
                         En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
                             switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
                         vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
-                            n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
+                            n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, MP_e.mass)
 
                         MP_e.add_new_MPs(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
                                          vx_mp_add, vy_mp_add, vz_mp_add)
