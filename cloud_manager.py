@@ -49,7 +49,7 @@
 #     all references.
 #----------------------------------------------------------------------
 
-class cloud_manager(object):
+class Cloud(object):
     def __init__(self, cloudname, config_dict, MP_e, impact_man, dynamics, pyeclsaver,
                  gas_ion_flag, resgasion, t_ion, photoem_flag, phemiss, rho):
         

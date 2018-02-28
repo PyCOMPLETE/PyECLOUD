@@ -384,7 +384,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         # Init empty rho for cloud
         rho = spacech_ele.rho*0.
 
-        cloud = cman.cloud_manager(thiscloud.cloud_name, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
+        cloud = cman.Cloud(thiscloud.cloud_name, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
                                    resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
 
         cloud_list.append(cloud)
