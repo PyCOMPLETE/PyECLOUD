@@ -159,6 +159,8 @@ class BuildupSimulation(object):
                     cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
 
 
+            # We want to save and clean MP only after iteration on all clouds is completed 
+            # (e.g. to have consistent space charge state)
             for cloud in cloud_list:
                 ## savings
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
