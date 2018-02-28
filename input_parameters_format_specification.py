@@ -75,9 +75,9 @@ def update_config_dict(config_dict, module, module_name, verbose=False, default_
 
         if hasattr(module, parameter): # the parameter is specified in the input file
             value = getattr(module, parameter)
+        elif (default_obj is not None) and hasattr(default_obj, parameter):
+            value = getattr(default_obj, parameter)
         else: # the parameter is not specified in the input file (default to be used)
-            if default_obj is not None:
-                default_value = getattr(default_obj, parameter)
             value = default_value
 
         # Check for duplicates
