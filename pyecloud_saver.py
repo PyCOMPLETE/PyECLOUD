@@ -549,6 +549,37 @@ class pyecloud_saver:
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
 
+
+            # logfile and progressfile
+            timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
+
+            string_tolog= timestr+(' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,self.cloud_name,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
+            
+            try:
+                with open(self.logfile_path,'a') as flog:
+                    flog.write(string_tolog)
+            except IOError as err:
+                print('Got: ',err)
+                print('while trying to write the following line on logfile:')
+                print(string_tolog)
+
+            try:
+                with open(self.progress_path,'w') as flog:
+                    flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
+            except IOError as err:
+                print('Got: ',err)
+                print('while trying to write the following line on progress file:')
+                print('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot)))
+
+
+            #stop simulation
+            try:
+                with open(self.stopfile, 'r') as fid:
+                    fid.readlines()
+                    raise ValueError('Stopped by user.')
+            except IOError:
+                pass
+                
         #Simulation state save
         if self.flag_save_simulation_state and self.flag_last_cloud:
             if  self.i_obs_sim<self.N_obs_sim:
@@ -584,41 +615,5 @@ class pyecloud_saver:
                     print('Save simulation state on ' + filename_simulation_state)
                     self.i_obs_sim=self.i_obs_sim+1
 
-            # logfile and progressfile
-            timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-
-            string_tolog= timestr+(' pass. %d/%d Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
-
-
-#             flog=open(self.logfile_path,'a')
-#             flog.write(string_tolog)
-#             flog.close()
-            try:
-                with open(self.logfile_path,'a') as flog:
-                    flog.write(string_tolog)
-            except IOError as err:
-                print('Got: ',err)
-                print('while trying to write the following line on logfile:')
-                print(string_tolog)
-
-#             flog=open(self.progress_path,'w')
-#             flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
-#             flog.close()
-            try:
-                with open(self.progress_path,'w') as flog:
-                    flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
-            except IOError as err:
-                print('Got: ',err)
-                print('while trying to write the following line on progress file:')
-                print('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot)))
-
-
-            #stop simulation
-            try:
-                with open(self.stopfile, 'r') as fid:
-                    fid.readlines()
-                    raise ValueError('Stopped by user.')
-            except IOError:
-                pass
 
         return impact_man
