@@ -238,7 +238,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         print('Initialize cloud %s:' % (thiscloud.cloud_name))
 
-        # Init saver for all but default cloud
+        # Init saver for all but default cloud (which is already initialized)
         if cloud_par is not cloud_par_list[0]:
             if not skip_pyeclsaver:
                 pyeclsaver=pysav.pyecloud_saver(thiscloud.logfile_path)
