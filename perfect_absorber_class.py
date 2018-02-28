@@ -85,9 +85,6 @@ class impact_management_perfect_absorber(impact_management):
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
 
-            me = MP_e.mass
-            qm = qe/me
-
             ## impact management
             N_mp_old=N_mp
 
@@ -122,7 +119,7 @@ class impact_management_perfect_absorber(impact_management):
 
                 # compute impact velocities, energy and angle
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
-                E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
+                E_impact_eV=0.5*MP_e.mass/qe*v_impact_mod*v_impact_mod
 
                 #electron histogram
                 histf.compute_hist(x_emit,nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)

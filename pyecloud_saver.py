@@ -111,8 +111,6 @@ class pyecloud_saver:
 
         self.filen_main_outp = filen_main_outp
 
-        self.qm = qe/MP_e.mass
-
         # cloud info
         self.flag_multiple_clouds = flag_multiple_clouds
         self.cloud_name = cloud_name
@@ -431,7 +429,7 @@ class pyecloud_saver:
 
 
             self.Nel_time[ii_curr_dec]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5/self.qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
+            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
             flag_center[MP_e.N_mp:]=False

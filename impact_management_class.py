@@ -178,9 +178,6 @@ class impact_management(object):
             scrub_en_th = self.scrub_en_th
             thresh_low_energy = self.thresh_low_energy
 
-            me = MP_e.mass
-            qm = qe/me
-
             ## impact management
 
             flag_impact = np.zeros_like(x_mp, dtype=bool)
@@ -219,7 +216,7 @@ class impact_management(object):
 
                 # compute impact velocities, energy and angle
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
-                E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
+                E_impact_eV=0.5*MP_e.mass/qe*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
                 # Use np.abs to rule out negative values, which can happen in very seldom fringe cases.
                 # Mathematically correct would be -(v_impact_n)/v_impact_mod
@@ -311,7 +308,7 @@ class impact_management(object):
 
                 #subtract replaced macroparticles
                 v_emit_mod = np.sqrt(vx_emit**2+vy_emit**2+vz_emit**2)
-                E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
+                E_emit_eV=0.5*MP_e.mass/qe*v_emit_mod*v_emit_mod
                 histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                 if flag_seg:
