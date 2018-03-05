@@ -154,7 +154,7 @@ class Ecloud(object):
         else:
             cloud = cloud_list[0]
 
-            MP_e = cloud. MP_e
+            MP_e = cloud.MP_e
             dynamics = cloud.dynamics
             impact_man = cloud.impact_man
             pyeclsaver = cloud.pyeclsaver
