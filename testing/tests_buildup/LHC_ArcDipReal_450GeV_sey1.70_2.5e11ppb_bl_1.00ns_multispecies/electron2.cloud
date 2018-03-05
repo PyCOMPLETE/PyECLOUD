@@ -1,6 +1,6 @@
 # Cloud particles
-charge = -1.602176565e-19
-mass = 9.10938291e-31
+cloud_charge = -1.602176565e-19
+cloud_mass = 9.10938291e-31
 
 # Residual gas ionization flag
 gas_ion_flag = 0

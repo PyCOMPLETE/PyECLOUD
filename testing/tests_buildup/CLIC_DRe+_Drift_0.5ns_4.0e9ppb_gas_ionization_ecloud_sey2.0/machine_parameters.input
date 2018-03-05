@@ -15,11 +15,6 @@ betafy = 8.5
 Dx = 0.027
 
  
-# cloud 
-mass = 9.10938291e-31
-charge = -1.602176565e-19
-
-
 # gas ionization parameters
 gas_ion_flag = 1
 P_nTorr = 100.

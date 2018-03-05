@@ -8,6 +8,11 @@ logfile_path = './logfile.txt'
 progress_path = './progress.txt'
 stopfile = 'stop'
 
+# cloud 
+cloud_mass = 9.10938291e-31
+cloud_charge = -1.602176565e-19
+
+
 Dt = .5e-12
 t_end = 1e-9         #s (no effect if log. profile is imported from file)
 

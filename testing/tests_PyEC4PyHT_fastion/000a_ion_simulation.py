@@ -133,7 +133,7 @@ ecloud_sk = PyEC4PyHTfi.Ecloud_fastion(L_ecloud=machine.circumference/n_segments
 			filename_chm=filename_chm, Dh_sc=Dh_sc,
 			init_unif_edens_flag=init_unif_edens_flag,
 			init_unif_edens=init_unif_edens, 
-            mass=ion_mass, charge=ion_charge,
+                        cloud_mass=ion_mass, cloud_charge=ion_charge,
 			gas_ion_flag=gas_ion_flag, unif_frac=unif_frac, 
 			P_nTorr=P_nTorr, sigma_ion_MBarn=sigma_ion_MBarn, 
 			Temp_K=Temp_K, E_init_ion=E_init_ion,
