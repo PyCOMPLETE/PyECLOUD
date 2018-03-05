@@ -55,8 +55,10 @@ parameters_dict = {
             # Additional clouds
             'additional_clouds_file_list': (), 
 
-            # Name for default cloud
-            'cloud_name':None,
+            # Name, mass and charge for default cloud
+            'cloud_name': None,
+            'cloud_mass': m_e, 
+            'cloud_charge': -qe,
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
@@ -129,10 +131,6 @@ parameters_dict = {
             'betafy': None,
             'Dx': 0.,
             'Dy': 0.,
-
-            # Cloud particles
-            'charge': -qe,
-            'mass'  : m_e,
 
             # Residual gas ionization
             'gas_ion_flag'      : 0,
@@ -285,8 +283,8 @@ parameters_dict = {
         'mandatory': {
 
             # Cloud particles
-            'charge',
-            'mass',
+            'cloud_mass',
+            'cloud_charge',
 
             # Residual gas ionization flag
             'gas_ion_flag',

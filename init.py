@@ -251,7 +251,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Dx_hist, thiscloud.Nx_regen, thiscloud.Ny_regen, thiscloud.Nvx_regen,
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
-                             charge=thiscloud.charge, mass=thiscloud.mass)
+                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
@@ -353,7 +353,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                      cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
             #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
-            if not(np.abs(thiscloud.charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.mass - m_e)/m_e<1e-3):
+            if not(np.abs(thiscloud.cloud_charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.cloud_mass - m_e)/m_e<1e-3):
                 raise ValueError('StrongBdip tracking method is implemented only for electrons!')
             if cc.B==-1:
                 B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
@@ -362,7 +362,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B) 
         elif cc.track_method == 'StrongBgen':
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
-            if not(np.abs(thiscloud.charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.mass - m_e)/m_e<1e-3):
+            if not(np.abs(thiscloud.cloud_charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.cloud_mass - m_e)/m_e<1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
             dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y, 
                         cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
