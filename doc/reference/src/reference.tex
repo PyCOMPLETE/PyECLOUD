@@ -269,8 +269,14 @@ Decimation factor to decrease the number of points of the longitudinal beam prof
 [m] Defines a region of the chamber where a detailed horizontal distribution histogram is saved (\_det stands for detailed). \\
 \hline
 \end{longtable}
-
-
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Cloud particles}
+}\\ \hline
+\textbf{cloud\_mass} & (optional -- default=electron mass) \newline [kg] Mass of cloud particles. \\ \hline
+\textbf{cloud\_charge}& (optional -- default=electron charge) \newline [C] Charge of cloud particles.\\ \hline
+\end{longtable}
 
 \newpage\subsection{Machine Parameters}
 
@@ -472,6 +478,9 @@ If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have u
 \textbf{m0\_part}& 	(optional -- default=proton mass)
 
 [Kg] Mass of beam particles. \\ \hline
+\textbf{q\_part}& 	(optional -- default=proton charge)
+
+[C] Charge of beam particles. \\ \hline
 \textbf{energy\_eV}& 	[eV] Total energy of the beam particles.\\ \hline
 \textbf{Dp\_p}& 	(optional -- default=0)
 
@@ -598,6 +607,54 @@ The more accurate is the 3D cosine distribution which takes into account the sur
 \\ \hline
 \end{longtable}
 
+
+\newpage
+
+\subsection{Simulations with multiple clouds}
+
+The code provides the option of including more than one cloud in the simulation. Each cloud is influenced by the other clouds only through their space charge. This option is switched on by providing a list of additional cloud file names  in the standard input, as follows. % the following additional parameter in the standard input.
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+In the \textbf{simulation\_parameters.input} file:}\\ \hline
+\textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline	
+List of additional cloud file names.\\ \hline
+\end{longtable}
+
+Each cloud file should contain a subset of the input parameters specified in the main input files, as listed below. The following parameters are required in the cloud input file.
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Mandatory cloud parameters}}\\ \hline
+\textbf{cloud\_mass} & See Simulation parameters section.\\ 
+\textbf{cloud\_mass} \\ \hline
+\textbf{gas\_ion\_flag} & See Machine parameters section.\\ 
+\textbf{photoem\_flag} & \\%Flag for photoemission.\\ 
+\textbf{init\_unif\_flag} & \\%Flag for initial uniform electron distribution.\\
+\textbf{init\_unif\_edens\_flag} & \\ \hline%Flag for initial uniform electron density.\\ \hline
+\textbf{switch\_model} & See Secondary emission parameters section.\\ \hline
+\end{longtable}
+
+In addition, the cloud file can contain the following optional parameters. Any optional parameter that is not specified in the cloud input file takes its value from the main input, and gets the default value if the parameter is not given in the main input files.
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Optional cloud parameters}}\\ \hline
+\textbf{MP management settings} & See Simulation parameters section.\\
+\textbf{Saving settings} & \\
+\textbf{Log and progress files} & \\ \hline
+\textbf{N\_sub\_steps} & See under ``Tracking and magnetic field'' in the Machine parameters section.\\ \hline
+\textbf{Residual gas ionization parameters} & See Machine parameters section.\\ 
+\textbf{Photoemission parameters} & \\ 
+\textbf{Uniform initial distribution} & \\
+\textbf{Uniform initial density} & \\ \hline
+\textbf{Secondary emission parameters} & As listed in the Secondary emission parameters section.\\ \hline
+\end{longtable}
+
+Each cloud produces its own .mat output file, as described in the following chapter. The file is named according to the main output file name and the cloud file name. 
 
 \newpage
 
