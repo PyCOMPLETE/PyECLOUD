@@ -57,7 +57,7 @@ except OSError as err:
 
 
 
-myfontsz = 12
+myfontsz = 10
 ms.mystyle_arial(fontsz=myfontsz)
 
 dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_angle%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
@@ -91,7 +91,7 @@ for ii,k in enumerate(out_var_curr):
         #Plot vector for the current simulation
         fig=pl.figure(ii)
         pl.subplots_adjust(right=0.75)
-        pl.title(out_var_curr[ii])
+        pl.title(out_var_curr[ii], fontsize=myfontsz)
 
         pl.plot(dict_curr[k],'b', label='curr_sim')
         print ii,k,'curr_sim'
@@ -124,14 +124,14 @@ for ii,k in enumerate(out_var_curr):
 
         fig=pl.figure(ii)
         pl.subplots_adjust(top=1.2)
-        pl.suptitle(out_var_curr[ii])
+        pl.suptitle(out_var_curr[ii], fontsize=myfontsz)
         gs1 = gridspec.GridSpec(2, 1)
         gs2 = gridspec.GridSpec(3, 1)
 
 
         #Plot matrix for the current simulation
         sp1 = fig.add_subplot(gs1[0])
-        sp1.set_title('curr_sim')
+        sp1.set_title('curr_sim', fontsize=myfontsz)
         pl.pcolormesh(dict_curr[k])
         sp1.tick_params(labelsize=10)
         cbar=pl.colorbar()
@@ -150,7 +150,7 @@ for ii,k in enumerate(out_var_curr):
             sp3=fig.add_subplot(gs2[0])
             sp3.plot(dict_curr[k][ind_in_mat],'b', label='curr_sim')
             sp3.legend(prop={'size':myfontsz},  loc='best')
-            sp3.set_title('index equal to [%d]'%n_pass)
+            sp3.set_title('index equal to [%d]'%n_pass, fontsize=myfontsz)
             sp3.tick_params(labelsize=10)
             ms.sciy()
 
@@ -186,7 +186,7 @@ for ii,k in enumerate(out_var_curr):
 
             #Plot matrix for the reference simulation
             sp2= fig.add_subplot(gs1[1])
-            sp2.set_title('ref_sim')
+            sp2.set_title('ref_sim', fontsize=myfontsz)
             pl.pcolormesh(dict_ref[k])
             cbar=pl.colorbar()
             cbar.ax.tick_params(labelsize=10)
