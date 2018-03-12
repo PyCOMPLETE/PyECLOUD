@@ -27,6 +27,8 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile'
 #sim_folder = 'LHC_Triplet_Quadrupole_multiple_beams'
+#sim_folder = 'LHC_TDIS_non_unif_sey'
+#sim_folder = 'LHC_Solenoid_sey1.10_100.00mT'
 #sim_folder = 'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0'
 #sim_folder = 'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0'
 #sim_folder = 'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18'
@@ -150,7 +152,7 @@ for ii,k in enumerate(out_var_curr):
             sp3=fig.add_subplot(gs2[0])
             sp3.plot(dict_curr[k][ind_in_mat],'b', label='curr_sim')
             sp3.legend(prop={'size':myfontsz},  loc='best')
-            sp3.set_title('index equal to [%d]'%n_pass, fontsize=myfontsz)
+            sp3.set_title('index equal to [%d]'%ind_in_mat, fontsize=myfontsz)
             sp3.tick_params(labelsize=10)
             ms.sciy()
 
