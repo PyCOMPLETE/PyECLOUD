@@ -5,7 +5,7 @@ secondary_emission_parameters_file='secondary_emission_parameters.input'
 beam_parameters_file='beam.beam' 
 
 logfile_path = 'logfile.txt'
-progress_path = 'progress'
+progress_path = 'progress.txt'
 stopfile = 'stop'
 
 Dt = 1.000000e-11
