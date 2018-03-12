@@ -5,7 +5,8 @@
         subroutine boris_step(N_mp, Dtt, xn1, yn1,  zn1, 
      +                                vxn1, vyn1,  vzn1,
      +                                Ex_n, Ey_n, Ez_n,
-     +                                Bx_n, By_n, Bz_n)
+     +                                Bx_n, By_n, Bz_n,
+     +                                mass, charge)
 Cf2py intent(in) N_mp
 Cf2py intent(in) Dtt
 Cf2py intent(inout) xn1
@@ -24,6 +25,10 @@ Cf2py intent(in) Bx_n
 Cf2py intent(in) By_n
 Cf2py intent(in) Bz_n
 
+Cf2py intent(in) mass
+Cf2py intent(in) charge
+
+
         implicit none
         integer  N_mp
         real*8   Dtt
@@ -32,7 +37,7 @@ Cf2py intent(in) Bz_n
         real*8   Ex_n(N_mp), Ey_n(N_mp),  Ez_n(N_mp)
         real*8   Bx_n(N_mp), By_n(N_mp),  Bz_n(N_mp)
 
-        real*8   me, qe, qm
+        real*8   mass, charge, qm
         integer  p
         real*8   tBx, tBy, tBz, tBsq
         real*8   sBx, sBy, sBz
@@ -43,9 +48,7 @@ Cf2py intent(in) Bz_n
         real*8  Ex_np, Ey_np, Ez_np 
         real*8  vxn1p, vyn1p, vzn1p
         
-        me=9.10938291e-31
-        qe=1.602176565e-19
-        qm=-qe/me !is an electron
+        qm=charge/mass
         
         do p=1,N_mp
         
