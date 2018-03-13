@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.2
+#                   PyECLOUD Version 7.0.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -60,7 +60,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', **kwargs):
 
 
-        print 'PyECLOUD Version 6.7.2'
+        print 'PyECLOUD Version 7.0.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder, **kwargs)
