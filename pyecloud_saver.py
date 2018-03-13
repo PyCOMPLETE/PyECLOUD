@@ -334,7 +334,7 @@ class pyecloud_saver:
                 impact_man.reset_cos_angle_hist()
 
         #Space charge electrostatic energy
-        if spacech_ele.flag_recomputed_sc:
+        if spacech_ele.last_recomputation_check:
             self.t_sc_video.append(beamtim.tt_curr)
             self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
 
@@ -345,7 +345,7 @@ class pyecloud_saver:
             if self.rho_video is None:
                 self.rho_video=[]
                 self.t_video=[]
-            if spacech_ele.flag_recomputed_sc:
+            if spacech_ele.last_recomputation_check:
                 self.rho_video.append(spacech_ele.rho)
                 self.t_video.append(beamtim.tt_curr)
             if beamtim.flag_new_bunch_pass:
@@ -365,7 +365,7 @@ class pyecloud_saver:
             if self.rho_video_cloud is None:
                     self.rho_video_cloud = []
                     self.t_video_cloud = []
-            if spacech_ele.flag_recomputed_sc:
+            if spacech_ele.last_recomputation_check:
                 if rho_cloud is None:
                     print('Warning! No rho provided for saving.')
                 else:
@@ -389,7 +389,7 @@ class pyecloud_saver:
                 self.efx_video=[]
                 self.efy_video=[]
                 self.t_efield_video=[]
-            if spacech_ele.flag_recomputed_sc:
+            if spacech_ele.last_recomputation_check:
                 self.efx_video.append(spacech_ele.efx)
                 self.efy_video.append(spacech_ele.efy)
                 self.t_efield_video.append(beamtim.tt_curr)

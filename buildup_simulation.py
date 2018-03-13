@@ -94,7 +94,9 @@ class BuildupSimulation(object):
             if flag_presence_sec_beams:
                 for sec_beam in sec_beams_list:
                     sec_beam.next_time_step()
-
+                    
+            
+            flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
 
             # Loop over clouds: gather fields, move, generate new MPs
             for i_cloud, cloud in enumerate(cloud_list):
@@ -150,10 +152,10 @@ class BuildupSimulation(object):
                     phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
                 # Compute space charge field
-                if (beamtim.tt_curr>t_sc_ON):
+                if (beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge:
                     flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                     flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
-                    spacech_ele.recompute_spchg_efield(MP_e, t_curr=beamtim.tt_curr, flag_solve=flag_solve, flag_reset=flag_reset)
+                    spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
 
                     # Copy rho to cloud
                     cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
