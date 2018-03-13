@@ -34,3 +34,6 @@ test_multipole
 *.beamc
 *.bak
 *.out
+Pyecltest_angle3D_electron1.mat
+Pyecltest_angle3D_electron2.mat
+Pyecltest_angle3D_electron3.mat
