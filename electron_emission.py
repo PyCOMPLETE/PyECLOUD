@@ -52,10 +52,8 @@ from __future__ import division
 import time
 import numpy as np
 import numpy.random as random
-from scipy.constants import e as qe, m_e
+from scipy.constants import e as qe
 import scipy.stats as stats
-
-qm = qe/m_e
 
 # Secondary electron secondaries
 def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit, E_th, En_impact_eV, thresh_low_energy):
@@ -122,18 +120,18 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
 # https://cds.cern.ch/record/537336?ln=en
 
 # Fixed behavior
-def velocities_angle_cosine_3D(N_new_MP, En_gen, Norm_x, Norm_y):
+def velocities_angle_cosine_3D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
     sin_theta_p = np.sqrt(random.rand(N_new_MP))
-    return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p)
+    return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass)
 
 # This has been the behavior of the code until the error was spotted.
-def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y):
+def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
     sin_theta_p = random.rand(N_new_MP)
-    return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p)
+    return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass)
 
 # Avoid code duplication
-def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p):
-    v_gen_mod=np.sqrt(2.*qm*En_gen)
+def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass):
+    v_gen_mod=np.sqrt(2.*qe/mass*En_gen)
 
     phi_p = random.rand(N_new_MP)*2*np.pi
     sin_phi_p = np.sin(phi_p)

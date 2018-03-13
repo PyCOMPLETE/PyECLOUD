@@ -55,6 +55,7 @@ import os
 import subprocess
 import hist_for as histf
 import time
+from scipy.constants import e as qe
 try:
     # cPickle is faster in python2
     import cPickle as pickle
@@ -62,10 +63,6 @@ except ImportError:
     # No cPickle in python3
     import pickle
 
-
-me=9.10938291e-31
-qe=1.602176565e-19
-qm=qe/me
 
 class pyecloud_saver:
 
@@ -108,11 +105,16 @@ class pyecloud_saver:
                  el_density_probes = [],
                  save_simulation_state_time_file = -1,
                  x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
-                 filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop'):
+                 filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop',
+                 flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
+        # cloud info
+        self.flag_multiple_clouds = flag_multiple_clouds
+        self.cloud_name = cloud_name
+        self.flag_last_cloud = flag_last_cloud
 
         # introduce decimation
         self.dec_fact_out = dec_fact_out
@@ -175,6 +177,10 @@ class pyecloud_saver:
         self.flag_video=(flag_movie==1)
         self.rho_video=None
         self.t_video=None
+
+        #rho video cloud
+        self.rho_video_cloud=None
+        self.t_video_cloud=None
 
         #efield video
         self.flag_sc_video=(flag_sc_movie==1)
@@ -298,57 +304,23 @@ class pyecloud_saver:
 
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
-        dynamics,gas_ion_flag,resgasion,t_ion,
-        t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list):
+                dynamics,gas_ion_flag,resgasion,t_ion,
+                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
+                cloud_list, rho_cloud = None):
 
         #MP state save
         if self.flag_save_MP_state:
             if  (MP_e.N_mp>0) and (self.i_obs<self.N_obs):
                 if (beamtim.tt_curr>=self.t_obs[self.i_obs]):
-                    filename_MP_state='MP_state_%d'%(self.i_obs)
+                    if self.flag_multiple_clouds:
+                        filename_MP_state='MP_state_%s_%d'%(self.cloud_name,self.i_obs)
+                    else:
+                        filename_MP_state='MP_state_%d'%(self.i_obs)
                     sio.savemat(filename_MP_state,{'tt':beamtim.tt_curr,'N_mp':MP_e.N_mp, 'x_mp':MP_e.x_mp[0:MP_e.N_mp], 'y_mp':MP_e.y_mp[0:MP_e.N_mp], 'z_mp':MP_e.z_mp[0:MP_e.N_mp],\
                                                     'vx_mp':MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp':MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp':MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp':MP_e.nel_mp[0:MP_e.N_mp]},oned_as='row')
 
                     print('Save MP state on ' + filename_MP_state)
                     self.i_obs=self.i_obs+1
-
-        #Simulation state save
-        if self.flag_save_simulation_state:
-            if  self.i_obs_sim<self.N_obs_sim:
-                if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
-                    filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
-
-                    temp_luobj = spacech_ele.PyPICobj.luobj
-                    spacech_ele.luobj=None
-                    spacech_ele.PyPICobj.luobj=None
-
-                    #~ dynamics.get_B=None
-
-                    dict_state = {
-                    'beamtim':beamtim,
-                    'MP_e':MP_e,
-                    'dynamics':dynamics,
-                    'impact_man':impact_man,
-                    'gas_ion_flag':gas_ion_flag,
-                    'resgasion':resgasion,
-                    't_ion':t_ion,
-                    'spacech_ele':spacech_ele,
-                    't_sc_ON':t_sc_ON,
-                    'photoem_flag':photoem_flag,
-                    'phemiss':phemiss,
-                    'flag_presence_sec_beams':flag_presence_sec_beams,
-                    'sec_beams_list':sec_beams_list}
-
-
-
-                    with open(filename_simulation_state, 'wb') as fid:
-                        # use best protocol available
-                        pickle.dump(dict_state, fid, protocol=-1)
-
-                    spacech_ele.PyPICobj.luobj = temp_luobj
-
-                    print('Save simulation state on ' + filename_simulation_state)
-                    self.i_obs_sim=self.i_obs_sim+1
 
         # Energy histogram saver
         if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
@@ -362,18 +334,18 @@ class pyecloud_saver:
                 impact_man.reset_cos_angle_hist()
 
         #Space charge electrostatic energy
-        if spacech_ele.flag_recomputed_sc:
+        if spacech_ele.last_recomputation_check:
             self.t_sc_video.append(beamtim.tt_curr)
             self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
 
         #save rho video
-        if self.flag_video:
+        if self.flag_video and self.flag_last_cloud:
             if not os.path.exists('rho_video'):
                 os.makedirs('rho_video')
             if self.rho_video is None:
                 self.rho_video=[]
                 self.t_video=[]
-            if spacech_ele.flag_recomputed_sc:
+            if spacech_ele.last_recomputation_check:
                 self.rho_video.append(spacech_ele.rho)
                 self.t_video.append(beamtim.tt_curr)
             if beamtim.flag_new_bunch_pass:
@@ -386,6 +358,29 @@ class pyecloud_saver:
                 self.rho_video=[]
                 self.t_video=[]
 
+        # save rho video for cloud
+        if self.flag_video and self.flag_multiple_clouds:
+            if not os.path.exists('rho_video_%s'%(self.cloud_name)):
+                os.makedirs('rho_video_%s'%(self.cloud_name))
+            if self.rho_video_cloud is None:
+                    self.rho_video_cloud = []
+                    self.t_video_cloud = []
+            if spacech_ele.last_recomputation_check:
+                if rho_cloud is None:
+                    print('Warning! No rho provided for saving.')
+                else:
+                    self.rho_video_cloud.append(rho_cloud)
+                self.t_video_cloud.append(beamtim.tt_curr)
+            if beamtim.flag_new_bunch_pass:
+                self.rho_video_cloud=np.array(self.rho_video_cloud)
+                self.t_video_cloud=np.array(self.t_video_cloud)
+                filename_rho='rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
+                print('Saving %s'%filename_rho)
+                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video_cloud,'rho_video':self.rho_video_cloud},oned_as='row')
+                print('Done')
+                self.rho_video_cloud=[]
+                self.t_video_cloud=[]
+
         #save efield video
         if self.flag_sc_video:
             if not os.path.exists('efield_video'):
@@ -394,7 +389,7 @@ class pyecloud_saver:
                 self.efx_video=[]
                 self.efy_video=[]
                 self.t_efield_video=[]
-            if spacech_ele.flag_recomputed_sc:
+            if spacech_ele.last_recomputation_check:
                 self.efx_video.append(spacech_ele.efx)
                 self.efy_video.append(spacech_ele.efy)
                 self.t_efield_video.append(beamtim.tt_curr)
@@ -434,7 +429,7 @@ class pyecloud_saver:
 
 
             self.Nel_time[ii_curr_dec]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5/qm*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
+            self.En_kin_eV_time[ii_curr_dec]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
             flag_center[MP_e.N_mp:]=False
@@ -554,15 +549,12 @@ class pyecloud_saver:
             sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
 
 
+
             # logfile and progressfile
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
-            string_tolog= timestr+(' pass. %d/%d Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
-
-
-#             flog=open(self.logfile_path,'a')
-#             flog.write(string_tolog)
-#             flog.close()
+            string_tolog= timestr+(' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,self.cloud_name,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
+            
             try:
                 with open(self.logfile_path,'a') as flog:
                     flog.write(string_tolog)
@@ -571,9 +563,6 @@ class pyecloud_saver:
                 print('while trying to write the following line on logfile:')
                 print(string_tolog)
 
-#             flog=open(self.progress_path,'w')
-#             flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
-#             flog.close()
             try:
                 with open(self.progress_path,'w') as flog:
                     flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
@@ -590,5 +579,41 @@ class pyecloud_saver:
                     raise ValueError('Stopped by user.')
             except IOError:
                 pass
+                
+        #Simulation state save
+        if self.flag_save_simulation_state and self.flag_last_cloud:
+            if  self.i_obs_sim<self.N_obs_sim:
+                if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
+                    filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
+
+                    temp_luobj = spacech_ele.PyPICobj.luobj
+                    spacech_ele.luobj=None
+                    spacech_ele.PyPICobj.luobj=None
+
+                    #~ dynamics.get_B=None
+
+                    if not save_pyeclsaver_state:
+                        for cloud in cloud_list:
+                            cloud.pyeclsaver = None
+
+                    dict_state = {
+                    'beamtim':beamtim,
+                    'spacech_ele':spacech_ele,
+                    't_sc_ON':t_sc_ON,
+                    'flag_presence_sec_beams':flag_presence_sec_beams,
+                    'sec_beams_list':sec_beams_list,
+                    'flag_multiple_clouds':self.flag_multiple_clouds,
+                    'cloud_list':cloud_list}
+
+
+                    with open(filename_simulation_state, 'wb') as fid:
+                        # use best protocol available
+                        pickle.dump(dict_state, fid, protocol=-1)
+
+                    spacech_ele.PyPICobj.luobj = temp_luobj
+
+                    print('Save simulation state on ' + filename_simulation_state)
+                    self.i_obs_sim=self.i_obs_sim+1
+
 
         return impact_man

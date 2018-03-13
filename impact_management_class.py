@@ -52,7 +52,7 @@ import numpy as np
 import electron_emission
 import hist_for as histf
 import seg_impact as segi
-
+from scipy.constants import e as qe
 
 class impact_management(object):
     def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
@@ -178,10 +178,6 @@ class impact_management(object):
             scrub_en_th = self.scrub_en_th
             thresh_low_energy = self.thresh_low_energy
 
-            me = MP_e.mass
-            qe = np.abs(MP_e.charge)
-            qm = qe/me
-
             ## impact management
 
             flag_impact = np.zeros_like(x_mp, dtype=bool)
@@ -220,7 +216,7 @@ class impact_management(object):
 
                 # compute impact velocities, energy and angle
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
-                E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
+                E_impact_eV=0.5*MP_e.mass/qe*v_impact_mod*v_impact_mod
                 v_impact_n=vx_impact*Norm_x+vy_impact*Norm_y
                 # Use np.abs to rule out negative values, which can happen in very seldom fringe cases.
                 # Mathematically correct would be -(v_impact_n)/v_impact_mod
@@ -276,7 +272,7 @@ class impact_management(object):
                     En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
                         switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
                     vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
-                        N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec])
+                        N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], MP_e.mass)
 
                     # Add new MPs
                     if n_add_total != 0:
@@ -293,7 +289,7 @@ class impact_management(object):
                         En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
                             switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
                         vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
-                            n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add)
+                            n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, MP_e.mass)
 
                         MP_e.add_new_MPs(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
                                          vx_mp_add, vy_mp_add, vz_mp_add)
@@ -312,7 +308,7 @@ class impact_management(object):
 
                 #subtract replaced macroparticles
                 v_emit_mod = np.sqrt(vx_emit**2+vy_emit**2+vz_emit**2)
-                E_emit_eV=0.5/qm*v_emit_mod*v_emit_mod
+                E_emit_eV=0.5*MP_e.mass/qe*v_emit_mod*v_emit_mod
                 histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                 if flag_seg:

@@ -63,7 +63,7 @@ extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
-                 slice_by_slice_mode=False, space_charge_obj=None, MP_e_mass=m_e, MP_e_charge=-e, **kwargs):
+                 slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
 
         print 'PyECLOUD Version 6.7.2'
 
@@ -96,20 +96,13 @@ class Ecloud(object):
 
         (
         beamtim,
-        MP_e,
-        dynamics,
-        impact_man,
-        pyeclsaver,
-        gas_ion_flag,
-        resgasion,
-        t_ion,
         spacech_ele,
         t_sc_ON,
-        photoem_flag,
-        phemiss,
         flag_presence_sec_beams,
         sec_beams_list,
-        config_dict
+        config_dict,
+        flag_multiple_clouds,
+        cloud_list
         ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True,
             skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None),
             ignore_kwargs=extra_allowed_kwargs, **kwargs)
@@ -156,10 +149,28 @@ class Ecloud(object):
 
         spacech_ele.flag_decimate = False
 
+        if flag_multiple_clouds:
+            raise ValueError('Multiple clouds not yet implemented in PyEC4PyHT!')
+        else:
+            cloud = cloud_list[0]
+
+            MP_e = cloud.MP_e
+            dynamics = cloud.dynamics
+            impact_man = cloud.impact_man
+            pyeclsaver = cloud.pyeclsaver
+            gas_ion_flag = cloud.gas_ion_flag
+            resgasion = cloud.resgasion
+            t_ion = cloud.t_ion
+            photoem_flag = cloud.photoem_flag
+            phemiss = cloud.phemiss
+
         self.MP_e = MP_e
         self.dynamics = dynamics
         self.impact_man = impact_man
         self.spacech_ele = spacech_ele
+
+        self.gas_ion_flag = gas_ion_flag
+        self.resgasion = resgasion
 
         self.save_ele_distributions_last_track = False
         self.save_ele_potential_and_field = False

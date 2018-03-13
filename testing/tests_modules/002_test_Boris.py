@@ -1,9 +1,10 @@
 import sys
+from numpy import array
+if '../../' not in sys.path: sys.path.append('../../')
+
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
-from numpy import array
 
-if '../../' not in sys.path: sys.path.append('../../')
 import MP_system as MPs
 from geom_impact_ellip import ellip_cham_geom_object
 

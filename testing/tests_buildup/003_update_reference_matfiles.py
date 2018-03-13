@@ -22,8 +22,13 @@ all_sim_folders = [
     'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns',
     'LHC_ArcDipReal_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns',
     'LHC_Triplet_Quadrupole_multiple_beams',
+    'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0',
+    'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0',
+    'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18',
+    'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18',
     'LHC_TDIS_non_unif_sey',
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile',
+    'LHC_Solenoid_sey1.10_100.00mT'
 ]
 
 for folder in all_sim_folders:

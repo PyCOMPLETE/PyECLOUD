@@ -120,7 +120,7 @@ class space_charge:
 
 
         self.flag_decimate=(self.Dt_sc is not None)
-        self.flag_recomputed_sc=False
+        self.last_recomputation_check=False
 
         print 'Done space charge init.'
 
@@ -139,30 +139,32 @@ class space_charge:
     @property
     def efy(self):
         return self.PyPICobj.efy
-
-
-    #@profile
-    def recompute_spchg_efield(self, MP_e, t_curr=None, force=False):
-
+        
+    def check_for_recomputation(self, t_curr=None):
         flag_recompute=True
+        
         if self.flag_decimate:
             flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
-
-        if flag_recompute or force:
+        
+        if flag_recompute:
             self.t_last_recom = t_curr
+            
+        self.last_recomputation_check = flag_recompute
+        
+        return flag_recompute
 
-            self.PyPICobj.scatter_and_solve(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge)
-            #~ U_sc_eV_stp = -0.5*eps0*np.sum(b*phi)*self.Dh*self.Dh/qe
-
-        self.flag_recomputed_sc=flag_recompute
-
+    #@profile
+    def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
+        # scatter
+        self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge, flag_add = not(flag_reset))
+        # solve
+        if flag_solve:
+            self.PyPICobj.solve()
 
     #@profile
     def compute_spchg_efield_from_rho(self, rho, flag_verbose = True):
         self.PyPICobj.solve(rho = rho, flag_verbose = flag_verbose)
 
-
     def get_sc_eletric_field(self, MP_e):
         Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
         return Ex_sc_n, Ey_sc_n
-

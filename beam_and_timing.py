@@ -55,7 +55,6 @@ import scipy.special as sspe
 from numpy import array
 import int_field_for as iff
 
-qe=1.602176565e-19;
 def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
 
     c=299792458.;
@@ -82,7 +81,7 @@ def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
 
 
 class beam_and_timing:
-    def __init__(self,flag_bunched_beam, fact_beam, coast_dens, beam_field_file, lam_th_beam_field,
+    def __init__(self,flag_bunched_beam, fact_beam, coast_dens, beam_charge, beam_field_file, lam_th_beam_field,
                  b_spac=None, sigmaz=None,t_offs=None, filling_pattern_file=None, Dt=None, t_end=None,
                  beam_long_prof_file=None, Dh_beam_field=None, f_telescope_beam = None, target_grid_beam = None,
                  N_nodes_discard_beam = None, N_min_Dh_main_beam = None,
@@ -320,6 +319,7 @@ class beam_and_timing:
         self.Nt=Nt
         self.b_spac=b_spac
         self.lam_t_array=lam_t_array
+        self.beam_charge = beam_charge
         self.t=t
         self.Dt=Dt
         self.N_pass_tot=N_pass_tot
@@ -360,8 +360,8 @@ class beam_and_timing:
             ## compute beam electric field
             Ex_n_beam, Ey_n_beam=iff.int_field(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],
                                                self.xmin_beam,self.ymin_beam,self.dx_beam,self.dy_beam,self.Ex_beam,self.Ey_beam)
-            Ex_n_beam=qe*self.lam_t_curr*Ex_n_beam;
-            Ey_n_beam=qe*self.lam_t_curr*Ey_n_beam;
+            Ex_n_beam=self.beam_charge*self.lam_t_curr*Ex_n_beam;
+            Ey_n_beam=self.beam_charge*self.lam_t_curr*Ey_n_beam;
 
         else:
             Ex_n_beam=0.
@@ -374,8 +374,8 @@ class beam_and_timing:
         if (self.lam_t_curr>self.lam_th_beam_field) and (MP_e.N_mp>0):
             ## compute beam electric field
             Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
-            Ex_n_beam=qe*self.lam_t_curr*Ex_n_beam;
-            Ey_n_beam=qe*self.lam_t_curr*Ey_n_beam;
+            Ex_n_beam=self.beam_charge*self.lam_t_curr*Ex_n_beam;
+            Ey_n_beam=self.beam_charge*self.lam_t_curr*Ey_n_beam;
         else:
             Ex_n_beam=0.
             Ey_n_beam=0.
