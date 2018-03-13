@@ -1,0 +1,24 @@
+# MACHINE PARAMETERS
+
+x_aper = 0.009
+y_aper = 0.009
+
+
+# Choose track_method: 'StrongBdip' / 'StrongBgen'/ 'Boris'
+track_method = 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [0.]
+
+
+betafx = 2.5
+betafy = 8.5
+Dx = 0.027
+
+ 
+# gas ionization parameters
+gas_ion_flag = 1
+P_nTorr = 100.
+sigma_ion_MBarn = 2.
+Temp_K = 300.
+unif_frac = 0.1
+E_init_ion = 0.1   #in eV

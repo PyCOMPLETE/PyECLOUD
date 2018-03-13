@@ -58,7 +58,7 @@ def update_module(module, new_module):
         else:
             setattr(module, attr, value)
 
-def update_config_dict(config_dict, module, module_name, verbose=False):
+def update_config_dict(config_dict, module, module_name, verbose=False, default_obj=None):
 
     mandatory_parameters = parameters_dict[module_name]['mandatory']
     optional_parameters = parameters_dict[module_name]['optional']
@@ -75,6 +75,8 @@ def update_config_dict(config_dict, module, module_name, verbose=False):
 
         if hasattr(module, parameter): # the parameter is specified in the input file
             value = getattr(module, parameter)
+        elif (default_obj is not None) and hasattr(default_obj, parameter):
+            value = getattr(default_obj, parameter)
         else: # the parameter is not specified in the input file (default to be used)
             value = default_value
 
@@ -87,6 +89,27 @@ def update_config_dict(config_dict, module, module_name, verbose=False):
 
         if verbose:
             print('%s: %s = %r' % (module_name, parameter, value))
+
+
+def copy_to_config_dict(config_dict, module_name, default_obj, verbose=False):
+
+    mandatory_parameters = parameters_dict[module_name]['mandatory']
+    optional_parameters = parameters_dict[module_name]['optional']
+
+    for parameter in mandatory_parameters:
+        value = getattr(default_obj, parameter)
+        config_dict[parameter] = value
+
+        if verbose:
+            print('%s: %s = %s' % (module_name, parameter, value))
+
+    for parameter in optional_parameters:
+        value = getattr(default_obj, parameter)
+        config_dict[parameter] = value
+
+        if verbose:
+            print('%s: %s = %s' % (module_name, parameter, value))
+
 
 def import_module_from_file(module_name, file_name):
     # Load any file as a python module. This function works for python2 and python3.

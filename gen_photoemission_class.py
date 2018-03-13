@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.2
+#                   PyECLOUD Version 7.0.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -84,7 +84,7 @@ class photoemission_base(object):
         En_gen = self.get_energy(Nint_new_MP) #in eV
 
         # generate velocities like in impact managment
-        vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
+        vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass)
 
         MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
 
@@ -248,7 +248,7 @@ class photoemission_per_segment(photoemission_base):
         if Nint_new_MP > 0:
             x_new_mp, y_new_mp, Norm_x, Norm_y = self.chamb.get_photoelectron_positions(Nint_new_MP)
             En_gen = self.get_energy(Nint_new_MP) #in eV
-            vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y)
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass)
 
             MP_e.add_new_MPs(x_new_mp.size, MP_e.nel_mp_ref, x_new_mp, y_new_mp, 0., vx_gen, vy_gen, vz_gen)
 

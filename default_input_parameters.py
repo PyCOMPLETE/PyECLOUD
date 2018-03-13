@@ -1,4 +1,4 @@
-from scipy.constants import m_p
+from scipy.constants import m_p, m_e, e as qe
 
 # To be safe, only use immutable python types as default values in the parameters_dict.
 # This most importantly excludes python lists. Tuples may be used in their place.
@@ -51,6 +51,14 @@ parameters_dict = {
         'optional':{
             # Secondary beams
             'secondary_beams_file_list': (),
+
+            # Additional clouds
+            'additional_clouds_file_list': (), 
+
+            # Name, mass and charge for default cloud
+            'cloud_name': None,
+            'cloud_mass': m_e, 
+            'cloud_charge': -qe,
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
@@ -192,6 +200,7 @@ parameters_dict = {
         },
         'optional': {
             # Basic definitions
+            'q_part': qe,
             'm0_part': m_p,
             'Dp_p': 0.,
             'nemittx': None,
@@ -242,8 +251,6 @@ parameters_dict = {
             'mufit',
 
             # Other parameters
-            'switch_no_increase_energy',
-            'thresh_low_energy',
             'scrub_en_th',
         },
         'optional': {
@@ -260,6 +267,9 @@ parameters_dict = {
 
             # Other parameters
             'secondary_angle_distribution': 'undefined',
+            'switch_no_increase_energy': 0,
+            'thresh_low_energy': -1,
+            
             # SEY from file
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
@@ -269,10 +279,145 @@ parameters_dict = {
     'combined_simulations_secondaryEmission_machine_parameters': {
         'mandatory': set(),
         'optional': {},
-    }
+    },
+    'additional_cloud_parameters': {
+        'mandatory': {
+
+            # Cloud particles
+            'cloud_mass',
+            'cloud_charge',
+
+            # Residual gas ionization flag
+            'gas_ion_flag',
+
+            # Photoemission flag
+            'photoem_flag',
+
+            # Uniform initial distribution flag
+            'init_unif_flag',
+
+            # Uniform initial density flag
+            'init_unif_edens_flag',
+
+            # Secondary emission model
+            'switch_model',
+        },
+        'optional': {
+
+            # MP management settings
+            'N_mp_max': (),
+            'N_mp_regen': (),
+            'N_mp_regen_low': (),
+            't_ON_regen_low': (),
+            'N_mp_after_regen': (),
+            'fact_split': (),
+            'fact_clean': (),
+            'nel_mp_ref_0': (),
+            'Nx_regen': (), 'Ny_regen': (), 'Nvx_regen': (), 'Nvy_regen': (), 'Nvz_regen': (),
+            'regen_hist_cut': (),
+
+            'N_mp_soft_regen': (),
+            'N_mp_after_soft_regen': (),
+
+            # Tracking and magnetic field
+            'N_sub_steps': (),
+
+            # Residual gas ionization
+            'P_nTorr': (),
+            'sigma_ion_MBarn': (),
+            'Temp_K': (),
+            'unif_frac': (),
+            'E_init_ion': (),
+
+            't_ion': (),
+
+            # Photoemission
+            'inv_CDF_refl_photoem_file': (),
+            'inv_CDF_all_photoem_file': (),
+            'k_pe_st': (),
+            'refl_frac': (),
+            'alimit': (),
+            'e_pe_sigma': (),
+            'e_pe_max': (),
+            'x0_refl': (),
+            'y0_refl': (),
+            'out_radius': (),
+            'phem_resc_fac': (),
+            'photoelectron_angle_distribution': (),
+            'energy_distribution': (),
+            'flag_continuous_emission': (),
+            'filename_chm_photoem': (),
+            'flag_counter_clockwise_chamb': (),
+
+            # Uniform initial distribution
+            'Nel_init_unif': (),
+            'E_init_unif': (),
+            'x_max_init_unif': (),
+            'x_min_init_unif': (),
+            'y_max_init_unif': (),
+            'y_min_init_unif': (),
+            'filename_init_MP_state': (),
+
+            # Uniform initial density
+            'init_unif_edens': (),
+            'E_init_unif_edens': (),
+            'x_max_init_unif_edens': (),
+            'x_min_init_unif_edens': (),
+            'y_max_init_unif_edens': (),
+            'y_min_init_unif_edens': (),
+
+            # Secondary emission parameters
+            'E_th': (),
+            'sigmafit': (),
+            'mufit': (),
+            'Emax': (),
+            's_param': (),
+            'del_max': (),
+            'R0': (),
+            'E0': (),
+
+            'switch_no_increase_energy': (),
+            'thresh_low_energy': (),
+            'scrub_en_th': (),
+
+            'secondary_angle_distribution': (),
+
+            'sey_file': (),
+            'flag_costheta_Emax_shift': (),
+            'flag_costheta_delta_scale': (),
+
+            # Saving settings
+            'Dx_hist': (),
+            'r_center': (),
+            'Dt_En_hist': (),
+            'Nbin_En_hist': (),
+            'En_hist_max': (),
+
+            'flag_movie': (),
+            'flag_sc_movie': (),
+            'flag_cos_angle_hist': (),
+            'cos_angle_width': (),
+            'save_mp_state_time_file': (),
+            'flag_detailed_MP_info': (),
+            'flag_hist_impact_seg': (),
+            'flag_verbose_file': (),
+            'flag_verbose_stdout': (),
+            'dec_fac_secbeam_prof': (),
+            'el_density_probes': (),
+            'save_simulation_state_time_file': (),
+            'x_min_hist_det': (),
+            'y_min_hist_det': (),
+            'x_max_hist_det': (),
+            'y_max_hist_det': (),
+            'Dx_hist_det': (),
+
+            # Log and progress files
+            'logfile_path': (),
+            'progress_path': (),
+        },
+    },
 }
 
 for key in ('secondary_emission_parameters', 'machine_parameters', 'simulation_parameters'):
     parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['mandatory'].update(parameters_dict[key]['mandatory'])
     parameters_dict['combined_simulations_secondaryEmission_machine_parameters']['optional'].update(parameters_dict[key]['optional'])
-

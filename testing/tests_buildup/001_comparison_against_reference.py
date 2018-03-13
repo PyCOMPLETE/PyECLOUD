@@ -27,8 +27,12 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_Drift_6500GeV_sey_1.70_1.1e11ppb_b1_1.00ns'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile'
 #sim_folder = 'LHC_Triplet_Quadrupole_multiple_beams'
-
-
+#sim_folder = 'LHC_TDIS_non_unif_sey'
+#sim_folder = 'LHC_Solenoid_sey1.10_100.00mT'
+#sim_folder = 'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0'
+#sim_folder = 'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0'
+#sim_folder = 'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18'
+#sim_folder = 'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18'
 
 
 # check if user provided folder as command line argument
@@ -55,7 +59,7 @@ except OSError as err:
 
 
 
-myfontsz = 14
+myfontsz = 10
 ms.mystyle_arial(fontsz=myfontsz)
 
 dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_angle%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
@@ -89,7 +93,7 @@ for ii,k in enumerate(out_var_curr):
         #Plot vector for the current simulation
         fig=pl.figure(ii)
         pl.subplots_adjust(right=0.75)
-        pl.title(out_var_curr[ii])
+        pl.title(out_var_curr[ii], fontsize=myfontsz)
 
         pl.plot(dict_curr[k],'b', label='curr_sim')
         print ii,k,'curr_sim'
@@ -109,8 +113,9 @@ for ii,k in enumerate(out_var_curr):
 
 
 
-        pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='upper left')
+        pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
         ms.sciy()
+        pl.suptitle(sim_folder)
         pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 
@@ -121,14 +126,14 @@ for ii,k in enumerate(out_var_curr):
 
         fig=pl.figure(ii)
         pl.subplots_adjust(top=1.2)
-        pl.suptitle(out_var_curr[ii])
+        pl.suptitle(out_var_curr[ii], fontsize=myfontsz)
         gs1 = gridspec.GridSpec(2, 1)
         gs2 = gridspec.GridSpec(3, 1)
 
 
         #Plot matrix for the current simulation
         sp1 = fig.add_subplot(gs1[0])
-        sp1.set_title('curr_sim')
+        sp1.set_title('curr_sim', fontsize=myfontsz)
         pl.pcolormesh(dict_curr[k])
         sp1.tick_params(labelsize=10)
         cbar=pl.colorbar()
@@ -146,8 +151,8 @@ for ii,k in enumerate(out_var_curr):
             #Plot number of e- for the reference passage
             sp3=fig.add_subplot(gs2[0])
             sp3.plot(dict_curr[k][ind_in_mat],'b', label='curr_sim')
-            sp3.legend(prop={'size':myfontsz},  loc='upper left')
-            sp3.set_title('index equal to [%d]'%n_pass)
+            sp3.legend(prop={'size':myfontsz},  loc='best')
+            sp3.set_title('index equal to [%d]'%ind_in_mat, fontsize=myfontsz)
             sp3.tick_params(labelsize=10)
             ms.sciy()
 
@@ -155,7 +160,7 @@ for ii,k in enumerate(out_var_curr):
             #Plot number of e- for each slice
             sp4=fig.add_subplot(gs2[1])
             sp4.plot(np.sum(dict_curr[k], axis=0),'b', label='curr_sim')
-            sp4.legend(prop={'size':myfontsz},  loc='upper left')
+            sp4.legend(prop={'size':myfontsz},  loc='best')
             #~ sp4.set_title('e- per slice')
             sp4.tick_params(labelsize=10)
             ms.sciy()
@@ -164,7 +169,7 @@ for ii,k in enumerate(out_var_curr):
             #Plot number of e- for each passage
             sp5=fig.add_subplot(gs2[2])
             sp5.plot(np.sum(dict_curr[k], axis=1),'b', label='curr_sim')
-            sp5.legend(prop={'size':myfontsz},  loc='upper right')
+            sp5.legend(prop={'size':myfontsz},  loc='best')
             #~ sp5.set_title('e- per passage')
             sp5.tick_params(labelsize=10)
             ms.sciy()
@@ -183,7 +188,7 @@ for ii,k in enumerate(out_var_curr):
 
             #Plot matrix for the reference simulation
             sp2= fig.add_subplot(gs1[1])
-            sp2.set_title('ref_sim')
+            sp2.set_title('ref_sim', fontsize=myfontsz)
             pl.pcolormesh(dict_ref[k])
             cbar=pl.colorbar()
             cbar.ax.tick_params(labelsize=10)
@@ -200,18 +205,18 @@ for ii,k in enumerate(out_var_curr):
                 
                 #Plot number of e- for the reference passage
                 sp3.plot(dict_ref[k][ind_in_mat],'r', label='ref_sim')
-                sp3.legend(prop={'size':myfontsz},  loc='upper left')
+                sp3.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
 
                 #Plot number of e- for each slice
                 sp4.plot(np.sum(dict_ref[k], axis=0),'r', label='ref_sim')
-                sp4.legend(prop={'size':myfontsz},  loc='upper left')
+                sp4.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
                 #Plot number of e- for each passage
                 sp5.plot(np.sum(dict_ref[k], axis=1),'r', label='ref_sim')
-                sp5.legend(prop={'size':myfontsz},  loc='upper right')
+                sp5.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
                 gs2.tight_layout(fig,rect=[0.45, 0, 1, 1], pad=1.08,h_pad=1.5)
@@ -231,6 +236,8 @@ for ii,k in enumerate(out_var_curr):
 
         gs1.update(top=top, bottom=bottom)
         gs2.update(top=top, bottom=bottom)
+        
+        pl.suptitle(sim_folder)
         pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 print 'Saved comparison plots in:'

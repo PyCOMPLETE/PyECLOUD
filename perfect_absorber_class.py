@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 6.7.2
+#                   PyECLOUD Version 7.0.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -50,7 +50,7 @@
 
 import hist_for as histf
 import numpy as np
-
+from scipy.constants import e as qe
 from impact_management_class import impact_management
 
 
@@ -84,10 +84,6 @@ class impact_management_perfect_absorber(impact_management):
             DEn_hist = self.DEn_hist
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
-
-            me = MP_e.mass
-            qe = np.abs(MP_e.charge)
-            qm = qe/me
 
             ## impact management
             N_mp_old=N_mp
@@ -123,7 +119,7 @@ class impact_management_perfect_absorber(impact_management):
 
                 # compute impact velocities, energy and angle
                 v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
-                E_impact_eV=0.5/qm*v_impact_mod*v_impact_mod
+                E_impact_eV=0.5*MP_e.mass/qe*v_impact_mod*v_impact_mod
 
                 #electron histogram
                 histf.compute_hist(x_emit,nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
@@ -158,4 +154,20 @@ class impact_management_perfect_absorber(impact_management):
                 MP_e.N_mp = N_mp
 
         return MP_e
+        
+        
+    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
+    
+        sey_mod = self.sey_mod
+        
+        nel_impact = 1. + 0.*E_impact_eV_test
+
+
+        del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        print('Extracting SEY curves...')
+        print(':-P')
+        print('Done extracting SEY curves.')       
+        
+        return del_true_mat, del_elast_mat
 
