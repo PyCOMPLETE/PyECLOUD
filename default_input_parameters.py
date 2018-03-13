@@ -251,8 +251,6 @@ parameters_dict = {
             'mufit',
 
             # Other parameters
-            'switch_no_increase_energy',
-            'thresh_low_energy',
             'scrub_en_th',
         },
         'optional': {
@@ -269,6 +267,9 @@ parameters_dict = {
 
             # Other parameters
             'secondary_angle_distribution': 'undefined',
+            'switch_no_increase_energy': 0,
+            'thresh_low_energy': -1,
+            
             # SEY from file
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
