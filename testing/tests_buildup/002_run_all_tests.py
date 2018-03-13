@@ -27,7 +27,7 @@ all_sim_folders = [
     'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ecloud_sey2.0',
     'CLIC_DRe-_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18',
     'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18',
-    'LHC_TDIS_non_unif_sey'
+    'LHC_TDIS_non_unif_sey',
     'LHC_Solenoid_sey1.10_100.00mT'
 ]
 
