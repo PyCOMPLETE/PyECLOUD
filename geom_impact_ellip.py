@@ -50,12 +50,19 @@
 
 
 
-from numpy import sum, sqrt, arctan2, sin, cos, isnan
+from numpy import sum, sqrt, arctan2, sin, cos, isnan, pi
 
 class ellip_cham_geom_object:
     def __init__(self, x_aper, y_aper, flag_verbose_file=True):
+        
+        print('Elliptic chamber')
+        
         self.x_aper = x_aper
         self.y_aper = y_aper
+        
+        self.area = pi*self.x_aper*self.y_aper
+        
+        print("The area of the chamber is %.3e m^2"%self.area)
 
         self.N_mp_impact=0
         self.N_mp_corrected=0
