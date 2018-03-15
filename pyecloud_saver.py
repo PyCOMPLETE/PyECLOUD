@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.0.0
+#                   PyECLOUD Version 7.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -91,7 +91,7 @@ class pyecloud_saver:
         print(git_branch)
 
         with open(self.logfile_path,'w') as flog:
-            flog.write('PyECLOUD Version 7.0.0\n')
+            flog.write('PyECLOUD Version 7.1.0\n')
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
@@ -539,6 +539,7 @@ class pyecloud_saver:
                     'sey_test_cos_theta':   self.sey_test_cos_theta,
                     'sey_test_del_true_mat':self.sey_test_del_true_mat,
                     'sey_test_del_elast_mat':self.sey_test_del_elast_mat,
+                    'chamber_area':         impact_man.chamb.area
                 }
                 
     
