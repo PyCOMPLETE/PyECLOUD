@@ -539,6 +539,7 @@ class pyecloud_saver:
                     'sey_test_cos_theta':   self.sey_test_cos_theta,
                     'sey_test_del_true_mat':self.sey_test_del_true_mat,
                     'sey_test_del_elast_mat':self.sey_test_del_elast_mat,
+                    'chamber_area':         impact_man.chamb.area
                 }
                 
     
