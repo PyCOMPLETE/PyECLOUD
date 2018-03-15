@@ -99,6 +99,13 @@ class polyg_cham_geom_object(object):
 
         Vx = np.array(Vx, float)
         Vy = np.array(Vy, float)
+        
+        self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
+        
+        print("The area of the chamber is %.3e m^2"%self.area)
+        
+        if self.area < 0:
+            raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
 
         Nx = -np.diff(Vy,1)
         Ny = np.diff(Vx,1)
