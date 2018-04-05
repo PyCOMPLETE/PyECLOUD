@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.1.0
+#                   PyECLOUD Version 7.1.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -390,7 +390,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud
-        rho = spacech_ele.rho*0.
+        if hasattr(spacech_ele, 'rho'):
+            rho = spacech_ele.rho*0.
+        else:
+            rho = None
 
         cloud = cman.Cloud(thiscloud.cloud_name, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
                                    resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
