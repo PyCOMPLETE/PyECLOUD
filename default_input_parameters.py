@@ -109,7 +109,6 @@ parameters_dict = {
             'y_aper': None,
             'filename_chm': None,
             'filename_chm_photoem': None,
-            'flag_counter_clockwise_chamb': None,
 
             # Tracking and magnetic field
             'track_method': 'StrongBdip',
@@ -347,7 +346,6 @@ parameters_dict = {
             'energy_distribution': (),
             'flag_continuous_emission': (),
             'filename_chm_photoem': (),
-            'flag_counter_clockwise_chamb': (),
 
             # Uniform initial distribution
             'Nel_init_unif': (),
