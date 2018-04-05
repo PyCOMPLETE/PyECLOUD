@@ -12,7 +12,7 @@ filename_chm_photoem = 'FCC_hh_full_chamber_phem.mat'
 # Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
 track_method= 'BorisMultipole'
 N_sub_steps = 5
-B_multip = [1.470000e+01]
+B_multip = [2.]
 
 betafx = 175.00
 betafy = 175.00

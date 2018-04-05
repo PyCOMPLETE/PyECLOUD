@@ -10,7 +10,7 @@ logfile_path = 'logfile.txt'
 progress_path = 'progress'
 stopfile = 'stop'
 
-Dt = 5.000000e-12
+Dt = 25.000000e-12
 t_end = 1e-9       #s (no effect if log. profile is imported from file)
 
 import numpy as np
@@ -40,8 +40,8 @@ fact_split = 1.5
 fact_clean = 1e-6
 regen_hist_cut = 1.e-4
 
-N_mp_soft_regen = 150000
-N_mp_after_soft_regen = 70000
+N_mp_soft_regen = 60000
+N_mp_after_soft_regen = 20000
 
 nel_mp_ref_0 = 3.68e6/(0.7*N_mp_soft_regen)
 
