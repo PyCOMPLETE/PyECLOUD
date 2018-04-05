@@ -1,0 +1,37 @@
+# MACHINE PARAMETERS
+
+chamb_type = 'polyg_cython'
+
+x_aper = 1.358000e-02
+y_aper = 1.182400e-02
+
+filename_chm = 'FCC_hh_full_chamber.mat'
+flag_assume_convex = False
+filename_chm_photoem = 'FCC_hh_full_chamber_phem.mat'
+
+# Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [1.470000e+01]
+
+betafx = 175.00
+betafy = 175.00
+
+# photoemission parameters
+photoem_flag = 3                #'per_segment'
+k_pe_st = 3.676e-5
+e_pe_sigma = 5. #in eV
+e_pe_max = 7.   #in eV
+out_radius = 20.e-3
+photoelectron_angle_distribution = 'cosine_3D'
+
+
+# uniform initial distrib
+init_unif_flag = -1
+Nel_init_unif = 1e7
+E_init_unif = 0.01   #in eV
+x_max_init_unif = x_aper
+x_min_init_unif = -x_aper
+y_max_init_unif = y_aper
+y_min_init_unif = -y_aper
+ 

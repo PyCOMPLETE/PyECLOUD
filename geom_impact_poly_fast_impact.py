@@ -358,10 +358,7 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
     # Distance of generated photoelecron MP relative to edge
     distance_new_phem = 1e-14
 
-    def __init__(self, filename_chm, flag_counter_clockwise_chamb):
-
-        if flag_counter_clockwise_chamb is None:
-            raise PyECLOUD_ChamberException('flag_counter_clockwise_chamb must be specified!')
+    def __init__(self, filename_chm):
 
         if isinstance(filename_chm, dict):
             dict_chm = filename_chm
@@ -389,6 +386,12 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         # Needed to calculate histograms and positions later
         self.Vx = Vx = np.append(orig_Vx, orig_Vx[0])
         self.Vy = Vy = np.append(orig_Vy, orig_Vy[0])
+        
+        self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
+        print("The area of the chamber is %.3e m^2"%self.area)
+        if self.area < 0:
+            raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
+        
         self.seg_diff_x = seg_diff_x = np.diff(Vx)
         self.seg_diff_y = seg_diff_y = np.diff(Vy)
         self.cdf_bins = np.append(0, phem_cdf)
@@ -397,13 +400,10 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         if np.any(len_segments == 0):
             raise PyECLOUD_ChamberException('Some segments have length 0!')
 
-        # Chamber corners are defined clockwise or counter-clockwise.
-        # This has an effect of the direction of the normal vector
-        self.normal_vect_x = seg_diff_y / len_segments
-        self.normal_vect_y = -seg_diff_x / len_segments
-        if not flag_counter_clockwise_chamb:
-            self.normal_vect_x *= -1
-            self.normal_vect_y *= -1
+        
+        self.normal_vect_x = -seg_diff_y / len_segments
+        self.normal_vect_y = seg_diff_x / len_segments
+
 
         self.phem_x0 = orig_Vx + self.distance_new_phem*self.normal_vect_x
         self.phem_y0 = orig_Vy + self.distance_new_phem*self.normal_vect_y

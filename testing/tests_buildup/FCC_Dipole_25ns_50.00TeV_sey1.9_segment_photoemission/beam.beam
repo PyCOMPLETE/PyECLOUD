@@ -1,0 +1,28 @@
+# BEAM PARAMETERS
+energy_eV = 5.000000e+13
+nemittx = 2.2e-06
+nemitty = nemittx	#m
+Dp_p = 0.000000e+00
+
+
+beam_field_file = 'computeFD'
+Dh_beam_field = .1e-3
+Nx = 440
+Ny = 360
+nimag = 20
+
+
+b_spac = 2.500000e-08
+                     	 #   it is used as period for clean and save)
+fact_beam = 1.000000e+11
+coast_dens = 0. #protons per meter
+
+flag_bunched_beam = 1 	 # 1: bunched beam 0:load profile from file 
+
+# to be filled in case of bunched beam
+sigmaz = 8.000000e-02
+t_offs = 2.5e-9
+filling_pattern_file = 1*(30*[1.]+5*[0])
+
+# to be filled in case of longitudinal profile from file
+beam_long_prof_file = -1
