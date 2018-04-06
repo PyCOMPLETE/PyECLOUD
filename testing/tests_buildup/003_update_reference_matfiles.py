@@ -28,7 +28,8 @@ all_sim_folders = [
     'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18',
     'LHC_TDIS_non_unif_sey',
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile',
-    'LHC_Solenoid_sey1.10_100.00mT'
+    'LHC_Solenoid_sey1.10_100.00mT',
+    'FCC_Dipole_25ns_50.00TeV_sey1.9_segment_photoemission'
 ]
 
 for folder in all_sim_folders:

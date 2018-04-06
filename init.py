@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.1.1
+#                   PyECLOUD Version 7.1.2
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -322,7 +322,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                                   thiscloud.e_pe_sigma, thiscloud.e_pe_max, thiscloud.k_pe_st, thiscloud.out_radius, 
                                                   thiscloud.photoelectron_angle_distribution, beamtim, thiscloud.flag_continuous_emission)
         elif thiscloud.photoem_flag in (3, 'per_segment'):
-            chamb_phemiss = gipfi.polyg_cham_photoemission(thiscloud.filename_chm_photoem, thiscloud.flag_counter_clockwise_chamb)
+            
+            if os.path.isfile(pyecl_input_folder+'/'+thiscloud.filename_chm_photoem):
+                filename_chm_photoem_path = pyecl_input_folder+'/'+thiscloud.filename_chm_photoem
+            elif os.path.isfile(pyecl_input_folder+'/'+thiscloud.filename_chm_photoem+'.mat'):
+                filename_chm_photoem_path = pyecl_input_folder+'/'+thiscloud.filename_chm_photoem+'.mat'
+            else:
+                filename_chm_photoem_path = thiscloud.filename_chm_photoem
+        
+            chamb_phemiss = gipfi.polyg_cham_photoemission(filename_chm_photoem_path)
             if not chamb_phemiss.vertexes_are_subset(chamb):
                 raise gipfi.PyECLOUD_ChamberException('Chambers for secondary emission and photoemission do not have the same shape!')
             phemiss = gpc.photoemission_per_segment(chamb_phemiss, thiscloud.energy_distribution, thiscloud.e_pe_sigma, thiscloud.e_pe_max, thiscloud.k_pe_st,

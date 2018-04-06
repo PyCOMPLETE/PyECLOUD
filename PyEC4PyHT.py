@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.1.1
+#                   PyECLOUD Version 7.1.2
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -65,7 +65,7 @@ class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
 
-        print 'PyECLOUD Version 7.1.1'
+        print 'PyECLOUD Version 7.1.2'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
@@ -463,7 +463,7 @@ class Ecloud(object):
             raise ValueError(
                     'track cannot clean the slices in slice-by-slice mode! ')
 
-        if beam.slice_info is not 'unsliced':
+        if beam.slice_info != 'unsliced':
             dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']
             self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
 

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.1.1
+#                   PyECLOUD Version 7.1.2
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -86,7 +86,10 @@ class polyg_cham_geom_object(object):
             self.R0_segments = np.squeeze(dict_chm['R0_segments'])
             self.Emax_segments = np.squeeze(dict_chm['Emax_segments'])
 
-
+        
+        if np.any(np.sqrt(np.diff(Vx)**2 + np.diff(Vy)**2)<1e-9):
+            raise PyECLOUD_ChamberException('There is a zero length segment!')
+        
         self.N_vert = len(Vx)
 
         N_edg = len(Vx)
@@ -317,6 +320,7 @@ class polyg_cham_geom_object(object):
         Tests if one point is on one of the chamber edges.
         """
         for diff_x, diff_y, vx, vy in zip(np.diff(self.Vx), np.diff(self.Vy), self.Vx, self.Vy):
+
             if x == vx and y == vy:
                 return True
             elif diff_x !=0 and diff_y != 0:
@@ -332,6 +336,7 @@ class polyg_cham_geom_object(object):
                 a = (x-vx)/diff_x
                 if 0 <= a <= 1:
                     return True
+
         return False
 
     def vertexes_are_subset(self, other_chamb):
@@ -358,10 +363,7 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
     # Distance of generated photoelecron MP relative to edge
     distance_new_phem = 1e-14
 
-    def __init__(self, filename_chm, flag_counter_clockwise_chamb):
-
-        if flag_counter_clockwise_chamb is None:
-            raise PyECLOUD_ChamberException('flag_counter_clockwise_chamb must be specified!')
+    def __init__(self, filename_chm):
 
         if isinstance(filename_chm, dict):
             dict_chm = filename_chm
@@ -389,21 +391,26 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         # Needed to calculate histograms and positions later
         self.Vx = Vx = np.append(orig_Vx, orig_Vx[0])
         self.Vy = Vy = np.append(orig_Vy, orig_Vy[0])
+        
+        self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
+        print("The area of the chamber is %.3e m^2"%self.area)
+        if self.area < 0:
+            raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
+        
         self.seg_diff_x = seg_diff_x = np.diff(Vx)
         self.seg_diff_y = seg_diff_y = np.diff(Vy)
         self.cdf_bins = np.append(0, phem_cdf)
 
         len_segments = np.sqrt(seg_diff_x**2 + seg_diff_y**2)
-        if np.any(len_segments == 0):
+
+        
+        if np.any(len_segments < 1e-9):
             raise PyECLOUD_ChamberException('Some segments have length 0!')
 
-        # Chamber corners are defined clockwise or counter-clockwise.
-        # This has an effect of the direction of the normal vector
-        self.normal_vect_x = seg_diff_y / len_segments
-        self.normal_vect_y = -seg_diff_x / len_segments
-        if not flag_counter_clockwise_chamb:
-            self.normal_vect_x *= -1
-            self.normal_vect_y *= -1
+        
+        self.normal_vect_x = -seg_diff_y / len_segments
+        self.normal_vect_y = seg_diff_x / len_segments
+
 
         self.phem_x0 = orig_Vx + self.distance_new_phem*self.normal_vect_x
         self.phem_y0 = orig_Vy + self.distance_new_phem*self.normal_vect_y
