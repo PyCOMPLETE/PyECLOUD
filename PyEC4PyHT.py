@@ -180,6 +180,8 @@ class Ecloud(object):
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
 
+        self.spacech_ele = self.cloudsim.spacech_ele # For backwards compatibility
+
     #    @profile
     def track(self, beam):
 
