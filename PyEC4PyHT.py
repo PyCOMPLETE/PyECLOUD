@@ -349,7 +349,7 @@ class Ecloud(object):
             self.N_MP_last_track.append(MP_e.N_mp)
 
         if self.save_ele_field_probes:
-            MP_probes = MP_light()
+            MP_probes = Empty()
             MP_probes.x_mp = self.x_probes
             MP_probes.y_mp = self.y_probes
             MP_probes.nel_mp = self.x_probes*0.+1. #fictitious charge of 1 C
