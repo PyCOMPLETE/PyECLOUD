@@ -79,6 +79,7 @@ class BuildupSimulation(object):
         self.sec_beams_list = sec_beams_list
         self.flag_multiple_clouds = flag_multiple_clouds
         self.cloud_list = cloud_list
+        self.chamb = cloud_list[0].impact_man.chamb
 
     def run(self, t_end_sim = None):
 
