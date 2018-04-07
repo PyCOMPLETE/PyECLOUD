@@ -205,7 +205,7 @@ class Ecloud(object):
         # self.init_nel = self.MP_e.nel_mp[:self.MP_e.N_mp].copy()
         # self.init_N_mp = self.MP_e.N_mp
 
-        self.init_MP_e_clouds = [cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list]
+        self.initial_MP_e_clouds = [cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list]
 
         self.flag_clean_slices = flag_clean_slices
 
@@ -396,14 +396,17 @@ class Ecloud(object):
 
     def _reinitialize(self):
 
-        self.MP_e.x_mp[:self.init_N_mp] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
-        self.MP_e.y_mp[:self.init_N_mp] = self.init_y
-        self.MP_e.z_mp[:self.init_N_mp] = self.init_z
-        self.MP_e.vx_mp[:self.init_N_mp] = self.init_vx
-        self.MP_e.vy_mp[:self.init_N_mp] = self.init_vy
-        self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
-        self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
-        self.MP_e.N_mp = self.init_N_mp
+        # self.MP_e.x_mp[:self.init_N_mp] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
+        # self.MP_e.y_mp[:self.init_N_mp] = self.init_y
+        # self.MP_e.z_mp[:self.init_N_mp] = self.init_z
+        # self.MP_e.vx_mp[:self.init_N_mp] = self.init_vx
+        # self.MP_e.vy_mp[:self.init_N_mp] = self.init_vy
+        # self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
+        # self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
+        # self.MP_e.N_mp = self.init_N_mp
+
+        for cloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
+            cloud.MP_e.init_from_dict(initdict)
 
         if self.save_ele_distributions_last_track:
             self.rho_ele_last_track = []

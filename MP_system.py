@@ -533,6 +533,11 @@ class MP_system:
             'vy_mp':self.vy_mp[:self.N_mp],
             'vy_mp':self.vz_mp[:self.N_mp],
             'nel_mp':self.nel_mp[:self.N_mp],
+            'N_mp':self.N_mp,
             }
         return dict_MP
+
+    def init_from_dict(self, dict_MP):
+        self.N_mp = 0
+        self.add_from_file(dict_MP)
 
