@@ -196,14 +196,16 @@ class Ecloud(object):
 
         self.track_only_first_time = False
 
-        self.init_x = self.MP_e.x_mp[:self.MP_e.N_mp].copy()
-        self.init_y = self.MP_e.y_mp[:self.MP_e.N_mp].copy()
-        self.init_z = self.MP_e.z_mp[:self.MP_e.N_mp].copy()
-        self.init_vx = self.MP_e.vx_mp[:self.MP_e.N_mp].copy()
-        self.init_vy = self.MP_e.vy_mp[:self.MP_e.N_mp].copy()
-        self.init_vz = self.MP_e.vz_mp[:self.MP_e.N_mp].copy()
-        self.init_nel = self.MP_e.nel_mp[:self.MP_e.N_mp].copy()
-        self.init_N_mp = self.MP_e.N_mp
+        # self.init_x = self.MP_e.x_mp[:self.MP_e.N_mp].copy()
+        # self.init_y = self.MP_e.y_mp[:self.MP_e.N_mp].copy()
+        # self.init_z = self.MP_e.z_mp[:self.MP_e.N_mp].copy()
+        # self.init_vx = self.MP_e.vx_mp[:self.MP_e.N_mp].copy()
+        # self.init_vy = self.MP_e.vy_mp[:self.MP_e.N_mp].copy()
+        # self.init_vz = self.MP_e.vz_mp[:self.MP_e.N_mp].copy()
+        # self.init_nel = self.MP_e.nel_mp[:self.MP_e.N_mp].copy()
+        # self.init_N_mp = self.MP_e.N_mp
+
+        self.init_MP_e_clouds = [cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list]
 
         self.flag_clean_slices = flag_clean_slices
 
@@ -212,7 +214,6 @@ class Ecloud(object):
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
 
-        wurstel
 
     #    @profile
     def track(self, beam):
