@@ -58,7 +58,7 @@ import numpy as np
 
 class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
-    				skip_pyeclsaver=False, ignore_kwargs=[], **kwargs):
+    				skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
         print 'PyECLOUD Version 7.1.2'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
@@ -67,9 +67,11 @@ class BuildupSimulation(object):
                                                     skip_beam=skip_beam,
             										skip_pyeclsaver=skip_pyeclsaver, 
             										skip_spacech_ele=skip_spacech_ele,
+            										spacech_ele = spacech_ele,
             										ignore_kwargs=ignore_kwargs, 
             										**kwargs)
 
+        self.config_dict = config_dict
         self.beamtim = beamtim
         self.spacech_ele = spacech_ele
         self.t_sc_ON = t_sc_ON

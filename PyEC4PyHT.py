@@ -97,32 +97,32 @@ class Ecloud(object):
 
         self.cloudsim = bsim.BuildupSimulation(
                     pyecl_input_folder=pyecl_input_folder, skip_beam=True, 
-                    skip_spacech_ele=(space_charge_obj is not None),
+                    spacech_ele=space_charge_obj,
                     skip_pyeclsaver=True, ignore_kwargs=extra_allowed_kwargs, **kwargs)
 
-        wurstel
 
-        (
-        beamtim,
-        spacech_ele,
-        t_sc_ON,
-        flag_presence_sec_beams,
-        sec_beams_list,
-        config_dict,
-        flag_multiple_clouds,
-        cloud_list
-        ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True,
-            skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None),
-            ignore_kwargs=extra_allowed_kwargs, **kwargs)
 
-        cc = mlm.obj_from_dict(config_dict)
+        # (
+        # beamtim,
+        # spacech_ele,
+        # t_sc_ON,
+        # flag_presence_sec_beams,
+        # sec_beams_list,
+        # config_dict,
+        # flag_multiple_clouds,
+        # cloud_list
+        # ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True,
+        #     skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None),
+        #     ignore_kwargs=extra_allowed_kwargs, **kwargs)
 
-        if space_charge_obj is not None:
-            spacech_ele = space_charge_obj
+        # cc = mlm.obj_from_dict(config_dict)
 
-        if cc.track_method == 'Boris':
+        # if space_charge_obj is not None:
+        #     spacech_ele = space_charge_obj
+
+        if self.cloudsim.config_dict['track_method'] == 'Boris':
             pass
-        elif cc.track_method == 'BorisMultipole':
+        elif self.cloudsim.config_dict['track_method'] == 'BorisMultipole':
             pass
         else:
             raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module""")
@@ -133,6 +133,7 @@ class Ecloud(object):
             self.x_beam_offset = kwargs['x_beam_offset']
         if 'y_beam_offset' in kwargs:
             self.y_beam_offset = kwargs['y_beam_offset']
+
 
         # initialize proton density probes
         self.save_ele_field_probes = False
@@ -155,30 +156,35 @@ class Ecloud(object):
 
         self.N_tracks = 0
 
-        spacech_ele.flag_decimate = False
+        self.cloudsim.spacech_ele.flag_decimate = False
 
-        if flag_multiple_clouds:
+
+
+        if self.cloudsim.flag_multiple_clouds:
             raise ValueError('Multiple clouds not yet implemented in PyEC4PyHT!')
-        else:
-            cloud = cloud_list[0]
 
-            MP_e = cloud.MP_e
-            dynamics = cloud.dynamics
-            impact_man = cloud.impact_man
-            pyeclsaver = cloud.pyeclsaver
-            gas_ion_flag = cloud.gas_ion_flag
-            resgasion = cloud.resgasion
-            t_ion = cloud.t_ion
-            photoem_flag = cloud.photoem_flag
-            phemiss = cloud.phemiss
+        # else:
+        #     cloud = cloud_list[0]
 
-        self.MP_e = MP_e
-        self.dynamics = dynamics
-        self.impact_man = impact_man
-        self.spacech_ele = spacech_ele
+        #     MP_e = cloud.MP_e
+        #     dynamics = cloud.dynamics
+        #     impact_man = cloud.impact_man
+        #     pyeclsaver = cloud.pyeclsaver
+        #     gas_ion_flag = cloud.gas_ion_flag
+        #     resgasion = cloud.resgasion
+        #     t_ion = cloud.t_ion
+        #     photoem_flag = cloud.photoem_flag
+        #     phemiss = cloud.phemiss
 
-        self.gas_ion_flag = gas_ion_flag
-        self.resgasion = resgasion
+
+
+        # self.MP_e = MP_e
+        # self.dynamics = dynamics
+        # self.impact_man = impact_man
+        # self.spacech_ele = spacech_ele
+
+        # self.gas_ion_flag = gas_ion_flag
+        # self.resgasion = resgasion
 
         self.save_ele_distributions_last_track = False
         self.save_ele_potential_and_field = False
@@ -205,6 +211,8 @@ class Ecloud(object):
         if self.slice_by_slice_mode:
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
+
+        wurstel
 
     #    @profile
     def track(self, beam):
