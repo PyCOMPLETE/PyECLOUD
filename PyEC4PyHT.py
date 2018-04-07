@@ -343,7 +343,7 @@ class Ecloud(object):
         dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
         
         # OK for single bunch, to be modified for multibunch
-        dummybeamtim.tt_curr = -1.
+        dummybeamtim.tt_curr = self.cloudsim.t_sc_ON + 1.
         dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
         dummybeamtim.Dt = dt
         dummybeamtim.sigmax = np.std(beam.x[ix]) 
