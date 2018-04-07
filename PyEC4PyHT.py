@@ -343,7 +343,7 @@ class Ecloud(object):
         dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
         
         # OK for single bunch, to be modified for multibunch
-        dummybeamtim.tt_curr = None
+        dummybeamtim.tt_curr = -1.
         dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
         dummybeamtim.Dt = dt
         dummybeamtim.sigmax = np.std(beam.x[ix]) 
@@ -360,9 +360,7 @@ class Ecloud(object):
         MP_p = Empty()
         MP_p.x_mp = beam.x[ix]+self.x_beam_offset
         MP_p.y_mp = beam.y[ix]+self.y_beam_offset
-        MP_p.nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz#they have to become cylinders
         MP_p.N_mp = len(beam.x[ix])
-        MP_p.charge = beam.charge
 
         ## compute cloud field on beam particles
         Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
