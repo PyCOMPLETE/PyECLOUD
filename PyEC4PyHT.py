@@ -115,25 +115,6 @@ class Ecloud(object):
                     skip_pyeclsaver=True, ignore_kwargs=extra_allowed_kwargs, **kwargs)
 
 
-
-        # (
-        # beamtim,
-        # spacech_ele,
-        # t_sc_ON,
-        # flag_presence_sec_beams,
-        # sec_beams_list,
-        # config_dict,
-        # flag_multiple_clouds,
-        # cloud_list
-        # ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True,
-        #     skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None),
-        #     ignore_kwargs=extra_allowed_kwargs, **kwargs)
-
-        # cc = mlm.obj_from_dict(config_dict)
-
-        # if space_charge_obj is not None:
-        #     spacech_ele = space_charge_obj
-
         if self.cloudsim.config_dict['track_method'] == 'Boris':
             pass
         elif self.cloudsim.config_dict['track_method'] == 'BorisMultipole':
@@ -175,30 +156,8 @@ class Ecloud(object):
 
 
         if self.cloudsim.flag_multiple_clouds:
-            raise ValueError('Multiple clouds not yet implemented in PyEC4PyHT!')
+            raise ValueError('Multiple clouds not yet tested in PyEC4PyHT!')
 
-        # else:
-        #     cloud = cloud_list[0]
-
-        #     MP_e = cloud.MP_e
-        #     dynamics = cloud.dynamics
-        #     impact_man = cloud.impact_man
-        #     pyeclsaver = cloud.pyeclsaver
-        #     gas_ion_flag = cloud.gas_ion_flag
-        #     resgasion = cloud.resgasion
-        #     t_ion = cloud.t_ion
-        #     photoem_flag = cloud.photoem_flag
-        #     phemiss = cloud.phemiss
-
-
-
-        # self.MP_e = MP_e
-        # self.dynamics = dynamics
-        # self.impact_man = impact_man
-        # self.spacech_ele = spacech_ele
-
-        # self.gas_ion_flag = gas_ion_flag
-        # self.resgasion = resgasion
 
         self.save_ele_distributions_last_track = False
         self.save_ele_potential_and_field = False
@@ -209,15 +168,6 @@ class Ecloud(object):
         self.save_ele_MP_size = False
 
         self.track_only_first_time = False
-
-        # self.init_x = self.MP_e.x_mp[:self.MP_e.N_mp].copy()
-        # self.init_y = self.MP_e.y_mp[:self.MP_e.N_mp].copy()
-        # self.init_z = self.MP_e.z_mp[:self.MP_e.N_mp].copy()
-        # self.init_vx = self.MP_e.vx_mp[:self.MP_e.N_mp].copy()
-        # self.init_vy = self.MP_e.vy_mp[:self.MP_e.N_mp].copy()
-        # self.init_vz = self.MP_e.vz_mp[:self.MP_e.N_mp].copy()
-        # self.init_nel = self.MP_e.nel_mp[:self.MP_e.N_mp].copy()
-        # self.init_N_mp = self.MP_e.N_mp
 
         self.initial_MP_e_clouds = [cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list]
 
@@ -316,9 +266,7 @@ class Ecloud(object):
 
     def _track_single_slice(self, beam, ix, dz):
 
-        # MP_e = self.MP_e
-        # dynamics = self.dynamics
-        # impact_man = self.impact_man
+
         spacech_ele = self.cloudsim.spacech_ele
 
         dt = dz / (beam.beta * c)
@@ -340,9 +288,10 @@ class Ecloud(object):
                     charge = beam.charge)
         self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
 
+        #build dummy beamtim object
         dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
         
-        # OK for single bunch, to be modified for multibunch
+        # OK for single bunch, to be modified for multibunch:
         dummybeamtim.tt_curr = self.cloudsim.t_sc_ON + 1. # In order to have the PIC activated
         dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
         dummybeamtim.Dt = dt
@@ -352,11 +301,12 @@ class Ecloud(object):
         dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
         dummybeamtim.flag_new_bunch_pass =False
 
+        # Perform cloud simulation step
         self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
                 Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps)
 
 
-        # Build slice MP_system-like object
+        # Build MP_system-like object with beam coordinates
         MP_p = Empty()
         MP_p.x_mp = beam.x[ix]+self.x_beam_offset
         MP_p.y_mp = beam.y[ix]+self.y_beam_offset
@@ -409,14 +359,6 @@ class Ecloud(object):
 
     def _reinitialize(self):
 
-        # self.MP_e.x_mp[:self.init_N_mp] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
-        # self.MP_e.y_mp[:self.init_N_mp] = self.init_y
-        # self.MP_e.z_mp[:self.init_N_mp] = self.init_z
-        # self.MP_e.vx_mp[:self.init_N_mp] = self.init_vx
-        # self.MP_e.vy_mp[:self.init_N_mp] = self.init_vy
-        # self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
-        # self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
-        # self.MP_e.N_mp = self.init_N_mp
 
         for cloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
             cloud.MP_e.init_from_dict(initdict)
