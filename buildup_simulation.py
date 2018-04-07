@@ -82,13 +82,10 @@ class BuildupSimulation(object):
 
     def run(self, t_end_sim = None):
 
-        beamtim = self.beamtim
-        spacech_ele = self.spacech_ele
-        t_sc_ON = self.t_sc_ON
-        flag_presence_sec_beams = self.flag_presence_sec_beams
+    	beamtim = self.beamtim
+
+    	flag_presence_sec_beams = self.flag_presence_sec_beams
         sec_beams_list = self.sec_beams_list
-        flag_multiple_clouds = self.flag_multiple_clouds
-        cloud_list = self.cloud_list
 
         print 'Start timestep iter'
 
@@ -100,93 +97,8 @@ class BuildupSimulation(object):
             if flag_presence_sec_beams:
                 for sec_beam in sec_beams_list:
                     sec_beam.next_time_step()
-                    
             
-            flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
-
-            # Loop over clouds: gather fields, move, generate new MPs
-            for i_cloud, cloud in enumerate(cloud_list):
-                MP_e = cloud.MP_e
-                dynamics = cloud.dynamics
-                impact_man = cloud.impact_man
-                gas_ion_flag = cloud.gas_ion_flag
-                resgasion = cloud.resgasion
-                t_ion = cloud.t_ion
-                photoem_flag = cloud.photoem_flag
-                phemiss = cloud.phemiss
-
-                ## compute beam electric field (main and secondary beams)
-                Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
-
-                if flag_presence_sec_beams:
-                    for sec_beam in sec_beams_list:
-                        Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(MP_e)
-                        Ex_n_beam+=Ex_n_secbeam
-                        Ey_n_beam+=Ey_n_secbeam
-
-                ## compute electron space charge electric field
-                Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-
-                ## Total electric field
-                Ex_n=Ex_sc_n+Ex_n_beam;
-                Ey_n=Ey_sc_n+Ey_n_beam;
-
-                ## save position before motion step
-                old_pos=MP_e.get_positions()
-
-                ## motion
-                MP_e = dynamics.step(MP_e, Ex_n, Ey_n);
-
-                ## impacts: backtracking and secondary emission
-                MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
-
-                ## gas ionization (main and secondary beams)
-                if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
-                    MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt, beamtim.sigmax, beamtim.sigmay,
-                                              x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
-                    if flag_presence_sec_beams:
-                        for sec_beam in sec_beams_list:
-                            MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt, sec_beam.sigmax, sec_beam.sigmay,
-                                                      x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
-
-                ## photoemission (main and secondary beams)
-                if (photoem_flag != 0):
-                    lam_curr_phem = beamtim.lam_t_curr
-                    if flag_presence_sec_beams:
-                        for sec_beam in sec_beams_list:
-                            lam_curr_phem += sec_beam.lam_t_curr
-                    phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
-
-                # Compute space charge field
-                if (beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge:
-                    flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
-                    flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
-                    spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
-
-                    # Copy rho to cloud
-                    cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
-
-
-            # We want to save and clean MP only after iteration on all clouds is completed 
-            # (e.g. to have consistent space charge state)
-            for cloud in cloud_list:
-                ## savings
-                cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
-                                                            cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
-                                                            cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, cloud_list, rho_cloud = cloud.rho)
-
-                ## every bunch passage
-                if beamtim.flag_new_bunch_pass:
-
-                    ## clean
-                    cloud.MP_e.clean_small_MPs()
-
-                    ## regeneration
-                    cloud.MP_e.check_for_regeneration()
-
-                    ## soft regeneration
-                    cloud.MP_e.check_for_soft_regeneration()
+            self.sim_time_step()
 
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
@@ -196,6 +108,109 @@ class BuildupSimulation(object):
                 if beamtim.tt_curr>    t_end_sim:
                     print 'Reached user defined t_end_sim --> Ending simulation'
                     break
+
+
+
+    def sim_time_step(self, beamtim_obj=None):
+
+    	if beamtim_obj is not None:
+    		beamtim = beamtim_obj
+    	else:
+	    	beamtim = self.beamtim
+
+        spacech_ele = self.spacech_ele
+        t_sc_ON = self.t_sc_ON
+        flag_presence_sec_beams = self.flag_presence_sec_beams
+        sec_beams_list = self.sec_beams_list
+        flag_multiple_clouds = self.flag_multiple_clouds
+        cloud_list = self.cloud_list
+
+        flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
+
+        # Loop over clouds: gather fields, move, generate new MPs
+        for i_cloud, cloud in enumerate(cloud_list):
+            MP_e = cloud.MP_e
+            dynamics = cloud.dynamics
+            impact_man = cloud.impact_man
+            gas_ion_flag = cloud.gas_ion_flag
+            resgasion = cloud.resgasion
+            t_ion = cloud.t_ion
+            photoem_flag = cloud.photoem_flag
+            phemiss = cloud.phemiss
+
+            ## compute beam electric field (main and secondary beams)
+            Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
+
+            if flag_presence_sec_beams:
+                for sec_beam in sec_beams_list:
+                    Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(MP_e)
+                    Ex_n_beam+=Ex_n_secbeam
+                    Ey_n_beam+=Ey_n_secbeam
+
+            ## compute electron space charge electric field
+            Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+
+            ## Total electric field
+            Ex_n=Ex_sc_n+Ex_n_beam;
+            Ey_n=Ey_sc_n+Ey_n_beam;
+
+            ## save position before motion step
+            old_pos=MP_e.get_positions()
+
+            ## motion
+            MP_e = dynamics.step(MP_e, Ex_n, Ey_n);
+
+            ## impacts: backtracking and secondary emission
+            MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
+
+            ## gas ionization (main and secondary beams)
+            if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
+                MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt, beamtim.sigmax, beamtim.sigmay,
+                                          x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
+                if flag_presence_sec_beams:
+                    for sec_beam in sec_beams_list:
+                        MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt, sec_beam.sigmax, sec_beam.sigmay,
+                                                  x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
+
+            ## photoemission (main and secondary beams)
+            if (photoem_flag != 0):
+                lam_curr_phem = beamtim.lam_t_curr
+                if flag_presence_sec_beams:
+                    for sec_beam in sec_beams_list:
+                        lam_curr_phem += sec_beam.lam_t_curr
+                phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
+
+            # Compute space charge field
+            if (beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge:
+                flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
+                flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
+                spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+
+                # Copy rho to cloud
+                cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
+
+
+        # We want to save and clean MP only after iteration on all clouds is completed 
+        # (e.g. to have consistent space charge state)
+        for cloud in cloud_list:
+            ## savings
+            cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
+                                                        cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
+                                                        cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
+                                                        sec_beams_list, cloud_list, rho_cloud = cloud.rho)
+
+            ## every bunch passage
+            if beamtim.flag_new_bunch_pass:
+
+                ## clean
+                cloud.MP_e.clean_small_MPs()
+
+                ## regeneration
+                cloud.MP_e.check_for_regeneration()
+
+                ## soft regeneration
+                cloud.MP_e.check_for_soft_regeneration()
+
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'): #, reset_pyeclsaver = True):
 

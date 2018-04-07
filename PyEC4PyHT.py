@@ -301,10 +301,12 @@ class Ecloud(object):
 
     def _track_single_slice(self, beam, ix, dz):
 
-        MP_e = self.MP_e
-        dynamics = self.dynamics
-        impact_man = self.impact_man
-        spacech_ele = self.spacech_ele
+        # MP_e = self.MP_e
+        # dynamics = self.dynamics
+        # impact_man = self.impact_man
+        spacech_ele = self.cloudsim.spacech_ele
+
+        wurstel
 
         dt = dz / (beam.beta * c)
 
