@@ -55,6 +55,7 @@ from scipy.constants import c, e, m_e
 
 import myloadmat_to_obj as mlm
 import init
+import buildup_simulation as bsim
 
 class MP_light(object):
     pass
@@ -93,6 +94,13 @@ class Ecloud(object):
 
         self.pyecl_input_folder = pyecl_input_folder
         self.kwargs = kwargs
+
+        self.cloudsim = bsim.BuildupSimulation(
+                    pyecl_input_folder=pyecl_input_folder, skip_beam=True, 
+                    skip_spacech_ele=(space_charge_obj is not None),
+                    skip_pyeclsaver=True, ignore_kwargs=extra_allowed_kwargs, **kwargs)
+
+        wurstel
 
         (
         beamtim,
