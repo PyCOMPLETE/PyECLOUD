@@ -111,7 +111,7 @@ class BuildupSimulation(object):
 
 
 
-    def sim_time_step(self, beamtim_obj=None):
+    def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None):
 
     	if beamtim_obj is not None:
     		beamtim = beamtim_obj
@@ -158,7 +158,12 @@ class BuildupSimulation(object):
             old_pos=MP_e.get_positions()
 
             ## motion
-            MP_e = dynamics.step(MP_e, Ex_n, Ey_n);
+            if Dt_substep_custom is None and N_sub_steps_custom is None:
+                MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
+            else:
+                if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
+                    raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
 
             ## impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
@@ -193,11 +198,14 @@ class BuildupSimulation(object):
         # We want to save and clean MP only after iteration on all clouds is completed 
         # (e.g. to have consistent space charge state)
         for cloud in cloud_list:
-            ## savings
-            cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
-                                                        cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
-                                                        cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                        sec_beams_list, cloud_list, rho_cloud = cloud.rho)
+            
+            if cloud.pyeclsaver is not None:
+                if Dt_substep_custom is not None or N_sub_steps_custom is not None:
+                    raise ValueError('Saving with custom steps not implemented!')
+                cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
+                                                            cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
+                                                            cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
+                                                            sec_beams_list, cloud_list, rho_cloud = cloud.rho)
 
             ## every bunch passage
             if beamtim.flag_new_bunch_pass:

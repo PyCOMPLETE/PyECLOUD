@@ -57,8 +57,22 @@ import myloadmat_to_obj as mlm
 import init
 import buildup_simulation as bsim
 
-class MP_light(object):
+class Empty(object):
     pass
+
+class DummyBeamTim(object):
+    def __init__(self, PyPIC_state):
+        self.PyPIC_state = PyPIC_state
+
+    def get_beam_eletric_field(self, MP_e):
+        if (MP_e.N_mp>0):
+            ## compute beam electric field
+            Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+        else:
+            Ex_n_beam=0.
+            Ey_n_beam=0.
+        return Ex_n_beam, Ey_n_beam
+
 
 extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
@@ -209,11 +223,12 @@ class Ecloud(object):
 
         self.flag_clean_slices = flag_clean_slices
 
+        self.beam_PyPIC_state = self.cloudsim.spacech_ele.PyPICobj.get_state_object()
+
         self.slice_by_slice_mode = slice_by_slice_mode
         if self.slice_by_slice_mode:
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
-
 
     #    @profile
     def track(self, beam):
@@ -306,8 +321,6 @@ class Ecloud(object):
         # impact_man = self.impact_man
         spacech_ele = self.cloudsim.spacech_ele
 
-        wurstel
-
         dt = dz / (beam.beta * c)
 
         # define substep
@@ -319,47 +332,47 @@ class Ecloud(object):
         Dt_substep = dt/N_sub_steps
         #print Dt_substep, N_sub_steps, dt
 
-
         # beam field
-        MP_p = MP_light()
+        self.beam_PyPIC_state.scatter(
+                    x_mp = beam.x[ix]+self.x_beam_offset, 
+                    y_mp = beam.y[ix]+self.y_beam_offset, 
+                    nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
+                    charge = beam.charge)
+        self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+
+        dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+        
+        # OK for single bunch, to be modified for multibunch
+        dummybeamtim.tt_curr = None
+        dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
+        dummybeamtim.Dt = dt
+        dummybeamtim.sigmax = np.std(beam.x[ix]) 
+        dummybeamtim.sigmay = np.std(beam.y[ix])
+        dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
+        dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
+        dummybeamtim.flag_new_bunch_pass =False
+
+        self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
+                Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps)
+
+
+        # Build slice MP_system-like object
+        MP_p = Empty()
         MP_p.x_mp = beam.x[ix]+self.x_beam_offset
         MP_p.y_mp = beam.y[ix]+self.y_beam_offset
         MP_p.nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz#they have to become cylinders
         MP_p.N_mp = len(beam.x[ix])
         MP_p.charge = beam.charge
-        #compute beam field (it assumes electrons!)
-        spacech_ele.recompute_spchg_efield(MP_p)
-        #scatter to electrons
-        Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e)
 
-
-        ## compute electron field map
-        spacech_ele.recompute_spchg_efield(MP_e)
-
-        ## compute electron field on electrons
-        Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-
-        ## compute electron field on beam particles
+        ## compute cloud field on beam particles
         Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
-
-        ## Total electric field on electrons
-        Ex_n=Ex_sc_n+Ex_n_beam
-        Ey_n=Ey_sc_n+Ey_n_beam
-
-        ## save position before motion step
-        old_pos=MP_e.get_positions()
-
-        ## motion electrons
-        MP_e = dynamics.stepcustomDt(MP_e, Ex_n,Ey_n, Dt_substep=Dt_substep, N_sub_steps=N_sub_steps)
-
-        ## impacts: backtracking and secondary emission
-        MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 
         ## kick beam particles
         fact_kick = beam.charge/(beam.mass*beam.beta*beam.beta*beam.gamma*c*c)*self.L_ecloud
         beam.xp[ix]+=fact_kick*Ex_sc_p
         beam.yp[ix]+=fact_kick*Ey_sc_p
 
+        ## Diagnostics
         if self.save_ele_distributions_last_track:
             self.rho_ele_last_track.append(spacech_ele.rho.copy())
             #print 'Here'
