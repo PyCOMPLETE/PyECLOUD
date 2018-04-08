@@ -236,15 +236,7 @@ class Ecloud(object):
 
             if delete_ecloud_data:
                 self.spacech_ele=None
-                self.Mp_e = None
-                self.init_nel = None
-                self.init_vx = None
-                self.init_vy = None
-                self.init_vz = None
-                self.init_x = None
-                self.init_y = None
-                self.init_z = None
-
+                self.cloudsim=None
 
         else:
             print 'Warning: efieldmap already exists. I do nothing.'
