@@ -50,6 +50,8 @@
 
 import os
 import subprocess
+import time
+
 import numpy as np
 from scipy.constants import c, e, m_e
 
@@ -78,7 +80,9 @@ extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
-                 slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
+                 slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
+                 beam_monitor=None, verbose=False,
+                 **kwargs):
 
         print 'PyECLOUD Version 7.1.2'
 
@@ -182,6 +186,11 @@ class Ecloud(object):
 
         self.spacech_ele = self.cloudsim.spacech_ele # For backwards compatibility
 
+        self.kick_mode_for_beam_field = kick_mode_for_beam_field
+        self.beam_monitor = beam_monitor
+        
+        self.verbose = verbose
+
     #    @profile
     def track(self, beam):
 
@@ -189,7 +198,10 @@ class Ecloud(object):
             if self.N_tracks>0:
                 print 'Warning: Track skipped because track_only_first_time is True.'
                 return
-
+        
+        if self.verbose:
+            start_time = time.mktime(time.localtime())
+        
         self._reinitialize()
 
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
@@ -209,8 +221,17 @@ class Ecloud(object):
             dz = (slices.z_bins[i + 1] - slices.z_bins[i])
 
             self._track_single_slice(beam, ix, dz)
+            
+        
+        # Used by Lotta to debug fastion mode
+        if self.beam_monitor is not None:
+            self.beam_monitor.dump(beam)
 
         self._finalize()
+        
+        if self.verbose:
+            stop_time = time.mktime(time.localtime())
+            print 'Done track %d in %.1f s'%(self.N_tracks, stop_time-start_time)
 
         self.N_tracks+=1
 
@@ -293,11 +314,12 @@ class Ecloud(object):
         dummybeamtim.sigmay = np.std(beam.y[ix])
         dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
         dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
-        dummybeamtim.flag_new_bunch_pass =False
+        dummybeamtim.flag_new_bunch_pass = False
 
         # Perform cloud simulation step
         self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
-                Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps)
+                Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps, 
+                kick_mode_for_beam_field=self.kick_mode_for_beam_field)
 
 
         # Build MP_system-like object with beam coordinates
