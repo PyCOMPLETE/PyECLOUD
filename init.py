@@ -119,7 +119,9 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     return config_dict
 
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
-            skip_pyeclsaver=False, skip_spacech_ele=False, ignore_kwargs=(), **kwargs):
+            skip_pyeclsaver=False, skip_spacech_ele=False, 
+            spacech_ele=None,
+            ignore_kwargs=(), **kwargs):
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
 
@@ -222,14 +224,18 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         sec_beams_list = []
 
     # Init spacecharge
-    if not skip_spacech_ele:
+    if skip_spacech_ele:
+        spacech_ele_sim = None
+    elif spacech_ele is not None:
+        spacech_ele_sim = spacech_ele
+    else:
         if cc.sparse_solver=='klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver='PyKLU'
-        spacech_ele = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+        spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                             f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
-    else:
-        spacech_ele = None
+
+        
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -398,8 +404,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud
-        if hasattr(spacech_ele, 'rho'):
-            rho = spacech_ele.rho*0.
+        if hasattr(spacech_ele_sim, 'rho'):
+            rho = spacech_ele_sim.rho*0.
         else:
             rho = None
 
@@ -410,7 +416,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
 
     return (beamtim,
-            spacech_ele,
+            spacech_ele_sim,
             cc.t_sc_ON,
             flag_presence_sec_beams,
             sec_beams_list,

@@ -50,20 +50,39 @@
 
 import os
 import subprocess
+import time
+
 import numpy as np
 from scipy.constants import c, e, m_e
 
 import myloadmat_to_obj as mlm
 import init
+import buildup_simulation as bsim
 
-class MP_light(object):
+class Empty(object):
     pass
+
+class DummyBeamTim(object):
+    def __init__(self, PyPIC_state):
+        self.PyPIC_state = PyPIC_state
+
+    def get_beam_eletric_field(self, MP_e):
+        if (MP_e.N_mp>0):
+            ## compute beam electric field
+            Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+        else:
+            Ex_n_beam=0.
+            Ey_n_beam=0.
+        return Ex_n_beam, Ey_n_beam
+
 
 extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
-                 slice_by_slice_mode=False, space_charge_obj=None, **kwargs):
+                 slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
+                 beam_monitor=None, verbose=False,
+                 **kwargs):
 
         print 'PyECLOUD Version 7.1.2'
 
@@ -94,27 +113,15 @@ class Ecloud(object):
         self.pyecl_input_folder = pyecl_input_folder
         self.kwargs = kwargs
 
-        (
-        beamtim,
-        spacech_ele,
-        t_sc_ON,
-        flag_presence_sec_beams,
-        sec_beams_list,
-        config_dict,
-        flag_multiple_clouds,
-        cloud_list
-        ) = init.read_input_files_and_init_components(pyecl_input_folder=pyecl_input_folder, skip_beam=True,
-            skip_pyeclsaver=True, skip_spacech_ele=(space_charge_obj is not None),
-            ignore_kwargs=extra_allowed_kwargs, **kwargs)
+        self.cloudsim = bsim.BuildupSimulation(
+                    pyecl_input_folder=pyecl_input_folder, skip_beam=True, 
+                    spacech_ele=space_charge_obj,
+                    skip_pyeclsaver=True, ignore_kwargs=extra_allowed_kwargs, **kwargs)
 
-        cc = mlm.obj_from_dict(config_dict)
 
-        if space_charge_obj is not None:
-            spacech_ele = space_charge_obj
-
-        if cc.track_method == 'Boris':
+        if self.cloudsim.config_dict['track_method'] == 'Boris':
             pass
-        elif cc.track_method == 'BorisMultipole':
+        elif self.cloudsim.config_dict['track_method'] == 'BorisMultipole':
             pass
         else:
             raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module""")
@@ -125,6 +132,7 @@ class Ecloud(object):
             self.x_beam_offset = kwargs['x_beam_offset']
         if 'y_beam_offset' in kwargs:
             self.y_beam_offset = kwargs['y_beam_offset']
+
 
         # initialize proton density probes
         self.save_ele_field_probes = False
@@ -147,30 +155,13 @@ class Ecloud(object):
 
         self.N_tracks = 0
 
-        spacech_ele.flag_decimate = False
+        self.cloudsim.spacech_ele.flag_decimate = False
 
-        if flag_multiple_clouds:
-            raise ValueError('Multiple clouds not yet implemented in PyEC4PyHT!')
-        else:
-            cloud = cloud_list[0]
 
-            MP_e = cloud.MP_e
-            dynamics = cloud.dynamics
-            impact_man = cloud.impact_man
-            pyeclsaver = cloud.pyeclsaver
-            gas_ion_flag = cloud.gas_ion_flag
-            resgasion = cloud.resgasion
-            t_ion = cloud.t_ion
-            photoem_flag = cloud.photoem_flag
-            phemiss = cloud.phemiss
 
-        self.MP_e = MP_e
-        self.dynamics = dynamics
-        self.impact_man = impact_man
-        self.spacech_ele = spacech_ele
+        if self.cloudsim.flag_multiple_clouds:
+            raise ValueError('Multiple clouds not yet tested in PyEC4PyHT!')
 
-        self.gas_ion_flag = gas_ion_flag
-        self.resgasion = resgasion
 
         self.save_ele_distributions_last_track = False
         self.save_ele_potential_and_field = False
@@ -182,21 +173,23 @@ class Ecloud(object):
 
         self.track_only_first_time = False
 
-        self.init_x = self.MP_e.x_mp[:self.MP_e.N_mp].copy()
-        self.init_y = self.MP_e.y_mp[:self.MP_e.N_mp].copy()
-        self.init_z = self.MP_e.z_mp[:self.MP_e.N_mp].copy()
-        self.init_vx = self.MP_e.vx_mp[:self.MP_e.N_mp].copy()
-        self.init_vy = self.MP_e.vy_mp[:self.MP_e.N_mp].copy()
-        self.init_vz = self.MP_e.vz_mp[:self.MP_e.N_mp].copy()
-        self.init_nel = self.MP_e.nel_mp[:self.MP_e.N_mp].copy()
-        self.init_N_mp = self.MP_e.N_mp
+        self.initial_MP_e_clouds = [cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list]
 
         self.flag_clean_slices = flag_clean_slices
+
+        self.beam_PyPIC_state = self.cloudsim.spacech_ele.PyPICobj.get_state_object()
 
         self.slice_by_slice_mode = slice_by_slice_mode
         if self.slice_by_slice_mode:
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
+
+        self.spacech_ele = self.cloudsim.spacech_ele # For backwards compatibility
+
+        self.kick_mode_for_beam_field = kick_mode_for_beam_field
+        self.beam_monitor = beam_monitor
+        
+        self.verbose = verbose
 
     #    @profile
     def track(self, beam):
@@ -205,7 +198,10 @@ class Ecloud(object):
             if self.N_tracks>0:
                 print 'Warning: Track skipped because track_only_first_time is True.'
                 return
-
+        
+        if self.verbose:
+            start_time = time.mktime(time.localtime())
+        
         self._reinitialize()
 
         if hasattr(beam.particlenumber_per_mp, '__iter__'):
@@ -225,8 +221,17 @@ class Ecloud(object):
             dz = (slices.z_bins[i + 1] - slices.z_bins[i])
 
             self._track_single_slice(beam, ix, dz)
+            
+        
+        # Used by Lotta to debug fastion mode
+        if self.beam_monitor is not None:
+            self.beam_monitor.dump(beam)
 
         self._finalize()
+        
+        if self.verbose:
+            stop_time = time.mktime(time.localtime())
+            print 'Done track %d in %.1f s'%(self.N_tracks, stop_time-start_time)
 
         self.N_tracks+=1
 
@@ -252,15 +257,7 @@ class Ecloud(object):
 
             if delete_ecloud_data:
                 self.spacech_ele=None
-                self.Mp_e = None
-                self.init_nel = None
-                self.init_vx = None
-                self.init_vy = None
-                self.init_vz = None
-                self.init_x = None
-                self.init_y = None
-                self.init_z = None
-
+                self.cloudsim=None
 
         else:
             print 'Warning: efieldmap already exists. I do nothing.'
@@ -284,10 +281,8 @@ class Ecloud(object):
 
     def _track_single_slice(self, beam, ix, dz):
 
-        MP_e = self.MP_e
-        dynamics = self.dynamics
-        impact_man = self.impact_man
-        spacech_ele = self.spacech_ele
+
+        spacech_ele = self.cloudsim.spacech_ele
 
         dt = dz / (beam.beta * c)
 
@@ -300,47 +295,48 @@ class Ecloud(object):
         Dt_substep = dt/N_sub_steps
         #print Dt_substep, N_sub_steps, dt
 
-
         # beam field
-        MP_p = MP_light()
+        self.beam_PyPIC_state.scatter(
+                    x_mp = beam.x[ix]+self.x_beam_offset, 
+                    y_mp = beam.y[ix]+self.y_beam_offset, 
+                    nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
+                    charge = beam.charge)
+        self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+
+        #build dummy beamtim object
+        dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+        
+        # OK for single bunch, to be modified for multibunch:
+        dummybeamtim.tt_curr = self.cloudsim.t_sc_ON + 1. # In order to have the PIC activated
+        dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
+        dummybeamtim.Dt = dt
+        dummybeamtim.sigmax = np.std(beam.x[ix]) 
+        dummybeamtim.sigmay = np.std(beam.y[ix])
+        dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
+        dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
+        dummybeamtim.flag_new_bunch_pass = False
+
+        # Perform cloud simulation step
+        self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
+                Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps, 
+                kick_mode_for_beam_field=self.kick_mode_for_beam_field)
+
+
+        # Build MP_system-like object with beam coordinates
+        MP_p = Empty()
         MP_p.x_mp = beam.x[ix]+self.x_beam_offset
         MP_p.y_mp = beam.y[ix]+self.y_beam_offset
-        MP_p.nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz#they have to become cylinders
         MP_p.N_mp = len(beam.x[ix])
-        MP_p.charge = beam.charge
-        #compute beam field (it assumes electrons!)
-        spacech_ele.recompute_spchg_efield(MP_p)
-        #scatter to electrons
-        Ex_n_beam, Ey_n_beam = spacech_ele.get_sc_eletric_field(MP_e)
 
-
-        ## compute electron field map
-        spacech_ele.recompute_spchg_efield(MP_e)
-
-        ## compute electron field on electrons
-        Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-
-        ## compute electron field on beam particles
+        ## compute cloud field on beam particles
         Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
-
-        ## Total electric field on electrons
-        Ex_n=Ex_sc_n+Ex_n_beam
-        Ey_n=Ey_sc_n+Ey_n_beam
-
-        ## save position before motion step
-        old_pos=MP_e.get_positions()
-
-        ## motion electrons
-        MP_e = dynamics.stepcustomDt(MP_e, Ex_n,Ey_n, Dt_substep=Dt_substep, N_sub_steps=N_sub_steps)
-
-        ## impacts: backtracking and secondary emission
-        MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 
         ## kick beam particles
         fact_kick = beam.charge/(beam.mass*beam.beta*beam.beta*beam.gamma*c*c)*self.L_ecloud
         beam.xp[ix]+=fact_kick*Ex_sc_p
         beam.yp[ix]+=fact_kick*Ey_sc_p
 
+        ## Diagnostics
         if self.save_ele_distributions_last_track:
             self.rho_ele_last_track.append(spacech_ele.rho.copy())
             #print 'Here'
@@ -367,7 +363,7 @@ class Ecloud(object):
             self.N_MP_last_track.append(MP_e.N_mp)
 
         if self.save_ele_field_probes:
-            MP_probes = MP_light()
+            MP_probes = Empty()
             MP_probes.x_mp = self.x_probes
             MP_probes.y_mp = self.y_probes
             MP_probes.nel_mp = self.x_probes*0.+1. #fictitious charge of 1 C
@@ -379,14 +375,9 @@ class Ecloud(object):
 
     def _reinitialize(self):
 
-        self.MP_e.x_mp[:self.init_N_mp] = self.init_x #it is a mutation and not a binding (and we have tested it :-))
-        self.MP_e.y_mp[:self.init_N_mp] = self.init_y
-        self.MP_e.z_mp[:self.init_N_mp] = self.init_z
-        self.MP_e.vx_mp[:self.init_N_mp] = self.init_vx
-        self.MP_e.vy_mp[:self.init_N_mp] = self.init_vy
-        self.MP_e.vz_mp[:self.init_N_mp] = self.init_vz
-        self.MP_e.nel_mp[:self.init_N_mp] = self.init_nel
-        self.MP_e.N_mp = self.init_N_mp
+
+        for cloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
+            cloud.MP_e.init_from_dict(initdict)
 
         if self.save_ele_distributions_last_track:
             self.rho_ele_last_track = []

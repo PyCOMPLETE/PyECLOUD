@@ -524,3 +524,20 @@ class MP_system:
 
         self.N_mp=int(self.N_mp+Nint_new_MP);
 
+    def extract_dict(self):
+        dict_MP = {
+            'x_mp':self.x_mp[:self.N_mp].copy(),
+            'y_mp':self.y_mp[:self.N_mp].copy(),
+            'z_mp':self.z_mp[:self.N_mp].copy(),
+            'vx_mp':self.vx_mp[:self.N_mp].copy(),
+            'vy_mp':self.vy_mp[:self.N_mp].copy(),
+            'vy_mp':self.vz_mp[:self.N_mp].copy(),
+            'nel_mp':self.nel_mp[:self.N_mp].copy(),
+            'N_mp':self.N_mp,
+            }
+        return dict_MP
+
+    def init_from_dict(self, dict_MP):
+        self.N_mp = 0
+        self.add_from_file(dict_MP)
+
