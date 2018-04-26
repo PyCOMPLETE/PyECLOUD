@@ -111,6 +111,11 @@ class pyecloud_saver:
 
         self.filen_main_outp = filen_main_outp
 
+        if '/' in self.filen_main_outp:
+            self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
+        else:
+            self.folder_outp='./'
+
         # cloud info
         self.flag_multiple_clouds = flag_multiple_clouds
         self.cloud_name = cloud_name
@@ -125,20 +130,7 @@ class pyecloud_saver:
         self.En_imp_last_step_group_eV = 0
         self.En_emit_last_step_group_eV = 0
 
-        # MP state saver init
-        try:
-            save_mp_state_time_file[0] #check if iterable
-            self.flag_save_MP_state=True
-            if type(save_mp_state_time_file) is str:
-                dict_save_mp_state_time=sio.loadmat(save_mp_state_time_file)
-                self.t_obs=np.squeeze(dict_save_mp_state_time['t_obs'].real)
-            else:
-                self.t_obs = np.array(save_mp_state_time_file)
-
-            self.N_obs=len(self.t_obs)
-            self.i_obs=0
-        except TypeError:
-            self.flag_save_MP_state=False
+        self._MP_state_init(save_mp_state_time_file)
 
 
         # Simulation state saver init
@@ -308,19 +300,9 @@ class pyecloud_saver:
                 t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
                 cloud_list, rho_cloud = None):
 
-        #MP state save
-        if self.flag_save_MP_state:
-            if  (MP_e.N_mp>0) and (self.i_obs<self.N_obs):
-                if (beamtim.tt_curr>=self.t_obs[self.i_obs]):
-                    if self.flag_multiple_clouds:
-                        filename_MP_state='MP_state_%s_%d'%(self.cloud_name,self.i_obs)
-                    else:
-                        filename_MP_state='MP_state_%d'%(self.i_obs)
-                    sio.savemat(filename_MP_state,{'tt':beamtim.tt_curr,'N_mp':MP_e.N_mp, 'x_mp':MP_e.x_mp[0:MP_e.N_mp], 'y_mp':MP_e.y_mp[0:MP_e.N_mp], 'z_mp':MP_e.z_mp[0:MP_e.N_mp],\
-                                                    'vx_mp':MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp':MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp':MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp':MP_e.nel_mp[0:MP_e.N_mp]},oned_as='row')
-
-                    print('Save MP state on ' + filename_MP_state)
-                    self.i_obs=self.i_obs+1
+        
+        self._MP_state_save(MP_e, beamtim)
+        
 
         # Energy histogram saver
         if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
@@ -618,3 +600,37 @@ class pyecloud_saver:
 
 
         return impact_man
+
+    def _MP_state_init(self, save_mp_state_time_file):
+
+        # MP state saver init
+        try:
+            save_mp_state_time_file[0] #check if iterable
+            self.flag_save_MP_state=True
+            if type(save_mp_state_time_file) is str:
+                dict_save_mp_state_time=sio.loadmat(save_mp_state_time_file)
+                self.t_obs=np.squeeze(dict_save_mp_state_time['t_obs'].real)
+            else:
+                self.t_obs = np.array(save_mp_state_time_file)
+
+            self.N_obs=len(self.t_obs)
+            self.i_obs=0
+        except TypeError:
+            self.flag_save_MP_state=False
+
+    def _MP_state_save(self, MP_e, beamtim):
+
+        #MP state save
+        if self.flag_save_MP_state:
+            if  (MP_e.N_mp>0) and (self.i_obs<self.N_obs):
+                if (beamtim.tt_curr>=self.t_obs[self.i_obs]):
+                    if self.flag_multiple_clouds:
+                        filename_MP_state='MP_state_%s_%d'%(self.cloud_name,self.i_obs)
+                    else:
+                        filename_MP_state='MP_state_%d'%(self.i_obs)
+                    path_MP_state = self.folder_outp+'/'+filename_MP_state
+                    sio.savemat(path_MP_state,{'tt':beamtim.tt_curr,'N_mp':MP_e.N_mp, 'x_mp':MP_e.x_mp[0:MP_e.N_mp], 'y_mp':MP_e.y_mp[0:MP_e.N_mp], 'z_mp':MP_e.z_mp[0:MP_e.N_mp],\
+                                                    'vx_mp':MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp':MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp':MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp':MP_e.nel_mp[0:MP_e.N_mp]},oned_as='row')
+
+                    print('Save MP state on ' + filename_MP_state)
+                    self.i_obs=self.i_obs+1
