@@ -283,6 +283,10 @@ class pyecloud_saver:
                 t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
                 cloud_list, rho_cloud = None):
 
+        ####################################################
+        # Quantites saved at custom times provided by user #
+        ####################################################
+
         # Check for MP save state
         self._MP_state_save(MP_e, beamtim)
         
@@ -408,40 +412,10 @@ class pyecloud_saver:
             self.b_spac = beamtim.b_spac
             self.area = impact_man.chamb.area
 
-
             sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
 
-
-
-            # logfile and progressfile
-            timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-
-            string_tolog= timestr+(' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,self.cloud_name,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
-            
-            try:
-                with open(self.logfile_path,'a') as flog:
-                    flog.write(string_tolog)
-            except IOError as err:
-                print('Got: ',err)
-                print('while trying to write the following line on logfile:')
-                print(string_tolog)
-
-            try:
-                with open(self.progress_path,'w') as flog:
-                    flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
-            except IOError as err:
-                print('Got: ',err)
-                print('while trying to write the following line on progress file:')
-                print('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot)))
-
-
-            #stop simulation
-            try:
-                with open(self.stopfile, 'r') as fid:
-                    fid.readlines()
-                    raise ValueError('Stopped by user.')
-            except IOError:
-                pass
+        if beamtim.flag_new_bunch_pass:
+            self._logfile_progressfile_stofile(beamtim, MP_e)
 
 
         return impact_man
@@ -493,6 +467,10 @@ class pyecloud_saver:
                     'cos_angle_hist':       self.cos_angle_hist,
                     'xg_hist_cos_angle':    self.xg_hist_cos_angle
                 }
+
+        for kk in saved_dict.keys():
+            saved_dict[kk] = np.array(saved_dict[kk])
+
         return saved_dict
 
 
@@ -669,3 +647,34 @@ class pyecloud_saver:
                 self.efx_video=[]
                 self.efy_video=[]
                 self.t_efield_video=[]
+
+    def _logfile_progressfile_stofile(self, beamtim, MP_e):
+            # logfile and progressfile
+            timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
+
+            string_tolog= timestr+(' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,self.cloud_name,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
+            
+            try:
+                with open(self.logfile_path,'a') as flog:
+                    flog.write(string_tolog)
+            except IOError as err:
+                print('Got: ',err)
+                print('while trying to write the following line on logfile:')
+                print(string_tolog)
+
+            try:
+                with open(self.progress_path,'w') as flog:
+                    flog.write(('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot))))
+            except IOError as err:
+                print('Got: ',err)
+                print('while trying to write the following line on progress file:')
+                print('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot)))
+
+
+            #stop simulation
+            try:
+                with open(self.stopfile, 'r') as fid:
+                    fid.readlines()
+                    raise ValueError('Stopped by user.')
+            except IOError:
+                pass
