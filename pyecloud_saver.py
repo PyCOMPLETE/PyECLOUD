@@ -522,7 +522,7 @@ class pyecloud_saver:
                     sio.savemat(path_MP_state,{'tt':beamtim.tt_curr,'N_mp':MP_e.N_mp, 'x_mp':MP_e.x_mp[0:MP_e.N_mp], 'y_mp':MP_e.y_mp[0:MP_e.N_mp], 'z_mp':MP_e.z_mp[0:MP_e.N_mp],\
                                                     'vx_mp':MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp':MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp':MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp':MP_e.nel_mp[0:MP_e.N_mp]},oned_as='row')
 
-                    print('Save MP state in; ' + path_MP_state)
+                    print('Save MP state in: ' + path_MP_state)
                     self.i_obs=self.i_obs+1
 
 
@@ -595,8 +595,8 @@ class pyecloud_saver:
     def _rho_video_save(self, spacech_ele, beamtim, rho_cloud):
         #save rho video
         if self.flag_video and self.flag_last_cloud:
-            if not os.path.exists('rho_video'):
-                os.makedirs('rho_video')
+            if not os.path.exists(self.folder_outp+'/rho_video'):
+                os.makedirs(self.folder_outp+'/rho_video')
             if self.rho_video is None:
                 self.rho_video=[]
                 self.t_video=[]
@@ -606,7 +606,7 @@ class pyecloud_saver:
             if beamtim.flag_new_bunch_pass:
                 self.rho_video=np.array(self.rho_video)
                 self.t_video=np.array(self.t_video)
-                filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
+                filename_rho=self.folder_outp+'/rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
                 print('Saving %s'%filename_rho)
                 sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
                 print('Done')
@@ -614,8 +614,8 @@ class pyecloud_saver:
                 self.t_video=[]
         # save rho video for cloud
         if self.flag_video and self.flag_multiple_clouds:
-            if not os.path.exists('rho_video_%s'%(self.cloud_name)):
-                os.makedirs('rho_video_%s'%(self.cloud_name))
+            if not os.path.exists(self.folder_outp+'/rho_video_%s'%(self.cloud_name)):
+                os.makedirs(self.folder_outp+'rho_video_%s'%(self.cloud_name))
             if self.rho_video_cloud is None:
                     self.rho_video_cloud = []
                     self.t_video_cloud = []
@@ -628,7 +628,7 @@ class pyecloud_saver:
             if beamtim.flag_new_bunch_pass:
                 self.rho_video_cloud=np.array(self.rho_video_cloud)
                 self.t_video_cloud=np.array(self.t_video_cloud)
-                filename_rho='rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
+                filename_rho=self.folder_outp+'rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
                 print('Saving %s'%filename_rho)
                 sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video_cloud,'rho_video':self.rho_video_cloud},oned_as='row')
                 print('Done')
@@ -644,8 +644,8 @@ class pyecloud_saver:
     def _sc_video_save(self, spacech_ele, beamtim):
         #save efield video
         if self.flag_sc_video:
-            if not os.path.exists('efield_video'):
-                os.makedirs('efield_video')
+            if not os.path.exists(self.folder_outp+'/efield_video'):
+                os.makedirs(self.folder_outp+'/efield_video')
             if self.efx_video is None:
                 self.efx_video=[]
                 self.efy_video=[]
@@ -658,7 +658,7 @@ class pyecloud_saver:
                 self.efx_video=np.array(self.efx_video)
                 self.efy_video=np.array(self.efy_video)
                 self.t_efield_video=np.array(self.t_efield_video)
-                filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
+                filename_efield=self.folder_outp+'/efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
                 print('Saving %s'%filename_efield)
                 sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
                                           'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
