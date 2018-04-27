@@ -360,51 +360,7 @@ class pyecloud_saver:
 
         if beamtim.flag_new_bunch_pass:
 
-            #update histograms
-            self.nel_hist_line=0.0*self.nel_hist_line
-            if MP_e.N_mp>0:
-                histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp],impact_man.bias_x_hist,impact_man.Dx_hist,self.nel_hist_line)
-
-
-                # detailed histogram
-                if self.flag_hist_det:
-                    #print 'here 1'
-                    mask_det_hist_x = np.logical_and(MP_e.x_mp[0:MP_e.N_mp]>self.x_min_hist_det, MP_e.x_mp[0:MP_e.N_mp]<self.x_max_hist_det)
-                    mask_det_hist_y = np.logical_and(MP_e.y_mp[0:MP_e.N_mp]>self.y_min_hist_det, MP_e.y_mp[0:MP_e.N_mp]<self.y_max_hist_det)
-                    mask_det_hist = np.logical_and(mask_det_hist_x, mask_det_hist_y)
-
-                    self.nel_hist_det_line=0.0*self.nel_hist_det_line
-
-                    if np.sum(mask_det_hist)>0:
-                        #print 'here 2'
-                        histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp][mask_det_hist],MP_e.nel_mp[0:MP_e.N_mp][mask_det_hist],
-                                           self.bias_x_hist_det, self.Dx_hist_det, self.nel_hist_det_line)
-
-
-            self.nel_hist[beamtim.pass_numb,:]=self.nel_hist_line
-            self.t_hist[beamtim.pass_numb]=beamtim.tt_curr
-            self.nel_impact_hist_tot[beamtim.pass_numb,:]=impact_man.nel_impact_hist_tot
-            impact_man.reset_impact_hist_tot()
-            self.nel_impact_hist_scrub[beamtim.pass_numb,:]=impact_man.nel_impact_hist_scrub
-            impact_man.reset_impact_hist_scrub()
-            self.energ_eV_impact_hist[beamtim.pass_numb,:]=impact_man.energ_eV_impact_hist
-            impact_man.reset_energ_eV_impact_hist()
-
-            self.N_mp_impact_pass[beamtim.pass_numb]=impact_man.chamb.N_mp_impact
-            self.N_mp_corrected_pass[beamtim.pass_numb]=impact_man.chamb.N_mp_corrected
-            self.N_mp_pass[beamtim.pass_numb]=MP_e.N_mp
-            self.N_mp_ref_pass[beamtim.pass_numb]=MP_e.nel_mp_ref
-
-            if impact_man.flag_seg:
-                self.nel_hist_impact_seg[beamtim.pass_numb,:]=impact_man.nel_hist_impact_seg
-                impact_man.reset_hist_impact_seg()
-
-            if impact_man.flag_seg:
-                self.energ_eV_impact_seg[beamtim.pass_numb,:]=impact_man.energ_eV_impact_seg
-                impact_man.reset_energ_impact_seg()
-
-            if self.flag_hist_det:
-                self.nel_hist_det[beamtim.pass_numb,:]=self.nel_hist_det_line
+            self._save_passage_by_passage_data(MP_e, impact_man, beamtim)
 
             # I want all elements that go to the output file to be mebers of this object
             self.xg_hist = impact_man.xg_hist
@@ -419,6 +375,55 @@ class pyecloud_saver:
 
 
         return impact_man
+
+    def _save_passage_by_passage_data(self, MP_e, impact_man, beamtim):
+        #update histograms
+        self.nel_hist_line=0.0*self.nel_hist_line
+        if MP_e.N_mp>0:
+            histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp],impact_man.bias_x_hist,impact_man.Dx_hist,self.nel_hist_line)
+
+
+            # detailed histogram
+            if self.flag_hist_det:
+                #print 'here 1'
+                mask_det_hist_x = np.logical_and(MP_e.x_mp[0:MP_e.N_mp]>self.x_min_hist_det, MP_e.x_mp[0:MP_e.N_mp]<self.x_max_hist_det)
+                mask_det_hist_y = np.logical_and(MP_e.y_mp[0:MP_e.N_mp]>self.y_min_hist_det, MP_e.y_mp[0:MP_e.N_mp]<self.y_max_hist_det)
+                mask_det_hist = np.logical_and(mask_det_hist_x, mask_det_hist_y)
+
+                self.nel_hist_det_line=0.0*self.nel_hist_det_line
+
+                if np.sum(mask_det_hist)>0:
+                    #print 'here 2'
+                    histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp][mask_det_hist],MP_e.nel_mp[0:MP_e.N_mp][mask_det_hist],
+                                       self.bias_x_hist_det, self.Dx_hist_det, self.nel_hist_det_line)
+
+
+        self.nel_hist[beamtim.pass_numb,:]=self.nel_hist_line
+        self.t_hist[beamtim.pass_numb]=beamtim.tt_curr
+        self.nel_impact_hist_tot[beamtim.pass_numb,:]=impact_man.nel_impact_hist_tot
+        impact_man.reset_impact_hist_tot()
+        self.nel_impact_hist_scrub[beamtim.pass_numb,:]=impact_man.nel_impact_hist_scrub
+        impact_man.reset_impact_hist_scrub()
+        self.energ_eV_impact_hist[beamtim.pass_numb,:]=impact_man.energ_eV_impact_hist
+        impact_man.reset_energ_eV_impact_hist()
+
+        self.N_mp_impact_pass[beamtim.pass_numb]=impact_man.chamb.N_mp_impact
+        self.N_mp_corrected_pass[beamtim.pass_numb]=impact_man.chamb.N_mp_corrected
+        self.N_mp_pass[beamtim.pass_numb]=MP_e.N_mp
+        self.N_mp_ref_pass[beamtim.pass_numb]=MP_e.nel_mp_ref
+
+        if impact_man.flag_seg:
+            self.nel_hist_impact_seg[beamtim.pass_numb,:]=impact_man.nel_hist_impact_seg
+            impact_man.reset_hist_impact_seg()
+
+        if impact_man.flag_seg:
+            self.energ_eV_impact_seg[beamtim.pass_numb,:]=impact_man.energ_eV_impact_seg
+            impact_man.reset_energ_impact_seg()
+
+        if self.flag_hist_det:
+            self.nel_hist_det[beamtim.pass_numb,:]=self.nel_hist_det_line
+
+
 
     def build_outp_dict(self):
         saved_dict = {
@@ -523,6 +528,7 @@ class pyecloud_saver:
 
             self.N_obs_sim=len(self.t_obs_sim)
             self.i_obs_sim=0
+
     def _sim_state_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
         #Simulation state save
@@ -573,6 +579,7 @@ class pyecloud_saver:
         #rho video cloud
         self.rho_video_cloud=None
         self.t_video_cloud=None
+
     def _rho_video_save(self, spacech_ele, beamtim, rho_cloud):
         #save rho video
         if self.flag_video and self.flag_last_cloud:
@@ -593,6 +600,7 @@ class pyecloud_saver:
                 print('Done')
                 self.rho_video=[]
                 self.t_video=[]
+
         # save rho video for cloud
         if self.flag_video and self.flag_multiple_clouds:
             if not os.path.exists(self.folder_outp+'/rho_video_%s'%(self.cloud_name)):
@@ -622,6 +630,7 @@ class pyecloud_saver:
         self.efx_video=None
         self.efy_video=None
         self.t_efield_video=None
+
     def _sc_video_save(self, spacech_ele, beamtim):
         #save efield video
         if self.flag_sc_video:
@@ -669,7 +678,6 @@ class pyecloud_saver:
                 print('Got: ',err)
                 print('while trying to write the following line on progress file:')
                 print('%f'%(float(beamtim.pass_numb)/float(beamtim.N_pass_tot)))
-
 
             #stop simulation
             try:
