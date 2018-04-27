@@ -72,7 +72,7 @@ out_var_curr = dict_curr.keys()
 out_var_ref.sort()         # sort the keys in alphabetical order
 out_var_curr.sort()
 
-n_pass = 7  # reference passage
+n_pass = 5  # reference passage
 
 
 

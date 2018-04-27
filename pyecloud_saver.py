@@ -180,24 +180,25 @@ class pyecloud_saver:
         else:
             self.N_mp_time=-1
 
+        self.nel_hist_line = np.zeros(impact_man.Nxg_hist,float)
+
         #pass by pass data
-        self.t_hist=np.zeros(beamtim.N_pass_tot+1,float)
-        self.nel_impact_hist_tot=np.zeros((beamtim.N_pass_tot+1,impact_man.Nxg_hist),float)
-        self.nel_impact_hist_scrub=np.zeros((beamtim.N_pass_tot+1,impact_man.Nxg_hist),float)
-        self.energ_eV_impact_hist=np.zeros((beamtim.N_pass_tot+1,impact_man.Nxg_hist),float)
-        self.nel_hist_line=np.zeros(impact_man.Nxg_hist,float)
-        self.nel_hist=np.zeros((beamtim.N_pass_tot+1,impact_man.Nxg_hist),float)
-        self.N_mp_impact_pass=np.zeros(beamtim.N_pass_tot+1)
-        self.N_mp_corrected_pass=np.zeros(beamtim.N_pass_tot+1)
-        self.N_mp_pass=np.zeros(beamtim.N_pass_tot+1)
-        self.N_mp_ref_pass=np.zeros(beamtim.N_pass_tot+1)
+        self.t_hist=[]
+        self.nel_impact_hist_tot = []
+        self.nel_impact_hist_scrub = []
+        self.energ_eV_impact_hist = []
+        self.nel_hist = []
+        self.N_mp_impact_pass = []
+        self.N_mp_corrected_pass = []
+        self.N_mp_pass = []
+        self.N_mp_ref_pass = []
 
         if impact_man.flag_seg:
-                self.nel_hist_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
-                self.energ_eV_impact_seg=np.zeros((beamtim.N_pass_tot+1,impact_man.chamb.N_vert),float)
+                self.nel_hist_impact_seg = []
+                self.energ_eV_impact_seg = []
         else:
-                self.nel_hist_impact_seg=-1
-                self.energ_eV_impact_seg=-1
+                self.nel_hist_impact_seg = -1
+                self.energ_eV_impact_seg = -1
 
 
         #logfile and progress file
@@ -261,7 +262,7 @@ class pyecloud_saver:
             self.bias_x_hist_det=min(self.xg_hist_det);
 
             self.nel_hist_det_line=np.zeros(self.Nxg_hist_det,float)
-            self.nel_hist_det=np.zeros((beamtim.N_pass_tot+1,self.Nxg_hist_det),float)
+            self.nel_hist_det=[]
 
 
 
@@ -398,30 +399,30 @@ class pyecloud_saver:
                                        self.bias_x_hist_det, self.Dx_hist_det, self.nel_hist_det_line)
 
 
-        self.nel_hist[beamtim.pass_numb,:]=self.nel_hist_line
-        self.t_hist[beamtim.pass_numb]=beamtim.tt_curr
-        self.nel_impact_hist_tot[beamtim.pass_numb,:]=impact_man.nel_impact_hist_tot
+        self.nel_hist.append(self.nel_hist_line.copy())
+        self.t_hist.append(beamtim.tt_curr)
+        self.nel_impact_hist_tot.append(impact_man.nel_impact_hist_tot.copy())
         impact_man.reset_impact_hist_tot()
-        self.nel_impact_hist_scrub[beamtim.pass_numb,:]=impact_man.nel_impact_hist_scrub
+        self.nel_impact_hist_scrub.append(impact_man.nel_impact_hist_scrub.copy())
         impact_man.reset_impact_hist_scrub()
-        self.energ_eV_impact_hist[beamtim.pass_numb,:]=impact_man.energ_eV_impact_hist
+        self.energ_eV_impact_hist.append(impact_man.energ_eV_impact_hist.copy())
         impact_man.reset_energ_eV_impact_hist()
 
-        self.N_mp_impact_pass[beamtim.pass_numb]=impact_man.chamb.N_mp_impact
-        self.N_mp_corrected_pass[beamtim.pass_numb]=impact_man.chamb.N_mp_corrected
-        self.N_mp_pass[beamtim.pass_numb]=MP_e.N_mp
-        self.N_mp_ref_pass[beamtim.pass_numb]=MP_e.nel_mp_ref
+        self.N_mp_impact_pass.append(impact_man.chamb.N_mp_impact)
+        self.N_mp_corrected_pass.append(impact_man.chamb.N_mp_corrected)
+        self.N_mp_pass.append(MP_e.N_mp)
+        self.N_mp_ref_pass.append(MP_e.nel_mp_ref)
 
         if impact_man.flag_seg:
-            self.nel_hist_impact_seg[beamtim.pass_numb,:]=impact_man.nel_hist_impact_seg
+            self.nel_hist_impact_seg.append(impact_man.nel_hist_impact_seg.copy())
             impact_man.reset_hist_impact_seg()
 
         if impact_man.flag_seg:
-            self.energ_eV_impact_seg[beamtim.pass_numb,:]=impact_man.energ_eV_impact_seg
+            self.energ_eV_impact_seg.append(impact_man.energ_eV_impact_seg.copy())
             impact_man.reset_energ_impact_seg()
 
         if self.flag_hist_det:
-            self.nel_hist_det[beamtim.pass_numb,:]=self.nel_hist_det_line
+            self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
 
 
