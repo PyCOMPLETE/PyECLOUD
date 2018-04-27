@@ -155,6 +155,9 @@ class pyecloud_saver:
             N_angles = int(1./ cos_angle_width)+1
             self.cos_angle_hist = np.zeros((self.N_En_hist, N_angles),float)
             self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
+        else:
+            self.cos_angle_hist = -1
+            self.xg_hist_cos_angle = -1            
 
         #Space charge electrostatic energy
         self.t_sc_video=[]
@@ -399,60 +402,14 @@ class pyecloud_saver:
             if self.flag_hist_det:
                 self.nel_hist_det[beamtim.pass_numb,:]=self.nel_hist_det_line
 
-            #self.t_dec = beamtim.t[::dec_fact_out]
-            #self.lam_t_array_dec = beamtim.lam_t_array[::dec_fact_out]
+            # I want all elements that go to the output file to be mebers of this object
+            self.xg_hist = impact_man.xg_hist
+            self.En_g_hist = impact_man.En_g_hist
+            self.b_spac = beamtim.b_spac
+            self.area = impact_man.chamb.area
 
-            saved_dict = {
-                    'Nel_timep':            self.Nel_time,
-                    't':                    self.t_dec,
-                    't_hist':               self.t_hist,
-                    'nel_hist':             self.nel_hist,
-                    'xg_hist':              impact_man.xg_hist,
-                    'nel_impact_hist_tot':  self.nel_impact_hist_tot,
-                    'nel_impact_hist_scrub':self.nel_impact_hist_scrub,
-                    'energ_eV_impact_hist': self.energ_eV_impact_hist,
-                    'cen_density':          self.cen_density,
-                    'Nel_imp_time':         self.Nel_imp_time,
-                    'Nel_emit_time':        self.Nel_emit_time,
-                    'En_imp_eV_time':       self.En_imp_eV_time,
-                    'En_emit_eV_time':      self.En_emit_eV_time,
-                    'En_g_hist':            impact_man.En_g_hist,
-                    'En_hist':              self.En_hist,
-                    't_En_hist':            self.t_En_hist,
-                    'lam_t_array':          self.lam_t_array_dec,
-                    'b_spac':               beamtim.b_spac,
-                    't_sc_video':           np.array(self.t_sc_video),
-                    'U_sc_eV':              np.array(self.U_sc_eV),
-                    'En_kin_eV_time':       self.En_kin_eV_time,
-                    'N_mp_impact_pass':     self.N_mp_impact_pass,
-                    'N_mp_corrected_pass':  self.N_mp_corrected_pass,
-                    'N_mp_pass':            self.N_mp_pass,
-                    'N_mp_time':            self.N_mp_time,
-                    'N_mp_ref_pass':        self.N_mp_ref_pass,
-                    'nel_hist_impact_seg':  self.nel_hist_impact_seg,
-                    'energ_eV_impact_seg':  self.energ_eV_impact_seg,
-                    't_sec_beams':          self.t_sec_beams,
-                    'sec_beam_profiles':    self.sec_beam_profiles,
-                    'el_dens_at_probes':    self.el_dens_at_probes,
-                    'x_el_dens_probes':     self.x_el_dens_probes,
-                    'y_el_dens_probes':     self.y_el_dens_probes,
-                    'r_el_dens_probes':     self.r_el_dens_probes,
-                    'nel_hist_det':         self.nel_hist_det,
-                    'xg_hist_det':          self.xg_hist_det,
-                    'dec_fact_out':         self.dec_fact_out,
-                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV, 
-                    'sey_test_cos_theta':   self.sey_test_cos_theta,
-                    'sey_test_del_true_mat':self.sey_test_del_true_mat,
-                    'sey_test_del_elast_mat':self.sey_test_del_elast_mat,
-                    'chamber_area':         impact_man.chamb.area
-                }
-                
-    
-            if self.flag_cos_angle_hist:
-                    saved_dict['cos_angle_hist'] = self.cos_angle_hist
-                    saved_dict['xg_hist_cos_angle'] = self.xg_hist_cos_angle
 
-            sio.savemat(self.filen_main_outp, saved_dict, oned_as='row')
+            sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
 
 
 
@@ -487,11 +444,57 @@ class pyecloud_saver:
                 pass
 
 
-      
-        
-
-
         return impact_man
+
+    def build_outp_dict(self):
+        saved_dict = {
+                    'Nel_timep':            self.Nel_time,
+                    't':                    self.t_dec,
+                    't_hist':               self.t_hist,
+                    'nel_hist':             self.nel_hist,
+                    'xg_hist':              self.xg_hist,
+                    'nel_impact_hist_tot':  self.nel_impact_hist_tot,
+                    'nel_impact_hist_scrub':self.nel_impact_hist_scrub,
+                    'energ_eV_impact_hist': self.energ_eV_impact_hist,
+                    'cen_density':          self.cen_density,
+                    'Nel_imp_time':         self.Nel_imp_time,
+                    'Nel_emit_time':        self.Nel_emit_time,
+                    'En_imp_eV_time':       self.En_imp_eV_time,
+                    'En_emit_eV_time':      self.En_emit_eV_time,
+                    'En_g_hist':            self.En_g_hist,
+                    'En_hist':              self.En_hist,
+                    't_En_hist':            self.t_En_hist,
+                    'lam_t_array':          self.lam_t_array_dec,
+                    'b_spac':               self.b_spac,
+                    't_sc_video':           np.array(self.t_sc_video),
+                    'U_sc_eV':              np.array(self.U_sc_eV),
+                    'En_kin_eV_time':       self.En_kin_eV_time,
+                    'N_mp_impact_pass':     self.N_mp_impact_pass,
+                    'N_mp_corrected_pass':  self.N_mp_corrected_pass,
+                    'N_mp_pass':            self.N_mp_pass,
+                    'N_mp_time':            self.N_mp_time,
+                    'N_mp_ref_pass':        self.N_mp_ref_pass,
+                    'nel_hist_impact_seg':  self.nel_hist_impact_seg,
+                    'energ_eV_impact_seg':  self.energ_eV_impact_seg,
+                    't_sec_beams':          self.t_sec_beams,
+                    'sec_beam_profiles':    self.sec_beam_profiles,
+                    'el_dens_at_probes':    self.el_dens_at_probes,
+                    'x_el_dens_probes':     self.x_el_dens_probes,
+                    'y_el_dens_probes':     self.y_el_dens_probes,
+                    'r_el_dens_probes':     self.r_el_dens_probes,
+                    'nel_hist_det':         self.nel_hist_det,
+                    'xg_hist_det':          self.xg_hist_det,
+                    'dec_fact_out':         self.dec_fact_out,
+                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV, 
+                    'sey_test_cos_theta':   self.sey_test_cos_theta,
+                    'sey_test_del_true_mat':self.sey_test_del_true_mat,
+                    'sey_test_del_elast_mat':self.sey_test_del_elast_mat,
+                    'chamber_area':         self.area,
+                    'cos_angle_hist':       self.cos_angle_hist,
+                    'xg_hist_cos_angle':    self.xg_hist_cos_angle
+                }
+        return saved_dict
+
 
     def _MP_state_init(self, save_mp_state_time_file):
         # MP state saver init
