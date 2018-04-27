@@ -330,7 +330,7 @@ class beam_and_timing:
         self.tt_curr = None
         self.lam_t_curr = None
         self.pass_numb = None
-        self._pass_numb_old = 0
+        self._pass_numb_old = -1
 
         self.sigmax = sigmax
         self.sigmay = sigmay

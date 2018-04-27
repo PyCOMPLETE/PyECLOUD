@@ -414,7 +414,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         cloud_list.append(cloud)
 
-
     return (beamtim,
             spacech_ele_sim,
             cc.t_sc_ON,
