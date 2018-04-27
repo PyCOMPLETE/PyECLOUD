@@ -136,6 +136,12 @@ class pyecloud_saver:
         # Init simulation state saving
         self._sim_state_init(save_simulation_state_time_file)
 
+        # Init charge distribution video saving
+        self._rho_video_init(flag_movie)
+
+        # Init electric field video saving
+        self._sc_video_init(flag_sc_movie)       
+
         # Energy histogram init
         self.Nst_En_hist=int(round(Dt_En_hist/beamtim.Dt)) #number of steps per hist. line
         self.N_En_hist=int(float(beamtim.Nt)/float(self.Nst_En_hist))+2    #hist size in time dimension
@@ -153,21 +159,6 @@ class pyecloud_saver:
         #Space charge electrostatic energy
         self.t_sc_video=[]
         self.U_sc_eV=[]
-
-        #rho video
-        self.flag_video=(flag_movie==1)
-        self.rho_video=None
-        self.t_video=None
-
-        #rho video cloud
-        self.rho_video_cloud=None
-        self.t_video_cloud=None
-
-        #efield video
-        self.flag_sc_video=(flag_sc_movie==1)
-        self.efx_video=None
-        self.efy_video=None
-        self.t_efield_video=None
 
         #step by step data
         self.r_center=r_center
@@ -289,8 +280,18 @@ class pyecloud_saver:
                 t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
                 cloud_list, rho_cloud = None):
 
-        
+        # Check for MP save state
         self._MP_state_save(MP_e, beamtim)
+        
+        # Check for simulation save state
+        self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                              sec_beams_list, self.flag_multiple_clouds, cloud_list) 
+
+        # Check for save video charge density
+        self._rho_video_save(spacech_ele, beamtim, rho_cloud)
+        
+        # Check for save video electric field
+        self._sc_video_save(spacech_ele, beamtim)
         
 
         # Energy histogram saver
@@ -309,74 +310,7 @@ class pyecloud_saver:
             self.t_sc_video.append(beamtim.tt_curr)
             self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
 
-        #save rho video
-        if self.flag_video and self.flag_last_cloud:
-            if not os.path.exists('rho_video'):
-                os.makedirs('rho_video')
-            if self.rho_video is None:
-                self.rho_video=[]
-                self.t_video=[]
-            if spacech_ele.last_recomputation_check:
-                self.rho_video.append(spacech_ele.rho)
-                self.t_video.append(beamtim.tt_curr)
-            if beamtim.flag_new_bunch_pass:
-                self.rho_video=np.array(self.rho_video)
-                self.t_video=np.array(self.t_video)
-                filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
-                print('Saving %s'%filename_rho)
-                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
-                print('Done')
-                self.rho_video=[]
-                self.t_video=[]
-
-        # save rho video for cloud
-        if self.flag_video and self.flag_multiple_clouds:
-            if not os.path.exists('rho_video_%s'%(self.cloud_name)):
-                os.makedirs('rho_video_%s'%(self.cloud_name))
-            if self.rho_video_cloud is None:
-                    self.rho_video_cloud = []
-                    self.t_video_cloud = []
-            if spacech_ele.last_recomputation_check:
-                if rho_cloud is None:
-                    print('Warning! No rho provided for saving.')
-                else:
-                    self.rho_video_cloud.append(rho_cloud)
-                self.t_video_cloud.append(beamtim.tt_curr)
-            if beamtim.flag_new_bunch_pass:
-                self.rho_video_cloud=np.array(self.rho_video_cloud)
-                self.t_video_cloud=np.array(self.t_video_cloud)
-                filename_rho='rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
-                print('Saving %s'%filename_rho)
-                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video_cloud,'rho_video':self.rho_video_cloud},oned_as='row')
-                print('Done')
-                self.rho_video_cloud=[]
-                self.t_video_cloud=[]
-
-        #save efield video
-        if self.flag_sc_video:
-            if not os.path.exists('efield_video'):
-                os.makedirs('efield_video')
-            if self.efx_video is None:
-                self.efx_video=[]
-                self.efy_video=[]
-                self.t_efield_video=[]
-            if spacech_ele.last_recomputation_check:
-                self.efx_video.append(spacech_ele.efx)
-                self.efy_video.append(spacech_ele.efy)
-                self.t_efield_video.append(beamtim.tt_curr)
-            if beamtim.flag_new_bunch_pass:
-                self.efx_video=np.array(self.efx_video)
-                self.efy_video=np.array(self.efy_video)
-                self.t_efield_video=np.array(self.t_efield_video)
-                filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
-                print('Saving %s'%filename_efield)
-                sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
-                                          'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
-                print('Done')
-                self.efx_video=[]
-                self.efy_video=[]
-                self.t_efield_video=[]
-
+        
 
         #save step by step data
         # Vars to be accumulated
@@ -553,8 +487,7 @@ class pyecloud_saver:
                 pass
 
 
-        self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                              sec_beams_list, self.flag_multiple_clouds, cloud_list)       
+      
         
 
 
@@ -650,3 +583,86 @@ class pyecloud_saver:
 
                     print('Save simulation state in: ' + self.folder_outp+'/'+filename_simulation_state)
                     self.i_obs_sim=self.i_obs_sim+1
+
+    def _rho_video_init(self, flag_movie):
+        #rho video
+        self.flag_video=(flag_movie==1)
+        self.rho_video=None
+        self.t_video=None
+        #rho video cloud
+        self.rho_video_cloud=None
+        self.t_video_cloud=None
+    def _rho_video_save(self, spacech_ele, beamtim, rho_cloud):
+        #save rho video
+        if self.flag_video and self.flag_last_cloud:
+            if not os.path.exists('rho_video'):
+                os.makedirs('rho_video')
+            if self.rho_video is None:
+                self.rho_video=[]
+                self.t_video=[]
+            if spacech_ele.last_recomputation_check:
+                self.rho_video.append(spacech_ele.rho)
+                self.t_video.append(beamtim.tt_curr)
+            if beamtim.flag_new_bunch_pass:
+                self.rho_video=np.array(self.rho_video)
+                self.t_video=np.array(self.t_video)
+                filename_rho='rho_video/rho_pass%d.mat'%(beamtim.pass_numb-1)
+                print('Saving %s'%filename_rho)
+                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video,'rho_video':self.rho_video},oned_as='row')
+                print('Done')
+                self.rho_video=[]
+                self.t_video=[]
+        # save rho video for cloud
+        if self.flag_video and self.flag_multiple_clouds:
+            if not os.path.exists('rho_video_%s'%(self.cloud_name)):
+                os.makedirs('rho_video_%s'%(self.cloud_name))
+            if self.rho_video_cloud is None:
+                    self.rho_video_cloud = []
+                    self.t_video_cloud = []
+            if spacech_ele.last_recomputation_check:
+                if rho_cloud is None:
+                    print('Warning! No rho provided for saving.')
+                else:
+                    self.rho_video_cloud.append(rho_cloud)
+                self.t_video_cloud.append(beamtim.tt_curr)
+            if beamtim.flag_new_bunch_pass:
+                self.rho_video_cloud=np.array(self.rho_video_cloud)
+                self.t_video_cloud=np.array(self.t_video_cloud)
+                filename_rho='rho_video_%s/rho_pass%d.mat'%(self.cloud_name, beamtim.pass_numb-1)
+                print('Saving %s'%filename_rho)
+                sio.savemat(filename_rho,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_video':self.t_video_cloud,'rho_video':self.rho_video_cloud},oned_as='row')
+                print('Done')
+                self.rho_video_cloud=[]
+                self.t_video_cloud=[]
+
+    def _sc_video_init(self, flag_sc_movie):
+        #efield video
+        self.flag_sc_video=(flag_sc_movie==1)
+        self.efx_video=None
+        self.efy_video=None
+        self.t_efield_video=None
+    def _sc_video_save(self, spacech_ele, beamtim):
+        #save efield video
+        if self.flag_sc_video:
+            if not os.path.exists('efield_video'):
+                os.makedirs('efield_video')
+            if self.efx_video is None:
+                self.efx_video=[]
+                self.efy_video=[]
+                self.t_efield_video=[]
+            if spacech_ele.last_recomputation_check:
+                self.efx_video.append(spacech_ele.efx)
+                self.efy_video.append(spacech_ele.efy)
+                self.t_efield_video.append(beamtim.tt_curr)
+            if beamtim.flag_new_bunch_pass:
+                self.efx_video=np.array(self.efx_video)
+                self.efy_video=np.array(self.efy_video)
+                self.t_efield_video=np.array(self.t_efield_video)
+                filename_efield='efield_video/efield_pass%d.mat'%(beamtim.pass_numb-1)
+                print('Saving %s'%filename_efield)
+                sio.savemat(filename_efield,{'xg_sc':spacech_ele.xg,'yg_sc':spacech_ele.yg,'t_efield_video':self.t_efield_video,
+                                          'efx_video':self.efx_video, 'efy_video':self.efy_video},oned_as='row')
+                print('Done')
+                self.efx_video=[]
+                self.efy_video=[]
+                self.t_efield_video=[]

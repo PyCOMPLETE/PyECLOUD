@@ -58,8 +58,8 @@ t_sc_ON=0e-9;		#s
 sparse_solver = 'klu'
 
 
-flag_movie = 0             #1/0
-flag_sc_movie = 0          #1/0
+flag_movie = 1             #1/0
+flag_sc_movie = 1          #1/0
 
 save_mp_state_time_file = [5e-9, 26e-9]
 save_simulation_state_time_file = [4e-9, 27e-9]
