@@ -72,7 +72,7 @@ out_var_curr = dict_curr.keys()
 out_var_ref.sort()         # sort the keys in alphabetical order
 out_var_curr.sort()
 
-n_pass = 35  # reference passage
+n_pass = 5  # reference passage
 
 
 
@@ -104,7 +104,7 @@ for ii,k in enumerate(out_var_curr):
 
 
             #Plot vector for the reference simulation
-            pl.plot(dict_ref[k],'r', label='ref_sim')
+            pl.plot(dict_ref[k],'--r', label='ref_sim')
             print ii,k,'ref_sim'
 
 
@@ -204,18 +204,18 @@ for ii,k in enumerate(out_var_curr):
                     ind_in_mat = 3
                 
                 #Plot number of e- for the reference passage
-                sp3.plot(dict_ref[k][ind_in_mat],'r', label='ref_sim')
+                sp3.plot(dict_ref[k][ind_in_mat],'--r', label='ref_sim')
                 sp3.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
 
                 #Plot number of e- for each slice
-                sp4.plot(np.sum(dict_ref[k], axis=0),'r', label='ref_sim')
+                sp4.plot(np.sum(dict_ref[k], axis=0),'--r', label='ref_sim')
                 sp4.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
                 #Plot number of e- for each passage
-                sp5.plot(np.sum(dict_ref[k], axis=1),'r', label='ref_sim')
+                sp5.plot(np.sum(dict_ref[k], axis=1),'--r', label='ref_sim')
                 sp5.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
