@@ -138,27 +138,13 @@ class pyecloud_saver:
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, 
                                     initial_size_t_vect=1000)  
-
-        # Energy histogram init
-        self.Dt_En_hist = Dt_En_hist
-        self.t_last_En_hist = -1.
-        self.En_hist=[]
-        self.t_En_hist = []
-
-        # Angle histogram
-        self.flag_cos_angle_hist = flag_cos_angle_hist
-        if flag_cos_angle_hist:
-            N_angles = int(1./ cos_angle_width)+1
-            self.cos_angle_hist = []
-            self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
-        else:
-            self.cos_angle_hist = -1
-            self.xg_hist_cos_angle = -1            
+           
 
         #Space charge electrostatic energy
         self.t_sc_video=[]
         self.U_sc_eV=[]
 
+        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
         
         self.nel_hist_line = np.zeros(impact_man.Nxg_hist,float)
 
@@ -758,3 +744,21 @@ class pyecloud_saver:
                     raise ValueError('Stopped by user.')
             except IOError:
                 pass
+
+    def _energy_and_cos_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
+                cos_angle_width):
+        # Energy histogram init
+        self.Dt_En_hist = Dt_En_hist
+        self.t_last_En_hist = -1.
+        self.En_hist=[]
+        self.t_En_hist = []
+
+        # Angle histogram
+        self.flag_cos_angle_hist = flag_cos_angle_hist
+        if flag_cos_angle_hist:
+            N_angles = int(1./ cos_angle_width)+1
+            self.cos_angle_hist = []
+            self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
+        else:
+            self.cos_angle_hist = -1
+            self.xg_hist_cos_angle = -1 
