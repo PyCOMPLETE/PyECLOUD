@@ -348,7 +348,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         # Real saver init
         if not skip_pyeclsaver:
             flag_last_cloud = cloud_par is cloud_par_list[-1]
-            pyeclsaver.start_observing(MP_e, beamtim, impact_man,
+            pyeclsaver.start_observing(cc.Dt, MP_e, beamtim, impact_man,
                                        thiscloud.r_center, thiscloud.Dt_En_hist, thiscloud.logfile_path, thiscloud.progress_path, 
                                        flag_detailed_MP_info=thiscloud.flag_detailed_MP_info, flag_movie=thiscloud.flag_movie, 
                                        flag_sc_movie=thiscloud.flag_sc_movie, save_mp_state_time_file=thiscloud.save_mp_state_time_file,
