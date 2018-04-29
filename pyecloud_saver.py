@@ -135,21 +135,21 @@ class pyecloud_saver:
         # Init electric field video saving
         self._sc_video_init(flag_sc_movie)    
 
+        # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, 
                                     initial_size_t_vect=1000)  
 
         # Energy histogram init
-        self.Nst_En_hist=int(round(Dt_En_hist/beamtim.Dt)) #number of steps per hist. line
-        self.N_En_hist=int(float(beamtim.Nt)/float(self.Nst_En_hist))+2    #hist size in time dimension
-        self.t_En_hist=np.zeros(self.N_En_hist,float)
-        self.En_hist=np.zeros((self.N_En_hist,impact_man.Nbin_En_hist),float) #allocate histograms
-        self.i_En_hist=0
+        self.Dt_En_hist = Dt_En_hist
+        self.t_last_En_hist = -1.
+        self.En_hist=[]
+        self.t_En_hist = []
 
         # Angle histogram
         self.flag_cos_angle_hist = flag_cos_angle_hist
         if flag_cos_angle_hist:
             N_angles = int(1./ cos_angle_width)+1
-            self.cos_angle_hist = np.zeros((self.N_En_hist, N_angles),float)
+            self.cos_angle_hist = []
             self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
         else:
             self.cos_angle_hist = -1
@@ -260,14 +260,15 @@ class pyecloud_saver:
         
 
         # Energy histogram saver
-        if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
-            self.En_hist[self.i_En_hist,:]=impact_man.En_hist_line
-            self.t_En_hist[self.i_En_hist]=beamtim.tt_curr
+        # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
+        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist:
+            self.En_hist.append(impact_man.En_hist_line.copy())
+            self.t_En_hist.append(beamtim.tt_curr)
             impact_man.reset_En_hist_line()
-            self.i_En_hist=self.i_En_hist+1
+            self.t_last_En_hist = beamtim.tt_curr 
 
             if self.flag_cos_angle_hist:
-                self.cos_angle_hist[self.i_En_hist,:] = impact_man.cos_angle_hist
+                self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
                 impact_man.reset_cos_angle_hist()
 
         #Space charge electrostatic energy
