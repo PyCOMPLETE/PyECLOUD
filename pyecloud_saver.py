@@ -135,7 +135,8 @@ class pyecloud_saver:
         # Init electric field video saving
         self._sc_video_init(flag_sc_movie)    
 
-        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect=len(beamtim.t))  
+        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, 
+                                    initial_size_t_vect=1000)  
 
         # Energy histogram init
         self.Nst_En_hist=int(round(Dt_En_hist/beamtim.Dt)) #number of steps per hist. line
@@ -351,37 +352,26 @@ class pyecloud_saver:
 
     def build_outp_dict(self):
         saved_dict = {
-                    'Nel_timep':            self.Nel_time,
-                    't':                    self.t_dec,
                     't_hist':               self.t_hist,
                     'nel_hist':             self.nel_hist,
                     'xg_hist':              self.xg_hist,
                     'nel_impact_hist_tot':  self.nel_impact_hist_tot,
                     'nel_impact_hist_scrub':self.nel_impact_hist_scrub,
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
-                    'cen_density':          self.cen_density,
-                    'Nel_imp_time':         self.Nel_imp_time,
-                    'Nel_emit_time':        self.Nel_emit_time,
-                    'En_imp_eV_time':       self.En_imp_eV_time,
-                    'En_emit_eV_time':      self.En_emit_eV_time,
                     'En_g_hist':            self.En_g_hist,
                     'En_hist':              self.En_hist,
                     't_En_hist':            self.t_En_hist,
-                    'lam_t_array':          self.lam_t_array_dec,
                     'b_spac':               self.b_spac,
                     't_sc_video':           np.array(self.t_sc_video),
                     'U_sc_eV':              np.array(self.U_sc_eV),
-                    'En_kin_eV_time':       self.En_kin_eV_time,
                     'N_mp_impact_pass':     self.N_mp_impact_pass,
                     'N_mp_corrected_pass':  self.N_mp_corrected_pass,
                     'N_mp_pass':            self.N_mp_pass,
-                    'N_mp_time':            self.N_mp_time,
                     'N_mp_ref_pass':        self.N_mp_ref_pass,
                     'nel_hist_impact_seg':  self.nel_hist_impact_seg,
                     'energ_eV_impact_seg':  self.energ_eV_impact_seg,
                     't_sec_beams':          self.t_sec_beams,
                     'sec_beam_profiles':    self.sec_beam_profiles,
-                    'el_dens_at_probes':    self.el_dens_at_probes,
                     'x_el_dens_probes':     self.x_el_dens_probes,
                     'y_el_dens_probes':     self.y_el_dens_probes,
                     'r_el_dens_probes':     self.r_el_dens_probes,
@@ -397,10 +387,38 @@ class pyecloud_saver:
                     'xg_hist_cos_angle':    self.xg_hist_cos_angle
                 }
 
+        saved_dict.update(self._stepbystep_get_dict())
+
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
 
         return saved_dict
+
+    def _stepbystep_check_for_data_resize(self):
+        if self.i_last_save==(len(self.t_dec)-1):
+            print('Saver: resizing from %d to %d...'%(len(self.t_dec), 2*len(self.t_dec)))
+            list_members = [
+                't_dec',
+                'lam_t_array_dec',
+                'Nel_time',
+                'Nel_imp_time',
+                'Nel_emit_time',
+                'En_imp_eV_time',
+                'En_emit_eV_time',
+                'En_kin_eV_time',
+                'cen_density'
+                ]
+            if self.flag_detailed_MP_info==1:
+                list_members.append('N_mp_time')
+
+            for mm in list_members:
+                vv = getattr(self, mm)
+                setattr(self, mm, np.concatenate((vv, 0*vv)))
+
+            if self.flag_el_dens_probes:
+                self.el_dens_at_probes = np.concatenate(
+                    (self.el_dens_at_probes, 0*self.el_dens_at_probes), axis=1)
+            print('Done resizing')
     
     def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect):
 
@@ -413,8 +431,7 @@ class pyecloud_saver:
         self.i_last_save = -1
         self.t_last_save = -1.
         
-        self.t_dec = np.zeros(initial_size_t_vect, dtype=float)
-        self.lam_t_array_dec = 0*self.t_dec# temporary
+        self.r_center=r_center
         
         self.Nel_impact_last_step_group = 0
         self.Nel_emit_last_step_group = 0
@@ -422,7 +439,8 @@ class pyecloud_saver:
         self.En_emit_last_step_group_eV = 0
 
         #step by step data
-        self.r_center=r_center
+        self.t_dec = np.zeros(initial_size_t_vect, dtype=float)
+        self.lam_t_array_dec = 0*self.t_dec
         self.Nel_time=0.*self.t_dec;
         self.Nel_imp_time=0.*self.t_dec;
         self.Nel_emit_time=0.*self.t_dec;
@@ -472,6 +490,9 @@ class pyecloud_saver:
 
         #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
         if beamtim.tt_curr-self.t_last_save > self.Dt_save:
+
+            self._stepbystep_check_for_data_resize()
+
             self.i_last_save+=1
             self.t_last_save = beamtim.tt_curr
 
@@ -505,6 +526,28 @@ class pyecloud_saver:
 
             if self.flag_detailed_MP_info==1:
                 self.N_mp_time[self.i_last_save]=MP_e.N_mp
+
+    def _stepbystep_get_dict(self):
+        
+        dict_sbs_data = {
+            't':self.t_dec[:self.i_last_save+1],
+            'lam_t_array':self.lam_t_array_dec[:self.i_last_save+1],
+            'Nel_timep':self.Nel_time[:self.i_last_save+1],
+            'Nel_imp_time':self.Nel_imp_time[:self.i_last_save+1],
+            'Nel_emit_time':self.Nel_emit_time[:self.i_last_save+1],
+            'En_imp_eV_time':self.En_imp_eV_time[:self.i_last_save+1],
+            'En_emit_eV_time':self.En_emit_eV_time[:self.i_last_save+1],
+            'En_kin_eV_time':self.En_kin_eV_time[:self.i_last_save+1],
+            'cen_density':self.cen_density[:self.i_last_save+1]
+        }
+
+        if self.flag_detailed_MP_info==1:
+            dict_sbs_data['N_mp_time'] = self.N_mp_time[:self.i_last_save+1]
+
+        if self.flag_el_dens_probes:
+            dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
+
+        return dict_sbs_data
 
 
     def _MP_state_init(self, save_mp_state_time_file):
