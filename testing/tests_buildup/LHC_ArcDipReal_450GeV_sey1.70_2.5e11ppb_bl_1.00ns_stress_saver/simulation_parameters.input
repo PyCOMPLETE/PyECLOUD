@@ -66,6 +66,8 @@ save_simulation_state_time_file = [4e-9, 27e-9]
 
 flag_hist_impact_seg = 1
 
+flag_detailed_MP_info = 1
+
 el_density_probes = [
 {'x' : 7.832798e-03, 'y': 9.356130e-04, 'r_obs': 1e-3},
 {'x' : -1.149298e-02, 'y': -5.784451e-04, 'r_obs': 1e-3}]

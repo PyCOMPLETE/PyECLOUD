@@ -98,7 +98,7 @@ class pyecloud_saver:
 
 
     def start_observing(self, Dt_ref, MP_e, beamtim, impact_man,
-                 r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info=0,
+                 r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info =0,
                  cos_angle_width=0.05, flag_cos_angle_hist=True,
                  flag_movie=0, flag_sc_movie=0, save_mp_state_time_file=-1,
                  flag_presence_sec_beams=False, sec_beams_list=[], dec_fac_secbeam_prof=1,
@@ -116,6 +116,8 @@ class pyecloud_saver:
         else:
             self.folder_outp='./'
 
+        self.flag_detailed_MP_info = flag_detailed_MP_info
+
         # cloud info
         self.flag_multiple_clouds = flag_multiple_clouds
         self.cloud_name = cloud_name
@@ -131,7 +133,9 @@ class pyecloud_saver:
         self._rho_video_init(flag_movie)
 
         # Init electric field video saving
-        self._sc_video_init(flag_sc_movie)       
+        self._sc_video_init(flag_sc_movie)    
+
+        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect=len(beamtim.t))  
 
         # Energy histogram init
         self.Nst_En_hist=int(round(Dt_En_hist/beamtim.Dt)) #number of steps per hist. line
@@ -154,39 +158,7 @@ class pyecloud_saver:
         self.t_sc_video=[]
         self.U_sc_eV=[]
 
-        #step by step data
-
-        # introduce decimation
-        self.Dt_ref = Dt_ref
-        self.dec_fact_out = dec_fact_out
-        self.Dt_save = (dec_fact_out-0.5)*Dt_ref
-        self.i_last_save = -1
-        self.t_last_save = -1.
         
-        self.t_dec = 0*beamtim.t[::dec_fact_out]# temporary
-        self.lam_t_array_dec = 0*beamtim.lam_t_array[::dec_fact_out]# temporary
-        self.Nel_impact_last_step_group = 0
-        self.Nel_emit_last_step_group = 0
-        self.En_imp_last_step_group_eV = 0
-        self.En_emit_last_step_group_eV = 0
-
-        #step by step data
-        self.r_center=r_center
-        self.Nel_time=0.*self.t_dec;
-        self.Nel_imp_time=0.*self.t_dec;
-        self.Nel_emit_time=0.*self.t_dec;
-        self.En_imp_eV_time=0.*self.t_dec;
-        self.En_emit_eV_time=0.*self.t_dec;
-        self.En_kin_eV_time=0.*self.t_dec;
-        self.cen_density=0.*self.t_dec;
-
-        self.flag_detailed_MP_info=flag_detailed_MP_info
-
-        if flag_detailed_MP_info==1:
-            self.N_mp_time=0.*self.t_dec
-        else:
-            self.N_mp_time=-1
-
         self.nel_hist_line = np.zeros(impact_man.Nxg_hist,float)
 
         #pass by pass data
@@ -222,29 +194,6 @@ class pyecloud_saver:
         else:
             self.t_sec_beams = -1
             self.sec_beam_profiles = -1
-
-        # initialize electron density probes
-        self.flag_el_dens_probes = False
-        self.x_el_dens_probes = -1
-        self.y_el_dens_probes = -1
-        self.r_el_dens_probes = -1
-        self.el_dens_at_probes = -1
-        if len(el_density_probes)>0:
-            self.flag_el_dens_probes = True
-            self.N_el_dens_probes = len(el_density_probes)
-            self.el_dens_at_probes = np.zeros((self.N_el_dens_probes, len(self.t_dec)))
-            self.x_el_dens_probes = []
-            self.y_el_dens_probes = []
-            self.r_el_dens_probes = []
-            for ii in xrange(self.N_el_dens_probes):
-                self.x_el_dens_probes.append(el_density_probes[ii]['x'])
-                self.y_el_dens_probes.append(el_density_probes[ii]['y'])
-                self.r_el_dens_probes.append(el_density_probes[ii]['r_obs'])
-
-            self.x_el_dens_probes = np.array(self.x_el_dens_probes)
-            self.y_el_dens_probes = np.array(self.y_el_dens_probes)
-            self.r_el_dens_probes = np.array(self.r_el_dens_probes)
-
 
 
         self.stopfile = stopfile
@@ -327,49 +276,7 @@ class pyecloud_saver:
 
         
 
-        #save step by step data
-        # Vars to be accumulated
-        self.Nel_impact_last_step_group += impact_man.Nel_impact_last_step
-        self.Nel_emit_last_step_group += impact_man.Nel_emit_last_step
-        self.En_imp_last_step_group_eV += impact_man.En_imp_last_step_eV
-        self.En_emit_last_step_group_eV += impact_man.En_emit_last_step_eV
-
-
-        #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
-        if beamtim.tt_curr-self.t_last_save > self.Dt_save:
-            self.i_last_save+=1
-            self.t_last_save = beamtim.tt_curr
-
-            self.t_dec[self.i_last_save] = beamtim.tt_curr
-            self.lam_t_array_dec[self.i_last_save] = beamtim.lam_t_curr
-
-            self.Nel_imp_time[self.i_last_save] = self.Nel_impact_last_step_group
-            self.Nel_emit_time[self.i_last_save] = self.Nel_emit_last_step_group
-            self.En_imp_eV_time[self.i_last_save] = self.En_imp_last_step_group_eV
-            self.En_emit_eV_time[self.i_last_save] = self.En_emit_last_step_group_eV
-
-            self.Nel_impact_last_step_group = 0
-            self.Nel_emit_last_step_group = 0
-            self.En_imp_last_step_group_eV = 0
-            self.En_emit_last_step_group_eV = 0
-
-
-            self.Nel_time[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[self.i_last_save]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
-
-            flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
-            flag_center[MP_e.N_mp:]=False
-            self.cen_density[self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_center*self.r_center)
-
-            if self.flag_el_dens_probes:
-                for ii in xrange(self.N_el_dens_probes):
-                    flag_center=((MP_e.x_mp-self.x_el_dens_probes[ii])**2 + (MP_e.y_mp-self.y_el_dens_probes[ii])**2)<self.r_el_dens_probes[ii]**2;
-                    flag_center[MP_e.N_mp:]=False
-                    self.el_dens_at_probes[ii, self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
-
-
-            if self.flag_detailed_MP_info==1:
-                self.N_mp_time[self.i_last_save]=MP_e.N_mp
+        self._stepbystep_data_save(impact_man, MP_e, beamtim)
 
         #########################################
         # Quantites saved at each bunch passage #
@@ -494,6 +401,110 @@ class pyecloud_saver:
             saved_dict[kk] = np.array(saved_dict[kk])
 
         return saved_dict
+    
+    def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect):
+
+        #step by step data
+
+        # introduce decimation
+        self.Dt_ref = Dt_ref
+        self.dec_fact_out = dec_fact_out
+        self.Dt_save = (dec_fact_out-0.5)*Dt_ref
+        self.i_last_save = -1
+        self.t_last_save = -1.
+        
+        self.t_dec = np.zeros(initial_size_t_vect, dtype=float)
+        self.lam_t_array_dec = 0*self.t_dec# temporary
+        
+        self.Nel_impact_last_step_group = 0
+        self.Nel_emit_last_step_group = 0
+        self.En_imp_last_step_group_eV = 0
+        self.En_emit_last_step_group_eV = 0
+
+        #step by step data
+        self.r_center=r_center
+        self.Nel_time=0.*self.t_dec;
+        self.Nel_imp_time=0.*self.t_dec;
+        self.Nel_emit_time=0.*self.t_dec;
+        self.En_imp_eV_time=0.*self.t_dec;
+        self.En_emit_eV_time=0.*self.t_dec;
+        self.En_kin_eV_time=0.*self.t_dec;
+        self.cen_density=0.*self.t_dec;
+
+
+        if self.flag_detailed_MP_info==1:
+            self.N_mp_time=0.*self.t_dec
+        else:
+            self.N_mp_time=-1
+
+        # initialize electron density probes
+        self.flag_el_dens_probes = False
+        self.x_el_dens_probes = -1
+        self.y_el_dens_probes = -1
+        self.r_el_dens_probes = -1
+        self.el_dens_at_probes = -1
+        if len(el_density_probes)>0:
+            self.flag_el_dens_probes = True
+            self.N_el_dens_probes = len(el_density_probes)
+            self.el_dens_at_probes = np.zeros((self.N_el_dens_probes, len(self.t_dec))) # to be changed
+            self.x_el_dens_probes = []
+            self.y_el_dens_probes = []
+            self.r_el_dens_probes = []
+            for ii in xrange(self.N_el_dens_probes):
+                self.x_el_dens_probes.append(el_density_probes[ii]['x'])
+                self.y_el_dens_probes.append(el_density_probes[ii]['y'])
+                self.r_el_dens_probes.append(el_density_probes[ii]['r_obs'])
+
+            self.x_el_dens_probes = np.array(self.x_el_dens_probes)
+            self.y_el_dens_probes = np.array(self.y_el_dens_probes)
+            self.r_el_dens_probes = np.array(self.r_el_dens_probes)
+
+
+
+    def _stepbystep_data_save(self, impact_man, MP_e, beamtim):
+        #save step by step data
+        # Vars to be accumulated
+        self.Nel_impact_last_step_group += impact_man.Nel_impact_last_step
+        self.Nel_emit_last_step_group += impact_man.Nel_emit_last_step
+        self.En_imp_last_step_group_eV += impact_man.En_imp_last_step_eV
+        self.En_emit_last_step_group_eV += impact_man.En_emit_last_step_eV
+
+
+        #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
+        if beamtim.tt_curr-self.t_last_save > self.Dt_save:
+            self.i_last_save+=1
+            self.t_last_save = beamtim.tt_curr
+
+            self.t_dec[self.i_last_save] = beamtim.tt_curr
+            self.lam_t_array_dec[self.i_last_save] = beamtim.lam_t_curr
+
+            self.Nel_imp_time[self.i_last_save] = self.Nel_impact_last_step_group
+            self.Nel_emit_time[self.i_last_save] = self.Nel_emit_last_step_group
+            self.En_imp_eV_time[self.i_last_save] = self.En_imp_last_step_group_eV
+            self.En_emit_eV_time[self.i_last_save] = self.En_emit_last_step_group_eV
+
+            self.Nel_impact_last_step_group = 0
+            self.Nel_emit_last_step_group = 0
+            self.En_imp_last_step_group_eV = 0
+            self.En_emit_last_step_group_eV = 0
+
+
+            self.Nel_time[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
+            self.En_kin_eV_time[self.i_last_save]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
+
+            flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
+            flag_center[MP_e.N_mp:]=False
+            self.cen_density[self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_center*self.r_center)
+
+            if self.flag_el_dens_probes:
+                for ii in xrange(self.N_el_dens_probes):
+                    flag_center=((MP_e.x_mp-self.x_el_dens_probes[ii])**2 + (MP_e.y_mp-self.y_el_dens_probes[ii])**2)<self.r_el_dens_probes[ii]**2;
+                    flag_center[MP_e.N_mp:]=False
+                    self.el_dens_at_probes[ii, self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
+
+
+            if self.flag_detailed_MP_info==1:
+                self.N_mp_time[self.i_last_save]=MP_e.N_mp
 
 
     def _MP_state_init(self, save_mp_state_time_file):
