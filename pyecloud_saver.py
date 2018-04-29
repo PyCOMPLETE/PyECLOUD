@@ -138,15 +138,111 @@ class pyecloud_saver:
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, 
                                     initial_size_t_vect=1000)  
-           
+
+        # Init pass by pass data saving
+        self._pass_by_pass_data_init(impact_man,
+                    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det)
+
+        # Init energy and cos angle histogram saving
+        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
 
         #Space charge electrostatic energy
         self.t_sc_video=[]
         self.U_sc_eV=[]
-
-        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
         
+        # Prepare space for density histogram calculation
         self.nel_hist_line = np.zeros(impact_man.Nxg_hist,float)
+
+        #logfile and progress file
+        self.logfile_path=logfile_path
+        self.progress_path=progress_path
+        self.stopfile = stopfile
+
+        # Store secondary beam profiles
+        if flag_presence_sec_beams:
+            self.t_sec_beams = beamtim.t[::dec_fac_secbeam_prof]
+            self.sec_beam_profiles = []
+            for sec_beam in sec_beams_list:
+                self.sec_beam_profiles.append(sec_beam.lam_t_array[::dec_fac_secbeam_prof])
+            self.sec_beam_profiles=np.array(self.sec_beam_profiles)
+        else:
+            self.t_sec_beams = -1
+            self.sec_beam_profiles = -1
+
+
+        # extract SEY curves
+        n_rep = 10000
+        self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
+        self.sey_test_cos_theta = np.linspace(0, 1., 10)
+        self.sey_test_del_true_mat, self.sey_test_del_elast_mat = impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta)
+
+        # Log
+        print('Done init pyecloud_saver.')
+        flog=open(self.logfile_path,'a')
+        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
+        flog.write('Initialization finished on %s\n'%timestr)
+        flog.close()
+        
+    def witness(self, MP_e, beamtim, spacech_ele, impact_man,
+                dynamics,gas_ion_flag,resgasion,t_ion,
+                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
+                cloud_list, rho_cloud = None):
+
+        ####################################################
+        # Quantites saved at custom times provided by user #
+        ####################################################
+
+        # Check for MP save state
+        self._MP_state_save(MP_e, beamtim)
+        
+        # Check for simulation save state
+        self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                              sec_beams_list, self.flag_multiple_clouds, cloud_list) 
+
+        # Check for save video charge density
+        self._rho_video_save(spacech_ele, beamtim, rho_cloud)
+        
+        # Check for save video electric field
+        self._sc_video_save(spacech_ele, beamtim)
+
+        # Check for energy and cos angle hist update
+        self._energy_and_cos_angle_hist_save(beamtim, impact_man)
+
+        #Space charge electrostatic energy
+        if spacech_ele.last_recomputation_check:
+            self.t_sc_video.append(beamtim.tt_curr)
+            self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
+
+        #########################
+        # Step-by-step saveings #
+        #########################
+        self._stepbystep_data_save(impact_man, MP_e, beamtim)
+        
+
+        ##########################################################
+        # Quantites saved at each bunch passage and dump to file #
+        ##########################################################
+
+        if beamtim.flag_new_bunch_pass:
+
+            self._pass_by_pass_data_save(MP_e, impact_man, beamtim)
+
+            # I want all elements that go to the output file to be members of this object
+            self.xg_hist = impact_man.xg_hist
+            self.En_g_hist = impact_man.En_g_hist
+            self.b_spac = beamtim.b_spac
+            self.area = impact_man.chamb.area
+
+            sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
+
+        if beamtim.flag_new_bunch_pass:
+            self._logfile_progressfile_stofile(beamtim, MP_e)
+
+
+        return impact_man
+
+    def _pass_by_pass_data_init(self, impact_man,
+                    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det):
 
         #pass by pass data
         self.t_hist=[]
@@ -165,25 +261,6 @@ class pyecloud_saver:
         else:
                 self.nel_hist_impact_seg = -1
                 self.energ_eV_impact_seg = -1
-
-
-        #logfile and progress file
-        self.logfile_path=logfile_path
-        self.progress_path=progress_path
-
-
-        if flag_presence_sec_beams:
-            self.t_sec_beams = beamtim.t[::dec_fac_secbeam_prof]
-            self.sec_beam_profiles = []
-            for sec_beam in sec_beams_list:
-                self.sec_beam_profiles.append(sec_beam.lam_t_array[::dec_fac_secbeam_prof])
-            self.sec_beam_profiles=np.array(self.sec_beam_profiles)
-        else:
-            self.t_sec_beams = -1
-            self.sec_beam_profiles = -1
-
-
-        self.stopfile = stopfile
 
         # detailed hist
         self.flag_hist_det = False
@@ -207,88 +284,7 @@ class pyecloud_saver:
             self.nel_hist_det_line=np.zeros(self.Nxg_hist_det,float)
             self.nel_hist_det=[]
 
-
-
-        print('Done init pyecloud_saver.')
-        flog=open(self.logfile_path,'a')
-        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-        flog.write('Initialization finished on %s\n'%timestr)
-        flog.close()
-        
-        # extract SEY curves
-        n_rep = 10000
-        self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
-        self.sey_test_cos_theta = np.linspace(0, 1., 10)
-        self.sey_test_del_true_mat, self.sey_test_del_elast_mat = impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta)
-
-
-    def witness(self, MP_e, beamtim, spacech_ele, impact_man,
-                dynamics,gas_ion_flag,resgasion,t_ion,
-                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
-                cloud_list, rho_cloud = None):
-
-        ####################################################
-        # Quantites saved at custom times provided by user #
-        ####################################################
-
-        # Check for MP save state
-        self._MP_state_save(MP_e, beamtim)
-        
-        # Check for simulation save state
-        self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                              sec_beams_list, self.flag_multiple_clouds, cloud_list) 
-
-        # Check for save video charge density
-        self._rho_video_save(spacech_ele, beamtim, rho_cloud)
-        
-        # Check for save video electric field
-        self._sc_video_save(spacech_ele, beamtim)
-        
-
-        # Energy histogram saver
-        # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
-        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist:
-            self.En_hist.append(impact_man.En_hist_line.copy())
-            self.t_En_hist.append(beamtim.tt_curr)
-            impact_man.reset_En_hist_line()
-            self.t_last_En_hist = beamtim.tt_curr 
-
-            if self.flag_cos_angle_hist:
-                self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
-                impact_man.reset_cos_angle_hist()
-
-        #Space charge electrostatic energy
-        if spacech_ele.last_recomputation_check:
-            self.t_sc_video.append(beamtim.tt_curr)
-            self.U_sc_eV.append(spacech_ele.U_sc_eV_stp)
-
-        
-
-        self._stepbystep_data_save(impact_man, MP_e, beamtim)
-
-        #########################################
-        # Quantites saved at each bunch passage #
-        #########################################
-
-        if beamtim.flag_new_bunch_pass:
-
-            self._save_passage_by_passage_data(MP_e, impact_man, beamtim)
-
-            # I want all elements that go to the output file to be members of this object
-            self.xg_hist = impact_man.xg_hist
-            self.En_g_hist = impact_man.En_g_hist
-            self.b_spac = beamtim.b_spac
-            self.area = impact_man.chamb.area
-
-            sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
-
-        if beamtim.flag_new_bunch_pass:
-            self._logfile_progressfile_stofile(beamtim, MP_e)
-
-
-        return impact_man
-
-    def _save_passage_by_passage_data(self, MP_e, impact_man, beamtim):
+    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim):
         #update histograms
         self.nel_hist_line=0.0*self.nel_hist_line
         if MP_e.N_mp>0:
@@ -334,8 +330,6 @@ class pyecloud_saver:
 
         if self.flag_hist_det:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
-
-
 
     def build_outp_dict(self):
         saved_dict = {
@@ -762,3 +756,16 @@ class pyecloud_saver:
         else:
             self.cos_angle_hist = -1
             self.xg_hist_cos_angle = -1 
+
+    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
+        # Energy histogram saver
+        # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
+        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist:
+            self.En_hist.append(impact_man.En_hist_line.copy())
+            self.t_En_hist.append(beamtim.tt_curr)
+            impact_man.reset_En_hist_line()
+            self.t_last_En_hist = beamtim.tt_curr 
+
+            if self.flag_cos_angle_hist:
+                self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
+                impact_man.reset_cos_angle_hist()
