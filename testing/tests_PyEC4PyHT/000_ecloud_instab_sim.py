@@ -52,7 +52,7 @@ machine.install_after_each_transverse_segment(ecloud)
 
 # setup transverse losses (to "protect" the ecloud)
 import PyHEADTAIL.aperture.aperture as aperture
-apt_xy = aperture.EllipticalApertureXY(x_aper=ecloud.impact_man.chamb.x_aper, y_aper=ecloud.impact_man.chamb.y_aper)
+apt_xy = aperture.EllipticalApertureXY(x_aper=ecloud.cloudsim.chamb.x_aper, y_aper=ecloud.cloudsim.chamb.y_aper)
 machine.one_turn_map.append(apt_xy)
 
 # generate a bunch 

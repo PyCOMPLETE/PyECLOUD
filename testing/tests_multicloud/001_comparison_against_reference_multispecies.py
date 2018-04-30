@@ -62,7 +62,7 @@ out_var_curr = dict_curr_list[0].keys()
 out_var_ref.sort()         # sort the keys in alphabetical order
 out_var_curr.sort()
 
-n_pass = 35  # reference passage
+n_pass = 29  # reference passage
 
 var_no_sum_list = ['En_g_hist', 'lam_t_array', 'N_mp_corrected_pass', 'N_mp_impact_pass', 'N_mp_ref_pass', 'sey_test_cos_theta', 'sey_test_del_elast_mat', 
                    'sey_test_del_true_mat', 'sey_test_E_impact_eV', 't', 't_En_hist', 't_hist', 't_sc_video', 'xg_hist', 'xg_hist_cos_angle', 'U_sc_eV']
