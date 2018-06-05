@@ -80,3 +80,15 @@ plt.figure(1)
 plt.plot(t, val)
 plt.plot(t_nunif, val_nunif, '.g')
 plt.show()
+
+dict_lam_unif = {}
+dict_lam_unif['t'] = t
+dict_lam_unif['lam_t_array'] = val
+
+dict_lam_nonunif = {}
+dict_lam_nonunif['t'] = t_nunif
+dict_lam_nonunif['lam_t_array'] = val_nunif
+
+import scipy.io as sio
+sio.savemat('profile_uniform.mat', dict_lam_unif, oned_as='row')
+sio.savemat('profile_non_uniform.mat', dict_lam_nonunif, oned_as='row')
