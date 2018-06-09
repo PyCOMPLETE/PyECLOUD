@@ -112,7 +112,8 @@ class BuildupSimulation(object):
 
 
 
-    def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False):
+    def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
+                      force_recompute_space_charge=False):
 
         if beamtim_obj is not None:
             beamtim = beamtim_obj
@@ -127,6 +128,7 @@ class BuildupSimulation(object):
         cloud_list = self.cloud_list
 
         flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
+
 
         # Loop over clouds: gather fields, move, generate new MPs
         for i_cloud, cloud in enumerate(cloud_list):
@@ -198,7 +200,7 @@ class BuildupSimulation(object):
                 phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
 
             # Compute space charge field
-            if (beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge:
+            if ((beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
                 spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)

@@ -155,7 +155,7 @@ class Ecloud(object):
 
         self.N_tracks = 0
 
-        self.cloudsim.spacech_ele.flag_decimate = False
+        #self.cloudsim.spacech_ele.flag_decimate = False
 
 
 
@@ -316,10 +316,14 @@ class Ecloud(object):
         dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
         dummybeamtim.flag_new_bunch_pass = False
 
+        # Force space charge recomputation (to be switched between bunches in multibunch mode)
+        force_recompute_space_charge = True
+
         # Perform cloud simulation step
         self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
                 Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps, 
-                kick_mode_for_beam_field=self.kick_mode_for_beam_field)
+                kick_mode_for_beam_field=self.kick_mode_for_beam_field,
+                force_recompute_space_charge=force_recompute_space_charge)
 
 
         # Build MP_system-like object with beam coordinates
