@@ -20,7 +20,7 @@ Dt = 2.500000e-11
 t_end=1e-9;
 
 # Parameters of the non-unif 
-Dt_coarse = 4*Dt
+Dt_coarse = Dt
 refine_fact = 4.
 t_start_refine = 0.
 t_end_refine = 5e-9
