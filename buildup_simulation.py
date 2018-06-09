@@ -184,11 +184,11 @@ class BuildupSimulation(object):
 
             ## Gas ionization (main and secondary beams)
             if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
-                MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt, beamtim.sigmax, beamtim.sigmay,
+                MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt_curr, beamtim.sigmax, beamtim.sigmay,
                                           x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
-                        MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt, sec_beam.sigmax, sec_beam.sigmay,
+                        MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt_curr, sec_beam.sigmax, sec_beam.sigmay,
                                                   x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
 
             ## Photoemission (main and secondary beams)
@@ -197,7 +197,7 @@ class BuildupSimulation(object):
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
                         lam_curr_phem += sec_beam.lam_t_curr
-                phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
+                phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
             # Compute space charge field
             if ((beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:

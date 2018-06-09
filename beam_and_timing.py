@@ -132,6 +132,9 @@ class beam_and_timing:
             lam_t_array=bunch_train4(t, b_spac,t_offs,ppb_vect,sigmaz_vect);
             print 'Done beam profile generation.'
         else:
+            print 'Loading beam profile from file:'
+            print beam_long_prof_file
+
             dict_lam=sio.loadmat(beam_long_prof_file)
             t=np.squeeze(dict_lam['t'].real)
             lam_t_array=np.squeeze(dict_lam['lam_t_array'].real)
@@ -295,7 +298,8 @@ class beam_and_timing:
 
 
         else:
-            print 'Loading beam field map from file'
+            print 'Loading beam field map from file:'
+            print beam_field_file
             dict_beam=sio.loadmat(beam_field_file)
 
             Ex_beam=np.squeeze(dict_beam['Ex'].real)

@@ -198,11 +198,14 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     # Init beam and timing
     if not skip_beam:
 
-        if os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file):
-            beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file
-        elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
-            beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'
-        else:
+        try:
+            if os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file):
+                beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file
+            elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
+                beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'
+            else:
+                beam_long_prof_file_path = b_par.beam_long_prof_file
+        except:
             beam_long_prof_file_path = b_par.beam_long_prof_file
 
         beamtim=beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.q_part, b_par.beam_field_file,cc.lam_th,
@@ -220,11 +223,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 print('Initialize secondary beam %d/%d' % (ii+1, N_sec_beams))
                 sb_par = sec_b_par_list[ii]
                 
-                if os.path.isfile(pyecl_input_folder+'/'+sb_par.beam_long_prof_file):
-                    sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file
-                elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
-                    sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file+'.mat'
-                else:
+                try:
+                    if os.path.isfile(pyecl_input_folder+'/'+sb_par.beam_long_prof_file):
+                        sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file
+                    elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
+                        sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file+'.mat'
+                    else:
+                        sbeam_long_prof_file_path = sb_par.beam_long_prof_file
+                except TypeError:
+                    # in case sb_par.beam_long_prof_file is -1
                     sbeam_long_prof_file_path = sb_par.beam_long_prof_file
 
                 sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.q_part, sb_par.beam_field_file, cc.lam_th,
