@@ -172,9 +172,19 @@ class BuildupSimulation(object):
             old_pos=MP_e.get_positions()
 
             ## Motion
-            if Dt_substep_custom is None and N_sub_steps_custom is None:
+            if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
+                # Standard simulation mode
                 MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
+            elif Dt_substep_custom is None and N_sub_steps_custom is None and not(beamtim.flag_unif_Dt):
+                # Dt from non-uniform beam profile
+                if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
+                    raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
+                Dt_substep_target = cloud.dynamics.Dt/cloud.dynamics.N_sub_steps
+                N_substeps_curr = np.round(beamtim.Dt_curr/Dt_substep_target)
+                Dt_substep_curr = beamtim.Dt_curr/N_substeps_curr
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
             else:
+                # Custom steps and substeps provided as arguments of sim_time_step
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
                     raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
                 MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)

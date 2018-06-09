@@ -334,8 +334,8 @@ class beam_and_timing:
         if not(flag_unif_Dt):
             print 'Cloud simulation in non-uniform Dt mode.'
             print 'Dt provided in input will be used only as reference for savings and substeps.'
-            prrrrr
 
+        self.flag_unif_Dt=flag_unif_Dt
         self.Nt=Nt
         self.b_spac=b_spac
         self.lam_t_array=lam_t_array
