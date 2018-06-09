@@ -197,9 +197,17 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Init beam and timing
     if not skip_beam:
+
+        if os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file):
+            beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file
+        elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
+            beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'
+        else:
+            beam_long_prof_file_path = b_par.beam_long_prof_file
+
         beamtim=beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.q_part, b_par.beam_field_file,cc.lam_th,
                      b_spac=b_par.b_spac, sigmaz=b_par.sigmaz,t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
-                     beam_long_prof_file=b_par.beam_long_prof_file, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam=b_par.f_telescope_beam,
+                     beam_long_prof_file=beam_long_prof_file_path, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam=b_par.f_telescope_beam,
                      target_grid_beam=b_par.target_grid_beam, N_nodes_discard_beam=b_par.N_nodes_discard_beam, N_min_Dh_main_beam=b_par.N_min_Dh_main_beam,
                      chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                      x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
@@ -211,9 +219,17 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             for ii in xrange(N_sec_beams):
                 print('Initialize secondary beam %d/%d' % (ii+1, N_sec_beams))
                 sb_par = sec_b_par_list[ii]
+                
+                if os.path.isfile(pyecl_input_folder+'/'+sb_par.beam_long_prof_file):
+                    sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file
+                elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
+                    sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file+'.mat'
+                else:
+                    sbeam_long_prof_file_path = sb_par.beam_long_prof_file
+
                 sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.q_part, sb_par.beam_field_file, cc.lam_th,
                      b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz,t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
-                     beam_long_prof_file=sb_par.beam_long_prof_file, Dh_beam_field=sb_par.Dh_beam_field, f_telescope_beam=sb_par.f_telescope_beam,
+                     beam_long_prof_file=sbeam_long_prof_file_path, Dh_beam_field=sb_par.Dh_beam_field, f_telescope_beam=sb_par.f_telescope_beam,
                      target_grid_beam=sb_par.target_grid_beam, N_nodes_discard_beam=sb_par.N_nodes_discard_beam, N_min_Dh_main_beam=sb_par.N_min_Dh_main_beam,
                      chamb=chamb, sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
                      x_beam_pos=sb_par.x_beam_pos, y_beam_pos=sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
