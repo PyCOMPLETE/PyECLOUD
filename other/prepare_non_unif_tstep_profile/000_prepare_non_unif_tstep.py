@@ -15,15 +15,24 @@ t_offs = 2.5e-9
 filling_pattern = 1*(30*[1.]+5*[0])
 
 b_spac = 25e-9
-
-Dt = 2.500000e-11
 t_end=1e-9;
 
+
 # Parameters of the non-unif 
+Dt = 2.500000e-11
 Dt_coarse = Dt
 refine_fact = 4.
 t_start_refine = 0.
 t_end_refine = 5e-9
+label = ''
+
+# # Parameters of the non-unif 
+# Dt = 2.500000e-11/4
+# Dt_coarse = Dt
+# refine_fact = 3.
+# t_start_refine = 0.
+# t_end_refine = 5e-9
+# label = '_for_ionization'
 
 ppb_vect = np.atleast_1d(np.float_(np.array(filling_pattern)))
 sigmaz_vect = 0*ppb_vect+sigmaz
@@ -90,5 +99,5 @@ dict_lam_nonunif['t'] = t_nunif
 dict_lam_nonunif['lam_t_array'] = val_nunif
 
 import scipy.io as sio
-sio.savemat('profile_uniform.mat', dict_lam_unif, oned_as='row')
-sio.savemat('profile_non_uniform.mat', dict_lam_nonunif, oned_as='row')
+sio.savemat('profile_uniform%s.mat'%label, dict_lam_unif, oned_as='row')
+sio.savemat('profile_non_uniform%s.mat'%label, dict_lam_nonunif, oned_as='row')
