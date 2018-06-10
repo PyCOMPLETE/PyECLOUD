@@ -26,13 +26,13 @@ t_start_refine = 0.
 t_end_refine = 5e-9
 label = ''
 
-# # Parameters of the non-unif 
-# Dt = 2.500000e-11/4
-# Dt_coarse = Dt
-# refine_fact = 3.
-# t_start_refine = 0.
-# t_end_refine = 5e-9
-# label = '_for_ionization'
+# Parameters of the non-unif 
+Dt = 2.500000e-11/4
+Dt_coarse = Dt
+refine_fact = 3.
+t_start_refine = 0.
+t_end_refine = 5e-9
+label = '_for_ionization'
 
 ppb_vect = np.atleast_1d(np.float_(np.array(filling_pattern)))
 sigmaz_vect = 0*ppb_vect+sigmaz
