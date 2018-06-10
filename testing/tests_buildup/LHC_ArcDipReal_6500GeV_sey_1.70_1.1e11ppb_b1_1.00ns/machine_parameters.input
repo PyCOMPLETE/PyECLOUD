@@ -33,8 +33,8 @@ y_min_init_unif =-y_aper
  
 photoem_flag = 1
 inv_CDF_refl_photoem_file = 'unif_no_file'
-k_pe_st = 0.00070025484948869714
-refl_frac = 0.18859001808468617
+k_pe_st = 0.001
+refl_frac = 0.8
 alimit = 0.36e-3
 e_pe_sigma = 5. #in eV
 e_pe_max = 7.   #in eV 
