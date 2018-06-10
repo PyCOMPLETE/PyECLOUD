@@ -30,7 +30,8 @@ all_sim_folders = [
     'LHC_TDIS_non_unif_sey',
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_seyfromfile',
     'LHC_Solenoid_sey1.10_100.00mT',
-    'FCC_Dipole_25ns_50.00TeV_sey1.9_segment_photoemission'
+    'FCC_Dipole_25ns_50.00TeV_sey1.9_segment_photoemission',
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime'
 ]
 
 for folder in all_sim_folders:

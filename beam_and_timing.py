@@ -94,6 +94,8 @@ class beam_and_timing:
         if chamb.is_outside(np.array([x_beam_pos]),np.array([y_beam_pos])):
             raise ValueError('The beam is outside the chamber!')
 
+        flag_unif_Dt = True
+
         if flag_bunched_beam:
             print 'Start beam profile generation.'
 
@@ -130,11 +132,23 @@ class beam_and_timing:
             lam_t_array=bunch_train4(t, b_spac,t_offs,ppb_vect,sigmaz_vect);
             print 'Done beam profile generation.'
         else:
+            print 'Loading beam profile from file:'
+            print beam_long_prof_file
+
             dict_lam=sio.loadmat(beam_long_prof_file)
             t=np.squeeze(dict_lam['t'].real)
             lam_t_array=np.squeeze(dict_lam['lam_t_array'].real)
             t_inter=t[-1]
-            Dt=t[1]-t[0]
+
+            Dt_vect = np.diff(t)
+            if (np.max(np.abs(Dt_vect))-np.mean(np.abs(Dt_vect))) > 1e-4*np.mean(np.abs(Dt_vect)):
+                flag_unif_Dt = False
+            else:
+                print 'Beam profile loaded from file.'
+                print 'Uniform time step detected.'
+                print 'The time step Dt provided in simulation_parameters.input will be ignored.'
+                Dt=t[1]-t[0]
+                print 'Time step set to Dt = %.3e s.'%Dt
 
         if flag_secodary_beam:
             if len(t)!=len(t_primary_beam):
@@ -284,7 +298,8 @@ class beam_and_timing:
 
 
         else:
-            print 'Loading beam field map from file'
+            print 'Loading beam field map from file:'
+            print beam_field_file
             dict_beam=sio.loadmat(beam_field_file)
 
             Ex_beam=np.squeeze(dict_beam['Ex'].real)
@@ -316,6 +331,11 @@ class beam_and_timing:
             self.xx_beam=xx_beam
             self.yy_beam=yy_beam
 
+        if not(flag_unif_Dt):
+            print 'Cloud simulation in non-uniform Dt mode.'
+            print 'Dt provided in input will be used only as reference for savings and substeps.'
+
+        self.flag_unif_Dt=flag_unif_Dt
         self.Nt=Nt
         self.b_spac=b_spac
         self.lam_t_array=lam_t_array
@@ -343,6 +363,7 @@ class beam_and_timing:
     def next_time_step(self):
         self.ii_curr+=1
         self.tt_curr=self.t[self.ii_curr]
+        self.Dt_curr=self.t[self.ii_curr+1]-self.t[self.ii_curr]
         self.lam_t_curr=self.lam_t_array[self.ii_curr]
         self.pass_numb=int(np.floor(self.tt_curr/self.b_spac));
         self.flag_new_bunch_pass=(self.pass_numb>self._pass_numb_old)
@@ -352,7 +373,7 @@ class beam_and_timing:
 
 
     def end_simulation(self):
-        return ((self.ii_curr+1)>=self.Nt)
+        return ((self.ii_curr+2)>=self.Nt) # I need the last point to compute Dt
 
     def get_beam_eletric_field(self, MP_e):
 

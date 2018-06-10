@@ -8,7 +8,7 @@ logfile_path = './logfile.txt'
 progress_path = './progress.txt'
 stopfile = 'stop'
 
-Dt = 2.500000e-11/4.
+Dt = 2.500000e-11
 t_end=1e-9;       #s (no effect if log. profile is imported from file)
 
 import numpy as np
@@ -40,7 +40,7 @@ regen_hist_cut = 1.e-4
 N_mp_soft_regen = 60000
 N_mp_after_soft_regen = 20000
 
-nel_mp_ref_0= 2.  #e-/m
+nel_mp_ref_0= 2e8/(0.7*N_mp_soft_regen)   #e-/m
 
 
 # Number of bins

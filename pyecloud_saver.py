@@ -408,7 +408,7 @@ class pyecloud_saver:
         # introduce decimation
         self.Dt_ref = Dt_ref
         self.dec_fact_out = dec_fact_out
-        self.Dt_save = (dec_fact_out-0.5)*Dt_ref
+        self.Dt_save = (dec_fact_out-0.0001)*Dt_ref
         self.i_last_save = -1
         self.t_last_save = -1.
         
