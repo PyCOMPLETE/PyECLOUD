@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.2.0
+#                   PyECLOUD Version 7.3.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -91,7 +91,7 @@ class pyecloud_saver:
         print(git_branch)
 
         with open(self.logfile_path,'w') as flog:
-            flog.write('PyECLOUD Version 7.2.0\n')
+            flog.write('PyECLOUD Version 7.3.0\n')
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
@@ -408,7 +408,7 @@ class pyecloud_saver:
         # introduce decimation
         self.Dt_ref = Dt_ref
         self.dec_fact_out = dec_fact_out
-        self.Dt_save = (dec_fact_out-0.5)*Dt_ref
+        self.Dt_save = (dec_fact_out-0.0001)*Dt_ref
         self.i_last_save = -1
         self.t_last_save = -1.
         

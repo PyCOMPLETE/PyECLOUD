@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.2.0
+#                   PyECLOUD Version 7.3.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -60,7 +60,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                     skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 7.2.0'
+        print 'PyECLOUD Version 7.3.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder, 
@@ -112,7 +112,8 @@ class BuildupSimulation(object):
 
 
 
-    def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False):
+    def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
+                      force_recompute_space_charge=False):
 
         if beamtim_obj is not None:
             beamtim = beamtim_obj
@@ -127,6 +128,7 @@ class BuildupSimulation(object):
         cloud_list = self.cloud_list
 
         flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
+
 
         # Loop over clouds: gather fields, move, generate new MPs
         for i_cloud, cloud in enumerate(cloud_list):
@@ -170,9 +172,19 @@ class BuildupSimulation(object):
             old_pos=MP_e.get_positions()
 
             ## Motion
-            if Dt_substep_custom is None and N_sub_steps_custom is None:
+            if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
+                # Standard simulation mode
                 MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
+            elif Dt_substep_custom is None and N_sub_steps_custom is None and not(beamtim.flag_unif_Dt):
+                # Dt from non-uniform beam profile
+                if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
+                    raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
+                Dt_substep_target = cloud.dynamics.Dt/cloud.dynamics.N_sub_steps
+                N_substeps_curr = np.round(beamtim.Dt_curr/Dt_substep_target)
+                Dt_substep_curr = beamtim.Dt_curr/N_substeps_curr
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
             else:
+                # Custom steps and substeps provided as arguments of sim_time_step
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
                     raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
                 MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
@@ -182,11 +194,11 @@ class BuildupSimulation(object):
 
             ## Gas ionization (main and secondary beams)
             if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
-                MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt, beamtim.sigmax, beamtim.sigmay,
+                MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt_curr, beamtim.sigmax, beamtim.sigmay,
                                           x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
-                        MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt, sec_beam.sigmax, sec_beam.sigmay,
+                        MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt_curr, sec_beam.sigmax, sec_beam.sigmay,
                                                   x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
 
             ## Photoemission (main and secondary beams)
@@ -195,10 +207,10 @@ class BuildupSimulation(object):
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
                         lam_curr_phem += sec_beam.lam_t_curr
-                phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt)
+                phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
             # Compute space charge field
-            if (beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge:
+            if ((beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
                 spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)

@@ -13,7 +13,7 @@ filename_chm = 'LHC_chm_ver.mat'
 # Choose track_method= 'StrongBdip' / 'StrongBgen'/ 'Boris'
 track_method= 'BorisMultipole'
 N_sub_steps = 5
-B_multip = [6.80]
+B_multip = [0.53549999999999998]
 
 
 
@@ -23,7 +23,7 @@ betafy = 90.00
 
 
 # uniform initial distrib
-init_unif_flag=0
+init_unif_flag=1
 Nel_init_unif=2e8
 E_init_unif=0.01;   #in eV
 x_max_init_unif =x_aper
@@ -31,17 +31,7 @@ x_min_init_unif =-x_aper
 y_max_init_unif =y_aper
 y_min_init_unif =-y_aper
  
-photoem_flag = 1
-inv_CDF_refl_photoem_file = 'unif_no_file'
-k_pe_st = 0.001
-refl_frac = 0.8
-alimit = 0.36e-3
-e_pe_sigma = 5. #in eV
-e_pe_max = 7.   #in eV 
-x0_refl = 0.0215
-y0_refl = 0.
-out_radius = 0.024
-energy_distribution = 'gaussian'
+
 
 
 photoelectron_angle_distribution = 'cosine_3D'
