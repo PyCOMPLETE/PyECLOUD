@@ -68,8 +68,12 @@ class DummyBeamTim(object):
 
     def get_beam_eletric_field(self, MP_e):
         if (MP_e.N_mp>0):
-            ## compute beam electric field
-            Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+            if self.PyPIC_state is None:
+                Ex_n_beam = 0. * MP_e.x_mp[0:MP_e.N_mp]
+                Ey_n_beam = 0. * MP_e.y_mp[0:MP_e.N_mp]
+            else:
+                # compute beam electric field
+                Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
         else:
             Ex_n_beam=0.
             Ey_n_beam=0.
@@ -298,26 +302,40 @@ class Ecloud(object):
         Dt_substep = dt/N_sub_steps
         #print Dt_substep, N_sub_steps, dt
 
-        # beam field
-        self.beam_PyPIC_state.scatter(
-                    x_mp = beam.x[ix]+self.x_beam_offset, 
-                    y_mp = beam.y[ix]+self.y_beam_offset, 
-                    nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
-                    charge = beam.charge)
-        self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+        if len(ix)==0: #no particles in the beam
+            
+            #build dummy beamtim object
+            dummybeamtim = DummyBeamTim(None)
 
-        #build dummy beamtim object
-        dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+            dummybeamtim.lam_t_curr = 0.
+            dummybeamtim.sigmax = 0. 
+            dummybeamtim.sigmay = 0.
+            dummybeamtim.x_beam_pos = 0.
+            dummybeamtim.y_beam_pos = 0.
+        else:
+            
+            # beam field
+            self.beam_PyPIC_state.scatter(
+                        x_mp = beam.x[ix]+self.x_beam_offset, 
+                        y_mp = beam.y[ix]+self.y_beam_offset, 
+                        nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
+                        charge = beam.charge)
+            self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+
+            #build dummy beamtim object
+            dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+
+            dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
+            dummybeamtim.sigmax = np.std(beam.x[ix]) 
+            dummybeamtim.sigmay = np.std(beam.y[ix])
+            dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
+            dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset 
+
         
         # OK for single bunch, to be modified for multibunch:
         dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
-        dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
         dummybeamtim.Dt = dt
         dummybeamtim.Dt_curr = dt
-        dummybeamtim.sigmax = np.std(beam.x[ix]) 
-        dummybeamtim.sigmay = np.std(beam.y[ix])
-        dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
-        dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
         dummybeamtim.flag_new_bunch_pass = False
 
         # Force space charge recomputation (to be switched between bunches in multibunch mode)
