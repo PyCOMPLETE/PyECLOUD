@@ -81,7 +81,7 @@ extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
-                 beam_monitor=None, verbose=False,
+                 beam_monitor=None, verbose=False, save_pyecl_outp_as=None, 
                  **kwargs):
 
         print 'PyECLOUD Version 7.3.0'
@@ -190,6 +190,9 @@ class Ecloud(object):
         self.beam_monitor = beam_monitor
         
         self.verbose = verbose
+
+        self.i_reinit = 0
+        self.t_sim = 0.
 
     #    @profile
     def track(self, beam):
@@ -307,7 +310,7 @@ class Ecloud(object):
         dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
         
         # OK for single bunch, to be modified for multibunch:
-        dummybeamtim.tt_curr = self.cloudsim.t_sc_ON + 1. # In order to have the PIC activated
+        dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
         dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
         dummybeamtim.Dt = dt
         dummybeamtim.Dt_curr = dt
@@ -378,6 +381,8 @@ class Ecloud(object):
             self.Ex_ele_last_track_at_probes.append(Ex_sc_probe.copy())
             self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
 
+        self.t_sim += dt
+
     def _reinitialize(self):
 
 
@@ -415,6 +420,9 @@ class Ecloud(object):
         if self.save_ele_field_probes:
             self.Ex_ele_last_track_at_probes = []
             self.Ey_ele_last_track_at_probes = []
+
+        self.t_sim = 0.
+        self.i_reinit += 1
 
     def _finalize(self):
 
