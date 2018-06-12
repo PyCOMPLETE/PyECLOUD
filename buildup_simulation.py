@@ -224,8 +224,8 @@ class BuildupSimulation(object):
         for cloud in cloud_list:
             
             if cloud.pyeclsaver is not None:
-                if Dt_substep_custom is not None or N_sub_steps_custom is not None:
-                    raise ValueError('Saving with custom steps not implemented!')
+                # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
+                #     raise ValueError('Saving with custom steps not implemented!')
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,

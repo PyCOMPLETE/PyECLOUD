@@ -66,6 +66,10 @@ class DummyBeamTim(object):
     def __init__(self, PyPIC_state):
         self.PyPIC_state = PyPIC_state
 
+        self.b_spac = 0.
+        self.pass_numb = 0
+        self.N_pass_tot = 1
+
     def get_beam_eletric_field(self, MP_e):
         if (MP_e.N_mp>0):
             if self.PyPIC_state is None:
@@ -120,7 +124,10 @@ class Ecloud(object):
         self.cloudsim = bsim.BuildupSimulation(
                     pyecl_input_folder=pyecl_input_folder, skip_beam=True, 
                     spacech_ele=space_charge_obj,
-                    skip_pyeclsaver=True, ignore_kwargs=extra_allowed_kwargs, **kwargs)
+                    ignore_kwargs=extra_allowed_kwargs, 
+                    skip_pyeclsaver=(save_pyecl_outp_as is None), 
+                    filen_main_outp = save_pyecl_outp_as,
+                    **kwargs)
 
 
         if self.cloudsim.config_dict['track_method'] == 'Boris':
@@ -227,7 +234,7 @@ class Ecloud(object):
             # slice size and time step
             dz = (slices.z_bins[i + 1] - slices.z_bins[i])
 
-            self._track_single_slice(beam, ix, dz)
+            self._track_single_slice(beam, ix, dz, force_pyecl_newpass=(i==0))
             
         
         # Used by Lotta to debug fastion mode
@@ -286,7 +293,7 @@ class Ecloud(object):
         self.replace_with_recorded_field_map(delete_ecloud_data=delete_ecloud_data)
 
 
-    def _track_single_slice(self, beam, ix, dz):
+    def _track_single_slice(self, beam, ix, dz, force_pyecl_newpass=False):
 
 
         spacech_ele = self.cloudsim.spacech_ele
@@ -330,13 +337,13 @@ class Ecloud(object):
             dummybeamtim.sigmay = np.std(beam.y[ix])
             dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
             dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset 
-
         
         # OK for single bunch, to be modified for multibunch:
         dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
         dummybeamtim.Dt = dt
         dummybeamtim.Dt_curr = dt
-        dummybeamtim.flag_new_bunch_pass = False
+        dummybeamtim.flag_new_bunch_pass = force_pyecl_newpass
+
 
         # Force space charge recomputation (to be switched between bunches in multibunch mode)
         force_recompute_space_charge = True

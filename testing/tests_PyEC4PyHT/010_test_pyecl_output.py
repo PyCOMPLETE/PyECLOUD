@@ -64,7 +64,10 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         N_min_Dh_main = 10,
         x_beam_offset = x_beam_offset,
         y_beam_offset = y_beam_offset,
-        sparse_solver = sparse_solver)
+        sparse_solver = sparse_solver,
+        save_pyecl_outp_as = 'test_saving',
+        Dt = 25e-9,#needed for saving
+        )
 
 print 'Track_bunch'
 ecloud_multigrid.track(bunch)
