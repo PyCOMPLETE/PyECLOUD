@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.3.0
+#                   PyECLOUD Version 7.3.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -92,7 +92,7 @@ class Ecloud(object):
                  beam_monitor=None, verbose=False, save_pyecl_outp_as=None, 
                  **kwargs):
 
-        print 'PyECLOUD Version 7.3.0'
+        print 'PyECLOUD Version 7.3.1'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
