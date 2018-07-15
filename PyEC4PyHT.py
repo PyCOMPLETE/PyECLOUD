@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.3.1
+#                   PyECLOUD Version 7.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -92,7 +92,7 @@ class Ecloud(object):
                  beam_monitor=None, verbose=False, save_pyecl_outp_as=None, 
                  **kwargs):
 
-        print 'PyECLOUD Version 7.3.1'
+        print 'PyECLOUD Version 7.4.0'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
@@ -345,14 +345,19 @@ class Ecloud(object):
         dummybeamtim.flag_new_bunch_pass = force_pyecl_newpass
 
 
-        # Force space charge recomputation (to be switched between bunches in multibunch mode)
+        # Force space charge recomputation (to be switched off between bunches in multibunch mode)
         force_recompute_space_charge = True
+        
+        # Disable cleanings and regenerations (to be switched off between bunches in multibunch mode)
+        skip_MP_cleaning = True
+        skip_MP_regen = True
 
         # Perform cloud simulation step
         self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
                 Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps, 
                 kick_mode_for_beam_field=self.kick_mode_for_beam_field,
-                force_recompute_space_charge=force_recompute_space_charge)
+                force_recompute_space_charge=force_recompute_space_charge,
+                skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
 
 
         # Build MP_system-like object with beam coordinates

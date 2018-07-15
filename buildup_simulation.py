@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.3.1
+#                   PyECLOUD Version 7.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -60,7 +60,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                     skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 7.3.1'
+        print 'PyECLOUD Version 7.4.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder, 
@@ -113,7 +113,7 @@ class BuildupSimulation(object):
 
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
-                      force_recompute_space_charge=False):
+                      force_recompute_space_charge=False, skip_MP_cleaning=False, skip_MP_regen=False):
 
         if beamtim_obj is not None:
             beamtim = beamtim_obj
@@ -235,13 +235,15 @@ class BuildupSimulation(object):
             if beamtim.flag_new_bunch_pass:
 
                 ## Clean
-                cloud.MP_e.clean_small_MPs()
+                if not skip_MP_cleaning:
+                    cloud.MP_e.clean_small_MPs()
 
-                ## Regeneration
-                cloud.MP_e.check_for_regeneration()
+                if not skip_MP_regen:
+                    ## Regeneration
+                    cloud.MP_e.check_for_regeneration()
 
-                ## Soft regeneration
-                cloud.MP_e.check_for_soft_regeneration()
+                    ## Soft regeneration
+                    cloud.MP_e.check_for_soft_regeneration()
 
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'): #, reset_pyeclsaver = True):
