@@ -301,18 +301,18 @@ class MP_system:
             #%% retrieve indices of nonempty cells
             #% NB use C-like indices
             divider=np.double(self.Ny_reg)*self.Nvx_reg*self.Nvy_reg*self.Nvz_reg
-            ix_nonzero=np.floor(indices_nonzero_cells/divider);
+            ix_nonzero=np.int_(np.floor(indices_nonzero_cells/divider));
             indices_nonzero_cells=indices_nonzero_cells-ix_nonzero*divider;
 
             divider=np.double(self.Nvx_reg)*self.Nvy_reg*self.Nvz_reg
-            iy_nonzero=np.floor(indices_nonzero_cells/divider);
+            iy_nonzero=np.int_(np.floor(indices_nonzero_cells/divider));
             indices_nonzero_cells=indices_nonzero_cells-iy_nonzero*divider;
             #
             divider=np.double(self.Nvy_reg)*self.Nvz_reg
-            ivx_nonzero=np.floor(indices_nonzero_cells/divider);
+            ivx_nonzero=np.int_(np.floor(indices_nonzero_cells/divider));
             indices_nonzero_cells=indices_nonzero_cells-ivx_nonzero*divider;
             #
-            ivy_nonzero=np.floor(indices_nonzero_cells/np.double(self.Nvz_reg));
+            ivy_nonzero=np.int_(np.floor(indices_nonzero_cells/np.double(self.Nvz_reg)));
             indices_nonzero_cells=indices_nonzero_cells-ivy_nonzero*self.Nvz_reg;
             #
             ivz_nonzero=indices_nonzero_cells;
@@ -342,7 +342,7 @@ class MP_system:
 
 
 
-            intnum_MP_in_cell=np.floor(num_MP_in_cell);
+            intnum_MP_in_cell=np.int_(np.floor(num_MP_in_cell));
             rest=num_MP_in_cell-intnum_MP_in_cell;
             ngen=len(rest)
             flag_rest=(rand(ngen)<rest);
