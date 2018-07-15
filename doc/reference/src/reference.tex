@@ -704,9 +704,13 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
     \textbf{Variables saved at each bunch passage}}
     \\\hline
     t\_hist($N\_{\mathrm{pass}}$) & [s] & The time at which data for the bunch passages are saved.\\\hline
-    t\_En\_hist($N\_{\mathrm{pass}}$) & [s] & The time at which the electron energy spectra are saved.\\\hline
+    
+    En\_hist &  & Energy spectrum of the impacting electrons (electron per time interval and per energy bin). The last bin contains all electrons falling outside the selected enegy interval. \\\hline
+    t\_En\_hist & [s] & The time at which the electron energy spectrum is saved.\\\hline
+    En\_g\_hist &[eV]& Center of the energy bins used to save the energy spectrum.\\\hline
+    
     xg\_hist($N\_{\mathrm{bins}}$) & [m] & The $x$ coordinates corresponding to related histogram bins.\\\hline
-    En\_hist($N_\mathrm{en}$) & [eV] & The energies corresponding to related histogram bins. \\\hline
+    
     N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$) & & Number of times a MP tracking error occurred. \\\hline
     N\_mp\_impact\_pass($N\_{\mathrm{pass}}$) & & Number of MPs that impacted. \\\hline
     N\_mp\_pass($N\_{\mathrm{pass}}$) & & Number of current MPs.\\\hline
