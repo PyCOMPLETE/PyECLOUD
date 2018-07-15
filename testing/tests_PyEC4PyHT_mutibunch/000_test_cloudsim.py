@@ -10,29 +10,31 @@ import numpy as np
 import PyPARIS.gen_multibunch_beam as gmb
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 
-from machines_for_testing import SPS
+from machines_for_testing import LHC
+
 
 
 n_segments = 1
 bunch_intensity = 1e11
 epsn_x = 2.5e-6
-epsn_y = 3.5e-6
+epsn_y = 2.5e-6
 sigma_z = 10e-2
 
-n_slices = 20
-z_cut = 2*sigma_z
+machine_configuration = 'Injection'
+
+n_slices = 150
+z_cut = 2.5e-9*clight
 
 min_inten_slice4EC = 1e3
 non_linear_long_matching = False
 b_spac_s = 25e-9
 #Here head is left and tail is right
-filling_pattern = 6*[1]
+filling_pattern = 5*[1]
 
 macroparticlenumber = 100000
 
-machine = SPS(n_segments = n_segments, 
-            machine_configuration = 'Q20-injection', accQ_x=20., accQ_y=20., 
-            RF_at='end_of_transverse', longitudinal_mode = 'non-linear')
+machine = LHC(machine_configuration=machine_configuration,
+                        optics_mode='smooth', n_segments=n_segments, RF_at='end_of_transverse')
             
 list_bunches = gmb.gen_matched_multibunch_beam(machine, macroparticlenumber, filling_pattern, b_spac_s, bunch_intensity, epsn_x, epsn_y, sigma_z, non_linear_long_matching, min_inten_slice4EC)
 
@@ -43,9 +45,35 @@ for bb in list_bunches:
     these_slices = st.slice_a_bunch(bb, z_cut=z_cut, n_slices=n_slices)
     list_slices+=these_slices
 
+# Build e-cloud
+print('Build ecloud...')
+import PyECLOUD.PyEC4PyHT as PyEC4PyHT
+ecloud = PyEC4PyHT.Ecloud(
+        L_ecloud=1., slicer=None, slice_by_slice_mode=True,
+        Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config',
+        chamb_type = 'polyg' ,
+        filename_chm= 'LHC_chm_ver.mat', Dh_sc=1e-3,
+        #init_unif_edens_flag=1,
+        #init_unif_edens=1e7,
+        #N_mp_max = 3000000,
+        #nel_mp_ref_0 = 1e7/(0.7*3000000),
+        #B_multip = [0.],
+        PyPICmode = 'ShortleyWeller_WithTelescopicGrids',
+        f_telescope = 0.3,
+        target_grid = {'x_min_target':-5*list_bunches[0].sigma_x(), 'x_max_target':5*list_bunches[0].sigma_x(),
+                       'y_min_target':-5*list_bunches[0].sigma_y(),'y_max_target':5*list_bunches[0].sigma_y(),
+                       'Dh_target':.2*list_bunches[0].sigma_x()},
+        N_nodes_discard = 10.,
+        N_min_Dh_main = 10,
+        #x_beam_offset = x_beam_offset,
+        #y_beam_offset = y_beam_offset,
+        #probes_position = probes_position,
+        save_pyecl_outp_as = 'test_saving',
+        sparse_solver = 'PyKLU')
+print('Done.')
+
+
 # REMEBMBER TO START POPPING FROM THE RIGHT SIDE
-
-
 
 # Some plotting
 bucket_length_m = machine.circumference/(machine.longitudinal_map.harmonics[0])
