@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.3.0
+#                   PyECLOUD Version 7.3.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -66,10 +66,18 @@ class DummyBeamTim(object):
     def __init__(self, PyPIC_state):
         self.PyPIC_state = PyPIC_state
 
+        self.b_spac = 0.
+        self.pass_numb = 0
+        self.N_pass_tot = 1
+
     def get_beam_eletric_field(self, MP_e):
         if (MP_e.N_mp>0):
-            ## compute beam electric field
-            Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+            if self.PyPIC_state is None:
+                Ex_n_beam = 0. * MP_e.x_mp[0:MP_e.N_mp]
+                Ey_n_beam = 0. * MP_e.y_mp[0:MP_e.N_mp]
+            else:
+                # compute beam electric field
+                Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
         else:
             Ex_n_beam=0.
             Ey_n_beam=0.
@@ -81,10 +89,10 @@ extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 class Ecloud(object):
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
-                 beam_monitor=None, verbose=False,
+                 beam_monitor=None, verbose=False, save_pyecl_outp_as=None, 
                  **kwargs):
 
-        print 'PyECLOUD Version 7.3.0'
+        print 'PyECLOUD Version 7.3.1'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) +'/.git'
@@ -116,7 +124,10 @@ class Ecloud(object):
         self.cloudsim = bsim.BuildupSimulation(
                     pyecl_input_folder=pyecl_input_folder, skip_beam=True, 
                     spacech_ele=space_charge_obj,
-                    skip_pyeclsaver=True, ignore_kwargs=extra_allowed_kwargs, **kwargs)
+                    ignore_kwargs=extra_allowed_kwargs, 
+                    skip_pyeclsaver=(save_pyecl_outp_as is None), 
+                    filen_main_outp = save_pyecl_outp_as,
+                    **kwargs)
 
 
         if self.cloudsim.config_dict['track_method'] == 'Boris':
@@ -191,6 +202,9 @@ class Ecloud(object):
         
         self.verbose = verbose
 
+        self.i_reinit = 0
+        self.t_sim = 0.
+
     #    @profile
     def track(self, beam):
 
@@ -220,7 +234,7 @@ class Ecloud(object):
             # slice size and time step
             dz = (slices.z_bins[i + 1] - slices.z_bins[i])
 
-            self._track_single_slice(beam, ix, dz)
+            self._track_single_slice(beam, ix, dz, force_pyecl_newpass=(i==0))
             
         
         # Used by Lotta to debug fastion mode
@@ -279,7 +293,7 @@ class Ecloud(object):
         self.replace_with_recorded_field_map(delete_ecloud_data=delete_ecloud_data)
 
 
-    def _track_single_slice(self, beam, ix, dz):
+    def _track_single_slice(self, beam, ix, dz, force_pyecl_newpass=False):
 
 
         spacech_ele = self.cloudsim.spacech_ele
@@ -295,27 +309,41 @@ class Ecloud(object):
         Dt_substep = dt/N_sub_steps
         #print Dt_substep, N_sub_steps, dt
 
-        # beam field
-        self.beam_PyPIC_state.scatter(
-                    x_mp = beam.x[ix]+self.x_beam_offset, 
-                    y_mp = beam.y[ix]+self.y_beam_offset, 
-                    nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
-                    charge = beam.charge)
-        self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+        if len(ix)==0: #no particles in the beam
+            
+            #build dummy beamtim object
+            dummybeamtim = DummyBeamTim(None)
 
-        #build dummy beamtim object
-        dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+            dummybeamtim.lam_t_curr = 0.
+            dummybeamtim.sigmax = 0. 
+            dummybeamtim.sigmay = 0.
+            dummybeamtim.x_beam_pos = 0.
+            dummybeamtim.y_beam_pos = 0.
+        else:
+            
+            # beam field
+            self.beam_PyPIC_state.scatter(
+                        x_mp = beam.x[ix]+self.x_beam_offset, 
+                        y_mp = beam.y[ix]+self.y_beam_offset, 
+                        nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
+                        charge = beam.charge)
+            self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+
+            #build dummy beamtim object
+            dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+
+            dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
+            dummybeamtim.sigmax = np.std(beam.x[ix]) 
+            dummybeamtim.sigmay = np.std(beam.y[ix])
+            dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
+            dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset 
         
         # OK for single bunch, to be modified for multibunch:
-        dummybeamtim.tt_curr = self.cloudsim.t_sc_ON + 1. # In order to have the PIC activated
-        dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
+        dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
         dummybeamtim.Dt = dt
         dummybeamtim.Dt_curr = dt
-        dummybeamtim.sigmax = np.std(beam.x[ix]) 
-        dummybeamtim.sigmay = np.std(beam.y[ix])
-        dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
-        dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset
-        dummybeamtim.flag_new_bunch_pass = False
+        dummybeamtim.flag_new_bunch_pass = force_pyecl_newpass
+
 
         # Force space charge recomputation (to be switched between bunches in multibunch mode)
         force_recompute_space_charge = True
@@ -378,6 +406,8 @@ class Ecloud(object):
             self.Ex_ele_last_track_at_probes.append(Ex_sc_probe.copy())
             self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
 
+        self.t_sim += dt
+
     def _reinitialize(self):
 
 
@@ -415,6 +445,9 @@ class Ecloud(object):
         if self.save_ele_field_probes:
             self.Ex_ele_last_track_at_probes = []
             self.Ey_ele_last_track_at_probes = []
+
+        self.t_sim = 0.
+        self.i_reinit += 1
 
     def _finalize(self):
 

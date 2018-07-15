@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.3.0
+#                   PyECLOUD Version 7.3.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -60,7 +60,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                     skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 7.3.0'
+        print 'PyECLOUD Version 7.3.1'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder, 
@@ -224,8 +224,8 @@ class BuildupSimulation(object):
         for cloud in cloud_list:
             
             if cloud.pyeclsaver is not None:
-                if Dt_substep_custom is not None or N_sub_steps_custom is not None:
-                    raise ValueError('Saving with custom steps not implemented!')
+                # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
+                #     raise ValueError('Saving with custom steps not implemented!')
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
