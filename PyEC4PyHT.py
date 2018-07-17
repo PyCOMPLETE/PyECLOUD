@@ -311,7 +311,6 @@ class Ecloud(object):
         if self.cloudsim.config_dict['Dt'] is not None:
             if dt_slice>self.cloudsim.config_dict['Dt']:
                 if interact_with_EC: 
-                    import pdb; pdb.set_trace()
                     raise ValueError('Slices that interact with the cloud cannot be longer than the buildup timestep!')
 
                 N_cloud_steps = np.int_(np.ceil(dt_slice/self.cloudsim.config_dict['Dt']))
@@ -323,7 +322,7 @@ class Ecloud(object):
             dt_array = np.array([dt_slice])
 
         # Acquire bunch passage information
-        if hasattr(slic.slice_info, 'info_parent_bunch'):
+        if 'info_parent_bunch' in slic.slice_info.keys():
             if slic.slice_info['info_parent_bunch']['i_bunch']>self.i_curr_bunch:
                 self.i_curr_bunch = slic.slice_info['info_parent_bunch']['i_bunch']
                 new_pass = True
@@ -332,6 +331,7 @@ class Ecloud(object):
 
         else:
             new_pass = force_pyecl_newpass
+
 
 
         # Cloud simulation
@@ -386,6 +386,8 @@ class Ecloud(object):
             # Disable cleanings and regenerations
             skip_MP_cleaning = interact_with_EC
             skip_MP_regen = interact_with_EC
+
+            # print(dummybeamtim.tt_curr, dummybeamtim.flag_new_bunch_pass, force_recompute_space_charge)
 
             # Perform cloud simulation step
             self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
@@ -447,6 +449,7 @@ class Ecloud(object):
                 self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
 
             self.t_sim += dt
+            new_pass = False # it can be true only for the first sub-slice of a slice
 
     def _reinitialize(self):
 
