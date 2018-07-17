@@ -204,6 +204,7 @@ class Ecloud(object):
 
         self.i_reinit = 0
         self.t_sim = 0.
+        self.i_curr_bunch = -1
 
     #    @profile
     def track(self, beam):
@@ -293,125 +294,158 @@ class Ecloud(object):
         self.replace_with_recorded_field_map(delete_ecloud_data=delete_ecloud_data)
 
 
-    def _track_single_slice(self, beam, ix, dz, force_pyecl_newpass=False):
-
+    def _track_single_slice(self, slic, ix, dz, force_pyecl_newpass=False):
 
         spacech_ele = self.cloudsim.spacech_ele
 
-        dt = dz / (beam.beta * c)
-
-        # define substep
-        if dt>self.Dt_ref:
-            N_sub_steps = int(np.round(dt/self.Dt_ref))
+        # Check if the slice interacts with the beam
+        if hasattr(slic, 'interact_with_EC'):
+            interact_with_EC = slic['interact_with_EC']
         else:
-            N_sub_steps=1
+            interact_with_EC = True
 
-        Dt_substep = dt/N_sub_steps
-        #print Dt_substep, N_sub_steps, dt
+        # Compute slice length
+        dt_slice = dz / (slic.beta * c)
 
-        if len(ix)==0: #no particles in the beam
-            
-            #build dummy beamtim object
-            dummybeamtim = DummyBeamTim(None)
+        # Check if sub-slicing is needed
+        if self.cloudsim.config_dict['Dt'] is not None:
+            if dt_slice>self.cloudsim.config_dict['Dt']:
+                if interact_with_EC: 
+                    raise ValueError('Slices that interact with the cloud cannot be longer than the buildup timestep!')
 
-            dummybeamtim.lam_t_curr = 0.
-            dummybeamtim.sigmax = 0. 
-            dummybeamtim.sigmay = 0.
-            dummybeamtim.x_beam_pos = 0.
-            dummybeamtim.y_beam_pos = 0.
+                N_cloud_steps = np.int_np.ceil(dt_slice/self.cloudsim.config_dict['Dt'])
+                dt_cloud_step = dt_slice/N_cloud_steps
+                dt_array = np.array(N_cloud_steps*[dt_cloud_step])
+            else:
+                dt_array = np.array([dt_slice])
         else:
+            dt_array = np.array([dt_slice])
+
+        # Acquire bunch passage information
+        if hasattr(slic.slice_info, 'info_parent_bunch'):
+            if slic.slice_info['info_parent_bunch']['i_bunch']>self.i_curr_bunch:
+                self.i_curr_bunch = slic.slice_info['info_parent_bunch']['i_bunch']
+                new_pass = True
+            else:
+                new_pass = force_pyecl_newpass
+
+        else:
+            new_pass = force_pyecl_newpass
+
+
+        # Cloud simulation
+        for i_clou_step, dt in enumerate(dt_array): 
+
+            # define substep
+            if dt>self.Dt_ref:
+                N_sub_steps = int(np.round(dt/self.Dt_ref))
+            else:
+                N_sub_steps=1
+
+            Dt_substep = dt/N_sub_steps
+            #print Dt_substep, N_sub_steps, dt
+
+            if len(ix)==0 or not interact_with_EC: #no particles in the beam
+                
+                #build dummy beamtim object
+                dummybeamtim = DummyBeamTim(None)
+
+                dummybeamtim.lam_t_curr = 0.
+                dummybeamtim.sigmax = 0. 
+                dummybeamtim.sigmay = 0.
+                dummybeamtim.x_beam_pos = 0.
+                dummybeamtim.y_beam_pos = 0.
+            else:
+                
+                # beam field
+                self.beam_PyPIC_state.scatter(
+                            x_mp = slic.x[ix]+self.x_beam_offset, 
+                            y_mp = slic.y[ix]+self.y_beam_offset, 
+                            nel_mp = slic.x[ix]*0.+slic.particlenumber_per_mp/dz,
+                            charge = slic.charge)
+                self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+
+                #build dummy beamtim object
+                dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+
+                dummybeamtim.lam_t_curr = np.mean(slic.particlenumber_per_mp/dz)*len(ix)
+                dummybeamtim.sigmax = np.std(slic.x[ix]) 
+                dummybeamtim.sigmay = np.std(slic.y[ix])
+                dummybeamtim.x_beam_pos = np.mean(slic.x[ix])+self.x_beam_offset
+                dummybeamtim.y_beam_pos = np.mean(slic.y[ix])+self.y_beam_offset 
             
-            # beam field
-            self.beam_PyPIC_state.scatter(
-                        x_mp = beam.x[ix]+self.x_beam_offset, 
-                        y_mp = beam.y[ix]+self.y_beam_offset, 
-                        nel_mp = beam.x[ix]*0.+beam.particlenumber_per_mp/dz,
-                        charge = beam.charge)
-            self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
+            dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
+            dummybeamtim.Dt = dt
+            dummybeamtim.Dt_curr = dt
+            dummybeamtim.flag_new_bunch_pass = new_pass
 
-            #build dummy beamtim object
-            dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
+            # Force space charge recomputation 
+            force_recompute_space_charge = interact_with_EC
+            
+            # Disable cleanings and regenerations
+            skip_MP_cleaning = interact_with_EC
+            skip_MP_regen = interact_with_EC
 
-            dummybeamtim.lam_t_curr = np.mean(beam.particlenumber_per_mp/dz)*len(ix)
-            dummybeamtim.sigmax = np.std(beam.x[ix]) 
-            dummybeamtim.sigmay = np.std(beam.y[ix])
-            dummybeamtim.x_beam_pos = np.mean(beam.x[ix])+self.x_beam_offset
-            dummybeamtim.y_beam_pos = np.mean(beam.y[ix])+self.y_beam_offset 
-        
-        # OK for single bunch, to be modified for multibunch:
-        dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
-        dummybeamtim.Dt = dt
-        dummybeamtim.Dt_curr = dt
-        dummybeamtim.flag_new_bunch_pass = force_pyecl_newpass
+            # Perform cloud simulation step
+            self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
+                    Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps, 
+                    kick_mode_for_beam_field=self.kick_mode_for_beam_field,
+                    force_recompute_space_charge=force_recompute_space_charge,
+                    skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
 
 
-        # Force space charge recomputation (to be switched off between bunches in multibunch mode)
-        force_recompute_space_charge = True
-        
-        # Disable cleanings and regenerations (to be switched off between bunches in multibunch mode)
-        skip_MP_cleaning = True
-        skip_MP_regen = True
+            # Build MP_system-like object with beam coordinates
+            MP_p = Empty()
+            MP_p.x_mp = beam.x[ix]+self.x_beam_offset
+            MP_p.y_mp = beam.y[ix]+self.y_beam_offset
+            MP_p.N_mp = len(slic.x[ix])
 
-        # Perform cloud simulation step
-        self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim, 
-                Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps, 
-                kick_mode_for_beam_field=self.kick_mode_for_beam_field,
-                force_recompute_space_charge=force_recompute_space_charge,
-                skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
+            ## compute cloud field on beam particles
+            Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 
+            ## kick beam particles
+            fact_kick = slic.charge/(slic.mass*slic.beta*slic.beta*slic.gamma*c*c)*self.L_ecloud
+            slic.xp[ix]+=fact_kick*Ex_sc_p
+            slic.yp[ix]+=fact_kick*Ey_sc_p
 
-        # Build MP_system-like object with beam coordinates
-        MP_p = Empty()
-        MP_p.x_mp = beam.x[ix]+self.x_beam_offset
-        MP_p.y_mp = beam.y[ix]+self.y_beam_offset
-        MP_p.N_mp = len(beam.x[ix])
+            ## Diagnostics
+            if self.save_ele_distributions_last_track:
+                self.rho_ele_last_track.append(spacech_ele.rho.copy())
+                #print 'Here'
 
-        ## compute cloud field on beam particles
-        Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
+            if self.save_ele_potential:
+                self.phi_ele_last_track.append(spacech_ele.phi.copy())
 
-        ## kick beam particles
-        fact_kick = beam.charge/(beam.mass*beam.beta*beam.beta*beam.gamma*c*c)*self.L_ecloud
-        beam.xp[ix]+=fact_kick*Ex_sc_p
-        beam.yp[ix]+=fact_kick*Ey_sc_p
+            if self.save_ele_field:
+                self.Ex_ele_last_track.append(spacech_ele.efx.copy())
+                self.Ey_ele_last_track.append(spacech_ele.efy.copy())
 
-        ## Diagnostics
-        if self.save_ele_distributions_last_track:
-            self.rho_ele_last_track.append(spacech_ele.rho.copy())
-            #print 'Here'
+            if self.save_ele_MP_position:
+                self.x_MP_last_track.append(MP_e.x_mp.copy())
+                self.y_MP_last_track.append(MP_e.y_mp.copy())
 
-        if self.save_ele_potential:
-            self.phi_ele_last_track.append(spacech_ele.phi.copy())
+            if self.save_ele_MP_velocity:
+                self.vx_MP_last_track.append(MP_e.vx_mp.copy())
+                self.vy_MP_last_track.append(MP_e.vy_mp.copy())
 
-        if self.save_ele_field:
-            self.Ex_ele_last_track.append(spacech_ele.efx.copy())
-            self.Ey_ele_last_track.append(spacech_ele.efy.copy())
+            if self.save_ele_MP_size:
+                self.nel_MP_last_track.append(MP_e.nel_mp.copy())
 
-        if self.save_ele_MP_position:
-            self.x_MP_last_track.append(MP_e.x_mp.copy())
-            self.y_MP_last_track.append(MP_e.y_mp.copy())
+            if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
+                self.N_MP_last_track.append(MP_e.N_mp)
 
-        if self.save_ele_MP_velocity:
-            self.vx_MP_last_track.append(MP_e.vx_mp.copy())
-            self.vy_MP_last_track.append(MP_e.vy_mp.copy())
+            if self.save_ele_field_probes:
+                MP_probes = Empty()
+                MP_probes.x_mp = self.x_probes
+                MP_probes.y_mp = self.y_probes
+                MP_probes.nel_mp = self.x_probes*0.+1. #fictitious charge of 1 C
+                MP_probes.N_mp = len(self.x_probes)
+                Ex_sc_probe, Ey_sc_probe = spacech_ele.get_sc_eletric_field(MP_probes)
 
-        if self.save_ele_MP_size:
-            self.nel_MP_last_track.append(MP_e.nel_mp.copy())
+                self.Ex_ele_last_track_at_probes.append(Ex_sc_probe.copy())
+                self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
 
-        if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-            self.N_MP_last_track.append(MP_e.N_mp)
-
-        if self.save_ele_field_probes:
-            MP_probes = Empty()
-            MP_probes.x_mp = self.x_probes
-            MP_probes.y_mp = self.y_probes
-            MP_probes.nel_mp = self.x_probes*0.+1. #fictitious charge of 1 C
-            MP_probes.N_mp = len(self.x_probes)
-            Ex_sc_probe, Ey_sc_probe = spacech_ele.get_sc_eletric_field(MP_probes)
-
-            self.Ex_ele_last_track_at_probes.append(Ex_sc_probe.copy())
-            self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
-
-        self.t_sim += dt
+            self.t_sim += dt
 
     def _reinitialize(self):
 
@@ -452,7 +486,9 @@ class Ecloud(object):
             self.Ey_ele_last_track_at_probes = []
 
         self.t_sim = 0.
+        self.i_curr_bunch = -1
         self.i_reinit += 1
+
 
     def _finalize(self):
 

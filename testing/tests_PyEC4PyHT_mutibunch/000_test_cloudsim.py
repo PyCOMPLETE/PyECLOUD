@@ -74,6 +74,12 @@ print('Done.')
 
 
 # REMEBMBER TO START POPPING FROM THE RIGHT SIDE
+print('Start cloud sim')
+ecloud._reinitialize()
+for ii in xrange(len(list_slices)-1, -1, -1):
+    ecloud.track(list_slices[ii])
+ecloud._finalize()
+print('End cloud sim')
 
 # Some plotting
 bucket_length_m = machine.circumference/(machine.longitudinal_map.harmonics[0])
