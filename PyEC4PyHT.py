@@ -331,6 +331,7 @@ class Ecloud(object):
 
         else:
             new_pass = force_pyecl_newpass
+            self.i_curr_bunch = 0
 
 
 
@@ -377,7 +378,7 @@ class Ecloud(object):
             
             dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
             dummybeamtim.Dt = dt
-            dummybeamtim.Dt_curr = dt
+            dummybeamtim.pass_numb = self.i_curr_bunch
             dummybeamtim.flag_new_bunch_pass = new_pass
 
             # Force space charge recomputation 

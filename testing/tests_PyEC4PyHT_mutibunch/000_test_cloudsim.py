@@ -15,10 +15,10 @@ from machines_for_testing import LHC
 
 
 n_segments = 1
-bunch_intensity = 1e11
+bunch_intensity = 2.5e11
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
-sigma_z = 10e-2
+sigma_z = 1.000000e-09/4.*299792458.
 
 machine_configuration = 'Injection'
 
@@ -29,7 +29,7 @@ min_inten_slice4EC = 1e3
 non_linear_long_matching = False
 b_spac_s = 25e-9
 #Here head is left and tail is right
-filling_pattern = 5*[1]
+filling_pattern = 1*[1]
 
 macroparticlenumber = 100000
 
