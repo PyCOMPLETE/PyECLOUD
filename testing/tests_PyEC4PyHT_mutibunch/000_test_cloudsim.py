@@ -23,7 +23,7 @@ sigma_z = 10e-2
 machine_configuration = 'Injection'
 
 n_slices = 150
-z_cut = 2.5e-9*clight
+z_cut = 2.5e-9*clight/2
 
 min_inten_slice4EC = 1e3
 non_linear_long_matching = False

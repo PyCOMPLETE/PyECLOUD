@@ -299,8 +299,8 @@ class Ecloud(object):
         spacech_ele = self.cloudsim.spacech_ele
 
         # Check if the slice interacts with the beam
-        if hasattr(slic, 'interact_with_EC'):
-            interact_with_EC = slic['interact_with_EC']
+        if 'interact_with_EC' in slic.slice_info.keys():
+            interact_with_EC = slic.slice_info['interact_with_EC']
         else:
             interact_with_EC = True
 
@@ -311,9 +311,10 @@ class Ecloud(object):
         if self.cloudsim.config_dict['Dt'] is not None:
             if dt_slice>self.cloudsim.config_dict['Dt']:
                 if interact_with_EC: 
+                    import pdb; pdb.set_trace()
                     raise ValueError('Slices that interact with the cloud cannot be longer than the buildup timestep!')
 
-                N_cloud_steps = np.int_np.ceil(dt_slice/self.cloudsim.config_dict['Dt'])
+                N_cloud_steps = np.int_(np.ceil(dt_slice/self.cloudsim.config_dict['Dt']))
                 dt_cloud_step = dt_slice/N_cloud_steps
                 dt_array = np.array(N_cloud_steps*[dt_cloud_step])
             else:
@@ -396,8 +397,8 @@ class Ecloud(object):
 
             # Build MP_system-like object with beam coordinates
             MP_p = Empty()
-            MP_p.x_mp = beam.x[ix]+self.x_beam_offset
-            MP_p.y_mp = beam.y[ix]+self.y_beam_offset
+            MP_p.x_mp = slic.x[ix]+self.x_beam_offset
+            MP_p.y_mp = slic.y[ix]+self.y_beam_offset
             MP_p.N_mp = len(slic.x[ix])
 
             ## compute cloud field on beam particles
