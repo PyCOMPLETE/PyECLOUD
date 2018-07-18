@@ -52,7 +52,7 @@ ecloud = PyEC4PyHT.Ecloud(
         L_ecloud=1., slicer=None, slice_by_slice_mode=True,
         Dt_ref=5e-12, pyecl_input_folder='./pyecloud_config',
         chamb_type = 'polyg' ,
-        filename_chm= 'LHC_chm_ver.mat', Dh_sc=1e-3,
+        filename_chm= 'LHC_chm_ver.mat', 
         #init_unif_edens_flag=1,
         #init_unif_edens=1e7,
         #N_mp_max = 3000000,
