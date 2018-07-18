@@ -33,7 +33,7 @@ filling_pattern = 1*(30*[1.]+5*[0])
 
 macroparticlenumber = 100000
 
-machine = LHC(machine_configuration=machine_configuration,
+machine = LHC(machine_configuration=machine_configuration, beta_x=85.00, beta_y=90.0,
                         optics_mode='smooth', n_segments=n_segments, RF_at='end_of_transverse')
             
 list_bunches = gmb.gen_matched_multibunch_beam(machine, macroparticlenumber, filling_pattern, b_spac_s, bunch_intensity, epsn_x, epsn_y, sigma_z, non_linear_long_matching, min_inten_slice4EC)
