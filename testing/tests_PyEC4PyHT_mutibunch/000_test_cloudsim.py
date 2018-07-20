@@ -75,9 +75,12 @@ print('Done.')
 
 # REMEBMBER TO START POPPING FROM THE RIGHT SIDE
 print('Start cloud sim')
-for i_turn in [0]:
+for i_turn in [0, 1]:
     for ii in xrange(len(list_slices)-1, -1, -1):
         ecloud.track(list_slices[ii])
+    #~ for cc in ecloud.cloudsim.cloud_list:
+        #~ cc.pyeclsaver.t_last_save = 0.
+        #~ cc.MP_e.nel_mp_ref = cc.MP_e.nel_mp_ref_0
 
 print('End cloud sim')
 

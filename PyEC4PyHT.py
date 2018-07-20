@@ -87,6 +87,16 @@ class DummyBeamTim(object):
 extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
 
 class Ecloud(object):
+    
+    
+    def generate_twin_ecloud_with_shared_space_charge(self):
+        if hasattr(self, 'efieldmap'):
+            raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
+        return Ecloud(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder, self.flag_clean_slices,
+                self.slice_by_slice_mode, self.spacech_ele, self.kick_mode_for_beam_field,
+                self.beam_monitor, self.verbose, self.save_pyecl_outp_as, **self.kwargs)
+
+    
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
                  beam_monitor=None, verbose=False, save_pyecl_outp_as=None, 
@@ -127,7 +137,7 @@ class Ecloud(object):
                     ignore_kwargs=extra_allowed_kwargs, 
                     skip_pyeclsaver=(save_pyecl_outp_as is None), 
                     filen_main_outp = save_pyecl_outp_as,
-                    **kwargs)
+                    **self.kwargs)
 
 
         if self.cloudsim.config_dict['track_method'] == 'Boris':
@@ -201,10 +211,13 @@ class Ecloud(object):
         self.beam_monitor = beam_monitor
         
         self.verbose = verbose
+        self.save_pyecl_outp_as = save_pyecl_outp_as
 
         self.i_reinit = 0
         self.t_sim = 0.
         self.i_curr_bunch = -1
+
+
 
     #    @profile
     def track(self, beam):
@@ -334,7 +347,7 @@ class Ecloud(object):
             # check if first slice of first bunch
             if slic.slice_info['info_parent_bunch']['i_bunch']==0 and slic.slice_info['i_slice']==0:
                 self.finalize_and_reinitialize()
-
+                                
         else:
             new_pass = force_pyecl_newpass
             self.i_curr_bunch = 0
@@ -463,6 +476,10 @@ class Ecloud(object):
 
         for cloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
             cloud.MP_e.init_from_dict(initdict)
+            cloud.MP_e.set_nel_mp_ref(cloud.MP_e.nel_mp_ref_0)
+            if cloud.pyeclsaver.filen_main_outp is not None:
+                cloud.pyeclsaver.filen_main_outp = cloud.pyeclsaver.filen_main_outp.split('.mat')[0].split('__iter')[0]+'__iter%d.mat'%self.i_reinit
+            
 
         if self.save_ele_distributions_last_track:
             self.rho_ele_last_track = []
@@ -496,7 +513,7 @@ class Ecloud(object):
             self.Ex_ele_last_track_at_probes = []
             self.Ey_ele_last_track_at_probes = []
 
-        self.t_sim = 0.
+        #~ self.t_sim = 0.
         self.i_curr_bunch = -1
         self.i_reinit += 1
 
@@ -549,9 +566,4 @@ class Ecloud(object):
             dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']
             self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
 
-    def generate_twin_ecloud_with_shared_space_charge(self):
-        if hasattr(self, 'efieldmap'):
-            raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
-        return Ecloud(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder, self.flag_clean_slices,
-                self.slice_by_slice_mode, space_charge_obj=self.spacech_ele, **self.kwargs)
 

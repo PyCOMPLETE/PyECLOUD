@@ -470,7 +470,8 @@ class pyecloud_saver:
 
 
         #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
-        if beamtim.tt_curr-self.t_last_save > self.Dt_save:
+        if beamtim.tt_curr-self.t_last_save >= self.Dt_save:
+            
 
             self._stepbystep_check_for_data_resize()
 
