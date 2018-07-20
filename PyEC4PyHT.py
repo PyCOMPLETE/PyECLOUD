@@ -323,11 +323,17 @@ class Ecloud(object):
 
         # Acquire bunch passage information
         if 'info_parent_bunch' in slic.slice_info.keys():
+            
+            # check if new passage
             if slic.slice_info['info_parent_bunch']['i_bunch']>self.i_curr_bunch:
                 self.i_curr_bunch = slic.slice_info['info_parent_bunch']['i_bunch']
                 new_pass = True
             else:
                 new_pass = force_pyecl_newpass
+                
+            # check if first slice of first bunch
+            if slic.slice_info['info_parent_bunch']['i_bunch']==0 and slic.slice_info['i_slice']==0:
+                self.finalize_and_reinitialize()
 
         else:
             new_pass = force_pyecl_newpass
@@ -526,6 +532,7 @@ class Ecloud(object):
             self.Ey_ele_last_track_at_probes = np.array(self.Ey_ele_last_track_at_probes[::-1])
 
     def _finalize_and_reinitialize(self):
+        print('Exec. finalize and reinitialize')
         self._finalize()
         self._reinitialize()
 

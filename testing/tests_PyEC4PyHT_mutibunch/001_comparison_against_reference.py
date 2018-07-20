@@ -30,7 +30,7 @@ out_var_curr = dict_curr.keys()
 out_var_ref.sort()         # sort the keys in alphabetical order
 out_var_curr.sort()
 
-n_pass = 5  # reference passage
+n_pass = 20  # reference passage
 
 pl.close('all')
 
@@ -71,6 +71,11 @@ pl.plot(dict_curr['energ_eV_impact_hist'][i_pass, :], '.r-')
 pl.figure(1008)
 pl.semilogy(dict_ref['t'], dict_ref['lam_t_array'], '.-')
 pl.semilogy(dict_curr['t']-10e-9, dict_curr['lam_t_array'], '.r-')
+
+pl.figure(1009)
+pl.plot(np.sum(dict_ref['nel_hist'], axis=1), '.-')
+pl.plot(np.sum(dict_curr['nel_hist'], axis=1), '.r-')
+
 
 
 pl.show()

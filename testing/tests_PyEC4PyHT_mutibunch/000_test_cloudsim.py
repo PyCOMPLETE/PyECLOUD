@@ -75,10 +75,10 @@ print('Done.')
 
 # REMEBMBER TO START POPPING FROM THE RIGHT SIDE
 print('Start cloud sim')
-ecloud._reinitialize()
-for ii in xrange(len(list_slices)-1, -1, -1):
-    ecloud.track(list_slices[ii])
-ecloud._finalize()
+for i_turn in [0]:
+    for ii in xrange(len(list_slices)-1, -1, -1):
+        ecloud.track(list_slices[ii])
+
 print('End cloud sim')
 
 # Some plotting
