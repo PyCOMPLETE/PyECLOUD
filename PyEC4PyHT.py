@@ -317,6 +317,8 @@ class Ecloud(object):
                 interact_with_EC = slic.slice_info['interact_with_EC']
             else:
                 interact_with_EC = True
+        else:
+            interact_with_EC = True
 
         # Compute slice length
         dt_slice = dz / (slic.beta * c)
@@ -351,7 +353,9 @@ class Ecloud(object):
             else:
                 new_pass = force_pyecl_newpass
                 self.i_curr_bunch = 0
-
+        else:
+            new_pass = force_pyecl_newpass
+            self.i_curr_bunch = 0
 
 
         # Cloud simulation
