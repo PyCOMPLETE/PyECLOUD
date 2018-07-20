@@ -480,9 +480,10 @@ class Ecloud(object):
             thiscloud.MP_e.init_from_dict(initdict)
             thiscloud.MP_e.set_nel_mp_ref(thiscloud.MP_e.nel_mp_ref_0)
             
+            
             thisconf = thiscloud.config_dict
             
-            if thiscloud.pyeclsaver.filen_main_outp is not None:
+            if thiscloud.pyeclsaver is not None:
                 thiscloud.pyeclsaver.start_observing(cc.Dt, thiscloud.MP_e, None, thiscloud.impact_man,
                                        thisconf.r_center, thisconf.Dt_En_hist, thisconf.logfile_path, thisconf.progress_path, 
                                        flag_detailed_MP_info=thisconf.flag_detailed_MP_info, flag_movie=thisconf.flag_movie, 
