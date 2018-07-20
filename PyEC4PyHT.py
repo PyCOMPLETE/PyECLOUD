@@ -312,10 +312,11 @@ class Ecloud(object):
         spacech_ele = self.cloudsim.spacech_ele
 
         # Check if the slice interacts with the beam
-        if 'interact_with_EC' in slic.slice_info.keys():
-            interact_with_EC = slic.slice_info['interact_with_EC']
-        else:
-            interact_with_EC = True
+        if hasattr(slic, 'slice_info'):
+            if 'interact_with_EC' in slic.slice_info.keys():
+                interact_with_EC = slic.slice_info['interact_with_EC']
+            else:
+                interact_with_EC = True
 
         # Compute slice length
         dt_slice = dz / (slic.beta * c)
