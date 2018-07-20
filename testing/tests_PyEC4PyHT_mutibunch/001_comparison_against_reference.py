@@ -35,7 +35,7 @@ pl.close('all')
 
 pl.figure(1000)
 pl.plot(dict_ref['t'], dict_ref['Nel_timep'], '.-')
-pl.plot(dict_curr['t']-10e-9, dict_curr['Nel_timep'], '.r-')
+pl.plot(dict_curr['t']-10e-9-dict_curr['t'][0], dict_curr['Nel_timep'], '.r-')
 
 #~ pl.figure(1001)
 #~ pl.semilogy(dict_ref['t'], dict_ref['En_kin_eV_time'], '.-')
@@ -50,7 +50,7 @@ pl.plot(dict_ref['N_mp_pass'], '.-')
 pl.plot(dict_curr['N_mp_pass'], '.r-')
 
 pl.figure(1004)
-i_pass = 20
+i_pass = 5
 pl.plot(dict_ref['nel_hist'][i_pass, :], '.-')
 pl.plot(dict_curr['nel_hist'][i_pass, :], '.r-')
 

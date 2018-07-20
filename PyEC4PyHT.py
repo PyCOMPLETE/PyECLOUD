@@ -473,12 +473,29 @@ class Ecloud(object):
 
     def _reinitialize(self):
 
-
-        for cloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
-            cloud.MP_e.init_from_dict(initdict)
-            cloud.MP_e.set_nel_mp_ref(cloud.MP_e.nel_mp_ref_0)
-            if cloud.pyeclsaver.filen_main_outp is not None:
-                cloud.pyeclsaver.filen_main_outp = cloud.pyeclsaver.filen_main_outp.split('.mat')[0].split('__iter')[0]+'__iter%d.mat'%self.i_reinit
+        cc = mlm.obj_from_dict(self.cloudsim.config_dict)
+        
+        
+        for thiscloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
+            thiscloud.MP_e.init_from_dict(initdict)
+            thiscloud.MP_e.set_nel_mp_ref(thiscloud.MP_e.nel_mp_ref_0)
+            
+            thisconf = thiscloud.config_dict
+            
+            if thiscloud.pyeclsaver.filen_main_outp is not None:
+                thiscloud.pyeclsaver.start_observing(cc.Dt, thiscloud.MP_e, None, thiscloud.impact_man,
+                                       thisconf.r_center, thisconf.Dt_En_hist, thisconf.logfile_path, thisconf.progress_path, 
+                                       flag_detailed_MP_info=thisconf.flag_detailed_MP_info, flag_movie=thisconf.flag_movie, 
+                                       flag_sc_movie=thisconf.flag_sc_movie, save_mp_state_time_file=thisconf.save_mp_state_time_file,
+                                       flag_presence_sec_beams=self.cloudsim.flag_presence_sec_beams, sec_beams_list=self.cloudsim.sec_beams_list, dec_fac_secbeam_prof=thisconf.dec_fac_secbeam_prof,
+                                       el_density_probes=thisconf.el_density_probes, save_simulation_state_time_file=thisconf.save_simulation_state_time_file,
+                                       x_min_hist_det=thisconf.x_min_hist_det, x_max_hist_det=thisconf.x_max_hist_det, 
+                                       y_min_hist_det=thisconf.y_min_hist_det, y_max_hist_det=thisconf.y_max_hist_det,
+                                       Dx_hist_det=thisconf.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thisconf.filen_main_outp,
+                                       flag_cos_angle_hist=thisconf.flag_cos_angle_hist, cos_angle_width=thisconf.cos_angle_width,
+                                       flag_multiple_clouds=(len(self.cloudsim.cloud_list)>1), cloud_name=thisconf.cloud_name, flag_last_cloud=(thiscloud is self.cloudsim.cloud_list[-1]))
+            
+                thiscloud.pyeclsaver.filen_main_outp = thiscloud.pyeclsaver.filen_main_outp.split('.mat')[0].split('__iter')[0]+'__iter%d.mat'%self.i_reinit
             
 
         if self.save_ele_distributions_last_track:
