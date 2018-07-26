@@ -405,7 +405,7 @@ class Ecloud(object):
             dummybeamtim.flag_new_bunch_pass = new_pass
 
             # Force space charge recomputation 
-            force_recompute_space_charge = interact_with_EC
+            force_recompute_space_charge = interact_with_EC or (i_clou_step==0) # we always force at the first step, as we don't know the state of the PIC
             
             # Disable cleanings and regenerations
             skip_MP_cleaning = interact_with_EC
