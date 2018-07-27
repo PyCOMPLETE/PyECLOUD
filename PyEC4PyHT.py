@@ -587,5 +587,9 @@ class Ecloud(object):
         if beam.slice_info != 'unsliced':
             dz = beam.slice_info['z_bin_right']-beam.slice_info['z_bin_left']
             self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
-
+            
+    def remove_savers(self):
+        for thiscloud in self.cloudsim.cloud_list:
+            thiscloud.pyeclsaver = None
+            
 
