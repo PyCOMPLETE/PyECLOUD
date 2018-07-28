@@ -488,6 +488,7 @@ class Ecloud(object):
             thisconf = thiscloud.config_dict
             
             if thiscloud.pyeclsaver is not None:
+                thiscloud.pyeclsaver.extract_sey = False
                 thiscloud.pyeclsaver.start_observing(cc.Dt, thiscloud.MP_e, None, thiscloud.impact_man,
                                        thisconf.r_center, thisconf.Dt_En_hist, thisconf.logfile_path, thisconf.progress_path, 
                                        flag_detailed_MP_info=thisconf.flag_detailed_MP_info, flag_movie=thisconf.flag_movie, 
