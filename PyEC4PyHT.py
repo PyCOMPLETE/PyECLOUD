@@ -340,6 +340,11 @@ class Ecloud(object):
         # Acquire bunch passage information
         if hasattr(slic, 'slice_info'):
             if 'info_parent_bunch' in slic.slice_info.keys():
+                
+                # check if first slice of first bunch
+                if slic.slice_info['info_parent_bunch']['i_bunch']==0 and slic.slice_info['i_slice']==0:
+                    self.finalize_and_reinitialize() 
+                
                 # check if new passage
                 if slic.slice_info['info_parent_bunch']['i_bunch']>self.i_curr_bunch:
                     self.i_curr_bunch = slic.slice_info['info_parent_bunch']['i_bunch']
@@ -347,9 +352,6 @@ class Ecloud(object):
                 else:
                     new_pass = force_pyecl_newpass
                     
-                # check if first slice of first bunch
-                if slic.slice_info['info_parent_bunch']['i_bunch']==0 and slic.slice_info['i_slice']==0:
-                    self.finalize_and_reinitialize()                       
             else:
                 new_pass = force_pyecl_newpass
                 self.i_curr_bunch = 0
