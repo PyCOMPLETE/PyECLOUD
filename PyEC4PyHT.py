@@ -84,7 +84,7 @@ class DummyBeamTim(object):
         return Ex_n_beam, Ey_n_beam
 
 
-extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position'}
+extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position', 'enable_kick_x', 'enable_kick_y'}
 
 class Ecloud(object):
     
@@ -153,6 +153,16 @@ class Ecloud(object):
             self.x_beam_offset = kwargs['x_beam_offset']
         if 'y_beam_offset' in kwargs:
             self.y_beam_offset = kwargs['y_beam_offset']
+
+        
+        self.enable_kick_x = True
+        self.enable_kick_y = True
+        if 'enable_kick_x' in kwargs:
+            self.enable_kick_x = kwargs['enable_kick_x']
+            print('Horizontal kick on the beam is disabled!')
+        if 'enable_kick_y' in kwargs:
+            self.enable_kick_y = kwargs['enable_kick_y']
+            print('Vertical kick on the beam is disabled!')
 
 
         # initialize proton density probes
@@ -423,19 +433,22 @@ class Ecloud(object):
                     skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
 
 
-            # Build MP_system-like object with beam coordinates
-            MP_p = Empty()
-            MP_p.x_mp = slic.x[ix]+self.x_beam_offset
-            MP_p.y_mp = slic.y[ix]+self.y_beam_offset
-            MP_p.N_mp = len(slic.x[ix])
+            if interact_with_EC:
+            	# Build MP_system-like object with beam coordinates
+	            MP_p = Empty()
+	            MP_p.x_mp = slic.x[ix]+self.x_beam_offset
+	            MP_p.y_mp = slic.y[ix]+self.y_beam_offset
+	            MP_p.N_mp = len(slic.x[ix])
 
-            ## compute cloud field on beam particles
-            Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
+	            ## compute cloud field on beam particles
+	            Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 
-            ## kick beam particles
-            fact_kick = slic.charge/(slic.mass*slic.beta*slic.beta*slic.gamma*c*c)*self.L_ecloud
-            slic.xp[ix]+=fact_kick*Ex_sc_p
-            slic.yp[ix]+=fact_kick*Ey_sc_p
+	            ## kick beam particles
+	            fact_kick = slic.charge/(slic.mass*slic.beta*slic.beta*slic.gamma*c*c)*self.L_ecloud
+	            if self.enable_kick_x:
+	            	slic.xp[ix]+=fact_kick*Ex_sc_p
+	            if self.enable_kick_y:
+	            	slic.yp[ix]+=fact_kick*Ey_sc_p
 
             ## Diagnostics
             if self.save_ele_distributions_last_track:
