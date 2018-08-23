@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.4.0
+#                   PyECLOUD Version 7.5.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -137,6 +137,11 @@ class MP_system:
         self.nel_mp[self.N_mp:]=0.0
 
         print "Done clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
+        
+    def set_nel_mp_ref(self, val):
+        self.nel_mp_ref = val
+        self.nel_mp_split = self.fact_split*val
+        self.nel_mp_cl_th = self.fact_clean*val
 
 
     def check_for_soft_regeneration(self):
@@ -154,9 +159,7 @@ class MP_system:
                 #if new_nel_mp_ref>self.nel_mp_ref_0:removed from version 3.16
                 print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
-                self.nel_mp_ref=new_nel_mp_ref
-                self.nel_mp_split = self.fact_split*self.nel_mp_ref;
-                self.nel_mp_cl_th=self.fact_clean*self.nel_mp_ref;
+                self.set_nel_mp_ref(new_nel_mp_ref)
 
 
                 death_prob = float(self.N_mp - self.N_mp_after_soft_regen)/float(self.N_mp)
@@ -198,15 +201,12 @@ class MP_system:
             print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
 
-            self.nel_mp_ref=chrg/self.N_mp_after_regen;
-            if self.nel_mp_ref<self.nel_mp_ref_0:
-                self.nel_mp_ref=self.nel_mp_ref_0
-            self.nel_mp_split = self.fact_split*self.nel_mp_ref;
-            self.nel_mp_cl_th=self.fact_clean*self.nel_mp_ref;
-#            MP_e.x_mp, MP_e.y_mp, MP_e.z_mp, MP_e.vx_mp, MP_e.vy_mp, MP_e.vz_mp, MP_e.nel_mp, MP_e.N_mp=rMPs.regenerate_MPs2(MP_e.x_mp, MP_e.y_mp, MP_e.z_mp, MP_e.vx_mp, MP_e.vy_mp, MP_e.vz_mp, MP_e.nel_mp,MP_e.N_mp,\
-#                                                                                    nel_mp_ref,Nx_regen,Ny_regen,Nvx_regen,Nvy_regen,Nvz_regen, chamb,\
-#                                                                                    bias_x_hist,Dx_hist,regen_hist_cut,Nxg_hist)
-
+            new_nel_mp_ref=chrg/self.N_mp_after_regen;
+            if new_nel_mp_ref<self.nel_mp_ref_0:
+                new_nel_mp_ref=self.nel_mp_ref_0
+            
+            self.set_nel_mp_ref(new_nel_mp_ref)
+            
 
             hist_vect=np.zeros(self.Nxg_hist_reg,float)
             histf.compute_hist(self.x_mp[0:self.N_mp],self.nel_mp[0:self.N_mp],self.bias_x_hist_reg,self.Dx_hist_reg,hist_vect)
