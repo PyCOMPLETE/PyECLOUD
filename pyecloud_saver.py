@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.4.0
+#                   PyECLOUD Version 7.5.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -91,7 +91,7 @@ class pyecloud_saver:
         print(git_branch)
 
         with open(self.logfile_path,'w') as flog:
-            flog.write('PyECLOUD Version 7.4.0\n')
+            flog.write('PyECLOUD Version 7.5.0\n')
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
