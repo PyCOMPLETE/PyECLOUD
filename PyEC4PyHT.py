@@ -412,7 +412,7 @@ class Ecloud(object):
                 dummybeamtim.y_beam_pos = np.mean(slic.y[ix])+self.y_beam_offset 
             
             dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
-            dummybeamtim.Dt = dt
+            dummybeamtim.Dt_curr = dt
             dummybeamtim.pass_numb = self.i_curr_bunch
             dummybeamtim.flag_new_bunch_pass = new_pass
 
