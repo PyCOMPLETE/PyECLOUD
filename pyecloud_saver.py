@@ -95,6 +95,8 @@ class pyecloud_saver:
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
+        
+        self.extract_sey = True
 
 
     def start_observing(self, Dt_ref, MP_e, beamtim, impact_man,
@@ -171,11 +173,16 @@ class pyecloud_saver:
 
 
         # extract SEY curves
-        n_rep = 10000
-        self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
-        self.sey_test_cos_theta = np.linspace(0, 1., 10)
-        self.sey_test_del_true_mat, self.sey_test_del_elast_mat = impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta)
-
+        if self.extract_sey:
+            n_rep = 10000
+            self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
+            self.sey_test_cos_theta = np.linspace(0, 1., 10)
+            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta)
+        else:
+            self.sey_test_E_impact_eV = 0.
+            self.sey_test_cos_theta = 0.
+            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = 0.,0.
+        
         # Log
         print('Done init pyecloud_saver.')
         flog=open(self.logfile_path,'a')
@@ -470,7 +477,8 @@ class pyecloud_saver:
 
 
         #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
-        if beamtim.tt_curr-self.t_last_save > self.Dt_save:
+        if beamtim.tt_curr-self.t_last_save >= self.Dt_save:
+            
 
             self._stepbystep_check_for_data_resize()
 
