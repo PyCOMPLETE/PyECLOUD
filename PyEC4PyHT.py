@@ -451,6 +451,8 @@ class Ecloud(object):
                     slic.yp[ix]+=fact_kick*Ey_sc_p
 
             ## Diagnostics
+            MPe_for_save = self.cloudsim.cloud_list[0].MP_e
+            
             if self.save_ele_distributions_last_track:
                 self.rho_ele_last_track.append(spacech_ele.rho.copy())
                 #print 'Here'
@@ -463,18 +465,18 @@ class Ecloud(object):
                 self.Ey_ele_last_track.append(spacech_ele.efy.copy())
 
             if self.save_ele_MP_position:
-                self.x_MP_last_track.append(MP_e.x_mp.copy())
-                self.y_MP_last_track.append(MP_e.y_mp.copy())
+                self.x_MP_last_track.append(MPe_for_save.x_mp.copy())
+                self.y_MP_last_track.append(MPe_for_save.y_mp.copy())
 
             if self.save_ele_MP_velocity:
-                self.vx_MP_last_track.append(MP_e.vx_mp.copy())
-                self.vy_MP_last_track.append(MP_e.vy_mp.copy())
+                self.vx_MP_last_track.append(MPe_for_save.vx_mp.copy())
+                self.vy_MP_last_track.append(MPe_for_save.vy_mp.copy())
 
             if self.save_ele_MP_size:
-                self.nel_MP_last_track.append(MP_e.nel_mp.copy())
+                self.nel_MP_last_track.append(MPe_for_save.nel_mp.copy())
 
             if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-                self.N_MP_last_track.append(MP_e.N_mp)
+                self.N_MP_last_track.append(MPe_for_save.N_mp)
 
             if self.save_ele_field_probes:
                 MP_probes = Empty()
