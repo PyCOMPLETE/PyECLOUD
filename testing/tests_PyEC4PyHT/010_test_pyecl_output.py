@@ -69,8 +69,6 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         Dt = 25e-12,#needed for saving
         )
         
-ecloud_multigrid.save_ele_MP_position = True
-
 print 'Track_bunch'
 ecloud_multigrid.track(bunch)
 print 'Done.'
