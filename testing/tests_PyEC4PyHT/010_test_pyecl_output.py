@@ -13,7 +13,7 @@ machine_configuration = '6.5_TeV_collision_tunes'
 p0_GeV = 2000
 
 z_cut = 2.5e-9*c
-n_slices = 150
+n_slices = 300
 L_ecloud = 1000.
 
 sigma_z = 10e-2
@@ -68,6 +68,8 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         save_pyecl_outp_as = 'test_saving',
         Dt = 25e-12,#needed for saving
         )
+        
+ecloud_multigrid.save_ele_MP_position = True
 
 print 'Track_bunch'
 ecloud_multigrid.track(bunch)
