@@ -434,21 +434,21 @@ class Ecloud(object):
 
 
             if interact_with_EC:
-            	# Build MP_system-like object with beam coordinates
-	            MP_p = Empty()
-	            MP_p.x_mp = slic.x[ix]+self.x_beam_offset
-	            MP_p.y_mp = slic.y[ix]+self.y_beam_offset
-	            MP_p.N_mp = len(slic.x[ix])
+                # Build MP_system-like object with beam coordinates
+                MP_p = Empty()
+                MP_p.x_mp = slic.x[ix]+self.x_beam_offset
+                MP_p.y_mp = slic.y[ix]+self.y_beam_offset
+                MP_p.N_mp = len(slic.x[ix])
 
-	            ## compute cloud field on beam particles
-	            Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
+                ## compute cloud field on beam particles
+                Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 
-	            ## kick beam particles
-	            fact_kick = slic.charge/(slic.mass*slic.beta*slic.beta*slic.gamma*c*c)*self.L_ecloud
-	            if self.enable_kick_x:
-	            	slic.xp[ix]+=fact_kick*Ex_sc_p
-	            if self.enable_kick_y:
-	            	slic.yp[ix]+=fact_kick*Ey_sc_p
+                ## kick beam particles
+                fact_kick = slic.charge/(slic.mass*slic.beta*slic.beta*slic.gamma*c*c)*self.L_ecloud
+                if self.enable_kick_x:
+                    slic.xp[ix]+=fact_kick*Ex_sc_p
+                if self.enable_kick_y:
+                    slic.yp[ix]+=fact_kick*Ey_sc_p
 
             ## Diagnostics
             if self.save_ele_distributions_last_track:
