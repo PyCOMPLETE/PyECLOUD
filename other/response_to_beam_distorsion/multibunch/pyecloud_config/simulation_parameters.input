@@ -15,8 +15,8 @@ import numpy as np
 dec_fact_out = 4.9
 
 lam_th=1.e2        #e-/m
-Dx_hist=0e-3      #m
-r_center=1.e-3     #m
+Dx_hist=.25e-3      #m
+r_center=.25e-3     #m
 
 
 Dt_En_hist = 25e-9 #s
@@ -25,11 +25,11 @@ En_hist_max= 5000.  #eV
 
 t_ion=100.;        #s
 
-N_mp_max=2000000;   #size of allocated vectors 
+N_mp_max=250000;   #size of allocated vectors 
 
 #Regen parameters
 
-N_mp_regen=20000000;
+N_mp_regen=1000000;
 N_mp_regen_low=5000;
 N_mp_after_regen=10000;
 t_ON_regen_low=10.
@@ -37,10 +37,10 @@ fact_split=1.5;
 fact_clean=1e-6;
 regen_hist_cut = 1.e-4
 
-N_mp_soft_regen = 1000000
-N_mp_after_soft_regen = 200000
+N_mp_soft_regen = 200000
+N_mp_after_soft_regen = 120000
 
-nel_mp_ref_0= 2e7/(0.7*N_mp_soft_regen)   #e-/m
+nel_mp_ref_0= 2e8/(0.7*N_mp_soft_regen)   #e-/m
 
 
 # Number of bins
@@ -53,7 +53,7 @@ Nvz_regen=51;#it must be odd!
 
 #Sp_ch params
 Dt_sc = .5e-9 
-Dh_sc = .1e-3
+Dh_sc = .3e-3
 t_sc_ON=0e-9;
 sparse_solver = 'klu'
 
