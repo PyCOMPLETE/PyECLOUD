@@ -159,9 +159,11 @@ class Ecloud(object):
         self.enable_kick_y = True
         if 'enable_kick_x' in kwargs:
             self.enable_kick_x = kwargs['enable_kick_x']
+        if not self.enable_kick_x:
             print('Horizontal kick on the beam is disabled!')
         if 'enable_kick_y' in kwargs:
             self.enable_kick_y = kwargs['enable_kick_y']
+        if not self.enable_kick_y:
             print('Vertical kick on the beam is disabled!')
 
 
