@@ -25,11 +25,11 @@ En_hist_max= 5000.  #eV
 
 t_ion=100.;        #s
 
-N_mp_max=250000;   #size of allocated vectors 
+N_mp_max=2500000;   #size of allocated vectors 
 
 #Regen parameters
 
-N_mp_regen=1000000;
+N_mp_regen=2000000;
 N_mp_regen_low=5000;
 N_mp_after_regen=10000;
 t_ON_regen_low=10.
@@ -37,8 +37,8 @@ fact_split=1.5;
 fact_clean=1e-6;
 regen_hist_cut = 1.e-4
 
-N_mp_soft_regen = 200000
-N_mp_after_soft_regen = 120000
+N_mp_soft_regen = 700000
+N_mp_after_soft_regen = 500000
 
 nel_mp_ref_0= 2e8/(0.7*N_mp_soft_regen)   #e-/m
 
