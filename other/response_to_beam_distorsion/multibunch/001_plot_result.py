@@ -18,6 +18,8 @@ ms.mystyle_arial(fontsz=14)
 
 ob = mlm.myloadmat_to_obj('./test_saving__iter0.mat')   # load dictionary of the current simulation
 
+N_pass = ob.nel_hist.shape[0]
+
 plt.figure(1)
-plt.pcolormesh(ob.nel_hist, shading='Gouraud')
+plt.pcolormesh(ob.xg_hist, range(N_pass), ob.nel_hist, shading='Gouraud')
 plt.show()

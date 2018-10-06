@@ -39,7 +39,7 @@ machine = LHC(machine_configuration=machine_configuration, beta_x=85.00, beta_y=
 list_bunches = gmb.gen_matched_multibunch_beam(machine, macroparticlenumber, filling_pattern, b_spac_s, bunch_intensity, epsn_x, epsn_y, sigma_z, non_linear_long_matching, min_inten_slice4EC)
 
 for bb in list_bunches[::-1][30:]:
-    bb.x+=6e-3
+    bb.x+=3e-3
 
 # Slice bunches
 import PyPARIS.slicing_tool as st
