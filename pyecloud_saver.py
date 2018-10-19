@@ -108,7 +108,8 @@ class pyecloud_saver:
                  save_simulation_state_time_file = -1,
                  x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
                  filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop',
-                 flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True):
+                 flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True,
+                 check_point_DT=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -182,6 +183,10 @@ class pyecloud_saver:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
             self.sey_test_del_true_mat, self.sey_test_del_elast_mat = 0.,0.
+            
+        
+        if check_point_DT is not None:
+            blaaaaa
         
         # Log
         print('Done init pyecloud_saver.')
@@ -244,6 +249,9 @@ class pyecloud_saver:
 
         if beamtim.flag_new_bunch_pass:
             self._logfile_progressfile_stofile(beamtim, MP_e)
+            
+        if self.checkpoint:
+            blaaaaa
 
 
         return impact_man
@@ -381,6 +389,16 @@ class pyecloud_saver:
             saved_dict[kk] = np.array(saved_dict[kk])
 
         return saved_dict
+    
+    def save_checkpoint(self):
+        blaaaaaa
+        
+    def restore_checkpoint(filename):
+        blaaa
+        
+    def load_from_output(fname, last_t=None):
+        #restore the pyecltest.mat up to last t
+        
 
     def _stepbystep_check_for_data_resize(self):
         if self.i_last_save==(len(self.t_dec)-1):
