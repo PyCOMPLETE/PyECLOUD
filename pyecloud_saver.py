@@ -445,9 +445,11 @@ class pyecloud_saver:
 
             print('Save simulation checkpoint in: ' + self.folder_outp+'/'+filename_simulation_checkpoint)
 
-            prev_filen_checkpoint = filename_simulation_checkpoint.split('.pkl')
-            if os.path.exists(filename_simulation_checkpoint):
-                os.remove()
+            # Remove previous checkpoint to save memory
+            curr_checkp_nbr = filename_simulation_checkpoint.split('.pkl')[0]
+            curr_checkp_nbr = curr_checkp_nbr.split('_')[-1]
+            if int(curr_checkp_nbr) > 0:
+                os.remove(self.folder_outp + '/simulation_checkpoint_%d.pkl'%(int(curr_checkp_nbr)-1))
 
             self.i_checkp += 1
             self.t_last_checkp = beamtim.tt_curr
