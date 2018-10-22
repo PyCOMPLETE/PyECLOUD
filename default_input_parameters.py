@@ -53,11 +53,11 @@ parameters_dict = {
             'secondary_beams_file_list': (),
 
             # Additional clouds
-            'additional_clouds_file_list': (), 
+            'additional_clouds_file_list': (),
 
             # Name, mass and charge for default cloud
             'cloud_name': None,
-            'cloud_mass': m_e, 
+            'cloud_mass': m_e,
             'cloud_charge': -qe,
 
             'N_mp_soft_regen': None,
@@ -78,6 +78,7 @@ parameters_dict = {
             'dec_fac_secbeam_prof': 1,
             'el_density_probes': (),
             'save_simulation_state_time_file': -1,
+            'checkpoint_DT': None,
             'x_min_hist_det': None,
             'y_min_hist_det': None,
             'x_max_hist_det': None,
@@ -268,7 +269,7 @@ parameters_dict = {
             'secondary_angle_distribution': 'undefined',
             'switch_no_increase_energy': 0,
             'thresh_low_energy': -1,
-            
+
             # SEY from file
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
