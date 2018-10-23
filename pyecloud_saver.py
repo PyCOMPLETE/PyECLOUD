@@ -500,6 +500,7 @@ class pyecloud_saver:
                     dict_restored[var] = dict_history[var]
                 else:
                     dict_restored[var] = dict_history[var][: idx_t]
+        self.i_last_save = len(self.Nel_time)-1
 
         for var in saved_every_passage_list:
             if var in dict_history.keys():
@@ -521,7 +522,7 @@ class pyecloud_saver:
 
 
     def _stepbystep_check_for_data_resize(self):
-        if self.i_last_save==(len(self.t_dec)-1):
+        if self.i_last_save>=(len(self.t_dec)-1):
             print('Saver: resizing from %d to %d...'%(len(self.t_dec), 2*len(self.t_dec)))
             list_members = [
                 't_dec',
