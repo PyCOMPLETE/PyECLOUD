@@ -16,7 +16,7 @@ pl.close('all')
 ms.mystyle_arial(fontsz=16)
 dpiset = 200
 
-ob = mlo.myloadmat_to_obj('./Pyecltest_from_checkpoint.mat')
+ob = mlo.myloadmat_to_obj('./Pyecltest.mat')
 
 ifig = 0
 

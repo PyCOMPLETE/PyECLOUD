@@ -290,4 +290,4 @@ class BuildupSimulation(object):
         for cloud in self.cloud_list:
             cloud.pyeclsaver.load_from_output(fname=cloud.pyeclsaver.filen_main_outp, last_t=self.beamtim.tt_curr)
             cloud.pyeclsaver.i_checkp = i_checkp + 1
-            self.t_last_checkp = self.beamtim.tt_curr
+            cloud.pyeclsaver.t_last_checkp = self.beamtim.tt_curr
