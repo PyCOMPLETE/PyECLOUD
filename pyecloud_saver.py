@@ -56,6 +56,7 @@ import subprocess
 import hist_for as histf
 import time
 from scipy.constants import e as qe
+import myfilemanager as mfm
 try:
     # cPickle is faster in python2
     import cPickle as pickle
@@ -431,7 +432,8 @@ class pyecloud_saver:
             'flag_presence_sec_beams':flag_presence_sec_beams,
             'sec_beams_list':sec_beams_list,
             'flag_multiple_clouds':self.flag_multiple_clouds,
-            'cloud_list':cloud_list}
+            'cloud_list':cloud_list,
+            'checkp_time':beamtim.tt_curr}
 
             with open(self.folder_outp+'/'+filename_simulation_checkpoint, 'wb') as fid:
                 # use best protocol available
@@ -443,7 +445,7 @@ class pyecloud_saver:
 
             spacech_ele.PyPICobj.luobj = temp_luobj
 
-            print('Save simulation checkpoint in: ' + self.folder_outp+'/'+filename_simulation_checkpoint)
+            print('Save simulation checkpoint in: ' + self.folder_outp + filename_simulation_checkpoint)
 
             # Remove previous checkpoint to save memory
             curr_checkp_nbr = filename_simulation_checkpoint.split('.pkl')[0]
@@ -454,12 +456,97 @@ class pyecloud_saver:
             self.i_checkp += 1
             self.t_last_checkp = beamtim.tt_curr
 
-    def restore_checkpoint(filename):
-        pass
+    # def restore_checkpoint(filename):
+    #     with open(fname, 'rb') as fid:
+    #         dict_state = cPickle.load(fid)
 
-    def load_from_output(fname, last_t=None):
-        #restore the pyecltest.mat up to last t
-        pass
+    def load_from_output(self, fname, last_t=None):
+        #restore the Pyecltest.mat up to last t
+        ob = mfm.myloadmat_to_obj(self.folder_outp + '/' + fname)
+        dict_history = mfm.obj_to_dict(ob)
+
+        idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
+
+        idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
+
+        # Delete everything in Pyecltest.mat recorded after the last checkpoint
+        saved_every_timestep_list = ['En_emit_eV_time',
+                                     'En_imp_eV_time',
+                                     'En_kin_eV_time',
+                                     'Nel_emit_time',
+                                     'Nel_imp_time',
+                                     'Nel_timep',
+                                     'cen_density',
+                                     'lam_t_array',
+                                     'N_mp_time']
+
+        saved_every_passage_list = ['En_hist',
+                                    't_En_hist',
+                                    'N_mp_corrected_pass',
+                                    'N_mp_impact_pass',
+                                    'N_mp_pass',
+                                    'N_mp_ref_pass',
+                                    'energ_eV_impact_hist',
+                                    'energ_eV_impact_seg',
+                                    'nel_hist',
+                                    'nel_hist_det',
+                                    'nel_hist_impact_seg',
+                                    'nel_impact_hist_scrub',
+                                    'nel_impact_hist_tot',
+                                    'cos_angle_hist']
+
+        not_time_dependent_list = ['xg_hist',
+                                   'xg_hist_det',
+                                   'En_g_hist',
+                                   'b_spac',
+                                   't_sc_video',
+                                   't_sec_beams',
+                                   'sec_beam_profiles',
+                                   'x_el_dens_probes',
+                                   'y_el_dens_probes',
+                                   'r_el_dens_probes',
+                                   'xg_hist_cos_angle',
+                                   'el_dens_at_probes',
+                                   'dec_fact_out',
+                                   'chamber_area',
+                                   'sey_test_del_true_mat',
+                                   'sey_test_E_impact_eV',
+                                   'sey_test_del_elast_mat',
+                                   'sey_test_cos_theta',
+                                   'U_sc_eV']
+
+        should_be_list_list = ['t_sc_video',
+                               'U_sc_eV',
+                               'x_el_dens_probes',
+                               'y_el_dens_probes',
+                               'r_el_dens_probes',
+                                ]
+        dict_restored = {}
+        for var in saved_every_timestep_list:
+            if var in dict_history.keys():
+                if dict_history[var].shape == np.array(0).shape:
+                    dict_restored[var] = dict_history[var]
+                else:
+                    dict_restored[var] = dict_history[var][: idx_t]
+
+        for var in saved_every_passage_list:
+            if var in dict_history.keys():
+                if dict_history[var].shape == np.array(0).shape:
+                    dict_restored[var] = dict_history[var].tolist()
+                else:
+                    dict_restored[var] = dict_history[var][: idx_t_hist].tolist()
+
+        for var in not_time_dependent_list:
+            if var in dict_history.keys():
+                if var in should_be_list_list:
+                    dict_restored[var] = dict_history[var].tolist()
+                else:
+                    dict_restored[var] = dict_history[var]
+
+        # Restore this pyecloud_saver object with values from dict_restored
+        for var in dict_restored.keys():
+            setattr(self, var, dict_restored[var])
+
 
     def _stepbystep_check_for_data_resize(self):
         if self.i_last_save==(len(self.t_dec)-1):
