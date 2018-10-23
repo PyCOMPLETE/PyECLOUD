@@ -63,12 +63,12 @@ class BuildupSimulation(object):
         print 'PyECLOUD Version 7.5.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
-                                                    pyecl_input_folder=pyecl_input_folder, 
+                                                    pyecl_input_folder=pyecl_input_folder,
                                                     skip_beam=skip_beam,
-                                                    skip_pyeclsaver=skip_pyeclsaver, 
+                                                    skip_pyeclsaver=skip_pyeclsaver,
                                                     skip_spacech_ele=skip_spacech_ele,
                                                     spacech_ele = spacech_ele,
-                                                    ignore_kwargs=ignore_kwargs, 
+                                                    ignore_kwargs=ignore_kwargs,
                                                     **kwargs)
 
         self.config_dict = config_dict
@@ -98,7 +98,7 @@ class BuildupSimulation(object):
             if flag_presence_sec_beams:
                 for sec_beam in sec_beams_list:
                     sec_beam.next_time_step()
-            
+
             self.sim_time_step()
 
             if beamtim.flag_new_bunch_pass:
@@ -153,7 +153,7 @@ class BuildupSimulation(object):
             ## Compute electron space charge electric field
             Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
 
-            
+
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
                     raise ValueError("""Kick mode can be used only with custom time steps!""")
@@ -219,10 +219,10 @@ class BuildupSimulation(object):
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
 
 
-        # We want to save and clean MP only after iteration on all clouds is completed 
+        # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
         for cloud in cloud_list:
-            
+
             if cloud.pyeclsaver is not None:
                 # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
                 #     raise ValueError('Saving with custom steps not implemented!')
@@ -271,6 +271,37 @@ class BuildupSimulation(object):
 
             if force_disable_save_simulation_state:
                 cloud.pyeclsaver.flag_save_simulation_state = False
+
+            filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
+            filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
+            cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
+
+        print 'Restoring PyPIC LU object...'
+        self.spacech_ele.PyPICobj.build_sparse_solver()
+        print 'Done reload.'
+
+    def load_checkpoint(self, filename_simulation_checkpoint, filen_main_outp='Pyecltest_from_checkpoint'):
+        print 'Realoading from checkpoint: %s...'% filename_simulation_checkpoint
+
+        with open(filename_simulation_checkpoint, 'rb') as fid:
+            dict_state = cPickle.load(fid)
+
+        self.beamtim = dict_state['beamtim']
+        self.spacech_ele = dict_state['spacech_ele']
+        self.t_sc_ON = dict_state['t_sc_ON']
+        self.flag_presence_sec_beams = dict_state['flag_presence_sec_beams']
+        self.sec_beams_list = dict_state['sec_beams_list']
+
+        self.flag_multiple_clouds = dict_state['flag_multiple_clouds']
+        old_filen_main_outp = 'Pyecltest.mat'
+        for i_cloud, new_cloud in enumerate(self.cloud_list):
+            new_pyeclsaver = new_cloud.pyeclsaver
+            self.cloud_list[i_cloud] = dict_state['cloud_list'][i_cloud]  # Replace new_cloud with saved cloud
+            cloud = self.cloud_list[i_cloud]
+
+            # if reset_pyeclsaver or cloud.pyeclsaver is None:
+            cloud.pyeclsaver = new_pyeclsaver
+            cloud.pyeclsaver.load_from_output(fname=old_filen_main_outp, last_t=dict_state['checkp_time'])
 
             filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
             filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
