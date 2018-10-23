@@ -447,11 +447,15 @@ class pyecloud_saver:
 
             print('Save simulation checkpoint in: ' + self.folder_outp + filename_simulation_checkpoint)
 
-            # Remove previous checkpoint to save memory
-            curr_checkp_nbr = filename_simulation_checkpoint.split('.pkl')[0]
-            curr_checkp_nbr = curr_checkp_nbr.split('_')[-1]
-            if int(curr_checkp_nbr) > 0:
-                os.remove(self.folder_outp + '/simulation_checkpoint_%d.pkl'%(int(curr_checkp_nbr)-1))
+            # Remove previous checkpoints to save memory
+            saved_states_list = [f for f in os.listdir('./') if (f.find('simulation_checkpoint_') != -1)]
+            for checks in saved_states_list:
+                if not checks == 'simulation_checkpoint_%d.pkl'%(self.i_checkp):
+                    os.remove(checks)
+            # curr_checkp_nbr = filename_simulation_checkpoint.split('.pkl')[0]
+            # curr_checkp_nbr = curr_checkp_nbr.split('_')[-1]
+            # if int(curr_checkp_nbr) > 0:
+            #     os.remove(self.folder_outp + '/simulation_checkpoint_%d.pkl'%(int(curr_checkp_nbr)-1))
 
             self.i_checkp += 1
             self.t_last_checkp = beamtim.tt_curr
@@ -461,6 +465,7 @@ class pyecloud_saver:
     #         dict_state = cPickle.load(fid)
 
     def load_from_output(self, fname, last_t=None):
+
         #restore the Pyecltest.mat up to last t
         ob = mfm.myloadmat_to_obj(self.folder_outp + '/' + fname)
         dict_history = mfm.obj_to_dict(ob)
