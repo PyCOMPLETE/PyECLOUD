@@ -411,64 +411,23 @@ class pyecloud_saver:
     def _checkpoint_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
         # First check if it is time to save a checkpoint
-        if (self.flag_save_checkpoint and self.flag_last_cloud and (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT)):
-            #Simulation checkpoint save
-            temp_luobj = spacech_ele.PyPICobj.luobj
-            spacech_ele.luobj=None
-            spacech_ele.PyPICobj.luobj=None
+        if (self.flag_save_checkpoint):
+            if (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT):
+                
+                outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp)
+            
+                self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                            sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
+                print('Save simulation checkpoint in: ' + outpath)
 
-            # remove savers
-            temp_saver_list = []
-            for cloud in cloud_list:
-                temp_saver_list.append(cloud.pyeclsaver)
-                cloud.pyeclsaver = 'removed'
-
-            dict_state = {
-            'beamtim':beamtim,
-            'spacech_ele':spacech_ele,
-            't_sc_ON':t_sc_ON,
-            'flag_presence_sec_beams':flag_presence_sec_beams,
-            'sec_beams_list':sec_beams_list,
-            'flag_multiple_clouds':self.flag_multiple_clouds,
-            'cloud_list':cloud_list,
-            'checkp_time':beamtim.tt_curr}
-
-            # Get current checkpoint number
-            saved_states_list = [f for f in os.listdir('./') if (f.find('simulation_checkpoint_') != -1)]
-            if len(saved_states_list) > 0:
-                saved_states_list.sort()
-                curr_checkp_nbr = saved_states_list[-1].split('.pkl')[0]
-                curr_checkp_nbr = curr_checkp_nbr.split('_')[-1]
-                self.i_checkp = int(curr_checkp_nbr) + 1
-            filename_simulation_checkpoint='simulation_checkpoint_%d.pkl'%(self.i_checkp)
-
-            with open(self.folder_outp+'/'+filename_simulation_checkpoint, 'wb') as fid:
-                # use best protocol available
-                pickle.dump(dict_state, fid, protocol=-1)
-
-            # put back savers
-            for cloud, saver in zip(cloud_list, temp_saver_list):
-                cloud.pyeclsaver = saver
-
-            spacech_ele.PyPICobj.luobj = temp_luobj
-
-            print('Save simulation checkpoint in: ' + self.folder_outp + filename_simulation_checkpoint)
-
-            # Remove previous checkpoints to save memory
-            for checks in saved_states_list:
-                if not checks == 'simulation_checkpoint_%d.pkl'%(self.i_checkp):
-                    os.remove(checks)
-            # curr_checkp_nbr = filename_simulation_checkpoint.split('.pkl')[0]
-            # curr_checkp_nbr = curr_checkp_nbr.split('_')[-1]
-            # if int(curr_checkp_nbr) > 0:
-            #     os.remove(self.folder_outp + '/simulation_checkpoint_%d.pkl'%(int(curr_checkp_nbr)-1))
-
-            self.i_checkp += 1
-            self.t_last_checkp = beamtim.tt_curr
-
-    # def restore_checkpoint(filename):
-    #     with open(fname, 'rb') as fid:
-    #         dict_state = cPickle.load(fid)
+                if self.i_checkp>0:
+                    prevpath = outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
+                    os.remove(prevpath)
+                    print('Removed simulation checkpoint in: ' + prevpath)                        
+                        
+                self.i_checkp += 1
+                self.t_last_checkp = beamtim.tt_curr
+                
 
     def load_from_output(self, fname, last_t=None):
 
@@ -767,47 +726,57 @@ class pyecloud_saver:
 
             self.N_obs_sim=len(self.t_obs_sim)
             self.i_obs_sim=0
+            
+    def _sim_state_single_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                    sec_beams_list, flag_multiple_clouds, cloud_list, outfile):
+        
+        if self.flag_last_cloud:
+            
+            temp_luobj = spacech_ele.PyPICobj.luobj
+            spacech_ele.luobj=None
+            spacech_ele.PyPICobj.luobj=None
+
+            #~ dynamics.get_B=None
+
+            # remove savers
+            temp_saver_list = []
+            for cloud in cloud_list:
+                temp_saver_list.append(cloud.pyeclsaver)
+                cloud.pyeclsaver = 'removed'
+
+            dict_state = {
+            'beamtim':beamtim,
+            'spacech_ele':spacech_ele,
+            't_sc_ON':t_sc_ON,
+            'flag_presence_sec_beams':flag_presence_sec_beams,
+            'sec_beams_list':sec_beams_list,
+            'flag_multiple_clouds':self.flag_multiple_clouds,
+            'cloud_list':cloud_list}
+
+            with open(outfile, 'wb') as fid:
+                # use best protocol available
+                pickle.dump(dict_state, fid, protocol=-1)
+
+            # put back savers
+            for cloud, saver in zip(cloud_list, temp_saver_list):
+                cloud.pyeclsaver = saver
+
+            spacech_ele.PyPICobj.luobj = temp_luobj
+
+            print('Save simulation state in: ' + outfile)
 
     def _sim_state_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
         #Simulation state save
-        if self.flag_save_simulation_state and self.flag_last_cloud:
+        if self.flag_save_simulation_state:
             if self.i_obs_sim<self.N_obs_sim:
                 if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
                     filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
-
-                    temp_luobj = spacech_ele.PyPICobj.luobj
-                    spacech_ele.luobj=None
-                    spacech_ele.PyPICobj.luobj=None
-
-                    #~ dynamics.get_B=None
-
-                    # remove savers
-                    temp_saver_list = []
-                    for cloud in cloud_list:
-                        temp_saver_list.append(cloud.pyeclsaver)
-                        cloud.pyeclsaver = 'removed'
-
-                    dict_state = {
-                    'beamtim':beamtim,
-                    'spacech_ele':spacech_ele,
-                    't_sc_ON':t_sc_ON,
-                    'flag_presence_sec_beams':flag_presence_sec_beams,
-                    'sec_beams_list':sec_beams_list,
-                    'flag_multiple_clouds':self.flag_multiple_clouds,
-                    'cloud_list':cloud_list}
-
-                    with open(self.folder_outp+'/'+filename_simulation_state, 'wb') as fid:
-                        # use best protocol available
-                        pickle.dump(dict_state, fid, protocol=-1)
-
-                    # put back savers
-                    for cloud, saver in zip(cloud_list, temp_saver_list):
-                        cloud.pyeclsaver = saver
-
-                    spacech_ele.PyPICobj.luobj = temp_luobj
-
-                    print('Save simulation state in: ' + self.folder_outp+'/'+filename_simulation_state)
+                    outpath = self.folder_outp+'/'+filename_simulation_state
+                    
+                    self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                        sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
+                    
                     self.i_obs_sim=self.i_obs_sim+1
 
     def _rho_video_init(self, flag_movie):

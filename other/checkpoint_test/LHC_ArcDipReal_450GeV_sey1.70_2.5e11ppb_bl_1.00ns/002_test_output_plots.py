@@ -48,6 +48,7 @@ pl.suptitle('Var. name: Nel_timep\nNumber of electrons in the chamber at each ti
 pl.subplots_adjust(top=.82, bottom=.14)
 pl.savefig('fig%02d.png' % ifig, dpi=dpiset)
 
+'''
 # 5.
 ifig += 1
 pl.figure(ifig)
@@ -293,5 +294,5 @@ pl.suptitle(
 pl.subplots_adjust(top=.82, bottom=.14)
 pl.savefig('fig%02d.png' % ifig, dpi=dpiset)
 
-
+'''
 pl.show()

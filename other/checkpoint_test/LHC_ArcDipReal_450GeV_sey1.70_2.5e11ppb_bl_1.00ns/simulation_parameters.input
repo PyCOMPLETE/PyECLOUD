@@ -65,4 +65,4 @@ save_mp_state_time_file =  -1
 
 #save_simulation_state_time_file =  list(25e-9*np.array([0., 15.]) - np.array([0., 2.5e-11]))
 
-checkpoint_DT = 5.*25e-9
+checkpoint_DT = 2.*25e-9
