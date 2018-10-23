@@ -282,6 +282,9 @@ class BuildupSimulation(object):
 
     def load_checkpoint(self, filename_simulation_checkpoint, filen_main_outp='Pyecltest_from_checkpoint'):
         print 'Realoading from checkpoint: %s...'% filename_simulation_checkpoint
+        
+        i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
+        
 
         with open(filename_simulation_checkpoint, 'rb') as fid:
             dict_state = cPickle.load(fid)
@@ -301,12 +304,17 @@ class BuildupSimulation(object):
 
             # if reset_pyeclsaver or cloud.pyeclsaver is None:
             cloud.pyeclsaver = new_pyeclsaver
-            cloud.pyeclsaver.load_from_output(fname=old_filen_main_outp, last_t=dict_state['checkp_time'])
+            cloud.pyeclsaver.load_from_output(fname=old_filen_main_outp, last_t=self.beamtim.tt_curr)
 
             filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
             filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
             cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
+            
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
         print 'Done reload.'
+        
+        for cloud in self.cloud_list:
+            cloud.pyeclsaver.i_checkp = i_checkp + 1
+            self.t_last_checkp = self.beamtim.tt_curr
