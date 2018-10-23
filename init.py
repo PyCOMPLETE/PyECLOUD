@@ -383,7 +383,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
                                        flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud,
                                        checkpoint_DT=cc.checkpoint_DT)
-            print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp )
+            print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker
         if cc.track_method == 'Boris':

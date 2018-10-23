@@ -478,7 +478,8 @@ class pyecloud_saver:
                                      'Nel_timep',
                                      'cen_density',
                                      'lam_t_array',
-                                     'N_mp_time']
+                                     'N_mp_time',
+                                     't']
 
         saved_every_passage_list = ['En_hist',
                                     't_En_hist',
@@ -493,7 +494,8 @@ class pyecloud_saver:
                                     'nel_hist_impact_seg',
                                     'nel_impact_hist_scrub',
                                     'nel_impact_hist_tot',
-                                    'cos_angle_hist']
+                                    'cos_angle_hist',
+                                    't_hist']
 
         not_time_dependent_list = ['xg_hist',
                                    'xg_hist_det',
