@@ -413,8 +413,6 @@ class pyecloud_saver:
         # First check if it is time to save a checkpoint
         if (self.flag_save_checkpoint and self.flag_last_cloud and (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT)):
             #Simulation checkpoint save
-            filename_simulation_checkpoint='simulation_checkpoint_%d.pkl'%(self.i_checkp)
-
             temp_luobj = spacech_ele.PyPICobj.luobj
             spacech_ele.luobj=None
             spacech_ele.PyPICobj.luobj=None
@@ -435,6 +433,15 @@ class pyecloud_saver:
             'cloud_list':cloud_list,
             'checkp_time':beamtim.tt_curr}
 
+            # Get current checkpoint number
+            saved_states_list = [f for f in os.listdir('./') if (f.find('simulation_checkpoint_') != -1)]
+            if len(saved_states_list) > 0:
+                saved_states_list.sort()
+                curr_checkp_nbr = saved_states_list[-1].split('.pkl')[0]
+                curr_checkp_nbr = curr_checkp_nbr.split('_')[-1]
+                self.i_checkp = int(curr_checkp_nbr) + 1
+            filename_simulation_checkpoint='simulation_checkpoint_%d.pkl'%(self.i_checkp)
+
             with open(self.folder_outp+'/'+filename_simulation_checkpoint, 'wb') as fid:
                 # use best protocol available
                 pickle.dump(dict_state, fid, protocol=-1)
@@ -448,7 +455,6 @@ class pyecloud_saver:
             print('Save simulation checkpoint in: ' + self.folder_outp + filename_simulation_checkpoint)
 
             # Remove previous checkpoints to save memory
-            saved_states_list = [f for f in os.listdir('./') if (f.find('simulation_checkpoint_') != -1)]
             for checks in saved_states_list:
                 if not checks == 'simulation_checkpoint_%d.pkl'%(self.i_checkp):
                     os.remove(checks)
