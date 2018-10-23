@@ -271,50 +271,23 @@ class BuildupSimulation(object):
 
             if force_disable_save_simulation_state:
                 cloud.pyeclsaver.flag_save_simulation_state = False
-
-            filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
-            filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
-            cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
+            
+            if filen_main_outp is not None:
+                filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
+                filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
+                cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
         print 'Done reload.'
 
-    def load_checkpoint(self, filename_simulation_checkpoint, filen_main_outp='Pyecltest_from_checkpoint'):
+    def load_checkpoint(self, filename_simulation_checkpoint):
         print 'Realoading from checkpoint: %s...'% filename_simulation_checkpoint
         
         i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
-        
-
-        with open(filename_simulation_checkpoint, 'rb') as fid:
-            dict_state = cPickle.load(fid)
-
-        self.beamtim = dict_state['beamtim']
-        self.spacech_ele = dict_state['spacech_ele']
-        self.t_sc_ON = dict_state['t_sc_ON']
-        self.flag_presence_sec_beams = dict_state['flag_presence_sec_beams']
-        self.sec_beams_list = dict_state['sec_beams_list']
-
-        self.flag_multiple_clouds = dict_state['flag_multiple_clouds']
-        old_filen_main_outp = 'Pyecltest.mat'
-        for i_cloud, new_cloud in enumerate(self.cloud_list):
-            new_pyeclsaver = new_cloud.pyeclsaver
-            self.cloud_list[i_cloud] = dict_state['cloud_list'][i_cloud]  # Replace new_cloud with saved cloud
-            cloud = self.cloud_list[i_cloud]
-
-            # if reset_pyeclsaver or cloud.pyeclsaver is None:
-            cloud.pyeclsaver = new_pyeclsaver
-            cloud.pyeclsaver.load_from_output(fname=old_filen_main_outp, last_t=self.beamtim.tt_curr)
-
-            filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
-            filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
-            cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
-            
-
-        print 'Restoring PyPIC LU object...'
-        self.spacech_ele.PyPICobj.build_sparse_solver()
-        print 'Done reload.'
+        self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None)
         
         for cloud in self.cloud_list:
+            cloud.pyeclsaver.load_from_output(fname=cloud.pyeclsaver.filen_main_outp, last_t=self.beamtim.tt_curr)
             cloud.pyeclsaver.i_checkp = i_checkp + 1
             self.t_last_checkp = self.beamtim.tt_curr
