@@ -526,7 +526,7 @@ class pyecloud_saver:
             print('Saver: resizing from %d to %d...'%(len(self.t), 2*len(self.t)))
             list_members = [
                 't',
-                'lam_t_array_dec',
+                'lam_t_array',
                 'Nel_timep',
                 'Nel_imp_time',
                 'Nel_emit_time',
@@ -567,7 +567,7 @@ class pyecloud_saver:
 
         #step by step data
         self.t = np.zeros(initial_size_t_vect, dtype=float)
-        self.lam_t_array_dec = 0*self.t
+        self.lam_t_array = 0*self.t
         self.Nel_timep=0.*self.t;
         self.Nel_imp_time=0.*self.t;
         self.Nel_emit_time=0.*self.t;
@@ -624,7 +624,7 @@ class pyecloud_saver:
             self.t_last_save = beamtim.tt_curr
 
             self.t[self.i_last_save] = beamtim.tt_curr
-            self.lam_t_array_dec[self.i_last_save] = beamtim.lam_t_curr
+            self.lam_t_array[self.i_last_save] = beamtim.lam_t_curr
 
             self.Nel_imp_time[self.i_last_save] = self.Nel_impact_last_step_group
             self.Nel_emit_time[self.i_last_save] = self.Nel_emit_last_step_group
@@ -658,7 +658,7 @@ class pyecloud_saver:
 
         dict_sbs_data = {
             't':self.t[:self.i_last_save+1],
-            'lam_t_array':self.lam_t_array_dec[:self.i_last_save+1],
+            'lam_t_array':self.lam_t_array[:self.i_last_save+1],
             'Nel_timep':self.Nel_timep[:self.i_last_save+1],
             'Nel_imp_time':self.Nel_imp_time[:self.i_last_save+1],
             'Nel_emit_time':self.Nel_emit_time[:self.i_last_save+1],
