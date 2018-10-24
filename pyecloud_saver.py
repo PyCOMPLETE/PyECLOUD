@@ -500,7 +500,7 @@ class pyecloud_saver:
                     dict_restored[var] = dict_history[var]
                 else:
                     dict_restored[var] = dict_history[var][: idx_t]
-        self.i_last_save = len(self.Nel_time)-1
+        self.i_last_save = len(self.Nel_timep)-1
 
         for var in saved_every_passage_list:
             if var in dict_history.keys():
@@ -522,12 +522,12 @@ class pyecloud_saver:
 
 
     def _stepbystep_check_for_data_resize(self):
-        if self.i_last_save>=(len(self.t_dec)-1):
-            print('Saver: resizing from %d to %d...'%(len(self.t_dec), 2*len(self.t_dec)))
+        if self.i_last_save>=(len(self.t)-1):
+            print('Saver: resizing from %d to %d...'%(len(self.t), 2*len(self.t)))
             list_members = [
-                't_dec',
+                't',
                 'lam_t_array_dec',
-                'Nel_time',
+                'Nel_timep',
                 'Nel_imp_time',
                 'Nel_emit_time',
                 'En_imp_eV_time',
@@ -566,19 +566,19 @@ class pyecloud_saver:
         self.En_emit_last_step_group_eV = 0
 
         #step by step data
-        self.t_dec = np.zeros(initial_size_t_vect, dtype=float)
-        self.lam_t_array_dec = 0*self.t_dec
-        self.Nel_time=0.*self.t_dec;
-        self.Nel_imp_time=0.*self.t_dec;
-        self.Nel_emit_time=0.*self.t_dec;
-        self.En_imp_eV_time=0.*self.t_dec;
-        self.En_emit_eV_time=0.*self.t_dec;
-        self.En_kin_eV_time=0.*self.t_dec;
-        self.cen_density=0.*self.t_dec;
+        self.t = np.zeros(initial_size_t_vect, dtype=float)
+        self.lam_t_array_dec = 0*self.t
+        self.Nel_timep=0.*self.t;
+        self.Nel_imp_time=0.*self.t;
+        self.Nel_emit_time=0.*self.t;
+        self.En_imp_eV_time=0.*self.t;
+        self.En_emit_eV_time=0.*self.t;
+        self.En_kin_eV_time=0.*self.t;
+        self.cen_density=0.*self.t;
 
 
         if self.flag_detailed_MP_info==1:
-            self.N_mp_time=0.*self.t_dec
+            self.N_mp_time=0.*self.t
         else:
             self.N_mp_time=-1
 
@@ -591,7 +591,7 @@ class pyecloud_saver:
         if len(el_density_probes)>0:
             self.flag_el_dens_probes = True
             self.N_el_dens_probes = len(el_density_probes)
-            self.el_dens_at_probes = np.zeros((self.N_el_dens_probes, len(self.t_dec))) # to be changed
+            self.el_dens_at_probes = np.zeros((self.N_el_dens_probes, len(self.t))) # to be changed
             self.x_el_dens_probes = []
             self.y_el_dens_probes = []
             self.r_el_dens_probes = []
@@ -617,14 +617,13 @@ class pyecloud_saver:
 
         #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
         if beamtim.tt_curr-self.t_last_save >= self.Dt_save:
-
-
+            
             self._stepbystep_check_for_data_resize()
 
             self.i_last_save+=1
             self.t_last_save = beamtim.tt_curr
 
-            self.t_dec[self.i_last_save] = beamtim.tt_curr
+            self.t[self.i_last_save] = beamtim.tt_curr
             self.lam_t_array_dec[self.i_last_save] = beamtim.lam_t_curr
 
             self.Nel_imp_time[self.i_last_save] = self.Nel_impact_last_step_group
@@ -638,7 +637,7 @@ class pyecloud_saver:
             self.En_emit_last_step_group_eV = 0
 
 
-            self.Nel_time[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
+            self.Nel_timep[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
             self.En_kin_eV_time[self.i_last_save]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
@@ -658,9 +657,9 @@ class pyecloud_saver:
     def _stepbystep_get_dict(self):
 
         dict_sbs_data = {
-            't':self.t_dec[:self.i_last_save+1],
+            't':self.t[:self.i_last_save+1],
             'lam_t_array':self.lam_t_array_dec[:self.i_last_save+1],
-            'Nel_timep':self.Nel_time[:self.i_last_save+1],
+            'Nel_timep':self.Nel_timep[:self.i_last_save+1],
             'Nel_imp_time':self.Nel_imp_time[:self.i_last_save+1],
             'Nel_emit_time':self.Nel_emit_time[:self.i_last_save+1],
             'En_imp_eV_time':self.En_imp_eV_time[:self.i_last_save+1],
