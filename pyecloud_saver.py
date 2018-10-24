@@ -216,10 +216,6 @@ class pyecloud_saver:
         self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                               sec_beams_list, self.flag_multiple_clouds, cloud_list)
 
-        # Check for checkpoint save state
-        self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                            sec_beams_list, self.flag_multiple_clouds, cloud_list)
-
         # Check for save video charge density
         self._rho_video_save(spacech_ele, beamtim, rho_cloud)
 
@@ -255,6 +251,10 @@ class pyecloud_saver:
             self.area = impact_man.chamb.area
 
             sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
+            
+            # Check for checkpoint save state
+            self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                       sec_beams_list, self.flag_multiple_clouds, cloud_list)
 
         if beamtim.flag_new_bunch_pass:
             self._logfile_progressfile_stofile(beamtim, MP_e)
@@ -500,7 +500,7 @@ class pyecloud_saver:
                     dict_restored[var] = dict_history[var]
                 else:
                     dict_restored[var] = dict_history[var][: idx_t]
-        self.i_last_save = len(self.Nel_timep)-1
+        self.i_last_save = len(dict_restored['Nel_timep'])-1
 
         for var in saved_every_passage_list:
             if var in dict_history.keys():
