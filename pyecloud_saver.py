@@ -56,7 +56,7 @@ import subprocess
 import hist_for as histf
 import time
 from scipy.constants import e as qe
-import myfilemanager as mfm
+import myloadmat_to_obj as mlm
 try:
     # cPickle is faster in python2
     import cPickle as pickle
@@ -251,7 +251,7 @@ class pyecloud_saver:
             self.area = impact_man.chamb.area
 
             sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
-            
+
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                        sec_beams_list, self.flag_multiple_clouds, cloud_list)
@@ -413,9 +413,9 @@ class pyecloud_saver:
         # First check if it is time to save a checkpoint
         if (self.flag_save_checkpoint):
             if (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT):
-                
+
                 outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp)
-            
+
                 self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                             sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
                 print('Save simulation checkpoint in: ' + outpath)
@@ -423,17 +423,17 @@ class pyecloud_saver:
                 if self.i_checkp>0:
                     prevpath = outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
                     os.remove(prevpath)
-                    print('Removed simulation checkpoint in: ' + prevpath)                        
-                        
+                    print('Removed simulation checkpoint in: ' + prevpath)
+
                 self.i_checkp += 1
                 self.t_last_checkp = beamtim.tt_curr
-                
+
 
     def load_from_output(self, fname, last_t=None):
 
         #restore the Pyecltest.mat up to last t
-        ob = mfm.myloadmat_to_obj(self.folder_outp + '/' + fname)
-        dict_history = mfm.obj_to_dict(ob)
+        ob = mlm.myloadmat_to_obj(self.folder_outp + '/' + fname)
+        dict_history = mlm.obj_to_dict(ob)
 
         idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
 
@@ -617,7 +617,7 @@ class pyecloud_saver:
 
         #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
         if beamtim.tt_curr-self.t_last_save >= self.Dt_save:
-            
+
             self._stepbystep_check_for_data_resize()
 
             self.i_last_save+=1
@@ -726,12 +726,12 @@ class pyecloud_saver:
 
             self.N_obs_sim=len(self.t_obs_sim)
             self.i_obs_sim=0
-            
+
     def _sim_state_single_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list, outfile):
-        
+
         if self.flag_last_cloud:
-            
+
             temp_luobj = spacech_ele.PyPICobj.luobj
             spacech_ele.luobj=None
             spacech_ele.PyPICobj.luobj=None
@@ -773,10 +773,10 @@ class pyecloud_saver:
                 if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
                     filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
                     outpath = self.folder_outp+'/'+filename_simulation_state
-                    
+
                     self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                         sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
-                    
+
                     self.i_obs_sim=self.i_obs_sim+1
 
     def _rho_video_init(self, flag_movie):
