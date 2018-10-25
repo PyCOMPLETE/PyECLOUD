@@ -418,7 +418,6 @@ class pyecloud_saver:
 
                 self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                             sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
-                print('Save simulation checkpoint in: ' + outpath)
 
                 if self.i_checkp>0:
                     prevpath = outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
@@ -436,8 +435,7 @@ class pyecloud_saver:
         dict_history = mlm.obj_to_dict(ob)
 
         idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
-
-        idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
+        #idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
 
         # Delete everything in Pyecltest.mat recorded after the last checkpoint
         saved_every_timestep_list = ['En_emit_eV_time',
@@ -471,7 +469,6 @@ class pyecloud_saver:
                                    'xg_hist_det',
                                    'En_g_hist',
                                    'b_spac',
-                                   't_sc_video',
                                    't_sec_beams',
                                    'sec_beam_profiles',
                                    'x_el_dens_probes',
@@ -485,13 +482,14 @@ class pyecloud_saver:
                                    'sey_test_E_impact_eV',
                                    'sey_test_del_elast_mat',
                                    'sey_test_cos_theta',
-                                   'U_sc_eV']
+                                   'U_sc_eV'
+                                   't_sc_video']
 
-        should_be_list_list = ['t_sc_video',
-                               'U_sc_eV',
+        should_be_list_list = ['U_sc_eV',
                                'x_el_dens_probes',
                                'y_el_dens_probes',
                                'r_el_dens_probes',
+                               't_sc_video'
                                 ]
         dict_restored = {}
         for var in saved_every_timestep_list:
@@ -499,7 +497,7 @@ class pyecloud_saver:
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var]
                 else:
-                    dict_restored[var] = dict_history[var][: idx_t]
+                    dict_restored[var] = dict_history[var][: idx_t+1]
         self.i_last_save = len(dict_restored['Nel_timep'])-1
 
         for var in saved_every_passage_list:
@@ -507,7 +505,8 @@ class pyecloud_saver:
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
-                    dict_restored[var] = dict_history[var][: idx_t_hist].tolist()
+                    idx_t_hist = len(dict_history[var][np.where(dict_history['t_hist']<=last_t)])
+                    dict_restored[var] = dict_history[var][: idx_t_hist+1].tolist()
 
         for var in not_time_dependent_list:
             if var in dict_history.keys():
@@ -751,7 +750,8 @@ class pyecloud_saver:
             'flag_presence_sec_beams':flag_presence_sec_beams,
             'sec_beams_list':sec_beams_list,
             'flag_multiple_clouds':self.flag_multiple_clouds,
-            'cloud_list':cloud_list}
+            'cloud_list':cloud_list,
+            't_last_En_hist':self.t_last_En_hist}
 
             with open(outfile, 'wb') as fid:
                 # use best protocol available
@@ -764,6 +764,7 @@ class pyecloud_saver:
             spacech_ele.PyPICobj.luobj = temp_luobj
 
             print('Save simulation state in: ' + outfile)
+
 
     def _sim_state_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
