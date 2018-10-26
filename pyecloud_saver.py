@@ -222,6 +222,9 @@ class pyecloud_saver:
         # Check for save video electric field
         self._sc_video_save(spacech_ele, beamtim)
 
+        if beamtim.tt_curr == (1.25e-07):
+            pass
+
         # Check for energy and cos angle hist update
         self._energy_and_cos_angle_hist_save(beamtim, impact_man)
 
@@ -435,7 +438,7 @@ class pyecloud_saver:
         dict_history = mlm.obj_to_dict(ob)
 
         idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
-        #idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
+        idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
 
         # Delete everything in Pyecltest.mat recorded after the last checkpoint
         saved_every_timestep_list = ['En_emit_eV_time',
@@ -505,7 +508,6 @@ class pyecloud_saver:
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
-                    idx_t_hist = len(dict_history[var][np.where(dict_history['t_hist']<=last_t)])
                     dict_restored[var] = dict_history[var][: idx_t_hist+1].tolist()
 
         for var in not_time_dependent_list:
@@ -917,7 +919,7 @@ class pyecloud_saver:
     def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
         # Energy histogram saver
         # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
-        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist:
+        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist or np.isclose(beamtim.tt_curr, self.t_last_En_hist+self.Dt_En_hist, rtol=1.e-10, atol=0.0):
             self.En_hist.append(impact_man.En_hist_line.copy())
             self.t_En_hist.append(beamtim.tt_curr)
             impact_man.reset_En_hist_line()
