@@ -485,15 +485,15 @@ class pyecloud_saver:
                                    'sey_test_E_impact_eV',
                                    'sey_test_del_elast_mat',
                                    'sey_test_cos_theta',
-                                   'U_sc_eV'
+                                   'U_sc_eV',
                                    't_sc_video']
 
         should_be_list_list = ['U_sc_eV',
                                'x_el_dens_probes',
                                'y_el_dens_probes',
                                'r_el_dens_probes',
-                               't_sc_video'
-                                ]
+                               't_sc_video']
+        
         dict_restored = {}
         for var in saved_every_timestep_list:
             if var in dict_history.keys():
