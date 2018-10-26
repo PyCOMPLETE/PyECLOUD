@@ -439,6 +439,7 @@ class pyecloud_saver:
 
         idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
         idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
+        idx_t_sc_video = (np.abs(dict_history['t_sc_video'] - last_t)).argmin()
 
         # Delete everything in Pyecltest.mat recorded after the last checkpoint
         saved_every_timestep_list = ['En_emit_eV_time',
@@ -485,15 +486,17 @@ class pyecloud_saver:
                                    'sey_test_E_impact_eV',
                                    'sey_test_del_elast_mat',
                                    'sey_test_cos_theta',
-                                   'U_sc_eV',
-                                   't_sc_video']
+                                   'U_sc_eV'
+                                   ]
 
         should_be_list_list = ['U_sc_eV',
                                'x_el_dens_probes',
                                'y_el_dens_probes',
-                               'r_el_dens_probes',
-                               't_sc_video']
-        
+                               'r_el_dens_probes'
+                               ]
+                               
+        treated_separately_list = ['t_sc_video'] # This list is not used
+
         dict_restored = {}
         for var in saved_every_timestep_list:
             if var in dict_history.keys():
@@ -516,6 +519,10 @@ class pyecloud_saver:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
                     dict_restored[var] = dict_history[var]
+
+        # Treating t_sc_video separately because of different indicies
+        if 't_sc_video' in dict_history.keys():
+            dict_restored['t_sc_video'] = dict_history['t_sc_video'][: idx_t_sc_video+1].tolist()
 
         # Restore this pyecloud_saver object with values from dict_restored
         for var in dict_restored.keys():
