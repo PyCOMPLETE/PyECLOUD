@@ -423,9 +423,10 @@ class pyecloud_saver:
                             sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
 
                 if self.i_checkp>0:
-                    prevpath = outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
-                    os.remove(prevpath)
-                    print('Removed simulation checkpoint in: ' + prevpath)
+                    if self.flag_last_cloud:
+                        prevpath = outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
+                        os.remove(prevpath)
+                        print('Removed simulation checkpoint in: ' + prevpath)
 
                 self.i_checkp += 1
                 self.t_last_checkp = beamtim.tt_curr
@@ -494,7 +495,7 @@ class pyecloud_saver:
                                'y_el_dens_probes',
                                'r_el_dens_probes'
                                ]
-                               
+
         treated_separately_list = ['t_sc_video'] # This list is not used
 
         dict_restored = {}
