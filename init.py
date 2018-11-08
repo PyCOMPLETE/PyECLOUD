@@ -405,6 +405,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
 
+
         # Initial electron density
         if thiscloud.init_unif_flag==1:
             print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
@@ -442,3 +443,4 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             flag_multiple_clouds,
             cloud_list
             )
+
