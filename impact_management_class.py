@@ -64,7 +64,6 @@ class impact_management(object):
         if flag_seg and chamb.chamb_type!='polyg':
                 raise ValueError("""flag_seg can be True only with chamb_type='polyg'!!!!""")
 
-
         self.switch_no_increase_energy = switch_no_increase_energy
         self.chamb = chamb
         self.sey_mod = sey_mod
@@ -235,7 +234,6 @@ class impact_management(object):
                     segi.update_seg_impact(i_found,nel_impact,self.nel_hist_impact_seg)#riga incriminata???
                     segi.update_seg_impact(i_found,nel_impact*E_impact_eV,self.energ_eV_impact_seg)
 
-
                 En_imp_hist=E_impact_eV.copy()
                 En_imp_hist[En_imp_hist>En_hist_max]=En_hist_max
                 histf.compute_hist(En_imp_hist,nel_impact,0.,DEn_hist,self.En_hist_line)
@@ -247,12 +245,10 @@ class impact_management(object):
 
                 self.En_imp_last_step_eV=np.sum(E_impact_eV*nel_impact)
 
-
                 # elastic reflection (only velocities are affected)
                 vx_emit[flag_elast]=vx_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_x[flag_elast]
                 vy_emit[flag_elast]=vy_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_y[flag_elast]
                 vz_emit[flag_elast]=vz_impact[flag_elast]
-
 
                 # true secondary
                 N_true_sec = np.sum(flag_truesec)
@@ -297,7 +293,6 @@ class impact_management(object):
                         if flag_seg:
                             i_found_new_mp[N_mp_old:N_mp_new] = np.repeat(i_found, n_add)
 
-
                 x_mp[flag_impact]  = x_emit
                 y_mp[flag_impact]  = y_emit
                 z_mp[flag_impact]  = z_emit
@@ -327,27 +322,26 @@ class impact_management(object):
                     self.En_emit_last_step_eV += np.sum(En_truesec_eV_add*nel_mp_add)
 
         return MP_e
-    
-    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
-    
-        sey_mod = self.sey_mod
-        
-        nel_impact = 1. + 0.*E_impact_eV_test
 
+    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
+
+        sey_mod = self.sey_mod
+
+        nel_impact = 1. + 0.*E_impact_eV_test
 
         del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         print('Extracting SEY curves...')
         for i_ct, ct in enumerate(cos_theta_test):
-            print('%d/%d'%(i_ct+1, len(cos_theta_test))) 
+            print('%d/%d'%(i_ct+1, len(cos_theta_test)))
             for i_ene, Ene in enumerate(E_impact_eV_test):
-                
-                nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep), 
+
+                nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
                                 E_impact_eV=Ene*np.ones(n_rep), costheta_impact=np.ones(n_rep)*ct, i_impact=np.array(n_rep*[0]))
-                                
+
                 del_true_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_truesec))/float(n_rep)
                 del_elast_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_elast))/float(n_rep)
-        print('Done extracting SEY curves.')       
-        
+        print('Done extracting SEY curves.')
+
         return del_true_mat, del_elast_mat
 

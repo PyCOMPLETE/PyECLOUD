@@ -63,7 +63,6 @@ def update_config_dict(config_dict, module, module_name, verbose=False, default_
     mandatory_parameters = parameters_dict[module_name]['mandatory']
     optional_parameters = parameters_dict[module_name]['optional']
 
-
     for parameter in mandatory_parameters:
 
         value = getattr(module, parameter)

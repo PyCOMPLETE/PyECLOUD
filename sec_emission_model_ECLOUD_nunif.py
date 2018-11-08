@@ -91,11 +91,9 @@ class SEY_model_ECLOUD_non_unif:
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
 
-
             Emax_mp = take(self.Emax_segments, i_impact)
             del_max_mp = take(self.del_max_segments, i_impact)
             R0_mp = take(self.R0_segments, i_impact)
-
 
             yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp, E0=self.E0);
             flag_elast=(rand(len(ref_frac))<ref_frac);

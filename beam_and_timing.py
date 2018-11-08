@@ -72,10 +72,8 @@ def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
             z0=c*(t_offs+ii*b_spac);
             mask_to_be_updated= (np.abs(zz-z0)<(10.*sigmaz))
 
-
             val[mask_to_be_updated]=val[mask_to_be_updated]+ppb/(sigmaz*np.sqrt(2*np.pi))*\
                np.exp(-(zz[mask_to_be_updated]-z0)*(zz[mask_to_be_updated]-z0)/(2*sigmaz*sigmaz));
-
 
     return val
 
@@ -156,7 +154,6 @@ class beam_and_timing:
             if np.max(np.abs(t-t_primary_beam)/Dt)>1e-4:
                 raise ValueError('Time axes provided for primary and secondary beams should be identical!')
 
-
         Nt=len(t)
         lam_t_array=fact_beam*lam_t_array
         lam_t_array=lam_t_array+coast_dens;
@@ -210,7 +207,6 @@ class beam_and_timing:
                 fprog.write("sigmax=%.3e, sigmay=%.3e, Nx=%d, Ny=%d, nimag=%d\n"%(sigmax, sigmay, Nx, Ny, nimag))
                 fprog.close()
 
-
             import BassErsk as BE
             a=chamb.x_aper
             b=chamb.y_aper
@@ -263,13 +259,11 @@ class beam_and_timing:
             if N_min_Dh_main_beam is None:
                 raise ValueError(' N_min_Dh_main_beam MUST be provided for multigrid beam field computation!')
 
-
             import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
             PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh_beam_field, sparse_solver = 'PyKLU')
             import PyPIC.MultiGrid as PIC_MG
             PyPICobj = PIC_MG.AddTelescopicGrids(pic_main = PyPICmain, f_telescope = f_telescope_beam, target_grid = target_grid_beam,
                                         N_nodes_discard = N_nodes_discard_beam, N_min_Dh_main = N_min_Dh_main_beam, sparse_solver = 'PyKLU')
-
 
             # set rho
             # PyPICmain.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(PyPICmain.xn-x_beam_pos)**2/(2.*sigmax**2)-(PyPICmain.yn-y_beam_pos)**2/(2.*sigmay**2))
@@ -286,7 +280,6 @@ class beam_and_timing:
                         *(sspe.erf((pic.yn-y_beam_pos)/(np.sqrt(2)*sigmay) + dh/(2*np.sqrt(2)*sigmay))\
                         - sspe.erf((pic.yn-y_beam_pos)/(np.sqrt(2)*sigmay) - dh/(2*np.sqrt(2)*sigmay)))
 
-
             PyPICobj.solve()
 
             self.PyPIC_state = PyPICobj.get_state_object()
@@ -295,7 +288,6 @@ class beam_and_timing:
             flag_PyPIC_state_mode = True
 
             del(PyPICobj)
-
 
         else:
             print 'Loading beam field map from file:'
@@ -306,7 +298,6 @@ class beam_and_timing:
             Ey_beam=np.squeeze(dict_beam['Ey'].real)
             xx_beam=np.squeeze(dict_beam['xx'].T)
             yy_beam=np.squeeze(dict_beam['yy'].T)
-
 
         if save_beam_field_file_as is not None:
             if flag_PyPIC_state_mode:
@@ -359,7 +350,6 @@ class beam_and_timing:
 
         self.flag_secodary_beam = flag_secodary_beam
 
-
     def next_time_step(self):
         self.ii_curr+=1
         self.tt_curr=self.t[self.ii_curr]
@@ -370,7 +360,6 @@ class beam_and_timing:
 
         if self.flag_new_bunch_pass:
             self._pass_numb_old = self.pass_numb
-
 
     def end_simulation(self):
         return ((self.ii_curr+2)>=self.Nt) # I need the last point to compute Dt

@@ -52,7 +52,7 @@
 class Cloud(object):
     def __init__(self, cloudname, config_dict, MP_e, impact_man, dynamics, pyeclsaver,
                  gas_ion_flag, resgasion, t_ion, photoem_flag, phemiss, rho):
-        
+
         self.name = cloudname
         self.config_dict = config_dict
         self.MP_e = MP_e

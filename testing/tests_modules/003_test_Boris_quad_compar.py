@@ -94,8 +94,6 @@ vz_mpB=array([223792.460031])
 #===============================================================================
 
 
-
-
 dynamicsB=dynB.pusher_Boris(Dt, 0., B, 0.,
                             B_map_file, fact_Bmap, None,N_sub_steps=N_sub_steps)
 
@@ -127,8 +125,6 @@ MP_eB=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
 MP_eg=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                        N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                        Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
-
-
 
 
 MP_eB.x_mp = x_mpB.copy()
@@ -175,8 +171,6 @@ for ii in range(N_steps):
 
     MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
     MP_eg = dynamicsGen.step(MP_eg,Ex_n[0:N_mp],Ey_n[0:N_mp])
-
-
 
 
 x_lisB=array(x_lisB)

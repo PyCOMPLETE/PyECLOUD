@@ -75,20 +75,20 @@ ecloud_list = []
 for ele in machine.one_turn_map:
 	new_one_turn_map.append(ele)
 	if ele in machine.transverse_map:
-		new_ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer, 
+		new_ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer,
 						Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 						x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 						init_unif_edens_flag=init_unif_edens_flag,
-						init_unif_edens=init_unif_edens, 
+						init_unif_edens=init_unif_edens,
 						N_mp_max=N_mp_max,
 						nel_mp_ref_0=nel_mp_ref_0,
 						B_multip=B_multip, slice_by_slice_mode=True)
 		new_one_turn_map.append(new_ecloud)
 		ecloud_list.append(new_ecloud)
-		
+
 machine.one_turn_map = new_one_turn_map
-				
-# generate a bunch 
+
+# generate a bunch
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=30000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 # replace first particles with HEADTAIL ones
@@ -112,22 +112,19 @@ rms_err_y_list = []
 # pl.show()
 
 
-
 for ii in xrange(N_turns-1):
 	slices_list = bunch.extract_slices(slicer)
-	
+
 	for slice_obj in slices_list[::-1]:
 		machine.track(slice_obj)#, verbose = True)
 	print 'Turn', ii
-	
-	
+
 	bunch = sum(slices_list)
-	
+
 	machine.longitudinal_map.track(bunch)
-	
+
 	for ec in ecloud_list:
 		ec.finalize_and_reinitialize()
-	
 
 	# id and momenta after track
 	id_after = bunch.id[bunch.id<=n_part_per_turn]
@@ -182,18 +179,17 @@ for ii in xrange(N_turns-1):
 	pl.ylabel('Occurrences')
 	rms_err_y = np.std(100*np.abs((yp_after-yp_before)-(yp[ii+1, :]-yp[0, :]))/np.std(yp[ii+1, :]-yp[0, :]))
 
-
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(ii, rms_err_x, rms_err_y))
 
 	pl.savefig(filename.split('_prb.dat')[0]+'_slicebyslice_%02d.png'%ii, dpi=150)
 
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
-	
+
 	pl.ion()
 	pl.draw()
 	time.sleep(1.)
-	
+
 pl.figure(1000)
 pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
 pl.plot(rms_err_y_list, '.-', markersize = 10, linewidth=2, label='y')

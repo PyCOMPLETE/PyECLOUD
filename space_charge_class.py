@@ -112,12 +112,10 @@ class space_charge:
         self.Nyg = self.PyPICobj.Nyg
         self.bias_y = self.PyPICobj.bias_y
 
-
         self.Dt_sc = Dt_sc
         self.t_last_recom=0.;
 
         self.U_sc_eV_stp = 0.
-
 
         self.flag_decimate=(self.Dt_sc is not None)
         self.last_recomputation_check=False
@@ -139,18 +137,18 @@ class space_charge:
     @property
     def efy(self):
         return self.PyPICobj.efy
-        
+
     def check_for_recomputation(self, t_curr=None):
         flag_recompute=True
-        
+
         if self.flag_decimate:
             flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
-        
+
         if flag_recompute:
             self.t_last_recom = t_curr
-            
+
         self.last_recomputation_check = flag_recompute
-        
+
         return flag_recompute
 
     #@profile

@@ -49,9 +49,6 @@
 #-End-preamble---------------------------------------------------------
 
 
-
-
-
 from __future__ import division, print_function
 import os
 
@@ -83,7 +80,7 @@ class SEY_model_from_file(object):
             print('Secondary emission from file %s' % sey_file_real)
 
             sey_properties = sio.loadmat(sey_file)
-        
+
         energy_eV = sey_properties['energy_eV'].squeeze()
         sey_true = sey_properties['sey_true'].squeeze()
         sey_elast = sey_properties['sey_elast'].squeeze()
@@ -101,7 +98,6 @@ class SEY_model_from_file(object):
         # A 0 is appended because this last element is never needed but the array must have the correct shape
         self.sey_true_diff = np.append(np.diff(sey_true), 0.)
         self.sey_elast_diff = np.append(np.diff(sey_elast), 0.)
-        
 
         # This merely populates the object namespace
         self.energy_eV              = energy_eV
@@ -117,50 +113,46 @@ class SEY_model_from_file(object):
         self.extrapolate_const_true = extrapolate_const_true
         self.extrapolate_grad_elast  = extrapolate_grad_elast
         self.extrapolate_const_elast = extrapolate_const_elast
-        
+
     def SEY_values(self, E_impact_eV, costheta_impact):
-        
+
         delta_true = np.zeros_like(E_impact_eV, dtype=float)
-        delta_elast= np.zeros_like(E_impact_eV, dtype=float) 
-        
+        delta_elast= np.zeros_like(E_impact_eV, dtype=float)
+
         mask_fit = (E_impact_eV > self.energy_eV_max)
         mask_regular = ~mask_fit
-            
+
         delta_true[mask_regular], delta_elast[mask_regular] = self.interp(E_impact_eV[mask_regular])
         delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV[mask_fit]
         delta_elast[mask_fit] = self.extrapolate_const_elast + self.extrapolate_grad_elast * E_impact_eV[mask_fit]
-        
-
 
         if self.flag_costheta_Emax_shift:
             # recompute Delta True
             E_impact_eV_scaled = E_impact_eV/(1.+0.7*(1.-costheta_impact))
-    
+
             mask_fit = (E_impact_eV_scaled > self.energy_eV_max)
             mask_regular = ~mask_fit
-            
+
             delta_true[mask_regular], _ = self.interp(E_impact_eV_scaled[mask_regular])
             delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV_scaled[mask_fit]
-        
-        
+
         if self.flag_costheta_delta_scale:
             factor_costheta = np.exp(0.5*(1.-costheta_impact))
             delta_true *= factor_costheta
-        
+
         delta_true[delta_true<1e-10] = 0. # We get rid of negative values
         delta_elast[delta_elast<1e-10] = 0. # We get rid of negative values
-        
+
         delta = delta_true + delta_elast
-        
+
         ref_frac=0.*delta
         mask_non_zero=(delta>0)
         ref_frac[mask_non_zero]=delta_elast[mask_non_zero]/delta[mask_non_zero]
-        
+
         return delta, ref_frac
-        
 
     def SEY_process(self, nel_impact,E_impact_eV, costheta_impact, i_impact):
-        
+
         yiel, ref_frac = self.SEY_values(E_impact_eV, costheta_impact)
         flag_elast=(rand(len(ref_frac))<ref_frac);
         flag_truesec=~(flag_elast);

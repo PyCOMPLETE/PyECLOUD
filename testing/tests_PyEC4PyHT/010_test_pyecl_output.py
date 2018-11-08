@@ -4,7 +4,7 @@ sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 from scipy.constants import c, e, m_p
 import numpy as np
-import pylab as pl				
+import pylab as pl
 import myfilemanager as mlm
 import PyECLOUD.mystyle as ms
 
@@ -33,18 +33,17 @@ bunch = machine.generate_6D_Gaussian_bunch(
                                         n_macroparticles=3000000, intensity=1e11,
                                         epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=sigma_z)
 
-             
+
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 slicer = UniformBinSlicer(n_slices = n_slices, z_cuts=(-z_cut, z_cut) )
 
 x_beam_offset = 0.
 y_beam_offset = 0.
-                 
 
 
-import PyECLOUD.PyEC4PyHT as PyEC4PyHT                        
+import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 
-        
+
 ecloud_multigrid = PyEC4PyHT.Ecloud(
         L_ecloud=L_ecloud, slicer=slicer,
         Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config_LHC',
@@ -68,7 +67,7 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         save_pyecl_outp_as = 'test_saving',
         Dt = 25e-12,#needed for saving
         )
-        
+
 print 'Track_bunch'
 ecloud_multigrid.track(bunch)
 print 'Done.'

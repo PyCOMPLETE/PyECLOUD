@@ -60,7 +60,6 @@ except OSError as err:
     print err
 
 
-
 myfontsz = 10
 ms.mystyle_arial(fontsz=myfontsz)
 
@@ -77,7 +76,6 @@ out_var_curr.sort()
 n_pass = 5  # reference passage
 
 
-
 print'Curr Variables are:'
 for variab in out_var_curr:
     print variab, dict_curr[variab].shape
@@ -88,9 +86,7 @@ for ii,k in enumerate(out_var_curr):
         print('Skipped %s' % k)
         continue
 
-
     if len(dict_curr[k].shape)==1:  # var is a vector!
-
 
         #Plot vector for the current simulation
         fig=pl.figure(ii)
@@ -100,38 +96,27 @@ for ii,k in enumerate(out_var_curr):
         pl.plot(dict_curr[k],'b', label='curr_sim')
         print ii,k,'curr_sim'
 
-
-
         if (k in out_var_ref) and (dict_ref[k].shape!=()):
-
 
             #Plot vector for the reference simulation
             pl.plot(dict_ref[k],'--r', label='ref_sim')
             print ii,k,'ref_sim'
 
-
         else:
             print '%s not  in reference'%k
-
-
 
         pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
         ms.sciy()
         pl.suptitle(sim_folder)
         pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
-
-
-
     elif len(dict_curr[k].shape)==2:  # var is a matrix!!!!!!!!!!!!!!!!!
-
 
         fig=pl.figure(ii)
         pl.subplots_adjust(top=1.2)
         pl.suptitle(out_var_curr[ii], fontsize=myfontsz)
         gs1 = gridspec.GridSpec(2, 1)
         gs2 = gridspec.GridSpec(3, 1)
-
 
         #Plot matrix for the current simulation
         sp1 = fig.add_subplot(gs1[0])
@@ -158,7 +143,6 @@ for ii,k in enumerate(out_var_curr):
             sp3.tick_params(labelsize=10)
             ms.sciy()
 
-
             #Plot number of e- for each slice
             sp4=fig.add_subplot(gs2[1])
             sp4.plot(np.sum(dict_curr[k], axis=0),'b', label='curr_sim')
@@ -166,7 +150,6 @@ for ii,k in enumerate(out_var_curr):
             #~ sp4.set_title('e- per slice')
             sp4.tick_params(labelsize=10)
             ms.sciy()
-
 
             #Plot number of e- for each passage
             sp5=fig.add_subplot(gs2[2])
@@ -178,15 +161,12 @@ for ii,k in enumerate(out_var_curr):
 
             gs2.tight_layout(fig,rect=[0.45, 0, 1, 1],pad=1.08, h_pad=0.5)
 
-
         except IOError as goterror:
                     print 'Skipped. Got:',  goterror
         except IndexError as goterror:
             print 'Skipped. Got:',  goterror
 
-
         if (k in out_var_ref) and  (dict_ref[k].shape!=()):
-
 
             #Plot matrix for the reference simulation
             sp2= fig.add_subplot(gs1[1])
@@ -204,12 +184,11 @@ for ii,k in enumerate(out_var_curr):
                 ind_in_mat = n_pass
                 if k.startswith('sey_test_'):
                     ind_in_mat = 3
-                
+
                 #Plot number of e- for the reference passage
                 sp3.plot(dict_ref[k][ind_in_mat],'--r', label='ref_sim')
                 sp3.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
-
 
                 #Plot number of e- for each slice
                 sp4.plot(np.sum(dict_ref[k], axis=0),'--r', label='ref_sim')
@@ -229,16 +208,13 @@ for ii,k in enumerate(out_var_curr):
         else:
             print '%s not  in reference'%k
 
-
-
-
         gs1.tight_layout(fig,rect=[0, 0, 0.45, 1],pad=1.08)
         top = 0.9
         bottom = max(gs1.bottom, gs2.bottom)
 
         gs1.update(top=top, bottom=bottom)
         gs2.update(top=top, bottom=bottom)
-        
+
         pl.suptitle(sim_folder)
         pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 

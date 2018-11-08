@@ -67,9 +67,7 @@ def yield_fun3(E,costheta,Emax,del_max,R0,E0):
 
     ref_frac=del_reflected/delta;
 
-
     return del_true_sec, del_reflected, ref_frac
-
 
 
 class SEY_model_acc_low_ene:
@@ -87,7 +85,6 @@ class SEY_model_acc_low_ene:
 
             flag_elast=(rand(len(ref_prob))<ref_prob);
             flag_truesec=~(flag_elast);
-
 
             nel_emit=nel_impact;
             nel_emit[flag_truesec]=nel_impact[flag_truesec]*beta_ts[flag_truesec];

@@ -22,7 +22,7 @@ mksize = 7
 ip = 258
 pl.figure(figsize=(7.5,10))
 sp3 = pl.subplot(2,1,1)
-pl.plot(pyhdtl['mean_x'][::-1,ip], '.-', markersize = mksize) 
+pl.plot(pyhdtl['mean_x'][::-1,ip], '.-', markersize = mksize)
 pl.gca().ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 pl.ylabel('Horizontal centroid position\n [m]')
 pl.xlabel('Bunch nr')
@@ -30,7 +30,7 @@ pl.xlim(0,156)
 pl.title(('Bunch train at IP %d')%(ip))
 
 sp4 = pl.subplot(2,1,2, sharex=sp3, sharey=sp3)
-pl.plot(pyhdtl['mean_y'][::-1,ip], '.-', markersize = mksize) 
+pl.plot(pyhdtl['mean_y'][::-1,ip], '.-', markersize = mksize)
 pl.gca().ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 pl.ylabel('Vertical centroid position\n [m]')
 pl.xlabel('Bunch nr')

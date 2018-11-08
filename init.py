@@ -258,8 +258,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                             f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
 
-
-
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
     for cloud_par in cloud_par_list:
@@ -296,7 +294,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                     kwargs_secem.update({'s':thiscloud.s_param})
                 else:
                     raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
-
 
             if thiscloud.switch_model in (0, 'ECLOUD'):
                 kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
@@ -367,7 +364,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             phemiss = None
 
-
         # Real saver init
         if not skip_pyeclsaver:
             flag_last_cloud = cloud_par is cloud_par_list[-1]
@@ -408,7 +404,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
-
 
         # Initial electron density
         if thiscloud.init_unif_flag==1:

@@ -42,7 +42,6 @@ except OSError as err:
     print err
 
 
-
 myfontsz = 10
 titlesz = 10
 labelsz = 10
@@ -64,7 +63,7 @@ out_var_curr.sort()
 
 n_pass = 29  # reference passage
 
-var_no_sum_list = ['En_g_hist', 'lam_t_array', 'N_mp_corrected_pass', 'N_mp_impact_pass', 'N_mp_ref_pass', 'sey_test_cos_theta', 'sey_test_del_elast_mat', 
+var_no_sum_list = ['En_g_hist', 'lam_t_array', 'N_mp_corrected_pass', 'N_mp_impact_pass', 'N_mp_ref_pass', 'sey_test_cos_theta', 'sey_test_del_elast_mat',
                    'sey_test_del_true_mat', 'sey_test_E_impact_eV', 't', 't_En_hist', 't_hist', 't_sc_video', 'xg_hist', 'xg_hist_cos_angle', 'U_sc_eV']
 
 print'Curr Variables are:'
@@ -77,15 +76,12 @@ for ii,k in enumerate(out_var_curr):
         print('Skipped %s' % k)
         continue
 
-
     if len(dict_curr_list[0][k].shape)==1:  # var is a vector!
-
 
         fig=pl.figure(ii)
         fig.patch.set_facecolor('w')
         pl.subplots_adjust(right=0.75)
         pl.title(out_var_curr[ii], fontsize=titlesz)
-
 
         #Plot vector for the current simulation
         out_var_curr_tot = dict_curr_list[0][k]*0
@@ -96,7 +92,6 @@ for ii,k in enumerate(out_var_curr):
         if out_var_curr[ii] not in var_no_sum_list:
             pl.plot(out_var_curr_tot,'b', label='curr_sim')
 
-
         #Plot vector for the reference simulation
         if (k in out_var_ref) and (dict_ref[k].shape!=()):
 
@@ -106,16 +101,11 @@ for ii,k in enumerate(out_var_curr):
         else:
             print '%s not  in reference'%k
 
-
         pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
         ms.sciy()
         pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
-
-
-
     elif len(dict_curr[k].shape)==2:  # var is a matrix!!!!!!!!!!!!!!!!!
-
 
         fig=pl.figure(ii)
         fig.patch.set_facecolor('w')
@@ -123,7 +113,6 @@ for ii,k in enumerate(out_var_curr):
         pl.suptitle(out_var_curr[ii], fontsize=titlesz)
         gs1 = gridspec.GridSpec(2, 1)
         gs2 = gridspec.GridSpec(3, 1)
-
 
         #Plot matrix for the current simulation
         sp1 = fig.add_subplot(gs1[0])
@@ -159,7 +148,6 @@ for ii,k in enumerate(out_var_curr):
             sp3.tick_params(labelsize=labelsz)
             ms.sciy()
 
-
             #Plot number of e- for each slice
             sp4=fig.add_subplot(gs2[1])
             out_var_curr_tot = dict_curr[k]*0
@@ -173,7 +161,6 @@ for ii,k in enumerate(out_var_curr):
             sp4.set_title('e- per slice', fontsize=titlesz)
             sp4.tick_params(labelsize=labelsz)
             ms.sciy()
-
 
             #Plot number of e- for each passage
             sp5=fig.add_subplot(gs2[2])
@@ -191,13 +178,10 @@ for ii,k in enumerate(out_var_curr):
 
             gs2.tight_layout(fig,rect=[0.45, 0, 1, 1],pad=1.08, h_pad=0.5)
 
-
         except IOError as goterror:
             print 'Skipped. Got:',  goterror
         except IndexError as goterror:
             print 'Skipped. Got:',  goterror
-
-
 
         if (k in out_var_ref) and  (dict_ref[k].shape!=()):
 
@@ -223,7 +207,6 @@ for ii,k in enumerate(out_var_curr):
                 sp3.legend(prop={'size':myfontsz},  loc='best')
                 ms.sciy()
 
-
                 #Plot number of e- for each slice
                 sp4.plot(np.sum(dict_ref[k], axis=0),'r', label='ref_sim')
                 sp4.legend(prop={'size':myfontsz},  loc='best')
@@ -243,8 +226,6 @@ for ii,k in enumerate(out_var_curr):
 
         else:
             print '%s not  in reference'%k
-
-
 
         gs1.tight_layout(fig,rect=[0, 0, 0.45, 1],pad=1.08)
         top = 0.9

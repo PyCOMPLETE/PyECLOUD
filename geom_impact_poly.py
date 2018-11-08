@@ -49,7 +49,6 @@
 #-End-preamble---------------------------------------------------------
 
 
-
 from numpy import squeeze, array,diff, max, sum, sqrt,\
                   logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
 import scipy.io as sio
@@ -151,7 +150,6 @@ class polyg_cham_geom_object:
 
         self.N_mp_impact=self.N_mp_impact+N_impacts
 
-
         for ii in xrange(self.N_edg):
             t_curr = (self.Nx[ii]*(self.Vx[ii]-x_in)+self.Ny[ii]*(self.Vy[ii]-y_in)) / \
                              (self.Nx[ii]*(x_out-x_in)+self.Ny[ii]*(y_out-y_in))
@@ -168,7 +166,6 @@ class polyg_cham_geom_object:
                          ((y_out[mask_same_min]-y_in[mask_same_min])*(self.Vx[ii+1]-self.Vx[ii])+(x_in[mask_same_min]-x_out[mask_same_min])*(self.Vy[ii+1]-self.Vy[ii]))
                 mask_upd_i_found[mask_same_min] = logical_and(t_border>=0., t_border<=1.)
                 i_found[mask_upd_i_found]=ii
-
 
         t_min=resc_fac*t_min;
         x_int=t_min*x_out+(1.-t_min)*x_in;
@@ -203,7 +200,6 @@ class polyg_cham_geom_object:
             Nx_int[mask_not_found]=Nx_corr
             Ny_int[mask_not_found]=Ny_corr
 
-
             x_in_error = x_in[mask_not_found]
             y_in_error = y_in[mask_not_found]
             x_out_error = x_out[mask_not_found]
@@ -224,9 +220,6 @@ class polyg_cham_geom_object:
                     for i_err in xrange(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         fbckt.write('1,'+lcurr+'\n')
-
-
-
 
         if flag_robust:
             flag_impact=self.is_outside(x_int, y_int)
@@ -287,9 +280,7 @@ class polyg_cham_geom_object:
                             lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('3,'+lcurr+'\n')
 
-
                 raise ValueError('Outside after backtracking!!!!')
-
 
         return  x_int,y_int,z_int,Nx_int,Ny_int, i_found
 

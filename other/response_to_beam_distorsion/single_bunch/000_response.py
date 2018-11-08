@@ -17,15 +17,14 @@ machine = LHC(n_segments = 1, machine_configuration = machine_configuration)
 
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000,
                 intensity=1.15e11, epsn_x=2.5e-6, epsn_y=2.5e-6, sigma_z=0.11)
-                
+
 bunch.x[bunch.z<5e-2] += 1e-3
-                
-                
+
 
 ecloud_ele = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
-            L_ecloud=1., slicer=None, 
+            L_ecloud=1., slicer=None,
             Dt_ref=25e-12, pyecl_input_folder='pyecloud_config',
-       ) 
+       )
 
 
 n_slices = 150
@@ -33,7 +32,7 @@ z_cut = 2.5e-9/2*clight
 
 slicer = UniformBinSlicer(n_slices = n_slices, z_cuts=(-z_cut, z_cut))
 slices_list_for_map = bunch.extract_slices(slicer)
-        
+
 ecloud_ele.save_ele_distributions_last_track = True
 ecloud_ele.save_ele_field = True
 ecloud_ele._reinitialize()
@@ -44,7 +43,7 @@ z_centers = []
 for ss in slices_list_for_map[::-1]:
     z_centers.append(ss.slice_info['z_bin_center'])
     ecloud_ele.track(ss)
-    
+
 ecloud_ele._finalize()
 
 

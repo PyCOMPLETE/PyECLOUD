@@ -3,13 +3,13 @@ sys.path.append('../../../')
 
 import numpy as np
 
-input_fol = "../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/" 
+input_fol = "../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/"
 
 import PyECLOUD.parse_beam_file as pbf
 
 # bp = pbf.beam_descr_from_fil(input_fol+'/beam.beam', 1., 1., 1., 1.)
 
-# 
+#
 sigmaz = 1.000000e-09/4.*299792458.
 t_offs = 2.5e-9
 filling_pattern = 1*(30*[1.]+5*[0])
@@ -18,7 +18,7 @@ b_spac = 25e-9
 t_end=1e-9;
 
 
-# Parameters of the non-unif 
+# Parameters of the non-unif
 Dt = 2.500000e-11
 Dt_coarse = Dt
 refine_fact = 4.
@@ -26,7 +26,7 @@ t_start_refine = 0.
 t_end_refine = 5e-9
 label = ''
 
-# Parameters of the non-unif 
+# Parameters of the non-unif
 Dt = 2.500000e-11/4
 Dt_coarse = Dt
 refine_fact = 3.
@@ -53,7 +53,7 @@ for i_step, t_step in enumerate(t_coarse):
 t_fine_add_single = np.array(t_fine_add_single)
 
 t_fine_add = []
-for ii in range(0,N_slots): 
+for ii in range(0,N_slots):
 	t_fine_add += list(t_fine_add_single + b_spac*ii)
 
 t_nunif = np.array(sorted(list(t_coarse)+t_fine_add))
@@ -61,9 +61,6 @@ t_nunif = np.array(sorted(list(t_coarse)+t_fine_add))
 c=299792458.;
 zz=c*t;
 val=0.*t;
-
-
-
 
 
 for ii in range(0,N_slots):
@@ -75,7 +72,6 @@ for ii in range(0,N_slots):
     if sigmaz>0:
         z0=c*(t_offs+ii*b_spac);
         mask_to_be_updated= (np.abs(zz-z0)<(10.*sigmaz))
-
 
         val[mask_to_be_updated]=val[mask_to_be_updated]+ppb/(sigmaz*np.sqrt(2*np.pi))*\
            np.exp(-(zz[mask_to_be_updated]-z0)*(zz[mask_to_be_updated]-z0)/(2*sigmaz*sigmaz));

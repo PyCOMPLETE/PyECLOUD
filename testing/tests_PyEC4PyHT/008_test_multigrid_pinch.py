@@ -4,7 +4,7 @@ sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 from scipy.constants import c, e, m_p
 import numpy as np
-import pylab as pl				
+import pylab as pl
 import myfilemanager as mlm
 import PyECLOUD.mystyle as ms
 
@@ -33,7 +33,7 @@ bunch = machine.generate_6D_Gaussian_bunch(
                                         n_macroparticles=3000000, intensity=1e11,
                                         epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=sigma_z)
 
-             
+
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 slicer = UniformBinSlicer(n_slices = n_slices, z_cuts=(-z_cut, z_cut) )
 
@@ -50,11 +50,11 @@ probes_position = [{'x' : x_beam_offset, 'y': y_beam_offset+Dy_probe},
                     {'x' : x_beam_offset, 'y': y_beam_offset-(2*Dy_probe)},
                     {'x' : x_beam_offset+(2*Dx_probe), 'y': y_beam_offset},
                     {'x' : x_beam_offset-(2*Dx_probe), 'y': y_beam_offset}]
-                    
+
 
 n_probes = len(probes_position)
 
-import PyECLOUD.PyEC4PyHT as PyEC4PyHT                        
+import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 ecloud_singlegrid = PyEC4PyHT.Ecloud(
         L_ecloud=L_ecloud, slicer=slicer,
         Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config_LHC',
@@ -69,7 +69,7 @@ ecloud_singlegrid = PyEC4PyHT.Ecloud(
         y_beam_offset = y_beam_offset,
         probes_position = probes_position,
         sparse_solver = sparse_solver)
-        
+
 ecloud_multigrid = PyEC4PyHT.Ecloud(
         L_ecloud=L_ecloud, slicer=slicer,
         Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config_LHC',
@@ -91,29 +91,28 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         y_beam_offset = y_beam_offset,
         probes_position = probes_position,
         sparse_solver = sparse_solver)
-     
-     
-# Singlegrid tracking time 
+
+
+# Singlegrid tracking time
 import time
 N_rep_test = 1
 print 'Ecloud track %d times'%N_rep_test
 t_start_sw = time.mktime(time.localtime())
 for _ in xrange(N_rep_test):
-    ecloud_singlegrid.track(bunch) 
+    ecloud_singlegrid.track(bunch)
 t_stop_sw = time.mktime(time.localtime())
 t_sw_single = t_stop_sw-t_start_sw
-print 'Singlegrid tracking time ', t_sw_single /N_rep_test 
-# Multigrid tracking time 
+print 'Singlegrid tracking time ', t_sw_single /N_rep_test
+# Multigrid tracking time
 print 'Ecloud track %d times'%N_rep_test
 t_start_sw = time.mktime(time.localtime())
 for _ in xrange(N_rep_test):
-    ecloud_multigrid.track(bunch) 
+    ecloud_multigrid.track(bunch)
 t_stop_sw = time.mktime(time.localtime())
 t_sw_single = t_stop_sw-t_start_sw
-print 'Multigrid tracking time ', t_sw_single /N_rep_test 
+print 'Multigrid tracking time ', t_sw_single /N_rep_test
 
 
-                    
 slices = bunch.get_slices(ecloud_singlegrid.slicer)
 
 
@@ -122,7 +121,7 @@ pl.close('all')
 pic_singlegrid = ecloud_singlegrid.spacech_ele.PyPICobj
 pic_multigrid = ecloud_multigrid.spacech_ele.PyPICobj
 
-# Plot field at probes 
+# Plot field at probes
 import matplotlib.gridspec as gridspec
 fig = pl.figure(1, figsize=(7,8))
 fig.patch.set_facecolor('w')
@@ -131,7 +130,7 @@ gs2 = gridspec.GridSpec(2, 1)
 
 
 sp1 = fig.add_subplot(gs1[0])
-obcham =  mlm.myloadmat_to_obj( 'LHC_chm_ver.mat') 	
+obcham =  mlm.myloadmat_to_obj( 'LHC_chm_ver.mat')
 sp1.plot(obcham.Vx*1e3, obcham.Vy*1e3, 'b')
 sp1.plot(ecloud_singlegrid.x_probes*1e3, ecloud_singlegrid.y_probes*1e3, 'or', markersize=3)
 sp1.plot(x_beam_offset, y_beam_offset, '*k', markersize=4)
@@ -146,9 +145,9 @@ sp1.grid('on')
 
 
 sp2 = fig.add_subplot(gs2[0])
-sp2.plot(np.array(n_probes*list(slices.z_centers))*1e2, 
+sp2.plot(np.array(n_probes*list(slices.z_centers))*1e2,
     ecloud_singlegrid.Ex_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
-sp2.plot(np.array(n_probes*list(slices.z_centers))*1e2, 
+sp2.plot(np.array(n_probes*list(slices.z_centers))*1e2,
     ecloud_multigrid.Ex_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
 sp2.set_ylabel('Ex at probes [V/m]')
 sp2.set_xlabel('z [cm]')
@@ -157,7 +156,7 @@ sp2.legend(loc='best')
 ms.sciy()
 
 sp3 = fig.add_subplot(gs2[1])
-sp3.plot(np.array(n_probes*list(slices.z_centers))*1e2, 
+sp3.plot(np.array(n_probes*list(slices.z_centers))*1e2,
     ecloud_singlegrid.Ey_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
 sp3.plot(np.array(n_probes*list(slices.z_centers))*1e2,
     ecloud_multigrid.Ey_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
@@ -171,10 +170,9 @@ gs1.tight_layout(fig, rect=[0.25, 0.6, 0.75, 0.98], pad=1.08, h_pad=.9)     #[le
 gs2.tight_layout(fig, rect=[0, 0, 1, 0.65], pad=1.08, h_pad=.9)     #[left, bottom, right, top]
 
 
-
 ########################
 #plot field maps last slice
-########################    
+########################
 
 #probes for map
 Dh_test = .5e-4
@@ -187,20 +185,20 @@ xn=xn.flatten()
 yn=yn.T
 yn=yn.flatten()
 
-#pic gather field 
-Ex_singlegrid_n, Ey_singlegrid_n = pic_singlegrid.gather(xn, yn)	
+#pic gather field
+Ex_singlegrid_n, Ey_singlegrid_n = pic_singlegrid.gather(xn, yn)
 Ex_singlegrid_matrix=np.reshape(Ex_singlegrid_n,(len(y_grid_probes),len(x_grid_probes)), 'F').T
 Ey_singlegrid_matrix=np.reshape(Ey_singlegrid_n,(len(y_grid_probes),len(x_grid_probes)), 'F').T
 
-Ex_multigrid_n, Ey_multigrid_n = pic_multigrid.gather(xn, yn)	
+Ex_multigrid_n, Ey_multigrid_n = pic_multigrid.gather(xn, yn)
 Ex_multigrid_matrix=np.reshape(Ex_multigrid_n,(len(y_grid_probes),len(x_grid_probes)), 'F').T
 Ey_multigrid_matrix=np.reshape(Ey_multigrid_n,(len(y_grid_probes),len(x_grid_probes)), 'F').T
 
-#pic gather rho 
-rho_multigrid_n = pic_multigrid.gather_rho(xn, yn)	
+#pic gather rho
+rho_multigrid_n = pic_multigrid.gather_rho(xn, yn)
 rho_multigrid_matrix=np.reshape(rho_multigrid_n,(len(y_grid_probes),len(x_grid_probes)), 'F').T
 
-rho_singlegrid_n = pic_singlegrid.gather_rho(xn, yn)	
+rho_singlegrid_n = pic_singlegrid.gather_rho(xn, yn)
 rho_singlegrid_matrix=np.reshape(rho_singlegrid_n,(len(y_grid_probes),len(x_grid_probes)), 'F').T
 
 #plot
@@ -208,7 +206,7 @@ vmin = -7; vmax = -2
 pl.figure(2, figsize=(16, 9)).patch.set_facecolor('w')
 pl.subplots_adjust(hspace = 0.5, wspace = 0.3, left=.07, right=.95)
 sp1 = pl.subplot(2,3,1)
-pl.pcolormesh(x_grid_probes, y_grid_probes, 
+pl.pcolormesh(x_grid_probes, y_grid_probes,
 	np.log10(np.sqrt(Ex_singlegrid_matrix**2+Ey_singlegrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -219,12 +217,12 @@ cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('E [V/m]')
 pl.title('Singlegrid electric field', y=1.08)
-sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
 sp1.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
 
 sp2 = pl.subplot(2,3,4, sharex=sp1, sharey=sp1)
-pl.pcolormesh(x_grid_probes, y_grid_probes, 
+pl.pcolormesh(x_grid_probes, y_grid_probes,
 	np.log10(np.sqrt(Ex_multigrid_matrix**2+Ey_multigrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -235,13 +233,12 @@ cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('E [V/m]')
 pl.title('Multigrid electric field', y=1.08)
-sp2.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp2.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
 sp2.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
 
-
 sp3 = pl.subplot(2,3,2)
-pl.pcolormesh(x_grid_probes, y_grid_probes, 
+pl.pcolormesh(x_grid_probes, y_grid_probes,
 	Ex_singlegrid_matrix.T)#, vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -252,11 +249,11 @@ cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('E [V/m]')
 pl.title('Singlegrid electric field', y=1.08)
-sp3.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp3.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
 sp3.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
 sp4 = pl.subplot(2,3,5, sharex=sp1, sharey=sp1)
-pl.pcolormesh(x_grid_probes, y_grid_probes, 
+pl.pcolormesh(x_grid_probes, y_grid_probes,
 	Ex_multigrid_matrix.T)#, vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -267,7 +264,7 @@ cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('E [V/m]')
 pl.title('Multigrid electric field', y=1.08)
-sp4.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp4.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
 sp4.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
 sp5 = pl.subplot(2,3,3, sharex=sp1, sharey=sp1)
@@ -281,7 +278,7 @@ cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('Rho')
 pl.title('Singlegrid distribution', y=1.08)
-sp5.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp5.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
 sp5.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
 
 sp6 = pl.subplot(2,3,6, sharex=sp1, sharey=sp1)
@@ -295,10 +292,8 @@ cb.formatter.set_powerlimits((0, 0))
 cb.update_ticks()
 cb.set_label('Rho')
 pl.title('Multigrid distribution', y=1.08)
-sp6.ticklabel_format(style='sci', scilimits=(0,0),axis='x') 
+sp6.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
 sp6.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
-
-
 
 
 pl.show()

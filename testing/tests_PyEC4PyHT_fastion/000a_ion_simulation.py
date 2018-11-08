@@ -21,7 +21,7 @@ init_unif_edens = None
 
 # rest gas parameters
 gas_ion_flag = 1
-unif_frac = 0. 
+unif_frac = 0.
 P_nTorr = 20.
 sigma_ion_MBarn = 1.5
 Temp_K = 300.
@@ -78,13 +78,13 @@ print 'Initializing', n_bunches, 'bunches, of', n_macroparticles, 'macroparticle
 bunches = []
 for i_bun in xrange(n_bunches):
     print 'Bunch', i_bun
-    bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=n_macroparticles, intensity=intensity, 
+    bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=n_macroparticles, intensity=intensity,
                                                    epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=sigma_z)
     bunch.z -= machine.circumference/machine.longitudinal_map.harmonics[0]*i_bun
-    
+
     print 'Bunch centroid at', bunch.mean_x(), bunch.mean_y(), bunch.mean_z()
     bunches.append(bunch)
-    
+
 beam = sum(bunches)
 
 
@@ -110,7 +110,7 @@ machine.buncher.add_statistics(sliceset=bunch_slots, beam=beam, statistics=True)
 
 mask_filled_slots = bunch_slots.n_macroparticles_per_slice > 0
 n_filled_slots = np.sum(mask_filled_slots)
-z_cuts_filled_slots = (np.min(bunch_slots.z_bins[mask_filled_slots]), 
+z_cuts_filled_slots = (np.min(bunch_slots.z_bins[mask_filled_slots]),
                        np.max(bunch_slots.z_bins[np.append(mask_filled_slots, True)]))
 
 bunch_slicer = UniformBinSlicer(n_filled_slots, z_cuts=z_cuts_filled_slots)
@@ -118,30 +118,30 @@ bunch_slices = beam.get_slices(bunch_slicer)
 bunch_slicer.add_statistics(sliceset=bunch_slices, beam=beam, statistics=True)
 
 
-# define a beam monitor 
+# define a beam monitor
 from PyHEADTAIL.monitors.monitors import SliceMonitor
-beam_monitor = SliceMonitor(filename='bunch_evolution_A%d_%db_%dips_%dturns_%.2fnTorr'%(A, n_bunches, n_segments, n_turns, P_nTorr), 
+beam_monitor = SliceMonitor(filename='bunch_evolution_A%d_%db_%dips_%dturns_%.2fnTorr'%(A, n_bunches, n_segments, n_turns, P_nTorr),
                             n_steps = n_turns*n_segments, slicer=bunch_slicer, write_buffer_every=100)
 
 
 # initialize ion cloud with single kick per bunch
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
-ecloud_sk = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/n_segments, slicer=bunch_slicer, 
-            Dt_ref=Dt_ref, pyecl_input_folder='./pyecloud_config', beam_monitor=beam_monitor, 
+ecloud_sk = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/n_segments, slicer=bunch_slicer,
+            Dt_ref=Dt_ref, pyecl_input_folder='./pyecloud_config', beam_monitor=beam_monitor,
             chamb_type = chamb_type, PyPICmode = 'FFT_OpenBoundary',
             x_aper=x_aper, y_aper=y_aper,
             filename_chm=filename_chm, Dh_sc=Dh_sc,
             init_unif_edens_flag=init_unif_edens_flag,
-            init_unif_edens=init_unif_edens, 
+            init_unif_edens=init_unif_edens,
             cloud_mass=ion_mass, cloud_charge=ion_charge,
-            gas_ion_flag=gas_ion_flag, unif_frac=unif_frac, 
-            P_nTorr=P_nTorr, sigma_ion_MBarn=sigma_ion_MBarn, 
+            gas_ion_flag=gas_ion_flag, unif_frac=unif_frac,
+            P_nTorr=P_nTorr, sigma_ion_MBarn=sigma_ion_MBarn,
             Temp_K=Temp_K, E_init_ion=E_init_ion,
             N_mp_max=N_mp_max,
             nel_mp_ref_0=nel_mp_ref_0,
             B_multip=B_multip_per_eV*machine.p0/e*c,
             switch_model='perfect_absorber',
-            kick_mode_for_beam_field=True, 
+            kick_mode_for_beam_field=True,
             verbose=True)
 
 

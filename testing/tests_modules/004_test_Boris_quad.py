@@ -40,9 +40,6 @@ MP_eB=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                        Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
 
 
-
-
-
 N_mp=1
 Ex_n=array([0.,0.])
 Ey_n=array([0.,0.])
@@ -84,13 +81,9 @@ MP_eB.vz_mp = vz_mpB.copy()
 MP_eB.N_mp = N_mp
 
 
-
-
-
 x_lisB=[]
 y_lisB=[]
 z_lisB=[]
-
 
 
 for ii in range(N_steps):
@@ -99,12 +92,7 @@ for ii in range(N_steps):
     y_lisB.append(MP_eB.y_mp.copy())
     z_lisB.append(MP_eB.z_mp.copy())
 
-
-
     MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
-
-
-
 
 
 x_lisB=array(x_lisB)
@@ -121,10 +109,8 @@ for ii in range(len(x_lisB[1])):
     sp1=pl.subplot(3,1,1)
     pl.plot(x_lisB[:,ii],'.-')
 
-
     pl.subplot(3,1,2, sharex=sp1)
     pl.plot(y_lisB[:,ii],'.-')
-
 
     pl.subplot(3,1,3, sharex=sp1)
     pl.plot(z_lisB[:,ii],'.-')
