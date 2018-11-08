@@ -13,7 +13,6 @@ from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing import LHC
 
 
-
 n_segments = 1
 bunch_intensity = 1e11
 epsn_x = 2.5e-6
@@ -35,7 +34,7 @@ macroparticlenumber = 100000
 
 machine = LHC(machine_configuration=machine_configuration, beta_x=85.00, beta_y=90.0,
                         optics_mode='smooth', n_segments=n_segments, RF_at='end_of_transverse')
-            
+
 list_bunches = gmb.gen_matched_multibunch_beam(machine, macroparticlenumber, filling_pattern, b_spac_s, bunch_intensity, epsn_x, epsn_y, sigma_z, non_linear_long_matching, min_inten_slice4EC)
 
 for bb in list_bunches[::-1][30:]:
@@ -55,7 +54,7 @@ ecloud = PyEC4PyHT.Ecloud(
         L_ecloud=1., slicer=None, slice_by_slice_mode=True,
         Dt_ref=5e-12, pyecl_input_folder='./pyecloud_config',
         chamb_type = 'polyg' ,
-        filename_chm= 'LHC_chm_ver.mat', 
+        filename_chm= 'LHC_chm_ver.mat',
         #init_unif_edens_flag=1,
         #init_unif_edens=1e7,
         #N_mp_max = 3000000,
@@ -118,7 +117,6 @@ for ibuf, ss in enumerate(list_slices):
 sp2.grid('on')
 
 
-    
 plt.figure(2)
 spb1 = plt.subplot(3,1,1, sharex=sp1)
 spb1.plot(thin_slice_set.z_centers, thin_slice_set.charge_per_slice)
@@ -131,7 +129,6 @@ for ibun, bun in enumerate(list_bunches):
         spb2.stem([bun.slice_info['z_bin_center']], [bun.slice_info['interact_with_EC']])
         spb3.stem([bun.slice_info['z_bin_center']], [bun.slice_info['i_bunch']])
 spb2.grid('on')
-
 
 
 plt.show()

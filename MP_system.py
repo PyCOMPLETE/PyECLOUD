@@ -113,10 +113,7 @@ class MP_system:
             self.N_mp_soft_regen=N_mp_soft_regen
             self.N_mp_after_soft_regen=N_mp_after_soft_regen
 
-
-
     def clean_small_MPs(self):
-
 
         print "Start clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
 
@@ -124,7 +121,6 @@ class MP_system:
         flag_keep=~(flag_clean)
         flag_keep[self.N_mp:]=False
         self.N_mp=np.sum(flag_keep);
-
 
         self.x_mp[0:self.N_mp]=self.x_mp[flag_keep].copy();
         self.y_mp[0:self.N_mp]=self.y_mp[flag_keep].copy();
@@ -137,12 +133,11 @@ class MP_system:
         self.nel_mp[self.N_mp:]=0.0
 
         print "Done clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
-        
+
     def set_nel_mp_ref(self, val):
         self.nel_mp_ref = val
         self.nel_mp_split = self.fact_split*val
         self.nel_mp_cl_th = self.fact_clean*val
-
 
     def check_for_soft_regeneration(self):
 
@@ -160,7 +155,6 @@ class MP_system:
                 print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
                 self.set_nel_mp_ref(new_nel_mp_ref)
-
 
                 death_prob = float(self.N_mp - self.N_mp_after_soft_regen)/float(self.N_mp)
 
@@ -187,11 +181,9 @@ class MP_system:
 
                 self.nel_mp[0:self.N_mp]=self.nel_mp[0:self.N_mp]*correct_fact
 
-
                 chrg=np.sum(self.nel_mp);
                 erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
                 print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
-
 
     def check_for_regeneration(self):
 
@@ -200,13 +192,11 @@ class MP_system:
             erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
             print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
 
-
             new_nel_mp_ref=chrg/self.N_mp_after_regen;
             if new_nel_mp_ref<self.nel_mp_ref_0:
                 new_nel_mp_ref=self.nel_mp_ref_0
-            
+
             self.set_nel_mp_ref(new_nel_mp_ref)
-            
 
             hist_vect=np.zeros(self.Nxg_hist_reg,float)
             histf.compute_hist(self.x_mp[0:self.N_mp],self.nel_mp[0:self.N_mp],self.bias_x_hist_reg,self.Dx_hist_reg,hist_vect)
@@ -228,7 +218,6 @@ class MP_system:
             flag_keep[self.N_mp:]=False
             self.N_mp=np.sum(flag_keep);
 
-
             self.x_mp[0:self.N_mp]=np.array(self.x_mp[flag_keep].copy());
             self.y_mp[0:self.N_mp]=np.array(self.y_mp[flag_keep].copy());
             self.z_mp[0:self.N_mp]=np.array(self.z_mp[flag_keep].copy());
@@ -238,9 +227,6 @@ class MP_system:
             self.nel_mp[0:self.N_mp]=np.array(self.nel_mp[flag_keep].copy());
 
             self.nel_mp[self.N_mp:]=0.0
-
-
-
 
             #Assign particle to grid
             #
@@ -254,7 +240,6 @@ class MP_system:
 
             Dy_reg=2*self.chamb.y_aper/(self.Ny_reg-1);
             bias_y=np.ceil(float(self.Ny_reg)/2.); #Attention when trnslating to python
-
 
             Dvx_reg=2*vx_max/(self.Nvx_reg-1);
             bias_vx=np.ceil(float(self.Nvx_reg)/2.); #Attention when trnslating to python
@@ -286,7 +271,6 @@ class MP_system:
             indices_nonzero_cells=np.array(list(set(indexes)))
             indices_nonzero_cells=np.sort(indices_nonzero_cells)
 
-
             vect_dens=dict(zip(indices_nonzero_cells,np.zeros(len(indices_nonzero_cells))))
             #lil_matrix((Nx_reg*Ny_reg*Nvx_reg*Nvy_reg*Nvz_reg,1));#allocate a sparse matrix
             #
@@ -296,7 +280,6 @@ class MP_system:
                 vect_dens[index_curr]=vect_dens[index_curr]+self.nel_mp[i_mp];
 
             nonzero_cells=np.array(map(vect_dens.get,indices_nonzero_cells))
-
 
             #%% retrieve indices of nonempty cells
             #% NB use C-like indices
@@ -316,8 +299,6 @@ class MP_system:
             indices_nonzero_cells=indices_nonzero_cells-ivy_nonzero*self.Nvz_reg;
             #
             ivz_nonzero=indices_nonzero_cells;
-
-
 
             #
             #%pass to MATLAB-like indices
@@ -339,8 +320,6 @@ class MP_system:
             #%%
 
             num_MP_in_cell=nonzero_cells/self.nel_mp_ref
-
-
 
             intnum_MP_in_cell=np.int_(np.floor(num_MP_in_cell));
             rest=num_MP_in_cell-intnum_MP_in_cell;
@@ -383,10 +362,8 @@ class MP_system:
                     flag_np = self.chamb.is_outside(x_temp, y_temp);#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
                     Nout=np.sum(flag_np);
 
-
                 self.x_mp[self.N_mp:self.N_mp+n_add_step]=x_temp;
                 self.y_mp[self.N_mp:self.N_mp+n_add_step]=y_temp;
-
 
                 self.vx_mp[self.N_mp:self.N_mp+n_add_step]=vx_temp;
                 self.vy_mp[self.N_mp:self.N_mp+n_add_step]=vy_temp;
@@ -398,8 +375,6 @@ class MP_system:
                 n_add_step=np.sum(flag_add);
 
             #end
-
-
 
             chrg=np.sum(self.nel_mp);
             erg=np.sum(0.5/np.abs(self.charge/self.mass)*self.nel_mp[0:self.N_mp]*(self.vx_mp[0:self.N_mp]*self.vx_mp[0:self.N_mp]+self.vy_mp[0:self.N_mp]*self.vy_mp[0:self.N_mp]+self.vz_mp[0:self.N_mp]*self.vz_mp[0:self.N_mp]));
@@ -413,8 +388,6 @@ class MP_system:
             if y_min==None: y_min = -self.chamb.y_aper
 
             v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
-
-
 
             N_new_MP=DNel/self.nel_mp_ref;
             Nint_new_MP=int(np.floor(N_new_MP));
@@ -444,8 +417,6 @@ class MP_system:
 
                 self.N_mp=int(self.N_mp+Nint_new_MP);
 
-
-
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
 
         if x_max is None:
@@ -461,8 +432,6 @@ class MP_system:
             y_min = -self.chamb.y_aper
 
         v0=-np.sqrt(2.*(E_init/3.)*np.abs(self.charge)/self.mass);
-
-
 
         N_new_MP=n_ele*(x_max-x_min)*(y_max-y_min)/self.nel_mp_ref;
         Nint_new_MP=int(np.floor(N_new_MP));

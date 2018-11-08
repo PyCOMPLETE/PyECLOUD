@@ -95,9 +95,8 @@ class pyecloud_saver:
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
-        
-        self.extract_sey = True
 
+        self.extract_sey = True
 
     def start_observing(self, Dt_ref, MP_e, beamtim, impact_man,
                  r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info =0,
@@ -135,11 +134,11 @@ class pyecloud_saver:
         self._rho_video_init(flag_movie)
 
         # Init electric field video saving
-        self._sc_video_init(flag_sc_movie)    
+        self._sc_video_init(flag_sc_movie)
 
         # Init step by step data saving
-        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, 
-                                    initial_size_t_vect=1000)  
+        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
+                                    initial_size_t_vect=1000)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
@@ -151,7 +150,7 @@ class pyecloud_saver:
         #Space charge electrostatic energy
         self.t_sc_video=[]
         self.U_sc_eV=[]
-        
+
         # Prepare space for density histogram calculation
         self.nel_hist_line = np.zeros(impact_man.Nxg_hist,float)
 
@@ -171,7 +170,6 @@ class pyecloud_saver:
             self.t_sec_beams = -1
             self.sec_beam_profiles = -1
 
-
         # extract SEY curves
         if self.extract_sey:
             n_rep = 10000
@@ -182,17 +180,17 @@ class pyecloud_saver:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
             self.sey_test_del_true_mat, self.sey_test_del_elast_mat = 0.,0.
-        
+
         # Log
         print('Done init pyecloud_saver.')
         flog=open(self.logfile_path,'a')
         timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
         flog.write('Initialization finished on %s\n'%timestr)
         flog.close()
-        
+
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics,gas_ion_flag,resgasion,t_ion,
-                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list, 
+                t_sc_ON, photoem_flag, phemiss,flag_presence_sec_beams,sec_beams_list,
                 cloud_list, rho_cloud = None):
 
         ####################################################
@@ -201,14 +199,14 @@ class pyecloud_saver:
 
         # Check for MP save state
         self._MP_state_save(MP_e, beamtim)
-        
+
         # Check for simulation save state
         self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                              sec_beams_list, self.flag_multiple_clouds, cloud_list) 
+                              sec_beams_list, self.flag_multiple_clouds, cloud_list)
 
         # Check for save video charge density
         self._rho_video_save(spacech_ele, beamtim, rho_cloud)
-        
+
         # Check for save video electric field
         self._sc_video_save(spacech_ele, beamtim)
 
@@ -224,7 +222,6 @@ class pyecloud_saver:
         # Step-by-step saveings #
         #########################
         self._stepbystep_data_save(impact_man, MP_e, beamtim)
-        
 
         ##########################################################
         # Quantites saved at each bunch passage and dump to file #
@@ -244,7 +241,6 @@ class pyecloud_saver:
 
         if beamtim.flag_new_bunch_pass:
             self._logfile_progressfile_stofile(beamtim, MP_e)
-
 
         return impact_man
 
@@ -297,7 +293,6 @@ class pyecloud_saver:
         if MP_e.N_mp>0:
             histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp],MP_e.nel_mp[0:MP_e.N_mp],impact_man.bias_x_hist,impact_man.Dx_hist,self.nel_hist_line)
 
-
             # detailed histogram
             if self.flag_hist_det:
                 #print 'here 1'
@@ -311,7 +306,6 @@ class pyecloud_saver:
                     #print 'here 2'
                     histf.compute_hist(MP_e.x_mp[0:MP_e.N_mp][mask_det_hist],MP_e.nel_mp[0:MP_e.N_mp][mask_det_hist],
                                        self.bias_x_hist_det, self.Dx_hist_det, self.nel_hist_det_line)
-
 
         self.nel_hist.append(self.nel_hist_line.copy())
         self.t_hist.append(beamtim.tt_curr)
@@ -366,7 +360,7 @@ class pyecloud_saver:
                     'nel_hist_det':         self.nel_hist_det,
                     'xg_hist_det':          self.xg_hist_det,
                     'dec_fact_out':         self.dec_fact_out,
-                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV, 
+                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV,
                     'sey_test_cos_theta':   self.sey_test_cos_theta,
                     'sey_test_del_true_mat':self.sey_test_del_true_mat,
                     'sey_test_del_elast_mat':self.sey_test_del_elast_mat,
@@ -407,7 +401,7 @@ class pyecloud_saver:
                 self.el_dens_at_probes = np.concatenate(
                     (self.el_dens_at_probes, 0*self.el_dens_at_probes), axis=1)
             print('Done resizing')
-    
+
     def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect):
 
         #step by step data
@@ -418,9 +412,9 @@ class pyecloud_saver:
         self.Dt_save = (dec_fact_out-0.0001)*Dt_ref
         self.i_last_save = -1
         self.t_last_save = -1.
-        
+
         self.r_center=r_center
-        
+
         self.Nel_impact_last_step_group = 0
         self.Nel_emit_last_step_group = 0
         self.En_imp_last_step_group_eV = 0
@@ -436,7 +430,6 @@ class pyecloud_saver:
         self.En_emit_eV_time=0.*self.t_dec;
         self.En_kin_eV_time=0.*self.t_dec;
         self.cen_density=0.*self.t_dec;
-
 
         if self.flag_detailed_MP_info==1:
             self.N_mp_time=0.*self.t_dec
@@ -465,8 +458,6 @@ class pyecloud_saver:
             self.y_el_dens_probes = np.array(self.y_el_dens_probes)
             self.r_el_dens_probes = np.array(self.r_el_dens_probes)
 
-
-
     def _stepbystep_data_save(self, impact_man, MP_e, beamtim):
         #save step by step data
         # Vars to be accumulated
@@ -475,10 +466,8 @@ class pyecloud_saver:
         self.En_imp_last_step_group_eV += impact_man.En_imp_last_step_eV
         self.En_emit_last_step_group_eV += impact_man.En_emit_last_step_eV
 
-
         #if np.mod(beamtim.ii_curr, self.dec_fact_out)==0:
         if beamtim.tt_curr-self.t_last_save >= self.Dt_save:
-            
 
             self._stepbystep_check_for_data_resize()
 
@@ -498,7 +487,6 @@ class pyecloud_saver:
             self.En_imp_last_step_group_eV = 0
             self.En_emit_last_step_group_eV = 0
 
-
             self.Nel_time[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
             self.En_kin_eV_time[self.i_last_save]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
@@ -512,12 +500,11 @@ class pyecloud_saver:
                     flag_center[MP_e.N_mp:]=False
                     self.el_dens_at_probes[ii, self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
 
-
             if self.flag_detailed_MP_info==1:
                 self.N_mp_time[self.i_last_save]=MP_e.N_mp
 
     def _stepbystep_get_dict(self):
-        
+
         dict_sbs_data = {
             't':self.t_dec[:self.i_last_save+1],
             'lam_t_array':self.lam_t_array_dec[:self.i_last_save+1],
@@ -537,7 +524,6 @@ class pyecloud_saver:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
 
         return dict_sbs_data
-
 
     def _MP_state_init(self, save_mp_state_time_file):
         # MP state saver init
@@ -570,7 +556,6 @@ class pyecloud_saver:
 
                     print('Save MP state in: ' + path_MP_state)
                     self.i_obs=self.i_obs+1
-
 
     def _sim_state_init(self, save_simulation_state_time_file):
         # Simulation state saver init
@@ -722,7 +707,7 @@ class pyecloud_saver:
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
             string_tolog= timestr+(' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot,self.cloud_name,np.sum(MP_e.nel_mp[0:MP_e.N_mp]),MP_e.N_mp))
-            
+
             try:
                 with open(self.logfile_path,'a') as flog:
                     flog.write(string_tolog)
@@ -763,7 +748,7 @@ class pyecloud_saver:
             self.xg_hist_cos_angle = np.linspace(0., 1., N_angles)
         else:
             self.cos_angle_hist = -1
-            self.xg_hist_cos_angle = -1 
+            self.xg_hist_cos_angle = -1
 
     def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
         # Energy histogram saver
@@ -772,7 +757,7 @@ class pyecloud_saver:
             self.En_hist.append(impact_man.En_hist_line.copy())
             self.t_En_hist.append(beamtim.tt_curr)
             impact_man.reset_En_hist_line()
-            self.t_last_En_hist = beamtim.tt_curr 
+            self.t_last_En_hist = beamtim.tt_curr
 
             if self.flag_cos_angle_hist:
                 self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())

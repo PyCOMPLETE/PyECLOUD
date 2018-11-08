@@ -87,7 +87,6 @@ class residual_gas_ionization:
 
         k_ion = n_gas * sigma_ion_mq * c
 
-
         DNel = k_ion * lambda_t * Dt
 
         N_new_MP = DNel / MP_e.nel_mp_ref

@@ -119,7 +119,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     return config_dict
 
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
-            skip_pyeclsaver=False, skip_spacech_ele=False, 
+            skip_pyeclsaver=False, skip_spacech_ele=False,
             spacech_ele=None,
             ignore_kwargs=(), **kwargs):
 
@@ -173,7 +173,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     for cloud_par in cloud_par_list:
         if cloud_par.cc.switch_model == "ECLOUD_nunif":
             flag_non_unif_sey = True
-            
+
     chamber_kwargs = {
         'flag_verbose_file': cc.flag_verbose_file,
         'flag_verbose_stdout': cc.flag_verbose_stdout,
@@ -222,7 +222,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             for ii in xrange(N_sec_beams):
                 print('Initialize secondary beam %d/%d' % (ii+1, N_sec_beams))
                 sb_par = sec_b_par_list[ii]
-                
+
                 try:
                     if os.path.isfile(pyecl_input_folder+'/'+sb_par.beam_long_prof_file):
                         sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file
@@ -257,8 +257,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             cc.sparse_solver='PyKLU'
         spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                             f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
-
-        
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -297,7 +295,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 else:
                     raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
 
-           
             if thiscloud.switch_model in (0, 'ECLOUD'):
                 kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
                 kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
@@ -330,9 +327,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             impact_man_class=imc.impact_management
 
-        impact_man = impact_man_class(thiscloud.switch_no_increase_energy, chamb, sey_mod, thiscloud.E_th, thiscloud.sigmafit, thiscloud.mufit, 
-                                      thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max, 
-                                      thresh_low_energy=thiscloud.thresh_low_energy, flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width, 
+        impact_man = impact_man_class(thiscloud.switch_no_increase_energy, chamb, sey_mod, thiscloud.E_th, thiscloud.sigmafit, thiscloud.mufit,
+                                      thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
+                                      thresh_low_energy=thiscloud.thresh_low_energy, flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
                                       secondary_angle_distribution=thiscloud.secondary_angle_distribution)
 
         # Init gas ionization and photoemission
@@ -343,22 +340,22 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             resgasion=None
 
         if thiscloud.photoem_flag == 1:
-            phemiss=gpc.photoemission(thiscloud.inv_CDF_refl_photoem_file, thiscloud.k_pe_st, thiscloud.refl_frac, thiscloud.e_pe_sigma, thiscloud.e_pe_max, 
-                                      thiscloud.alimit, thiscloud.x0_refl, thiscloud.y0_refl, thiscloud.out_radius, chamb, thiscloud.phem_resc_fac, 
+            phemiss=gpc.photoemission(thiscloud.inv_CDF_refl_photoem_file, thiscloud.k_pe_st, thiscloud.refl_frac, thiscloud.e_pe_sigma, thiscloud.e_pe_max,
+                                      thiscloud.alimit, thiscloud.x0_refl, thiscloud.y0_refl, thiscloud.out_radius, chamb, thiscloud.phem_resc_fac,
                                       thiscloud.energy_distribution, thiscloud.photoelectron_angle_distribution, beamtim, thiscloud.flag_continuous_emission)
         elif thiscloud.photoem_flag in (2, 'from_file'):
-            phemiss = gpc.photoemission_from_file(thiscloud.inv_CDF_all_photoem_file, chamb, thiscloud.phem_resc_fac, thiscloud.energy_distribution, 
-                                                  thiscloud.e_pe_sigma, thiscloud.e_pe_max, thiscloud.k_pe_st, thiscloud.out_radius, 
+            phemiss = gpc.photoemission_from_file(thiscloud.inv_CDF_all_photoem_file, chamb, thiscloud.phem_resc_fac, thiscloud.energy_distribution,
+                                                  thiscloud.e_pe_sigma, thiscloud.e_pe_max, thiscloud.k_pe_st, thiscloud.out_radius,
                                                   thiscloud.photoelectron_angle_distribution, beamtim, thiscloud.flag_continuous_emission)
         elif thiscloud.photoem_flag in (3, 'per_segment'):
-            
+
             if os.path.isfile(pyecl_input_folder+'/'+thiscloud.filename_chm_photoem):
                 filename_chm_photoem_path = pyecl_input_folder+'/'+thiscloud.filename_chm_photoem
             elif os.path.isfile(pyecl_input_folder+'/'+thiscloud.filename_chm_photoem+'.mat'):
                 filename_chm_photoem_path = pyecl_input_folder+'/'+thiscloud.filename_chm_photoem+'.mat'
             else:
                 filename_chm_photoem_path = thiscloud.filename_chm_photoem
-        
+
             chamb_phemiss = gipfi.polyg_cham_photoemission(filename_chm_photoem_path)
             if not chamb_phemiss.vertexes_are_subset(chamb):
                 raise gipfi.PyECLOUD_ChamberException('Chambers for secondary emission and photoemission do not have the same shape!')
@@ -367,23 +364,22 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             phemiss = None
 
-
         # Real saver init
         if not skip_pyeclsaver:
             flag_last_cloud = cloud_par is cloud_par_list[-1]
             pyeclsaver.start_observing(cc.Dt, MP_e, beamtim, impact_man,
-                                       thiscloud.r_center, thiscloud.Dt_En_hist, thiscloud.logfile_path, thiscloud.progress_path, 
-                                       flag_detailed_MP_info=thiscloud.flag_detailed_MP_info, flag_movie=thiscloud.flag_movie, 
+                                       thiscloud.r_center, thiscloud.Dt_En_hist, thiscloud.logfile_path, thiscloud.progress_path,
+                                       flag_detailed_MP_info=thiscloud.flag_detailed_MP_info, flag_movie=thiscloud.flag_movie,
                                        flag_sc_movie=thiscloud.flag_sc_movie, save_mp_state_time_file=thiscloud.save_mp_state_time_file,
                                        flag_presence_sec_beams=flag_presence_sec_beams, sec_beams_list=sec_beams_list, dec_fac_secbeam_prof=thiscloud.dec_fac_secbeam_prof,
                                        el_density_probes=thiscloud.el_density_probes, save_simulation_state_time_file=thiscloud.save_simulation_state_time_file,
-                                       x_min_hist_det=thiscloud.x_min_hist_det, x_max_hist_det=thiscloud.x_max_hist_det, 
+                                       x_min_hist_det=thiscloud.x_min_hist_det, x_max_hist_det=thiscloud.x_max_hist_det,
                                        y_min_hist_det=thiscloud.y_min_hist_det, y_max_hist_det=thiscloud.y_max_hist_det,
                                        Dx_hist_det=thiscloud.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thiscloud.filen_main_outp,
                                        flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
                                        flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud)
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp )
-    
+
         # Init electron tracker
         if cc.track_method == 'Boris':
             dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
@@ -396,24 +392,23 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
             else:
                 B = cc.B
-            dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B) 
+            dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B)
         elif cc.track_method == 'StrongBgen':
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.cloud_mass - m_e)/m_e<1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
-            dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y, 
+            dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
                         cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
         elif cc.track_method == 'BorisMultipole':
             dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
 
-
         # Initial electron density
         if thiscloud.init_unif_flag==1:
             print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
-            MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif, 
-                                        thiscloud.x_max_init_unif, thiscloud.x_min_init_unif, 
+            MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif,
+                                        thiscloud.x_max_init_unif, thiscloud.x_min_init_unif,
                                         thiscloud.y_max_init_unif, thiscloud.y_min_init_unif)
 
         if thiscloud.init_unif_edens_flag==1:

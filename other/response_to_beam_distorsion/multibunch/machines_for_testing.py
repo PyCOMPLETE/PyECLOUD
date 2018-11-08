@@ -2,18 +2,17 @@ from PyHEADTAIL.machines.synchrotron import Synchrotron
 import numpy as np
 from scipy.constants import c, e, m_p
 
-             
+
 class LHC(Synchrotron):
 
 	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
-		
-		
-		longitudinal_mode = 'non-linear' 
+
+		longitudinal_mode = 'non-linear'
 		alpha		= 3.225e-04
 		h_RF       	= 35640
 		mass 		= m_p
 		charge		= e
-		
+
 		if machine_configuration=='Injection':
 			p0 			= 450e9 * e /c
 			p_increment = 0.
@@ -30,67 +29,64 @@ class LHC(Synchrotron):
 			dphi_RF		= 0.
 		else:
 			raise ValueError('machine_configuration not recognized!')
-			
-		
-		
+
 		if optics_mode=='smooth':
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
-			
+
 			n_segments = kwargs['n_segments']
 			circumference = h_RF*2.5e-9*c
-			
+
 			name = None
-			
-			beta_x 		= 92.7 
+
+			beta_x 		= 92.7
 			D_x 		= 0
-			beta_y 		= 93.2 
-			D_y 		= 0 
-			
+			beta_y 		= 93.2
+			D_y 		= 0
+
 			alpha_x 	= None
 			alpha_y 	= None
-			
+
 			s = None
-			
+
 		elif optics_mode=='non-smooth':
 			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
-			
+
 			name		= kwargs['name']
-			
+
 			beta_x 		= kwargs['beta_x']
-			beta_y 		= kwargs['beta_y'] 
+			beta_y 		= kwargs['beta_y']
 
 			try:
-				D_x 		= kwargs['D_x']	
+				D_x 		= kwargs['D_x']
 			except KeyError:
 				D_x 		= 0*np.array(kwargs['s'])
 			try:
-				D_y 		= kwargs['D_y']	
+				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])			
-					
+				D_y 		= 0*np.array(kwargs['s'])
+
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']
-			
-			s = kwargs['s']
-		
-		else:
-			raise ValueError('optics_mode not recognized!')		
 
-		
+			s = kwargs['s']
+
+		else:
+			raise ValueError('optics_mode not recognized!')
+
 		# detunings
 		Qp_x		= 0
 		Qp_y		= 0
-		
+
 		app_x		= 0
 		app_y		= 0
 		app_xy		= 0
-		
+
 		i_octupole_focusing = None
 		i_octupole_defocusing = None
-		octupole_knob = None	
-		
+		octupole_knob = None
+
 		for attr in kwargs.keys():
 			if kwargs[attr] is not None:
 				if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
@@ -101,8 +97,6 @@ class LHC(Synchrotron):
 							% (attr, str2print))
 				temp =  kwargs[attr]
 				exec('%s = temp'%attr)
-				
-
 
 		if i_octupole_focusing is not None or i_octupole_defocusing is not None:
 			if octupole_knob is not None:
@@ -110,23 +104,22 @@ class LHC(Synchrotron):
 			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)
 			self.i_octupole_focusing = i_octupole_focusing
 			self.i_octupole_defocusing = i_octupole_defocusing
-			
-		if octupole_knob is not None:	
+
+		if octupole_knob is not None:
 			if i_octupole_focusing is not None or i_octupole_defocusing is not None:
 				raise ValueError('octupole_knobs and octupole currents cannot be used at the same time!')
 			i_octupole_focusing, i_octupole_defocusing =  self._octupole_currents_from_octupole_knobs(octupole_knob, p0)
-			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)		
+			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)
 			self.i_octupole_focusing = i_octupole_focusing
 			self.i_octupole_defocusing = i_octupole_defocusing
-		
-		
+
 		super(LHC, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
              alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
              accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
              alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
              h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
              charge=charge, mass=mass)
-		
+
 	def _anharmonicities_from_octupole_current_settings(self, i_octupole_focusing, i_octupole_defocusing):
 			"""Calculate the constants of proportionality app_x, app_y and
 			app_xy (== app_yx) for the amplitude detuning introduced by the
@@ -152,22 +145,22 @@ class LHC(Synchrotron):
 			"""
 			i_max = 550.  # [A]
 			E_max = 7000. # [GeV]
-	
+
 			app_x  = E_max * (267065. * i_octupole_focusing / i_max -
 				7856. * i_octupole_defocusing / i_max)
 			app_y  = E_max * (9789. * i_octupole_focusing / i_max -
 				277203. * i_octupole_defocusing / i_max)
 			app_xy = E_max * (-102261. * i_octupole_focusing / i_max +
 				93331. * i_octupole_defocusing / i_max)
-	
+
 			# Convert to SI units.
 			convert_to_SI = e / (1.e-9 * c)
 			app_x *= convert_to_SI
 			app_y *= convert_to_SI
 			app_xy *= convert_to_SI
-	
+
 			return app_x, app_y, app_xy
-		
+
 	def _octupole_currents_from_octupole_knobs(self, octupole_knob, p0):
 		i_octupole_focusing = 19.557 * octupole_knob / (-1.5) * p0 / 2.4049285931335872e-16
 		i_octupole_defocusing = - i_octupole_focusing

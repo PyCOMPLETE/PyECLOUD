@@ -56,7 +56,6 @@ class pusher_Boris_multipole():
 
     def __init__(self, Dt, N_sub_steps=1, B_multip=None, B_skew=None):
 
-
         self.N_sub_steps = N_sub_steps
         self.Dt = Dt
 
@@ -83,7 +82,6 @@ class pusher_Boris_multipole():
 
     #@profile
     def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
-
 
         if MP_e.N_mp>0:
 
@@ -113,7 +111,6 @@ class pusher_Boris_multipole():
             vxn1 = MP_e.vx_mp[0:MP_e.N_mp]
             vyn1 = MP_e.vy_mp[0:MP_e.N_mp]
             vzn1 = MP_e.vz_mp[0:MP_e.N_mp]
-
 
             if Ez_n!=0.:
                 raise ValueError('Oooops! Not implemented....')

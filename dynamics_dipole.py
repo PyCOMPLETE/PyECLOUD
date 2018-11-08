@@ -59,7 +59,6 @@ qm=qe/me;
 class pusher_dipole_magnet():
     def __init__(self, Dt, B):
 
-
         print "Tracker: Dipole - strong B"
         omegac=B*qm;
         self.sincc_v=cs.sincc(omegac*Dt);
@@ -81,7 +80,6 @@ class pusher_dipole_magnet():
             vyn = MP_e.vy_mp[0:MP_e.N_mp]
             vzn = MP_e.vz_mp[0:MP_e.N_mp]
 
-
             xn1=xn+vxn*self.sincc_v*self.Dt+vzn*self.cosincc_v*self.omegac*self.Dt*self.Dt\
                 -qm*Ex_n*self.cosincc_v*self.Dt*self.Dt;
             yn1=yn+vyn*self.Dt-0.5*qm*Ey_n*self.Dt*self.Dt;
@@ -92,15 +90,12 @@ class pusher_dipole_magnet():
             vyn1=vyn-qm*Ey_n*self.Dt;
             vzn1=vzn*self.cos_v-vxn*self.sin_v+qm*Ex_n*self.cosincc_v*self.omegac*self.Dt*self.Dt;
 
-
             MP_e.x_mp[0:MP_e.N_mp] = xn1
             MP_e.y_mp[0:MP_e.N_mp] = yn1
             MP_e.z_mp[0:MP_e.N_mp] = zn1
             MP_e.vx_mp[0:MP_e.N_mp] = vxn1
             MP_e.vy_mp[0:MP_e.N_mp] = vyn1
             MP_e.vz_mp[0:MP_e.N_mp]  = vzn1
-
-
 
         return MP_e
 

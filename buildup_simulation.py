@@ -63,12 +63,12 @@ class BuildupSimulation(object):
         print 'PyECLOUD Version 7.5.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
         config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
-                                                    pyecl_input_folder=pyecl_input_folder, 
+                                                    pyecl_input_folder=pyecl_input_folder,
                                                     skip_beam=skip_beam,
-                                                    skip_pyeclsaver=skip_pyeclsaver, 
+                                                    skip_pyeclsaver=skip_pyeclsaver,
                                                     skip_spacech_ele=skip_spacech_ele,
                                                     spacech_ele = spacech_ele,
-                                                    ignore_kwargs=ignore_kwargs, 
+                                                    ignore_kwargs=ignore_kwargs,
                                                     **kwargs)
 
         self.config_dict = config_dict
@@ -98,7 +98,7 @@ class BuildupSimulation(object):
             if flag_presence_sec_beams:
                 for sec_beam in sec_beams_list:
                     sec_beam.next_time_step()
-            
+
             self.sim_time_step()
 
             if beamtim.flag_new_bunch_pass:
@@ -109,8 +109,6 @@ class BuildupSimulation(object):
                 if beamtim.tt_curr>    t_end_sim:
                     print 'Reached user defined t_end_sim --> Ending simulation'
                     break
-
-
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
                       force_recompute_space_charge=False, skip_MP_cleaning=False, skip_MP_regen=False):
@@ -128,7 +126,6 @@ class BuildupSimulation(object):
         cloud_list = self.cloud_list
 
         flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
-
 
         # Loop over clouds: gather fields, move, generate new MPs
         for i_cloud, cloud in enumerate(cloud_list):
@@ -153,7 +150,6 @@ class BuildupSimulation(object):
             ## Compute electron space charge electric field
             Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
 
-            
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
                     raise ValueError("""Kick mode can be used only with custom time steps!""")
@@ -166,7 +162,6 @@ class BuildupSimulation(object):
                 # Electric field for dynamics step
                 Ex_n = Ex_sc_n + Ex_n_beam
                 Ey_n = Ey_sc_n + Ey_n_beam
-
 
             ## Save position before motion step
             old_pos=MP_e.get_positions()
@@ -218,11 +213,10 @@ class BuildupSimulation(object):
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
 
-
-        # We want to save and clean MP only after iteration on all clouds is completed 
+        # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
         for cloud in cloud_list:
-            
+
             if cloud.pyeclsaver is not None:
                 # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
                 #     raise ValueError('Saving with custom steps not implemented!')
@@ -244,7 +238,6 @@ class BuildupSimulation(object):
 
                     ## Soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
-
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'): #, reset_pyeclsaver = True):
 

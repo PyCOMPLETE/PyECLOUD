@@ -54,7 +54,6 @@ import int_field_for as iff
 from boris_step import boris_step
 
 
-
 def crprod(bx, by, bz, cx,cy,cz):
     ax = by*cz-bz*cy
     ay = bz*cx-bx*cz
@@ -84,7 +83,6 @@ class B_quad():
         self.B0y=B0y
         self.B0z=B0z
         self.fact_Bmap = fact_Bmap
-
 
     def get_B(self,xn,yn):
         Bx_n = self.fact_Bmap*yn.copy()
@@ -123,8 +121,6 @@ class B_file():
                 return Bx_n, By_n, Bz_n
 
 
-
-
 class pusher_Boris():
 
     def __init__(self, Dt, B0x, B0y, B0z, \
@@ -139,7 +135,6 @@ class pusher_Boris():
         self.B0z = B0z
         self.fact_Bmap = fact_Bmap
 
-
         if B_map_file is None:
             self.B_ob = B_none(B0x, B0y, B0z)
 
@@ -150,12 +145,10 @@ class pusher_Boris():
         else:
             self.B_ob = B_file(B0x, B0y, B0z, fact_Bmap, B_map_file)
 
-
         print "N_subst_init=%d"% self.N_sub_steps
 
     #@profile
     def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
-
 
         if MP_e.N_mp>0:
 
@@ -177,8 +170,6 @@ class pusher_Boris():
                 boris_step(self.Dtt,xn1,yn1,zn1,vxn1,vyn1,vzn1,
                            Ex_n,Ey_n,Ez_n,Bx_n,By_n,Bz_n,mass,charge)
 
-
-
             MP_e.x_mp[0:MP_e.N_mp] = xn1
             MP_e.y_mp[0:MP_e.N_mp] = yn1
             MP_e.z_mp[0:MP_e.N_mp] = zn1
@@ -186,12 +177,9 @@ class pusher_Boris():
             MP_e.vy_mp[0:MP_e.N_mp] = vyn1
             MP_e.vz_mp[0:MP_e.N_mp]  = vzn1
 
-
-
         return MP_e
 
     def stepcustomDt(self, MP_e, Ex_n,Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
-
 
         if MP_e.N_mp>0:
 
@@ -213,16 +201,12 @@ class pusher_Boris():
                 boris_step(Dt_substep,xn1,yn1,zn1,vxn1,vyn1,vzn1,
                            Ex_n,Ey_n,Ez_n,Bx_n,By_n,Bz_n,mass,charge)
 
-
-
             MP_e.x_mp[0:MP_e.N_mp] = xn1
             MP_e.y_mp[0:MP_e.N_mp] = yn1
             MP_e.z_mp[0:MP_e.N_mp] = zn1
             MP_e.vx_mp[0:MP_e.N_mp] = vxn1
             MP_e.vy_mp[0:MP_e.N_mp] = vyn1
             MP_e.vz_mp[0:MP_e.N_mp]  = vzn1
-
-
 
         return MP_e
 

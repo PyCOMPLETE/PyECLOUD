@@ -16,7 +16,6 @@ pl.close('all')
 sim_folder = './'
 
 
-
 myfontsz = 10
 ms.mystyle_arial(fontsz=myfontsz)
 
@@ -83,7 +82,6 @@ pl.plot(dict_curr['N_mp_ref_pass'], '.r-')
 pl.figure(1011)
 pl.plot(np.sum(dict_ref['En_hist'], axis=1), '.-')
 pl.plot(np.sum(dict_curr['En_hist'], axis=1), '.r-')
-
 
 
 pl.show()

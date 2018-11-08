@@ -47,9 +47,9 @@ def update_module(module, new_module):
     Some entries are skipped.
     """
     for attr in dir(new_module):
-        
+
         if attr=='pi': continue
-        
+
         value = getattr(new_module, attr)
         if attr.startswith('_') or isinstance(value, types.ModuleType):
             continue
@@ -62,7 +62,6 @@ def update_config_dict(config_dict, module, module_name, verbose=False, default_
 
     mandatory_parameters = parameters_dict[module_name]['mandatory']
     optional_parameters = parameters_dict[module_name]['optional']
-
 
     for parameter in mandatory_parameters:
 
@@ -126,7 +125,7 @@ def import_module_from_file(module_name, file_name):
     try:
         new_file_name = dir_name+'/temp_file_%s.py' % (module_name+'_'+str(time.time())).replace('.','_')
         shutil.copy(file_name, new_file_name)
-        
+
         # As we use pi in many old input files
         with open(new_file_name, 'r') as fid: content = fid.read()
         content = "from numpy import pi\n\n"+content

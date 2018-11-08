@@ -10,9 +10,6 @@ if BIN not in sys.path:
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
 
-
-
-
 time_0 = time.time()
 sim = BuildupSimulation()
 sim.run()

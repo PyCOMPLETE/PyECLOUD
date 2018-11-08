@@ -55,7 +55,6 @@ class Transverse_Efield_map(object):
 
             self._track_single_slice(beam, sid, pid)
 
-
     def _track_single_slice(self, beam, sid, pid):
         x = self.get_beam_x(beam)[pid]
         y = self.get_beam_y(beam)[pid]
@@ -78,13 +77,11 @@ class Transverse_Efield_map(object):
         beam.xp[pid] += fact_kick * Ex_sc_p
         beam.yp[pid] += fact_kick * Ey_sc_p
 
-
     def _track_in_single_slice_mode(self, beam):
 
         if beam.slice_info is not 'unsliced':
             self.sid -= 1
             self._track_single_slice(beam=beam, sid=self.sid, pid=np.arange(beam.macroparticlenumber))
-
 
     def _finalize_and_reinitialize(self):
         self.sid = 0

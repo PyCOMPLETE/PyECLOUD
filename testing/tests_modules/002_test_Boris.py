@@ -43,9 +43,6 @@ MP_ed=MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                        Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
 
 
-
-
-
 N_mp=2
 Ex_n=array([0.001,0.001])
 Ey_n=array([1.,0.])
@@ -79,7 +76,6 @@ MP_ed.vz_mp = vz_mpB.copy()
 MP_ed.N_mp = N_mp
 
 
-
 x_lisB=[]
 y_lisB=[]
 z_lisB=[]
@@ -104,7 +100,6 @@ for ii in range(N_steps):
     MP_ed = dynamicsd.step(MP_ed,Ex_n[0:N_mp],Ey_n[0:N_mp])
 
 
-
 x_lisB=array(x_lisB)
 y_lisB=array(y_lisB)
 z_lisB=array(z_lisB)
@@ -124,12 +119,10 @@ for ii in range(len(x_lisB[1])):
     pl.hold('on')
     pl.plot(x_lisB[:,ii],'.r')
 
-
     pl.subplot(3,1,2)
     pl.plot(y_lisd[:,ii])
     pl.hold('on')
     pl.plot(y_lisB[:,ii],'.r')
-
 
     pl.subplot(3,1,3)
     pl.plot(z_lisd[:,ii])

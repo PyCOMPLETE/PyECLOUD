@@ -9,7 +9,6 @@ import mystyle as ms
 import time
 
 
-
 filename = 'headtail_for_test/test_protons/SPS_Q20_proton_check_dipole_betatron_motion_20150212_prb.dat'
 B_multip = [0.5]
 N_kicks = 3
@@ -64,18 +63,18 @@ N_mp_max = N_MP_ele_init*4.
 nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer, 
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer,
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
-				init_unif_edens=init_unif_edens, 
+				init_unif_edens=init_unif_edens,
 				N_mp_max=N_mp_max,
 				nel_mp_ref_0=nel_mp_ref_0,
 				B_multip=B_multip)
 machine.install_after_each_transverse_segment(ecloud)
 
-				
-# generate a bunch 
+
+# generate a bunch
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 
@@ -98,13 +97,13 @@ rms_err_y_list = []
 for ii in xrange(N_turns-1):
 	print 'Turn', ii
 	# track
-	
+
 	# id and momenta after track
 	id_before = id_after.copy()
 	xp_before = xp_after.copy()
 	z_before = z_after.copy()
 	yp_before = yp_after.copy()
-	
+
 	machine.track(bunch)#, verbose = True)
 
 	# id and momenta after track
@@ -140,7 +139,7 @@ for ii in xrange(N_turns-1):
 	pl.ylabel('Occurrences')
 	pl.xlim(0,100)
 	rms_err_x = np.std(100*np.abs((xp_after-xp_before)-(xp[ii+1, :]-xp[ii, :]))/np.std(xp[ii+1, :]-xp[ii, :]))
-	
+
 	sp1 = pl.subplot(2,3,2)
 	pl.plot(z_after,  (100*np.abs((yp_after-yp_before)-(yp[ii+1, :]-yp[ii, :]))/np.std(yp[ii+1, :]-yp[ii, :])), '.r', markersize = 2)
 	pl.grid('on')
@@ -159,19 +158,18 @@ for ii in xrange(N_turns-1):
 	pl.xlabel('Error_y [%]')
 	pl.ylabel('Occurrences')
 	rms_err_y = np.std(100*np.abs((yp_after-yp_before)-(yp[ii+1, :]-yp[ii, :]))/np.std(yp[ii+1, :]-yp[ii, :]))
-	
-	
+
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(ii, rms_err_x, rms_err_y))
-	
+
 	pl.savefig(filename.split('_prb.dat')[0]+'_%02d.png'%ii, dpi=150)
-	
+
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
-	
+
 	pl.ion()
 	time.sleep(1.)
 	pl.draw()
-	
+
 pl.figure(1000)
 pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
 pl.plot(rms_err_y_list, '.-', markersize = 10, linewidth=2, label='y')

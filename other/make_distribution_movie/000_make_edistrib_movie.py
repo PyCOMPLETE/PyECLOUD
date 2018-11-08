@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../../../') 
+sys.path.append('../../../')
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pylab as pl
@@ -71,15 +71,15 @@ cendens = np.squeeze(obout.cen_density)
 for pass_ind in passlist:
 
     filename_rho = folder_sim+'/rho_video/rho_pass%d.mat'%pass_ind
-    filename_efield = folder_sim+'/efield_video/efield_pass%d.mat'%pass_ind    
+    filename_efield = folder_sim+'/efield_video/efield_pass%d.mat'%pass_ind
     #new code
 
     obout_ecl_video = mlo.myloadmat_to_obj(filename_rho)
     obout_efield = mlo.myloadmat_to_obj(filename_efield)
-    
+
     xg_sc = obout_ecl_video.xg_sc
     yg_sc = obout_ecl_video.yg_sc
-    
+
     xmin = np.min(xg_sc)
     xmax = np.max(xg_sc)
     ymin = np.min(yg_sc)
@@ -88,22 +88,13 @@ for pass_ind in passlist:
     ix_0 = np.argmin(np.abs(xg_sc-x_beam_pos))
     iy_0 = np.argmin(np.abs(yg_sc-y_beam_pos))
 
-    
-
-   
-
     rho_video = -obout_ecl_video.rho_video/qe
     ex_video = obout_efield.efx_video
     ey_video = obout_efield.efy_video
     t_video = np.squeeze(obout_ecl_video.t_video.real)
-    b_spac = np.squeeze(obout.b_spac.real) 
-
-    
+    b_spac = np.squeeze(obout.b_spac.real)
 
     (nphotog,_,_)=rho_video.shape
-
-  
-    
 
     for ii in xrange(0, nphotog, N_dec):
 
@@ -154,7 +145,7 @@ for pass_ind in passlist:
 		pl.xlabel('(s-s0) [m]')
 		pl.ylabel('beam prof. [p/m]')
 
-		pl.subplots_adjust(top=0.85,right=0.8, left=0.15, hspace=0.3, wspace=0.5)	
+		pl.subplots_adjust(top=0.85,right=0.8, left=0.15, hspace=0.3, wspace=0.5)
 		filename = str('Pass%05d_%05d' % (pass_ind,ii)) + '.png'
 		pl.savefig(filename, dpi=150)
 		pl.clf()

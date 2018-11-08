@@ -13,7 +13,6 @@ n_record = 1000
 n_part_per_turn = 5000
 
 
-
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing  import shortSPS
@@ -49,8 +48,7 @@ sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
 sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 
-				
-# generate a bunch 
+# generate a bunch
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 # replace first particles with HEADTAIL ones
@@ -82,23 +80,21 @@ N_mp_max = N_MP_ele_init*4.
 nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer, 
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer,
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
-				init_unif_edens=init_unif_edens, 
+				init_unif_edens=init_unif_edens,
 				N_mp_max=N_mp_max,
 				nel_mp_ref_0=nel_mp_ref_0,
 				B_multip=B_multip)
-				
-# generate a bunch 
-bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000, 
+
+# generate a bunch
+bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000,
 	intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 ecloud.track_once_and_replace_with_recorded_field_map(bunch_for_map)
-				
+
 machine.install_after_each_transverse_segment(ecloud)
-
-
 
 
 # prepare storage for particles cohordinates
@@ -108,12 +104,12 @@ y_i = np.empty((n_record, n_turns))
 yp_i = np.empty((n_record, n_turns))
 
 # track and store
-for i in range(n_turns):    
+for i in range(n_turns):
     machine.track(bunch)#, verbose=True)
-    
+
     print 'Turn', i
     sys.stdout.flush()
-    
+
     x_i[:,i] = bunch.x[:n_record]
     xp_i[:,i] = bunch.xp[:n_record]
     y_i[:,i] = bunch.y[:n_record]

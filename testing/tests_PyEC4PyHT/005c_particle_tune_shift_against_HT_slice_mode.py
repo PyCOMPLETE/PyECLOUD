@@ -13,7 +13,6 @@ n_record = 1000
 n_part_per_turn = 5000
 
 
-
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing  import shortSPS
@@ -49,8 +48,7 @@ sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
 sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
 
 
-				
-# generate a bunch 
+# generate a bunch
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 # replace first particles with HEADTAIL ones
@@ -87,12 +85,12 @@ for ele in machine.one_turn_map:
     new_one_turn_map.append(ele)
     if ele in machine.transverse_map:
         new_ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
-                L_ecloud=machine.circumference/machine.transverse_map.n_segments, 
-                slicer=slicer, 
+                L_ecloud=machine.circumference/machine.transverse_map.n_segments,
+                slicer=slicer,
                 Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
                 x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
                 init_unif_edens_flag=init_unif_edens_flag,
-                init_unif_edens=init_unif_edens, 
+                init_unif_edens=init_unif_edens,
                 N_mp_max=N_mp_max,
                 nel_mp_ref_0=nel_mp_ref_0,
                 B_multip=B_multip)
@@ -101,10 +99,8 @@ for ele in machine.one_turn_map:
 machine.one_turn_map = new_one_turn_map
 
 
-
-				
-# generate a bunch 
-bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000, 
+# generate a bunch
+bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000,
 	intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 slices_list_for_map = bunch.extract_slices(slicer)
@@ -119,7 +115,6 @@ y_i = np.empty((n_record, n_turns))
 yp_i = np.empty((n_record, n_turns))
 
 
-
 for ii in xrange(n_turns):
     slices_list = bunch.extract_slices(slicer)
 
@@ -132,7 +127,6 @@ for ii in xrange(n_turns):
 
     for ec in ecloud_list:
         ec.finalize_and_reinitialize()
-
 
     # id and momenta after track
     id_after = bunch.id[bunch.id<=n_part_per_turn]
@@ -155,7 +149,6 @@ for ii in xrange(n_turns):
     xp_i[:,ii] = xp_after[:n_record]
     y_i[:,ii] = y_after[:n_record]
     yp_i[:,ii] = yp_after[:n_record]
-
 
 
 from tune_analysis import tune_analysis

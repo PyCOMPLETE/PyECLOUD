@@ -64,7 +64,6 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 new_preamble_lines = preamble_new.split('\n')
 
 
-
 for dirpath, _, filenames in os.walk('.'):
     full_paths = [os.path.join(dirpath, x) for x in filenames]
 
@@ -98,7 +97,6 @@ for dirpath, _, filenames in os.walk('.'):
                     status = after_preamble
             elif status == after_preamble:
                 pass
-
 
             if status != in_preamble:
                 new_lines.append(line)

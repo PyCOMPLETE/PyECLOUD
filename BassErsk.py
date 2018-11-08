@@ -15,7 +15,6 @@ def BassErsk(xin,yin,sigmax,sigmay):
 
     eps0=8.854187817620e-12;
 
-
     if sigmax>sigmay:
 
         S=sqrt(2*(sigmax*sigmax-sigmay*sigmay));
@@ -44,7 +43,6 @@ def BassErsk(xin,yin,sigmax,sigmay):
 
 def ImageTerms(x,y,a,b,x0,y0, nimag):
 
-
     eps0=8.854187817620e-12;
 
     if abs((a-b)/a)>1e-3:
@@ -64,11 +62,9 @@ def ImageTerms(x,y,a,b,x0,y0, nimag):
 
         Ecpx=0+0j
 
-
         q=conj(q)
         for nn in range(1,nimag+1):
             Ecpx=Ecpx+exp(-nn*mu1) * ( (cosh(nn*mu0)*cos(nn*phi0)) / (cosh(nn*mu1)) + 1j * (sinh(nn*mu0)*sin(nn*phi0)) / (sinh(nn*mu1))   )* (sinh(nn*q))/(sinh(q))
-
 
         Ecpx=Ecpx/(4*pi*eps0)*4/g
         Ex=Ecpx.real

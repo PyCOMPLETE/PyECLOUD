@@ -49,19 +49,18 @@
 #-End-preamble---------------------------------------------------------
 
 
-
 from numpy import sum, sqrt, arctan2, sin, cos, isnan, pi
 
 class ellip_cham_geom_object:
     def __init__(self, x_aper, y_aper, flag_verbose_file=True):
-        
+
         print('Elliptic chamber')
-        
+
         self.x_aper = x_aper
         self.y_aper = y_aper
-        
+
         self.area = pi*self.x_aper*self.y_aper
-        
+
         print("The area of the chamber is %.3e m^2"%self.area)
 
         self.N_mp_impact=0
@@ -69,7 +68,6 @@ class ellip_cham_geom_object:
         self.chamb_type='ellip'
 
         self.flag_verbose_file = flag_verbose_file
-
 
     def is_outside(self, x_mp, y_mp):
         return (((x_mp/self.x_aper)**2 + (y_mp/self.y_aper)**2)>=1);
@@ -91,7 +89,6 @@ class ellip_cham_geom_object:
         y_in__y_out=y_in*y_out;
         x_in__x_out=x_in*x_out;
 
-
         t0=(a**2*y_insq - a**2*y_in__y_out + \
           sqrt(a**4*b**2*y_insq - 2*a**4*b**2*y_in__y_out \
               + a**4*b**2*y_outsq +  \
@@ -102,8 +99,6 @@ class ellip_cham_geom_object:
             b**2*x_in__x_out)/(a**2*y_insq -  \
             2*a**2*y_in__y_out + a**2*y_outsq + b**2*x_insq -  \
             2*b**2*x_in__x_out + b**2*x_outsq);
-
-
 
         # Handle pathological cases
         mask_nan = isnan(t0)
@@ -124,8 +119,6 @@ class ellip_cham_geom_object:
         flag_ident=(((x_in-x_out)*(x_in-x_out)+(y_in-y_out)*(y_in-y_out))/(x_out*x_out+y_out*y_out))<1e-8;
         t0[flag_ident]=0;
 
-
-
         if sum(abs(t0.imag))>0:
             print 'imag detected'
             raise ValueError('Backtracking: complex t0!!!!')
@@ -134,10 +127,8 @@ class ellip_cham_geom_object:
         y_int=t0*y_out+(1-t0)*y_in;
         z_int=t0*z_out+(1-t0)*z_in;
 
-
         if flag_robust:
             flag_impact=(((x_int/a)**2 + (y_int/b)**2)>1);
-
 
             if flag_impact.any():
                 self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
@@ -164,7 +155,6 @@ class ellip_cham_geom_object:
 
                     fbckt.close()
 
-
                 x_pr=x_int_pat/a
                 y_pr=y_int_pat/b
 
@@ -176,17 +166,10 @@ class ellip_cham_geom_object:
                 x_int[flag_impact] = x_pr*a
                 y_int[flag_impact] = y_pr*b
 
-
-
-
             flag_impact=(((x_int/a)**2 + (y_int/b)**2)>=1);
             if sum(flag_impact)>0:
                 print 'err inside'
                 raise ValueError('Outside after backtracking!!!!')
-
-
-
-
 
         par_cross=arctan2(a*y_int,b*x_int);
 
@@ -200,7 +183,6 @@ class ellip_cham_geom_object:
 
         Nx[neg_flag]=-Nx[neg_flag];
         Ny[neg_flag]=-Ny[neg_flag];
-
 
         nor=sqrt(Nx*Nx+Ny*Ny);
 

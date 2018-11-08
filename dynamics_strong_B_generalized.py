@@ -108,7 +108,6 @@ class pusher_strong_B_generalized():
 #            ####
 
 
-
 #    def step(self, xn, yn, zn, vxn, vyn, vzn,Ex_n,Ey_n):
     def step(self, MP_e, Ex_n,Ey_n):
 
@@ -119,7 +118,6 @@ class pusher_strong_B_generalized():
             vxn = MP_e.vx_mp[0:MP_e.N_mp]
             vyn = MP_e.vy_mp[0:MP_e.N_mp]
             vzn = MP_e.vz_mp[0:MP_e.N_mp]
-
 
             if self.flag_B_map:
                 Bx_n,By_n = iff.int_field(xn,yn,self.xmin,self.ymin,\
@@ -132,8 +130,6 @@ class pusher_strong_B_generalized():
             else:
                 Bx_n = 0*xn
                 By_n = 0*xn
-
-
 
             Bx_n = Bx_n + self.B0x
             By_n = By_n + self.B0y
@@ -165,7 +161,6 @@ class pusher_strong_B_generalized():
                        EB_Bmodsq*(self.Dt*self.Dt/2.+(coswcDt-1.)/(omegac*omegac)) \
                        - vB_Bmod*self.Dt/omegac
 
-
             vzn1 = vzn*coswcDt - vB_Bmod*sinwcDt + EB_Bmodsq * (1.-coswcDt)
             vxn1 = vxn - qm*(Ex_n*self.Dt - By_n*Dz)
             vyn1 = vyn - qm*(Ey_n*self.Dt + Bx_n*Dz )
@@ -173,7 +168,6 @@ class pusher_strong_B_generalized():
             xn1 = xn + vxn*self.Dt - qm * (Ex_n*self.Dt*self.Dt/2. - By_n*Dz_tilde)
             yn1 = yn + vyn*self.Dt - qm * (Ey_n*self.Dt*self.Dt/2. + Bx_n*Dz_tilde)
             zn1 = zn + Dz
-
 
             # correcting zero field points
             if N_B_zero>0:
@@ -194,8 +188,6 @@ class pusher_strong_B_generalized():
             MP_e.vx_mp[0:MP_e.N_mp] = vxn1
             MP_e.vy_mp[0:MP_e.N_mp] = vyn1
             MP_e.vz_mp[0:MP_e.N_mp]  = vzn1
-
-
 
         return MP_e
 

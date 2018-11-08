@@ -24,8 +24,6 @@ n_segments = 5
 B_multip = [0.5]
 
 
-
-
 n_record = 1000
 
 n_part_per_turn = 5000
@@ -45,7 +43,7 @@ n_turns = len(x[:,0])
 print 'Done!'
 
 # compute tunes from headtail data
-print 'Tune analysis for headtail...' 
+print 'Tune analysis for headtail...'
 from tune_analysis import tune_analysis
 qx_ht, qy_ht, qx_centroid_ht, qy_centroid_ht  = tune_analysis(x[:, :n_record].T, xp[:, :n_record].T, y[:, :n_record].T, yp[:, :n_record].T)
 

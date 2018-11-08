@@ -74,11 +74,11 @@ N_mp_max = N_MP_ele_init*4.
 nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer, 
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer,
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
-				init_unif_edens=init_unif_edens, 
+				init_unif_edens=init_unif_edens,
 				N_mp_max=N_mp_max,
 				nel_mp_ref_0=nel_mp_ref_0,
 				B_multip=B_multip)
@@ -87,8 +87,8 @@ machine.install_after_each_transverse_segment(ecloud)
 if show_movie:
 	ecloud.save_ele_distributions_last_track = True
 	ecloud.save_ele_potential_and_field = True
-				
-# generate a bunch 
+
+# generate a bunch
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 
@@ -165,18 +165,17 @@ for ii in xrange(N_turns-1):
 	pl.ylabel('Occurrences')
 	rms_err_y = np.std(100*np.abs((yp_after-yp_before)-(yp[ii+1, :]-yp[0, :]))/np.std(yp[ii+1, :]-yp[0, :]))
 
-
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(ii, rms_err_x, rms_err_y))
 
 	pl.savefig(filename.split('_prb.dat')[0]+'_%02d.png'%ii, dpi=150)
 
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
-	
+
 	pl.ion()
 	pl.draw()
 	time.sleep(1.)
-	
+
 pl.figure(1000)
 pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
 pl.plot(rms_err_y_list, '.-', markersize = 10, linewidth=2, label='y')

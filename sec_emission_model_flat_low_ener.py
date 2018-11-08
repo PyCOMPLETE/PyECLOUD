@@ -63,7 +63,6 @@ def yield_fun2(E,costheta,Emax,del_max,R0):
 
     true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
 
-
     delta=true_sec;
 
     mask_change=logical_and(delta<R0,E<Emax)

@@ -12,16 +12,15 @@ class beam_descr_from_fil:
 
         # Parse beam input file
         beam_beam = inp_spec.import_module_from_file('beam_beam', beamfilename)
-        
+
         # Verify validity of provided module w.r.t. parameters_dict
         inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
-        
+
         # Create config_dict with all allowed beam parameters (not specified are set to default)
         config_dict = {}
         inp_spec.update_config_dict(config_dict, beam_beam, 'beam_beam')
 
         cc = mlm.obj_from_dict(config_dict)
-
 
         # keep beackwards compatibility (optics in the machine params file)
         if cc.Dx is None:

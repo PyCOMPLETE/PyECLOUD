@@ -67,7 +67,6 @@ class polyg_cham_geom_object(object):
     def __init__(self, filename_chm, flag_non_unif_sey, flag_verbose_file=False, flag_verbose_stdout=False,
                  flag_assume_convex=True):
 
-
         print('Polygonal chamber - cython implementation')
 
         if type(filename_chm)==str:
@@ -86,10 +85,9 @@ class polyg_cham_geom_object(object):
             self.R0_segments = np.squeeze(dict_chm['R0_segments'])
             self.Emax_segments = np.squeeze(dict_chm['Emax_segments'])
 
-        
         if np.any(np.sqrt(np.diff(Vx)**2 + np.diff(Vy)**2)<1e-9):
             raise PyECLOUD_ChamberException('There is a zero length segment!')
-        
+
         self.N_vert = len(Vx)
 
         N_edg = len(Vx)
@@ -102,11 +100,11 @@ class polyg_cham_geom_object(object):
 
         Vx = np.array(Vx, float)
         Vy = np.array(Vy, float)
-        
+
         self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
-        
+
         print("The area of the chamber is %.3e m^2"%self.area)
-        
+
         if self.area < 0:
             raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
 
@@ -150,10 +148,8 @@ class polyg_cham_geom_object(object):
             self.cythonisoutside = gipc.is_outside_nonconvex
             print('No assumption on the convexity of the polygon')
 
-
     def is_outside(self, x_mp, y_mp):
         return self.cythonisoutside(x_mp, y_mp, self.Vx, self.Vy, self.cx, self.cy, self.N_edg)
-
 
     #@profile
     def impact_point_and_normal(self, x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=0.99, flag_robust=True):
@@ -189,7 +185,6 @@ class polyg_cham_geom_object(object):
             Nx_int[mask_not_found]=Nx_corr
             Ny_int[mask_not_found]=Ny_corr
 
-
             x_in_error = x_in[mask_not_found]
             y_in_error = y_in[mask_not_found]
             x_out_error = x_out[mask_not_found]
@@ -210,9 +205,6 @@ class polyg_cham_geom_object(object):
                     for i_err in xrange(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         fbckt.write('1,'+lcurr+'\n')
-
-
-
 
         if flag_robust:
             flag_impact=self.is_outside(x_int, y_int)
@@ -273,9 +265,7 @@ class polyg_cham_geom_object(object):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('3,'+lcurr+'\n')
 
-
                 raise PyECLOUD_ChamberException('Outside after backtracking!!!!')
-
 
         return x_int, y_int, z_int, Nx_int, Ny_int, i_found
 
@@ -310,7 +300,6 @@ class polyg_cham_geom_object(object):
                     got_positive = True
                 if (got_negative and got_positive):
                     return False
-
 
             # If we got this far, the polygon is convex.
             return True
@@ -391,26 +380,23 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         # Needed to calculate histograms and positions later
         self.Vx = Vx = np.append(orig_Vx, orig_Vx[0])
         self.Vy = Vy = np.append(orig_Vy, orig_Vy[0])
-        
+
         self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
         print("The area of the chamber is %.3e m^2"%self.area)
         if self.area < 0:
             raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
-        
+
         self.seg_diff_x = seg_diff_x = np.diff(Vx)
         self.seg_diff_y = seg_diff_y = np.diff(Vy)
         self.cdf_bins = np.append(0, phem_cdf)
 
         len_segments = np.sqrt(seg_diff_x**2 + seg_diff_y**2)
 
-        
         if np.any(len_segments < 1e-9):
             raise PyECLOUD_ChamberException('Some segments have length 0!')
 
-        
         self.normal_vect_x = -seg_diff_y / len_segments
         self.normal_vect_y = seg_diff_x / len_segments
-
 
         self.phem_x0 = orig_Vx + self.distance_new_phem*self.normal_vect_x
         self.phem_y0 = orig_Vy + self.distance_new_phem*self.normal_vect_y

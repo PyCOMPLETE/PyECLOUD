@@ -97,7 +97,6 @@ def test_model_1():
     velocities = np.array([MP_e.vx_mp, MP_e.vy_mp, MP_e.vz_mp]).T
     energies = np.sum(velocities**2, axis=1)*m_e/2/e
 
-
     sp = plt.subplot(2,2,1)
     sp.grid(True)
     sp.set_xlabel('X dimension')
@@ -138,7 +137,7 @@ def test_model_1():
         yy[mask] = 1/sig
 
     sp.plot(xx,yy, color='g', lw=3)
-    
+
     xx, yy = MP_e.x_mp, MP_e.y_mp
 
     angles = np.arctan(yy/xx)
@@ -243,8 +242,6 @@ def test_model_2():
     phem_segment = gen_photoemission_class.photoemission_per_segment(
         chamb_phem, args.energy_dist, sig, mu, k_pe_st, args.angle_dist, None, None)
 
-
-
     sp = plt.subplot(2,2,3)
     sp.grid(True)
     sp.set_xlabel('X dimension')
@@ -264,7 +261,6 @@ def test_model_2():
     sp.set_xlabel('Angles [rad]')
     sp.set_ylabel('Normalized # generated')
     sp.set_title('Sin$^2$ distribution - per segment')
-
 
     angles_generated = np.arctan2(MP_e.y_mp, MP_e.x_mp)
     hist, bins = np.histogram(angles_generated, n_dist)
@@ -291,7 +287,6 @@ def test_model_3():
     phem_seg = gen_photoemission_class.photoemission_per_segment(
         chamb_photo_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
     N_mp_max = int(1e3)
-
 
     MP_e = init_mp(N_mp_max, chamb_seg)
     phem_seg.generate(MP_e, 1/c*N_mp_max, 1)
