@@ -66,3 +66,6 @@ save_mp_state_time_file =  -1
 #save_simulation_state_time_file =  list(25e-9*np.array([0., 15.]) - np.array([0., 2.5e-11]))
 
 checkpoint_DT = 3.*25e-9
+checkpoint_folder = './checkpoints/LHC_blabla/'
+copy_main_outp_DT = 3.*25e-9
+copy_main_outp_folder = './simulations/LHC_blabla/'

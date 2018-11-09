@@ -57,6 +57,7 @@ import hist_for as histf
 import time
 from scipy.constants import e as qe
 import myloadmat_to_obj as mlm
+import shutil
 try:
     # cPickle is faster in python2
     import cPickle as pickle
@@ -109,7 +110,8 @@ class pyecloud_saver:
                  x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
                  filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop',
                  flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True,
-                 checkpoint_DT=None):
+                 checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
+                 copy_main_outp_DT=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -132,15 +134,21 @@ class pyecloud_saver:
         # Init simulation state saving
         self._sim_state_init(save_simulation_state_time_file)
 
+        # Init checkpoint saving
+        self._checkpoint_init(checkpoint_DT, checkpoint_folder)
+
+        # Copying main output to safety
+        self._copy_main_outp_init(copy_main_outp_DT, copy_main_outp_folder)
+
         # Init charge distribution video saving
         self._rho_video_init(flag_movie)
 
         # Init electric field video saving
-        self._sc_video_init(flag_sc_movie)    
+        self._sc_video_init(flag_sc_movie)
 
         # Init step by step data saving
-        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center, 
-                                    initial_size_t_vect=1000)  
+        self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
+                                    initial_size_t_vect=1000)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
@@ -152,7 +160,7 @@ class pyecloud_saver:
         #Space charge electrostatic energy
         self.t_sc_video=[]
         self.U_sc_eV=[]
-        
+
         # Prepare space for density histogram calculation
         self.nel_hist_line = np.zeros(impact_man.Nxg_hist,float)
 
@@ -183,7 +191,7 @@ class pyecloud_saver:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
             self.sey_test_del_true_mat, self.sey_test_del_elast_mat = 0.,0.
-        
+
         # Log
         print('Done init pyecloud_saver.')
         flog=open(self.logfile_path,'a')
@@ -245,6 +253,8 @@ class pyecloud_saver:
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                        sec_beams_list, self.flag_multiple_clouds, cloud_list)
+
+            self._copy_main_outp_save(beamtim)
 
         if beamtim.flag_new_bunch_pass:
             self._logfile_progressfile_stofile(beamtim, MP_e)
@@ -383,7 +393,7 @@ class pyecloud_saver:
 
         return saved_dict
 
-    def _checkpoint_init(self, checkpoint_DT):
+    def _checkpoint_init(self, checkpoint_DT, checkpoint_folder):
         # Simulation state saver init
         if checkpoint_DT is None:
             self.flag_save_checkpoint=False
@@ -394,6 +404,10 @@ class pyecloud_saver:
             self.checkpoint_DT = checkpoint_DT
             self.t_last_checkp = 0
             self.i_checkp = 0
+            self.checkpoint_folder = checkpoint_folder
+            if not os.path.isdir(self.checkpoint_folder):
+                os.makedirs(self.checkpoint_folder)
+
 
     def _checkpoint_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
@@ -401,24 +415,55 @@ class pyecloud_saver:
         if (self.flag_save_checkpoint):
             if (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT):
 
-                outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp)
+                outpath = self.checkpoint_folder + 'simulation_checkpoint_%d.pkl'%(self.i_checkp)
 
                 self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                             sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
+                if self.copy_main_outp_folder is not None:
+                    self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
 
                 if self.i_checkp>0:
                     if self.flag_last_cloud:
-                        prevpath = outpath = self.folder_outp + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
+                        prevpath = self.checkpoint_folder + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
                         os.remove(prevpath)
                         print('Removed simulation checkpoint in: ' + prevpath)
 
                 self.i_checkp += 1
                 self.t_last_checkp = beamtim.tt_curr
 
-    def load_from_output(self, fname, last_t=None):
+    def _copy_main_outp_to_safety(self, outpath, beamtim):
+        shutil.copy(self.folder_outp + self.filen_main_outp, outpath)
+        self.t_last_copy = beamtim.tt_curr
+
+    def _copy_main_outp_init(self, copy_main_outp_DT, copy_main_outp_folder):
+        # Simulation state saver init
+        if copy_main_outp_DT is None:
+            self.flag_copy_main_output=False
+        elif type(copy_main_outp_DT) is int and copy_main_outp_DT < 0:
+            self.flag_copy_main_output=False
+        else:
+            self.flag_copy_main_output=True
+            self.t_last_copy = 0
+            self.copy_main_outp_DT = copy_main_outp_DT
+
+        self.copy_main_outp_folder = copy_main_outp_folder
+        if copy_main_outp_folder is not None:
+            if not os.path.isdir(self.copy_main_outp_folder):
+                os.makedirs(self.copy_main_outp_folder)
+        elif self.checkpoint_DT is not None:
+            if self.checkpoint_DT > 0:
+                raise ValueError('copy_main_outp_folder not specified in simulation_parameters.input')
+
+    def _copy_main_outp_save(self, beamtim):
+        if self.flag_copy_main_output:
+            if (beamtim.tt_curr - self.t_last_copy >= self.copy_main_outp_DT):
+                self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
+
+
+    def load_from_output(self, fname, load_output_folder='./', last_t=None):
 
         #restore the Pyecltest.mat up to last t
-        ob = mlm.myloadmat_to_obj(self.folder_outp + '/' + fname)
+        ob = mlm.myloadmat_to_obj(load_output_folder + '/' + fname)
         dict_history = mlm.obj_to_dict(ob)
 
         idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
