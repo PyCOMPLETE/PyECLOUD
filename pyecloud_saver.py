@@ -450,9 +450,8 @@ class pyecloud_saver:
         if copy_main_outp_folder is not None:
             if not os.path.isdir(self.copy_main_outp_folder):
                 os.makedirs(self.copy_main_outp_folder)
-        elif self.checkpoint_DT is not None:
-            if self.checkpoint_DT > 0:
-                raise ValueError('copy_main_outp_folder not specified in simulation_parameters.input')
+        elif self.flag_copy_main_output:
+            raise ValueError('copy_main_outp_folder not specified in simulation_parameters.input')
 
     def _copy_main_outp_save(self, beamtim):
         if self.flag_copy_main_output:
