@@ -266,14 +266,14 @@ class impact_management(object):
 
                     #subtract new macroparticles
                     v_new_MPs_mod = np.sqrt(vx_new_MPs**2+vy_new_MPs**2+vz_new_MPs**2)
-                    E_new_MPs_eV=0.5*MP_e.mass/qe*v_replace_mod*v_replace_mod
+                    E_new_MPs_eV=0.5*MP_e.mass/qe*v_new_MPs_mod*v_new_MPs_mod
 
-                    histf.compute_hist(x_mp_add,-nel_new_MPs*E_new_MPs_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                    histf.compute_hist(x_new_MPs,-nel_new_MPs*E_new_MPs_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
                         segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
-                    self.En_emit_last_step_eV += E_new_MPs_eV
+                    self.En_emit_last_step_eV += np.sum(E_new_MPs_eV)
 
         return MP_e
 
