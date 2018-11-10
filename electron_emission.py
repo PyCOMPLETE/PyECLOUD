@@ -178,6 +178,10 @@ For more info, see presentation by P. Dijkstal on the angle of emission
 of generated electrons (https://indico.cern.ch/event/673160/).
 """)
 
+def specular_velocity(vx_impact, vy_impact, Norm_x, Norm_y, v_impact_n):
+    vx_emit=vx_impact-2*v_impact_n*Norm_x
+    vy_emit=vy_impact-2*v_impact_n*Norm_y
+    return vx_emit, vy_emit
 
 # Photoelectron energy classes
 class _gen_energy_base(object):

@@ -49,7 +49,6 @@
 #-End-preamble---------------------------------------------------------
 
 import numpy as np
-import electron_emission
 import hist_for as histf
 import seg_impact as segi
 from scipy.constants import e as qe
@@ -66,15 +65,10 @@ class impact_management(object):
         if flag_seg and chamb.chamb_type!='polyg':
                 raise ValueError("""flag_seg can be True only with chamb_type='polyg'!!!!""")
 
-        self.switch_no_increase_energy = switch_no_increase_energy
         self.chamb = chamb
         self.sey_mod = sey_mod
-        self.E_th = E_th
-        self.sigmafit = sigmafit
-        self.mufit = mufit
         self.Dx_hist = Dx_hist
         self.scrub_en_th = scrub_en_th
-        self.thresh_low_energy = thresh_low_energy
         self.Nbin_En_hist = Nbin_En_hist
         self.En_hist_max = En_hist_max
         self.flag_seg = flag_seg
@@ -116,8 +110,6 @@ class impact_management(object):
             self.nel_hist_impact_seg=np.zeros(chamb.N_vert,float)
             self.energ_eV_impact_seg =np.zeros(chamb.N_vert,float)
 
-        self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
-
         print 'Done impact man. init.'
 
     def reset_impact_hist_tot(self):
@@ -153,7 +145,6 @@ class impact_management(object):
 
         if MP_e.N_mp>0:
 
-            switch_no_increase_energy = self.switch_no_increase_energy
             x_mp_old = old_pos.x_mp
             y_mp_old = old_pos.y_mp
             z_mp_old = old_pos.z_mp
@@ -168,17 +159,13 @@ class impact_management(object):
             nel_mp_th = MP_e.nel_mp_split
             chamb = self.chamb
             sey_mod = self.sey_mod
-            E_th = self.E_th
-            sigmafit = self.sigmafit
-            mufit = self.mufit
             bias_x_hist = self.bias_x_hist
             Dx_hist = self.Dx_hist
             En_hist_max = self.En_hist_max
             DEn_hist = self.DEn_hist
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
-            thresh_low_energy = self.thresh_low_energy
-
+            
             ## impact management
 
             flag_impact = np.zeros_like(x_mp, dtype=bool)
@@ -210,9 +197,6 @@ class impact_management(object):
                 vx_impact = vx_mp[flag_impact]
                 vy_impact = vy_mp[flag_impact]
                 vz_impact = vz_mp[flag_impact]
-                vx_emit   = np.zeros_like(vx_impact)
-                vy_emit   = np.zeros_like(vy_impact)
-                vz_emit   = np.zeros_like(vz_impact)
                 nel_impact = nel_mp[flag_impact]
 
                 # compute impact velocities, energy and angle
@@ -240,60 +224,25 @@ class impact_management(object):
                 En_imp_hist[En_imp_hist>En_hist_max]=En_hist_max
                 histf.compute_hist(En_imp_hist,nel_impact,0.,DEn_hist,self.En_hist_line)
 
-                nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact,E_impact_eV, costheta_impact, i_found)
-
                 self.Nel_impact_last_step=np.sum(nel_impact)
-                self.Nel_emit_last_step=np.sum(nel_emit)
-
                 self.En_imp_last_step_eV=np.sum(E_impact_eV*nel_impact)
 
-                # elastic reflection (only velocities are affected)
-                vx_emit[flag_elast]=vx_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_x[flag_elast]
-                vy_emit[flag_elast]=vy_impact[flag_elast]-2*v_impact_n[flag_elast]*Norm_y[flag_elast]
-                vz_emit[flag_elast]=vz_impact[flag_elast]
 
-                # true secondary
-                N_true_sec = np.sum(flag_truesec)
-                if N_true_sec == 0:
-                    n_add_total = 0
-                    N_mp_new = N_mp_old
-                else:
-                    n_add = np.zeros_like(flag_truesec, dtype=int)
-                    n_add[flag_truesec]=np.ceil(nel_emit[flag_truesec]/nel_mp_th)-1
-                    n_add[n_add<0]=0. #in case of underflow
-                    nel_emit[flag_truesec]=nel_emit[flag_truesec]/(n_add[flag_truesec]+1.)
 
-                    n_add_total = np.sum(n_add)
-                    N_mp_new = N_mp_old + n_add_total
 
-                    # replace impacted MPs that are not reflected
-                    En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
-                        switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
-                    vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
-                        N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], MP_e.mass)
+                HERE THERE WILL BE THE CALL
 
-                    # Add new MPs
-                    if n_add_total != 0:
-                        # Clone MPs
-                        x_mp_add = np.repeat(x_emit, n_add)
-                        y_mp_add = np.repeat(y_emit, n_add)
-                        z_mp_add = np.repeat(z_emit, n_add)
-                        norm_x_add = np.repeat(Norm_x, n_add)
-                        norm_y_add = np.repeat(Norm_y, n_add)
-                        nel_mp_add = np.repeat(nel_emit, n_add)
-                        E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
-                        # Generate new MP properties, angles and energies
-                        En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
-                            switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
-                        vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
-                            n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, MP_e.mass)
+                
 
-                        MP_e.add_new_MPs(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
-                                         vx_mp_add, vy_mp_add, vz_mp_add)
+                self.Nel_emit_last_step=np.sum(nel_emit)
 
-                        if flag_seg:
-                            i_found_new_mp[N_mp_old:N_mp_new] = np.repeat(i_found, n_add)
+                
+
+
+                MP_e.add_new_MPs(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
+                 vx_mp_add, vy_mp_add, vz_mp_add)
+                
 
                 x_mp[flag_impact]  = x_emit
                 y_mp[flag_impact]  = y_emit

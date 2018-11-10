@@ -50,6 +50,7 @@
 
 from numpy import sqrt, exp
 from numpy.random import rand
+import electron_emission as ee
 
 def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
 
@@ -84,23 +85,110 @@ class SEY_model_ECLOUD:
                     E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
                 ):
 
-            self.Emax = Emax
-            self.del_max = del_max
-            self.R0 = R0
-            self.E0 = E0
-            self.s = s
-            self.flag_costheta_delta_scale = flag_costheta_delta_scale
-            self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
+        self.E_th = E_th
+        self.sigmafit = sigmafit
+        self.mufit = mufit
+        self.switch_no_increase_energy = switch_no_increase_energy
+        self.thresh_low_energy = thresh_low_energy
+        self.secondary_angle_distribution = secondary_angle_distribution
 
-            print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
+        self.Emax = Emax
+        self.del_max = del_max
+        self.R0 = R0
+        self.E0 = E0
+        self.s = s
+        self.flag_costheta_delta_scale = flag_costheta_delta_scale
+        self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
+
+        if secondary_angle_distribution is not None:
+            import electron_emission
+            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
+        else:
+            self.angle_dist_func = None
+
+
+        print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac = yield_fun2(
-                E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s,
-                flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
-            flag_elast=(rand(len(ref_frac))<ref_frac)
-            flag_truesec=~(flag_elast)
-            nel_emit=nel_impact*yiel
+            
+        yiel, ref_frac = yield_fun2(
+            E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s,
+            flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
+        flag_elast=(rand(len(ref_frac))<ref_frac)
+        flag_truesec=~(flag_elast)
+        nel_emit=nel_impact*yiel
 
-            return nel_emit, flag_elast, flag_truesec
+        return nel_emit, flag_elast, flag_truesec
+
+    def impacts_on_surface(self, nel_impact, x_impact, y_impact, z_impact, 
+                                vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found
+                                v_impact_n, E_impact_eV, costheta_impact, nel_mp_th):
+
+        
+        nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact,E_impact_eV, costheta_impact, i_found)
+
+        nel_replace = nel_impact.copy()
+        x_replace = x_impact.copy()
+        y_replace = y_impact.copy()
+        z_replace = z_impact.copy()
+        vx_replace = vx_impact.copy()
+        vy_replace = vy_impact.copy()
+        vz_replace = vz_impact.copy()
+        i_seg_replace = i_found.copy()
+
+        # Handle elastics
+        vx_replace[flag_elast], vy_replace[flag_elast] =  ee.specular_velocity(
+                                                        vx_impact[flag_elast], vy_impact[flag_elast], 
+                                                        Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
+                                                        )
+
+        # true secondary
+        N_true_sec = np.sum(flag_truesec)
+        if N_true_sec > 0:
+
+            n_add = np.zeros_like(flag_truesec, dtype=int)
+            n_add[flag_truesec]=np.ceil(nel_replace[flag_truesec]/nel_mp_th)-1
+            n_add[n_add<0]=0. #in case of underflow
+            nel_replace[flag_truesec]=nel_replace[flag_truesec]/(n_add[flag_truesec]+1.)
+
+            n_add_total = np.sum(n_add)
+            N_mp_new = N_mp_old + n_add_total
+
+            # MPs to be replaced
+            En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
+                switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
+            vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
+                N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], MP_e.mass)
+
+            # Add new MPs
+            if n_add_total != 0:
+                # Clone MPs
+                x_mp_add = np.repeat(x_emit, n_add)
+                y_mp_add = np.repeat(y_emit, n_add)
+                z_mp_add = np.repeat(z_emit, n_add)
+                norm_x_add = np.repeat(Norm_x, n_add)
+                norm_y_add = np.repeat(Norm_y, n_add)
+                nel_mp_add = np.repeat(nel_emit, n_add)
+                E_impact_eV_add = np.repeat(E_impact_eV, n_add)
+
+                # Generate new MP properties, angles and energies
+                En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
+                    switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
+                vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
+                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, MP_e.mass)
+
+
+
+                if flag_seg:
+                    i_found_new_mp[N_mp_old:N_mp_new] = np.repeat(i_found, n_add)
+
+
+
+        event_type = flag_truesec
+        event_info = {}
+
+        return nel_emit_tot_events, event_type, event_info, 
+               nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,
+               nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
+
 
