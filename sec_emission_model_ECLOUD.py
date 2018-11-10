@@ -127,7 +127,7 @@ class SEY_model_ECLOUD:
         
         nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact,E_impact_eV, costheta_impact, i_found)
 
-        nel_replace = nel_emit_tot_events
+        nel_replace = nel_emit_tot_events.copy()
         x_replace = x_impact.copy()
         y_replace = y_impact.copy()
         z_replace = z_impact.copy()
