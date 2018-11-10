@@ -186,7 +186,8 @@ class pyecloud_saver:
             n_rep = 10000
             self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
             self.sey_test_cos_theta = np.linspace(0, 1., 10)
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta)
+            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = \
+                impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta , MP_e.charge, MP_e.mass)
         else:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.

@@ -277,11 +277,7 @@ class impact_management(object):
 
         return MP_e
 
-    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
-
-        sey_mod = self.sey_mod
-
-        nel_impact = 1. + 0.*E_impact_eV_test
+    def extract_sey_curves(self, n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
         del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
@@ -290,11 +286,32 @@ class impact_management(object):
             print('%d/%d'%(i_ct+1, len(cos_theta_test)))
             for i_ene, Ene in enumerate(E_impact_eV_test):
 
-                nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
-                                E_impact_eV=Ene*np.ones(n_rep), costheta_impact=np.ones(n_rep)*ct, i_impact=np.array(n_rep*[0]))
+                # nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
+                #                 E_impact_eV=Ene*np.ones(n_rep), costheta_impact=np.ones(n_rep)*ct, i_impact=np.array(n_rep*[0]))
+                nel_impact = np.ones(n_rep)
+                # Assuming normal is along x
+                v_mod = np.sqrt(2*Ene*qe/mass)*np.ones_like(nel_impact)
+                vx = v_mod*ct
+                vy = v_mod*np.sqrt(1-ct*ct)
 
-                del_true_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_truesec))/float(n_rep)
-                del_elast_mat[i_ct, i_ene] = np.mean(nel_emit)*float(np.sum(flag_elast))/float(n_rep)
+                nel_emit_tot_events, event_type, event_info,\
+                    nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
+                    nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
+                    self.sey_mod.impacts_on_surface(
+                                mass = mass, nel_impact=nel_impact, x_impact=nel_impact*0, y_impact=nel_impact*0, z_impact=nel_impact*0, 
+                                vx_impact=vx*np.ones_like(nel_impact), 
+                                vy_impact=vy*np.ones_like(nel_impact), 
+                                vz_impact=nel_impact*0, 
+                                Norm_x=np.ones_like(nel_impact), Norm_y=np.zeros_like(nel_impact), 
+                                i_found=np.int_(np.ones_like(nel_impact)),
+                                v_impact_n = vx*np.ones_like(nel_impact), 
+                                E_impact_eV = Ene*np.ones_like(nel_impact), 
+                                costheta_impact = ct*np.ones_like(nel_impact), 
+                                nel_mp_th=1, 
+                                flag_seg = True)
+                del_tot = (np.sum(nel_replace) + np.sum(nel_new_MPs))/n_rep
+                del_true_mat[i_ct, i_ene] = del_tot*float(np.sum(event_type))/float(n_rep)
+                del_elast_mat[i_ct, i_ene] = del_tot*float(np.sum(~event_type))/float(n_rep)
         print('Done extracting SEY curves.')
 
         return del_true_mat, del_elast_mat
