@@ -48,6 +48,7 @@
 #
 #-End-preamble---------------------------------------------------------
 
+import numpy as np
 from numpy import sqrt, exp
 from numpy.random import rand
 import electron_emission as ee
@@ -120,7 +121,7 @@ class SEY_model_ECLOUD:
         return nel_emit, flag_elast, flag_truesec
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact, 
-                                vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found
+                                vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                                 v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
         
@@ -143,6 +144,7 @@ class SEY_model_ECLOUD:
 
         # true secondary
         N_true_sec = np.sum(flag_truesec)
+        n_add_total = 0
         if N_true_sec > 0:
 
             n_add = np.zeros_like(flag_truesec, dtype=int)
@@ -153,7 +155,7 @@ class SEY_model_ECLOUD:
             n_add_total = np.sum(n_add)
 
             # MPs to be replaced
-            En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
+            En_truesec_eV = ee.sec_energy_hilleret_model2(
                 self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit, 
                 self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
 
@@ -172,7 +174,7 @@ class SEY_model_ECLOUD:
                 E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
                 # Generate new MP properties, angles and energies
-                En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
+                En_truesec_eV_add = ee.sec_energy_hilleret_model2(
                     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit, 
                     self.E_th, E_impact_eV_add, self.thresh_low_energy)
                 
@@ -183,14 +185,24 @@ class SEY_model_ECLOUD:
                     i_seg_new_MPs = np.repeat(i_found, n_add)
                 else:
                     i_seg_new_MPs = None
+        
+        if n_add_total==0:
+            nel_new_MPs = np.array([])
+            x_new_MPs = np.array([])
+            y_new_MPs = np.array([])
+            z_new_MPs = np.array([])
+            vx_new_MPs = np.array([])
+            vy_new_MPs = np.array([])
+            vz_new_MPs = np.array([])
+            i_seg_new_MPs = np.array([])
 
 
 
         event_type = flag_truesec
         event_info = {}
 
-        return nel_emit_tot_events, event_type, event_info, 
-               nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,
+        return nel_emit_tot_events, event_type, event_info,\
+               nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
                nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
 
 

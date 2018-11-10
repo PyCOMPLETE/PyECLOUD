@@ -190,7 +190,7 @@ class impact_management(object):
                 z_out=z_mp[flag_impact]
 
                 # backtracking and surface normal generation
-                [x_emit,y_emit,z_emit,Norm_x,Norm_y, i_found]=\
+                [x_impact,y_impact,z_impact,Norm_x,Norm_y, i_found]=\
                     chamb.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out)
 
                 # load velocities and charges
@@ -208,9 +208,9 @@ class impact_management(object):
                 costheta_impact = np.abs(v_impact_n/v_impact_mod)
 
                 #electron histogram
-                histf.compute_hist(x_emit, nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
-                histf.compute_hist(x_emit, nel_impact*(E_impact_eV>scrub_en_th),bias_x_hist,Dx_hist,self.nel_impact_hist_scrub)
-                histf.compute_hist(x_emit, nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                histf.compute_hist(x_impact, nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
+                histf.compute_hist(x_impact, nel_impact*(E_impact_eV>scrub_en_th),bias_x_hist,Dx_hist,self.nel_impact_hist_scrub)
+                histf.compute_hist(x_impact, nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                 # angle histogram
                 if self.flag_cos_angle_hist:
@@ -228,49 +228,52 @@ class impact_management(object):
                 self.En_imp_last_step_eV=np.sum(E_impact_eV*nel_impact)
 
 
+                nel_emit_tot_events, event_type, event_info,\
+                    nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
+                    nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
+                    self.sey_mod.impacts_on_surface(
+                                MP_e.mass, nel_impact, x_impact, y_impact, z_impact, 
+                                vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
+                                v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg
+                                                   )
 
+                self.Nel_emit_last_step = np.sum(nel_emit_tot_events)
 
-                HERE THERE WILL BE THE CALL
-
-
-                
-
-                self.Nel_emit_last_step=np.sum(nel_emit)
-
-                
-
-
-                MP_e.add_new_MPs(n_add_total, nel_mp_add, x_mp_add, y_mp_add, z_mp_add,
-                 vx_mp_add, vy_mp_add, vz_mp_add)
-                
-
-                x_mp[flag_impact]  = x_emit
-                y_mp[flag_impact]  = y_emit
-                z_mp[flag_impact]  = z_emit
-                vx_mp[flag_impact] = vx_emit
-                vy_mp[flag_impact] = vy_emit
-                vz_mp[flag_impact] = vz_emit
-                nel_mp[flag_impact]= nel_emit
+                # Replace old MPs
+                x_mp[flag_impact]  = x_replace
+                y_mp[flag_impact]  = y_replace
+                z_mp[flag_impact]  = z_replace
+                vx_mp[flag_impact] = vx_replace
+                vy_mp[flag_impact] = vy_replace
+                vz_mp[flag_impact] = vz_replace
+                nel_mp[flag_impact]= nel_replace
 
                 #subtract replaced macroparticles
-                v_emit_mod = np.sqrt(vx_emit**2+vy_emit**2+vz_emit**2)
-                E_emit_eV=0.5*MP_e.mass/qe*v_emit_mod*v_emit_mod
-                histf.compute_hist(x_emit,-nel_emit*E_emit_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                v_replace_mod = np.sqrt(vx_replace**2+vy_replace**2+vz_replace**2)
+                E_replace_eV=0.5*MP_e.mass/qe*v_replace_mod*v_replace_mod
 
+                self.En_emit_last_step_eV = np.sum(E_replace_eV*nel_replace)
+
+                histf.compute_hist(x_replace,-nel_replace*E_replace_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
                 if flag_seg:
-                    segi.update_seg_impact(i_found,-nel_emit*E_emit_eV,self.energ_eV_impact_seg)
+                    segi.update_seg_impact(i_found,-nel_replace*E_replace_eV,self.energ_eV_impact_seg)
 
-                self.En_emit_last_step_eV=np.sum(E_emit_eV*nel_emit)
+                # New macroparticles
+                N_new_MPs = len(nel_new_MPs)
+                if N_new_MPs>0:
+                    MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs,
+                                        vx_new_MPs, vy_new_MPs, vz_new_MPs)
 
-                #subtract new macroparticles
-                if n_add_total > 0:
-                    wei =-nel_mp_add*En_truesec_eV_add
-                    histf.compute_hist(x_mp_add,wei,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                    #subtract new macroparticles
+                    v_new_MPs_mod = np.sqrt(vx_new_MPs**2+vy_new_MPs**2+vz_new_MPs**2)
+                    E_new_MPs_eV=0.5*MP_e.mass/qe*v_replace_mod*v_replace_mod
+
+                    histf.compute_hist(x_mp_add,-nel_new_MPs*E_new_MPs_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
                         segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
-                    self.En_emit_last_step_eV += np.sum(En_truesec_eV_add*nel_mp_add)
+                    self.En_emit_last_step_eV += E_new_MPs_eV
 
         return MP_e
 
