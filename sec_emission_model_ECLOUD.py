@@ -92,6 +92,12 @@ class SEY_model_ECLOUD:
         self.thresh_low_energy = thresh_low_energy
         self.secondary_angle_distribution = secondary_angle_distribution
 
+        if secondary_angle_distribution is not None:
+            import electron_emission
+            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
+        else:
+            self.angle_dist_func = None
+
         self.Emax = Emax
         self.del_max = del_max
         self.R0 = R0
@@ -99,13 +105,6 @@ class SEY_model_ECLOUD:
         self.s = s
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
-
-        if secondary_angle_distribution is not None:
-            import electron_emission
-            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
-        else:
-            self.angle_dist_func = None
-
 
         print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
 
@@ -120,9 +119,9 @@ class SEY_model_ECLOUD:
 
         return nel_emit, flag_elast, flag_truesec
 
-    def impacts_on_surface(self, nel_impact, x_impact, y_impact, z_impact, 
+    def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact, 
                                 vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found
-                                v_impact_n, E_impact_eV, costheta_impact, nel_mp_th):
+                                v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
         
         nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact,E_impact_eV, costheta_impact, i_found)
@@ -138,8 +137,8 @@ class SEY_model_ECLOUD:
 
         # Handle elastics
         vx_replace[flag_elast], vy_replace[flag_elast] =  ee.specular_velocity(
-                                                        vx_impact[flag_elast], vy_impact[flag_elast], 
-                                                        Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
+                                                            vx_impact[flag_elast], vy_impact[flag_elast], 
+                                                            Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
                                                         )
 
         # true secondary
@@ -152,35 +151,38 @@ class SEY_model_ECLOUD:
             nel_replace[flag_truesec]=nel_replace[flag_truesec]/(n_add[flag_truesec]+1.)
 
             n_add_total = np.sum(n_add)
-            N_mp_new = N_mp_old + n_add_total
 
             # MPs to be replaced
             En_truesec_eV = electron_emission.sec_energy_hilleret_model2(
-                switch_no_increase_energy, N_true_sec, sigmafit, mufit, E_th, E_impact_eV[flag_truesec], thresh_low_energy)
-            vx_emit[flag_truesec], vy_emit[flag_truesec], vz_emit[flag_truesec] = self.angle_dist_func(
-                N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], MP_e.mass)
+                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit, 
+                self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+
+            vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
+                N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
 
             # Add new MPs
             if n_add_total != 0:
                 # Clone MPs
-                x_mp_add = np.repeat(x_emit, n_add)
-                y_mp_add = np.repeat(y_emit, n_add)
-                z_mp_add = np.repeat(z_emit, n_add)
+                x_new_MPs = np.repeat(x_impact, n_add)
+                y_new_MPs = np.repeat(y_impact, n_add)
+                z_new_MPs = np.repeat(z_impact, n_add)
                 norm_x_add = np.repeat(Norm_x, n_add)
                 norm_y_add = np.repeat(Norm_y, n_add)
-                nel_mp_add = np.repeat(nel_emit, n_add)
+                nel_new_MPs = np.repeat(nel_replace, n_add)
                 E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
                 # Generate new MP properties, angles and energies
                 En_truesec_eV_add = electron_emission.sec_energy_hilleret_model2(
-                    switch_no_increase_energy, n_add_total, sigmafit, mufit, E_th, E_impact_eV_add, thresh_low_energy)
-                vx_mp_add, vy_mp_add, vz_mp_add = self.angle_dist_func(
-                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, MP_e.mass)
-
-
+                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit, 
+                    self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                
+                vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
+                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
                 if flag_seg:
-                    i_found_new_mp[N_mp_old:N_mp_new] = np.repeat(i_found, n_add)
+                    i_seg_new_MPs = np.repeat(i_found, n_add)
+                else:
+                    i_seg_new_MPs = None
 
 
 
