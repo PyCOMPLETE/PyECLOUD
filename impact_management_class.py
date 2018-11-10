@@ -55,9 +55,11 @@ import seg_impact as segi
 from scipy.constants import e as qe
 
 class impact_management(object):
-    def __init__(self, switch_no_increase_energy, chamb, sey_mod, E_th, sigmafit, mufit,
-                 Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, thresh_low_energy=None, flag_seg=False,
-                 cos_angle_width=0.05, flag_cos_angle_hist=True,  secondary_angle_distribution=None):
+    def __init__(
+                    self, chamb, sey_mod,
+                    Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, flag_seg=False,
+                    cos_angle_width=0.05, flag_cos_angle_hist=True
+                ):
 
         print 'Start impact man. init.'
 

@@ -298,7 +298,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             if thiscloud.switch_model in (0, 'ECLOUD'):
                 kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
                 kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
-                sey_mod=SEY_model_ECLOUD(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,**kwargs_secem)
+                sey_mod=SEY_model_ECLOUD(
+                                            thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                                            switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                            thresh_low_energy=thiscloud.thresh_low_energy,
+                                            secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                            **kwargs_secem)
             elif thiscloud.switch_model in (1, 'ACC_LOW'):
                 sey_mod=SEY_model_acc_low_ene(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,**kwargs_secem)
             elif thiscloud.switch_model == 'ECLOUD_nunif':
@@ -327,10 +333,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             impact_man_class=imc.impact_management
 
-        impact_man = impact_man_class(thiscloud.switch_no_increase_energy, chamb, sey_mod, thiscloud.E_th, thiscloud.sigmafit, thiscloud.mufit,
+        impact_man = impact_man_class(chamb, sey_mod, 
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
-                                      thresh_low_energy=thiscloud.thresh_low_energy, flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
-                                      secondary_angle_distribution=thiscloud.secondary_angle_distribution)
+                                      flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
+                                      )
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag==1:

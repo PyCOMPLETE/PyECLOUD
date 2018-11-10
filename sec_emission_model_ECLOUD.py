@@ -77,7 +77,13 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 
 class SEY_model_ECLOUD:
-    def __init__(self, Emax,del_max,R0,E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
+    def __init__(   
+                    self, Emax,del_max,R0,
+                    E_th=None, sigmafit=None, mufit=None, 
+                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+                    E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
+                ):
+
             self.Emax = Emax
             self.del_max = del_max
             self.R0 = R0
