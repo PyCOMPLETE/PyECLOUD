@@ -377,8 +377,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        y_min_hist_det=thiscloud.y_min_hist_det, y_max_hist_det=thiscloud.y_max_hist_det,
                                        Dx_hist_det=thiscloud.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thiscloud.filen_main_outp,
                                        flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
-                                       flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud)
-            print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp )
+                                       flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud,
+                                       checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
+                                       copy_main_outp_DT=cc.copy_main_outp_DT)
+            print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker
         if cc.track_method == 'Boris':
@@ -403,6 +405,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
+
 
         # Initial electron density
         if thiscloud.init_unif_flag==1:
@@ -439,6 +442,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             sec_beams_list,
             config_dict,
             flag_multiple_clouds,
-            cloud_list
+            cloud_list,
+            cc.checkpoint_folder
             )
-

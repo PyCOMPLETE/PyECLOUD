@@ -18,3 +18,9 @@ class obj_from_dict:
 def myloadmat_to_obj(filename):
     return obj_from_dict(myloadmat(filename))
 
+def obj_to_dict(obj):
+    dict_out = {}
+    members = dir(obj)
+    for member in members:
+        exec "dict_out['%s'] = obj.%s" % (member, member)
+    return dict_out

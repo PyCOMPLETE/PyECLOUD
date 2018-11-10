@@ -83,7 +83,7 @@ def update_config_dict(config_dict, module, module_name, verbose=False, default_
         if parameter in config_dict:
             raise PyECLOUD_ConfigException('Parameter %s is specified multiple times!' % parameter)
 
-        # Upadate config dictionary
+        # Update config dictionary
         config_dict[parameter] = value
 
         if verbose:
@@ -147,4 +147,3 @@ def import_module_from_file(module_name, file_name):
         shutil.rmtree(dir_name)
 
     return module
-

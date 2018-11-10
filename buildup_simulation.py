@@ -54,6 +54,7 @@
 import init as init
 import cPickle
 import numpy as np
+import os
 
 
 class BuildupSimulation(object):
@@ -62,7 +63,7 @@ class BuildupSimulation(object):
 
         print 'PyECLOUD Version 7.5.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
-        config_dict, flag_multiple_clouds, cloud_list = init.read_input_files_and_init_components(\
+        config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
                                                     pyecl_input_folder=pyecl_input_folder,
                                                     skip_beam=skip_beam,
                                                     skip_pyeclsaver=skip_pyeclsaver,
@@ -80,6 +81,21 @@ class BuildupSimulation(object):
         self.flag_multiple_clouds = flag_multiple_clouds
         self.cloud_list = cloud_list
         self.chamb = cloud_list[0].impact_man.chamb
+        self.checkpoint_folder = checkpoint_folder
+
+        # Checking if there are saved checkpoints
+        if self.checkpoint_folder is not None:
+            if os.path.isdir(self.checkpoint_folder):
+                if len(os.listdir(self.checkpoint_folder)) == 1:
+                    print('Loading from checkpoint...')
+                    # Selecting latest checkpoint
+                    checkpoint = os.listdir(self.checkpoint_folder)[0]
+                    self.load_checkpoint(filename_simulation_checkpoint=checkpoint, load_from_folder=self.checkpoint_folder)
+                elif len(os.listdir(self.checkpoint_folder)) == 0:
+                    print('No checkpoint found, starting new simulation...')
+                else:
+                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
+
 
     def run(self, t_end_sim = None):
 
@@ -239,11 +255,11 @@ class BuildupSimulation(object):
                     ## Soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
 
-    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted'): #, reset_pyeclsaver = True):
+    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'): #, reset_pyeclsaver = True):
 
-        print 'Realoading state from file: %s...'% filename_simulation_state
+        print 'Reloading state from file: %s...'% filename_simulation_state
 
-        with open(filename_simulation_state, 'rb') as fid:
+        with open(load_from_folder + filename_simulation_state, 'rb') as fid:
             dict_state = cPickle.load(fid)
 
         self.beamtim = dict_state['beamtim']
@@ -265,10 +281,24 @@ class BuildupSimulation(object):
             if force_disable_save_simulation_state:
                 cloud.pyeclsaver.flag_save_simulation_state = False
 
-            filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
-            filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
-            cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
+            if filen_main_outp is not None:
+                filen_outp_ext = filen_main_outp.split('Pyecltest')[-1]
+                filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
+                cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
         print 'Done reload.'
+        return dict_state
+
+    def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):
+        print 'Realoading from checkpoint: %s...'% (load_from_folder+filename_simulation_checkpoint)
+
+        i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
+        dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)
+
+        for cloud in self.cloud_list:
+            cloud.pyeclsaver.load_from_output(fname=cloud.pyeclsaver.filen_main_outp, load_output_folder=cloud.pyeclsaver.copy_main_outp_folder, last_t=self.beamtim.tt_curr)
+            cloud.pyeclsaver.i_checkp = i_checkp + 1
+            cloud.pyeclsaver.t_last_checkp = self.beamtim.tt_curr
+            cloud.pyeclsaver.t_last_En_hist = dict_state['t_last_En_hist']

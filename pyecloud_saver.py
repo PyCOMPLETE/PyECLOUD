@@ -56,6 +56,8 @@ import subprocess
 import hist_for as histf
 import time
 from scipy.constants import e as qe
+import myloadmat_to_obj as mlm
+import shutil
 try:
     # cPickle is faster in python2
     import cPickle as pickle
@@ -107,7 +109,9 @@ class pyecloud_saver:
                  save_simulation_state_time_file = -1,
                  x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
                  filen_main_outp = 'Pyecltest', dec_fact_out = 1, stopfile = 'stop',
-                 flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True):
+                 flag_multiple_clouds = False, cloud_name = None, flag_last_cloud = True,
+                 checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
+                 copy_main_outp_DT=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -129,6 +133,12 @@ class pyecloud_saver:
 
         # Init simulation state saving
         self._sim_state_init(save_simulation_state_time_file)
+
+        # Init checkpoint saving
+        self._checkpoint_init(checkpoint_DT, checkpoint_folder)
+
+        # Copying main output to safety
+        self._copy_main_outp_init(copy_main_outp_DT, copy_main_outp_folder)
 
         # Init charge distribution video saving
         self._rho_video_init(flag_movie)
@@ -169,6 +179,7 @@ class pyecloud_saver:
         else:
             self.t_sec_beams = -1
             self.sec_beam_profiles = -1
+
 
         # extract SEY curves
         if self.extract_sey:
@@ -238,6 +249,12 @@ class pyecloud_saver:
             self.area = impact_man.chamb.area
 
             sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
+
+            # Check for checkpoint save state
+            self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                       sec_beams_list, self.flag_multiple_clouds, cloud_list)
+
+            self._copy_main_outp_save(beamtim)
 
         if beamtim.flag_new_bunch_pass:
             self._logfile_progressfile_stofile(beamtim, MP_e)
@@ -376,13 +393,176 @@ class pyecloud_saver:
 
         return saved_dict
 
+    def _checkpoint_init(self, checkpoint_DT, checkpoint_folder):
+        # Simulation state saver init
+        if checkpoint_DT is None:
+            self.flag_save_checkpoint=False
+        elif type(checkpoint_DT) is int and checkpoint_DT == -1:
+            self.flag_save_checkpoint=False
+        else:
+            self.flag_save_checkpoint=True
+            self.checkpoint_DT = checkpoint_DT
+            self.t_last_checkp = 0
+            self.i_checkp = 0
+            self.checkpoint_folder = checkpoint_folder
+            if not os.path.isdir(self.checkpoint_folder):
+                os.makedirs(self.checkpoint_folder)
+
+
+    def _checkpoint_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                    sec_beams_list, flag_multiple_clouds, cloud_list):
+        # First check if it is time to save a checkpoint
+        if (self.flag_save_checkpoint):
+            if (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT):
+
+                outpath = self.checkpoint_folder + 'simulation_checkpoint_%d.pkl'%(self.i_checkp)
+
+                self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                            sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
+                if self.copy_main_outp_folder is not None:
+                    self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
+
+                if self.i_checkp>0:
+                    if self.flag_last_cloud:
+                        prevpath = self.checkpoint_folder + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
+                        os.remove(prevpath)
+                        print('Removed simulation checkpoint in: ' + prevpath)
+
+                self.i_checkp += 1
+                self.t_last_checkp = beamtim.tt_curr
+
+    def _copy_main_outp_to_safety(self, outpath, beamtim):
+        shutil.copy(self.folder_outp + self.filen_main_outp, outpath)
+        self.t_last_copy = beamtim.tt_curr
+
+    def _copy_main_outp_init(self, copy_main_outp_DT, copy_main_outp_folder):
+        # Simulation state saver init
+        if copy_main_outp_DT is None:
+            self.flag_copy_main_output=False
+        elif type(copy_main_outp_DT) is int and copy_main_outp_DT < 0:
+            self.flag_copy_main_output=False
+        else:
+            self.flag_copy_main_output=True
+            self.t_last_copy = 0
+            self.copy_main_outp_DT = copy_main_outp_DT
+
+        self.copy_main_outp_folder = copy_main_outp_folder
+        if copy_main_outp_folder is not None:
+            if not os.path.isdir(self.copy_main_outp_folder):
+                os.makedirs(self.copy_main_outp_folder)
+        elif self.flag_copy_main_output:
+            raise ValueError('copy_main_outp_folder not specified in simulation_parameters.input')
+
+    def _copy_main_outp_save(self, beamtim):
+        if self.flag_copy_main_output:
+            if (beamtim.tt_curr - self.t_last_copy >= self.copy_main_outp_DT):
+                self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
+
+
+    def load_from_output(self, fname, load_output_folder='./', last_t=None):
+
+        #restore the Pyecltest.mat up to last t
+        ob = mlm.myloadmat_to_obj(load_output_folder + '/' + fname)
+        dict_history = mlm.obj_to_dict(ob)
+
+        idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
+        idx_t_hist = (np.abs(dict_history['t_hist'] - last_t)).argmin()
+        idx_t_sc_video = (np.abs(dict_history['t_sc_video'] - last_t)).argmin()
+
+        # Delete everything in Pyecltest.mat recorded after the last checkpoint
+        saved_every_timestep_list = ['En_emit_eV_time',
+                                     'En_imp_eV_time',
+                                     'En_kin_eV_time',
+                                     'Nel_emit_time',
+                                     'Nel_imp_time',
+                                     'Nel_timep',
+                                     'cen_density',
+                                     'lam_t_array',
+                                     'N_mp_time',
+                                     't']
+
+        saved_every_passage_list = ['En_hist',
+                                    't_En_hist',
+                                    'N_mp_corrected_pass',
+                                    'N_mp_impact_pass',
+                                    'N_mp_pass',
+                                    'N_mp_ref_pass',
+                                    'energ_eV_impact_hist',
+                                    'energ_eV_impact_seg',
+                                    'nel_hist',
+                                    'nel_hist_det',
+                                    'nel_hist_impact_seg',
+                                    'nel_impact_hist_scrub',
+                                    'nel_impact_hist_tot',
+                                    'cos_angle_hist',
+                                    't_hist']
+
+        not_time_dependent_list = ['xg_hist',
+                                   'xg_hist_det',
+                                   'En_g_hist',
+                                   'b_spac',
+                                   't_sec_beams',
+                                   'sec_beam_profiles',
+                                   'x_el_dens_probes',
+                                   'y_el_dens_probes',
+                                   'r_el_dens_probes',
+                                   'xg_hist_cos_angle',
+                                   'el_dens_at_probes',
+                                   'dec_fact_out',
+                                   'chamber_area',
+                                   'sey_test_del_true_mat',
+                                   'sey_test_E_impact_eV',
+                                   'sey_test_del_elast_mat',
+                                   'sey_test_cos_theta',
+                                   'U_sc_eV'
+                                   ]
+
+        should_be_list_list = ['U_sc_eV',
+                               'x_el_dens_probes',
+                               'y_el_dens_probes',
+                               'r_el_dens_probes'
+                               ]
+
+        treated_separately_list = ['t_sc_video'] # This list is not used
+
+        dict_restored = {}
+        for var in saved_every_timestep_list:
+            if var in dict_history.keys():
+                if dict_history[var].shape == np.array(0).shape:
+                    dict_restored[var] = dict_history[var]
+                else:
+                    dict_restored[var] = dict_history[var][: idx_t+1]
+        self.i_last_save = len(dict_restored['Nel_timep'])-1
+
+        for var in saved_every_passage_list:
+            if var in dict_history.keys():
+                if dict_history[var].shape == np.array(0).shape:
+                    dict_restored[var] = dict_history[var].tolist()
+                else:
+                    dict_restored[var] = dict_history[var][: idx_t_hist+1].tolist()
+
+        for var in not_time_dependent_list:
+            if var in dict_history.keys():
+                if var in should_be_list_list:
+                    dict_restored[var] = dict_history[var].tolist()
+                else:
+                    dict_restored[var] = dict_history[var]
+
+        # Treating t_sc_video separately because of different indicies
+        if 't_sc_video' in dict_history.keys():
+            dict_restored['t_sc_video'] = dict_history['t_sc_video'][: idx_t_sc_video+1].tolist()
+
+        # Restore this pyecloud_saver object with values from dict_restored
+        for var in dict_restored.keys():
+            setattr(self, var, dict_restored[var])
+
     def _stepbystep_check_for_data_resize(self):
-        if self.i_last_save==(len(self.t_dec)-1):
-            print('Saver: resizing from %d to %d...'%(len(self.t_dec), 2*len(self.t_dec)))
+        if self.i_last_save>=(len(self.t)-1):
+            print('Saver: resizing from %d to %d...'%(len(self.t), 2*len(self.t)))
             list_members = [
-                't_dec',
-                'lam_t_array_dec',
-                'Nel_time',
+                't',
+                'lam_t_array',
+                'Nel_timep',
                 'Nel_imp_time',
                 'Nel_emit_time',
                 'En_imp_eV_time',
@@ -421,18 +601,18 @@ class pyecloud_saver:
         self.En_emit_last_step_group_eV = 0
 
         #step by step data
-        self.t_dec = np.zeros(initial_size_t_vect, dtype=float)
-        self.lam_t_array_dec = 0*self.t_dec
-        self.Nel_time=0.*self.t_dec;
-        self.Nel_imp_time=0.*self.t_dec;
-        self.Nel_emit_time=0.*self.t_dec;
-        self.En_imp_eV_time=0.*self.t_dec;
-        self.En_emit_eV_time=0.*self.t_dec;
-        self.En_kin_eV_time=0.*self.t_dec;
-        self.cen_density=0.*self.t_dec;
+        self.t = np.zeros(initial_size_t_vect, dtype=float)
+        self.lam_t_array = 0*self.t
+        self.Nel_timep=0.*self.t;
+        self.Nel_imp_time=0.*self.t;
+        self.Nel_emit_time=0.*self.t;
+        self.En_imp_eV_time=0.*self.t;
+        self.En_emit_eV_time=0.*self.t;
+        self.En_kin_eV_time=0.*self.t;
+        self.cen_density=0.*self.t;
 
         if self.flag_detailed_MP_info==1:
-            self.N_mp_time=0.*self.t_dec
+            self.N_mp_time=0.*self.t
         else:
             self.N_mp_time=-1
 
@@ -445,7 +625,7 @@ class pyecloud_saver:
         if len(el_density_probes)>0:
             self.flag_el_dens_probes = True
             self.N_el_dens_probes = len(el_density_probes)
-            self.el_dens_at_probes = np.zeros((self.N_el_dens_probes, len(self.t_dec))) # to be changed
+            self.el_dens_at_probes = np.zeros((self.N_el_dens_probes, len(self.t))) # to be changed
             self.x_el_dens_probes = []
             self.y_el_dens_probes = []
             self.r_el_dens_probes = []
@@ -457,6 +637,7 @@ class pyecloud_saver:
             self.x_el_dens_probes = np.array(self.x_el_dens_probes)
             self.y_el_dens_probes = np.array(self.y_el_dens_probes)
             self.r_el_dens_probes = np.array(self.r_el_dens_probes)
+
 
     def _stepbystep_data_save(self, impact_man, MP_e, beamtim):
         #save step by step data
@@ -474,8 +655,8 @@ class pyecloud_saver:
             self.i_last_save+=1
             self.t_last_save = beamtim.tt_curr
 
-            self.t_dec[self.i_last_save] = beamtim.tt_curr
-            self.lam_t_array_dec[self.i_last_save] = beamtim.lam_t_curr
+            self.t[self.i_last_save] = beamtim.tt_curr
+            self.lam_t_array[self.i_last_save] = beamtim.lam_t_curr
 
             self.Nel_imp_time[self.i_last_save] = self.Nel_impact_last_step_group
             self.Nel_emit_time[self.i_last_save] = self.Nel_emit_last_step_group
@@ -487,7 +668,7 @@ class pyecloud_saver:
             self.En_imp_last_step_group_eV = 0
             self.En_emit_last_step_group_eV = 0
 
-            self.Nel_time[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
+            self.Nel_timep[self.i_last_save]=np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
             self.En_kin_eV_time[self.i_last_save]=np.sum(0.5*MP_e.mass/qe*MP_e.nel_mp[0:MP_e.N_mp]*(MP_e.vx_mp[0:MP_e.N_mp]*MP_e.vx_mp[0:MP_e.N_mp]+MP_e.vy_mp[0:MP_e.N_mp]*MP_e.vy_mp[0:MP_e.N_mp]+MP_e.vz_mp[0:MP_e.N_mp]*MP_e.vz_mp[0:MP_e.N_mp]));
 
             flag_center=((MP_e.x_mp**2 + MP_e.y_mp**2)<self.r_center**2);
@@ -500,15 +681,15 @@ class pyecloud_saver:
                     flag_center[MP_e.N_mp:]=False
                     self.el_dens_at_probes[ii, self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
 
+
             if self.flag_detailed_MP_info==1:
                 self.N_mp_time[self.i_last_save]=MP_e.N_mp
 
     def _stepbystep_get_dict(self):
-
         dict_sbs_data = {
-            't':self.t_dec[:self.i_last_save+1],
-            'lam_t_array':self.lam_t_array_dec[:self.i_last_save+1],
-            'Nel_timep':self.Nel_time[:self.i_last_save+1],
+            't':self.t[:self.i_last_save+1],
+            'lam_t_array':self.lam_t_array[:self.i_last_save+1],
+            'Nel_timep':self.Nel_timep[:self.i_last_save+1],
             'Nel_imp_time':self.Nel_imp_time[:self.i_last_save+1],
             'Nel_emit_time':self.Nel_emit_time[:self.i_last_save+1],
             'En_imp_eV_time':self.En_imp_eV_time[:self.i_last_save+1],
@@ -574,46 +755,57 @@ class pyecloud_saver:
             self.N_obs_sim=len(self.t_obs_sim)
             self.i_obs_sim=0
 
+    def _sim_state_single_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                    sec_beams_list, flag_multiple_clouds, cloud_list, outfile):
+
+        if self.flag_last_cloud:
+
+            temp_luobj = spacech_ele.PyPICobj.luobj
+            spacech_ele.luobj=None
+            spacech_ele.PyPICobj.luobj=None
+
+            #~ dynamics.get_B=None
+
+            # remove savers
+            temp_saver_list = []
+            for cloud in cloud_list:
+                temp_saver_list.append(cloud.pyeclsaver)
+                cloud.pyeclsaver = 'removed'
+
+            dict_state = {
+            'beamtim':beamtim,
+            'spacech_ele':spacech_ele,
+            't_sc_ON':t_sc_ON,
+            'flag_presence_sec_beams':flag_presence_sec_beams,
+            'sec_beams_list':sec_beams_list,
+            'flag_multiple_clouds':self.flag_multiple_clouds,
+            'cloud_list':cloud_list,
+            't_last_En_hist':self.t_last_En_hist}
+
+            with open(outfile, 'wb') as fid:
+                # use best protocol available
+                pickle.dump(dict_state, fid, protocol=-1)
+
+            # put back savers
+            for cloud, saver in zip(cloud_list, temp_saver_list):
+                cloud.pyeclsaver = saver
+
+            spacech_ele.PyPICobj.luobj = temp_luobj
+
+            print('Save simulation state in: ' + outfile)
+
     def _sim_state_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
         #Simulation state save
-        if self.flag_save_simulation_state and self.flag_last_cloud:
-            if  self.i_obs_sim<self.N_obs_sim:
+        if self.flag_save_simulation_state:
+            if self.i_obs_sim<self.N_obs_sim:
                 if (beamtim.tt_curr>=self.t_obs_sim[self.i_obs_sim]):
                     filename_simulation_state='simulation_state_%d.pkl'%(self.i_obs_sim)
+                    outpath = self.folder_outp+'/'+filename_simulation_state
 
-                    temp_luobj = spacech_ele.PyPICobj.luobj
-                    spacech_ele.luobj=None
-                    spacech_ele.PyPICobj.luobj=None
+                    self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
+                        sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
 
-                    #~ dynamics.get_B=None
-
-                    # remove savers
-                    temp_saver_list = []
-                    for cloud in cloud_list:
-                        temp_saver_list.append(cloud.pyeclsaver)
-                        cloud.pyeclsaver = 'removed'
-
-                    dict_state = {
-                    'beamtim':beamtim,
-                    'spacech_ele':spacech_ele,
-                    't_sc_ON':t_sc_ON,
-                    'flag_presence_sec_beams':flag_presence_sec_beams,
-                    'sec_beams_list':sec_beams_list,
-                    'flag_multiple_clouds':self.flag_multiple_clouds,
-                    'cloud_list':cloud_list}
-
-                    with open(self.folder_outp+'/'+filename_simulation_state, 'wb') as fid:
-                        # use best protocol available
-                        pickle.dump(dict_state, fid, protocol=-1)
-
-                    # put back savers
-                    for cloud, saver in zip(cloud_list, temp_saver_list):
-                        cloud.pyeclsaver = saver
-
-                    spacech_ele.PyPICobj.luobj = temp_luobj
-
-                    print('Save simulation state in: ' + self.folder_outp+'/'+filename_simulation_state)
                     self.i_obs_sim=self.i_obs_sim+1
 
     def _rho_video_init(self, flag_movie):
@@ -753,7 +945,7 @@ class pyecloud_saver:
     def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
         # Energy histogram saver
         # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
-        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist:
+        if beamtim.tt_curr>=self.t_last_En_hist+self.Dt_En_hist or np.isclose(beamtim.tt_curr, self.t_last_En_hist+self.Dt_En_hist, rtol=1.e-10, atol=0.0):
             self.En_hist.append(impact_man.En_hist_line.copy())
             self.t_En_hist.append(beamtim.tt_curr)
             impact_man.reset_En_hist_line()
