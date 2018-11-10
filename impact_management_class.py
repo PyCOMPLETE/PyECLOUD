@@ -273,7 +273,7 @@ class impact_management(object):
                     if flag_seg:
                         segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
 
-                    self.En_emit_last_step_eV += np.sum(E_new_MPs_eV)
+                    self.En_emit_last_step_eV += np.sum(E_new_MPs_eV*nel_new_MPs)
 
         return MP_e
 

@@ -215,7 +215,7 @@ for ii,k in enumerate(out_var_curr):
         gs1.update(top=top, bottom=bottom)
         gs2.update(top=top, bottom=bottom)
 
-        pl.suptitle(sim_folder)
+        pl.suptitle(sim_folder+'\n'+k)
         pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 print 'Saved comparison plots in:'
