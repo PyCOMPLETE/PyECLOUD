@@ -178,9 +178,6 @@ class impact_management(object):
 
             if Nimpact>0:
 
-                if flag_seg:
-                    i_found_new_mp = 0*x_mp
-
                 # load segment endpoints
                 x_in=x_mp_old[flag_impact[:N_mp_old]]
                 y_in=y_mp_old[flag_impact[:N_mp_old]]
@@ -256,7 +253,7 @@ class impact_management(object):
 
                 histf.compute_hist(x_replace,-nel_replace*E_replace_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
                 if flag_seg:
-                    segi.update_seg_impact(i_found,-nel_replace*E_replace_eV,self.energ_eV_impact_seg)
+                    segi.update_seg_impact(i_seg_replace,-nel_replace*E_replace_eV,self.energ_eV_impact_seg)
 
                 # New macroparticles
                 N_new_MPs = len(nel_new_MPs)
@@ -271,7 +268,7 @@ class impact_management(object):
                     histf.compute_hist(x_new_MPs,-nel_new_MPs*E_new_MPs_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
                     if flag_seg:
-                        segi.update_seg_impact(i_found_new_mp[N_mp_old:N_mp_new],wei,self.energ_eV_impact_seg)
+                        segi.update_seg_impact(i_seg_new_MPs,-nel_new_MPs*E_new_MPs_eV,self.energ_eV_impact_seg)
 
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV*nel_new_MPs)
 

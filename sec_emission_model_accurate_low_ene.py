@@ -50,6 +50,7 @@
 
 from numpy import sqrt, exp
 from numpy.random import rand
+from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 def yield_fun3(E,costheta,Emax,del_max,R0,E0):
 
@@ -70,8 +71,25 @@ def yield_fun3(E,costheta,Emax,del_max,R0,E0):
     return del_true_sec, del_reflected, ref_frac
 
 
-class SEY_model_acc_low_ene:
-    def __init__(self, Emax,del_max,R0,E0=150):
+class SEY_model_acc_low_ene(SEY_model_ECLOUD):
+    def __init__(self, Emax,del_max,R0,E0=150,
+                    E_th=None, sigmafit=None, mufit=None, 
+                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+                    ):
+            
+            self.E_th = E_th
+            self.sigmafit = sigmafit
+            self.mufit = mufit
+            self.switch_no_increase_energy = switch_no_increase_energy
+            self.thresh_low_energy = thresh_low_energy
+            self.secondary_angle_distribution = secondary_angle_distribution
+
+            if secondary_angle_distribution is not None:
+                import electron_emission
+                self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
+            else:
+                self.angle_dist_func = None
+
             self.Emax = Emax
             self.del_max = del_max
             self.R0 = R0

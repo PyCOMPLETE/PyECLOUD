@@ -55,15 +55,33 @@ import os
 import numpy as np
 import scipy.io as sio
 from numpy.random import rand
+from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
-class SEY_model_from_file(object):
+class SEY_model_from_file(SEY_model_ECLOUD):
 
-    def __init__(self, sey_file, flag_costheta_delta_scale, flag_costheta_Emax_shift):
+    def __init__(self, sey_file, flag_costheta_delta_scale, flag_costheta_Emax_shift, 
+                    E_th=None, sigmafit=None, mufit=None, 
+                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+                    ):
         """
         - sey file is the path to a mat file of the correct format, either an absolute path or in the sey_files folder.
         - if flag_factor_costheta is True, the SEY is increased depending on the angle with which the electrons are hitting.
             Set to None or False to disable.
         """
+        
+        self.E_th = E_th
+        self.sigmafit = sigmafit
+        self.mufit = mufit
+        self.switch_no_increase_energy = switch_no_increase_energy
+        self.thresh_low_energy = thresh_low_energy
+        self.secondary_angle_distribution = secondary_angle_distribution
+
+        if secondary_angle_distribution is not None:
+            import electron_emission
+            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
+        else:
+            self.angle_dist_func = None
+
         if type(sey_file) is dict:
             sey_properties = sey_file
         else:

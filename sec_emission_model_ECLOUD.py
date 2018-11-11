@@ -78,7 +78,7 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
     return delta, ref_frac
 
 
-class SEY_model_ECLOUD:
+class SEY_model_ECLOUD(object):
     def __init__(   
                     self, Emax,del_max,R0,
                     E_th=None, sigmafit=None, mufit=None, 
