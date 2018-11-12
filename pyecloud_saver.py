@@ -432,7 +432,7 @@ class pyecloud_saver:
                 self.t_last_checkp = beamtim.tt_curr
 
     def _copy_main_outp_to_safety(self, outpath, beamtim):
-        shutil.copy(self.folder_outp + self.filen_main_outp, outpath)
+        shutil.copy(self.filen_main_outp, outpath)
         self.t_last_copy = beamtim.tt_curr
 
     def _copy_main_outp_init(self, copy_main_outp_DT, copy_main_outp_folder):
@@ -531,7 +531,7 @@ class pyecloud_saver:
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var]
                 else:
-                    dict_restored[var] = dict_history[var][: idx_t+1]
+                    dict_restored[var] = dict_history[var][: idx_t]
         self.i_last_save = len(dict_restored['Nel_timep'])-1
 
         for var in saved_every_passage_list:
