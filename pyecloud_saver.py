@@ -118,8 +118,10 @@ class pyecloud_saver:
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
+            self.fname_only_main_outp = self.filen_main_outp.split('/')[-1]
         else:
-            self.folder_outp='./'
+            self.folder_outp = './'
+            self.fname_only_main_outp = self.filen_main_outp
 
         self.flag_detailed_MP_info = flag_detailed_MP_info
 
@@ -423,7 +425,7 @@ class pyecloud_saver:
                 if self.copy_main_outp_folder is not None:
                     self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
 
-                if self.i_checkp>0:
+                if self.i_checkp > 0:
                     if self.flag_last_cloud:
                         prevpath = self.checkpoint_folder + 'simulation_checkpoint_%d.pkl'%(self.i_checkp-1)
                         os.remove(prevpath)
@@ -433,17 +435,17 @@ class pyecloud_saver:
                 self.t_last_checkp = beamtim.tt_curr
 
     def _copy_main_outp_to_safety(self, outpath, beamtim):
-        shutil.copy(self.folder_outp + self.filen_main_outp, outpath)
+        shutil.copy(self.filen_main_outp, outpath)
         self.t_last_copy = beamtim.tt_curr
 
     def _copy_main_outp_init(self, copy_main_outp_DT, copy_main_outp_folder):
         # Simulation state saver init
         if copy_main_outp_DT is None:
-            self.flag_copy_main_output=False
+            self.flag_copy_main_output = False
         elif type(copy_main_outp_DT) is int and copy_main_outp_DT < 0:
-            self.flag_copy_main_output=False
+            self.flag_copy_main_output = False
         else:
-            self.flag_copy_main_output=True
+            self.flag_copy_main_output = True
             self.t_last_copy = 0
             self.copy_main_outp_DT = copy_main_outp_DT
 
@@ -460,10 +462,15 @@ class pyecloud_saver:
                 self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
 
 
-    def load_from_output(self, fname, load_output_folder='./', last_t=None):
+    def load_from_output(self, last_t=None):
 
-        #restore the Pyecltest.mat up to last t
-        ob = mlm.myloadmat_to_obj(load_output_folder + '/' + fname)
+        if self.copy_main_outp_folder is not None:
+            load_output_folder = self.copy_main_outp_folder
+        else:
+            load_output_folder = self.folder_outp
+
+        # restore the Pyecltest.mat up to last t
+        ob = mlm.myloadmat_to_obj(load_output_folder + '/' + self.fname_only_main_outp)
         dict_history = mlm.obj_to_dict(ob)
 
         idx_t = (np.abs(dict_history['t'] - last_t)).argmin()  # index closest to last_t
@@ -532,7 +539,7 @@ class pyecloud_saver:
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var]
                 else:
-                    dict_restored[var] = dict_history[var][: idx_t+1]
+                    dict_restored[var] = dict_history[var][: idx_t]
         self.i_last_save = len(dict_restored['Nel_timep'])-1
 
         for var in saved_every_passage_list:
