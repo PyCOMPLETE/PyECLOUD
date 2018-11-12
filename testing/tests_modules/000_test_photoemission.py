@@ -233,7 +233,7 @@ def test_model_2():
         'phem_cdf': phem_cdf,
     }
 
-    chamb_phem = gipfi.polyg_cham_photoemission(phem_chamb_dict, flag_counter_clockwise_chamb=True)
+    chamb_phem = gipfi.polyg_cham_photoemission(phem_chamb_dict)
     if chamb_phem.vertexes_are_subset(chamb_rect):
         print('Vertexes are compatible -> Good!')
     else:
@@ -282,7 +282,7 @@ def test_model_3():
     my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
 
     chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, flag_verbose_stdout=True)
-    chamb_photo_seg = gipfi.polyg_cham_photoemission(my_chamb_dict, flag_counter_clockwise_chamb=False)
+    chamb_photo_seg = gipfi.polyg_cham_photoemission(my_chamb_dict)
 
     phem_seg = gen_photoemission_class.photoemission_per_segment(
         chamb_photo_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
@@ -318,4 +318,3 @@ if args.o:
 
 if not args.noshow:
     plt.show()
-
