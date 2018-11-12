@@ -79,10 +79,10 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 
 class SEY_model_ECLOUD(object):
-    def __init__(   
+    def __init__(
                     self, Emax,del_max,R0,
-                    E_th=None, sigmafit=None, mufit=None, 
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+                    E_th=None, sigmafit=None, mufit=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
                     E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
                 ):
 
@@ -110,22 +110,21 @@ class SEY_model_ECLOUD(object):
         print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            
+
         yiel, ref_frac = yield_fun2(
             E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s,
             flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
-        flag_elast=(rand(len(ref_frac))<ref_frac)
-        flag_truesec=~(flag_elast)
-        nel_emit=nel_impact*yiel
+        flag_elast = (rand(len(ref_frac))<ref_frac)
+        flag_truesec = ~(flag_elast)
+        nel_emit = nel_impact * yiel
 
         return nel_emit, flag_elast, flag_truesec
 
-    def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact, 
+    def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                                 vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                                 v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
-        
-        nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact,E_impact_eV, costheta_impact, i_found)
+        nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
 
         nel_replace = nel_emit_tot_events.copy()
         x_replace = x_impact.copy()
@@ -134,11 +133,14 @@ class SEY_model_ECLOUD(object):
         vx_replace = vx_impact.copy()
         vy_replace = vy_impact.copy()
         vz_replace = vz_impact.copy()
-        i_seg_replace = i_found.copy()
+        if i_found is not None:
+            i_seg_replace = i_found.copy()
+        else:
+            i_seg_replace = i_found
 
         # Handle elastics
-        vx_replace[flag_elast], vy_replace[flag_elast] =  ee.specular_velocity(
-                                                            vx_impact[flag_elast], vy_impact[flag_elast], 
+        vx_replace[flag_elast], vy_replace[flag_elast] = ee.specular_velocity(
+                                                            vx_impact[flag_elast], vy_impact[flag_elast],
                                                             Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
                                                         )
 
@@ -148,15 +150,15 @@ class SEY_model_ECLOUD(object):
         if N_true_sec > 0:
 
             n_add = np.zeros_like(flag_truesec, dtype=int)
-            n_add[flag_truesec]=np.ceil(nel_replace[flag_truesec]/nel_mp_th)-1
-            n_add[n_add<0]=0. #in case of underflow
-            nel_replace[flag_truesec]=nel_replace[flag_truesec]/(n_add[flag_truesec]+1.)
+            n_add[flag_truesec] = np.ceil(nel_replace[flag_truesec] / nel_mp_th) - 1
+            n_add[n_add < 0] = 0.  # in case of underflow
+            nel_replace[flag_truesec] = nel_replace[flag_truesec] / (n_add[flag_truesec] + 1.)
 
             n_add_total = np.sum(n_add)
 
             # MPs to be replaced
             En_truesec_eV = ee.sec_energy_hilleret_model2(
-                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit, 
+                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
                 self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
 
             vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
@@ -175,9 +177,9 @@ class SEY_model_ECLOUD(object):
 
                 # Generate new MP properties, angles and energies
                 En_truesec_eV_add = ee.sec_energy_hilleret_model2(
-                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit, 
+                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
                     self.E_th, E_impact_eV_add, self.thresh_low_energy)
-                
+
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
@@ -185,8 +187,8 @@ class SEY_model_ECLOUD(object):
                     i_seg_new_MPs = np.repeat(i_found, n_add)
                 else:
                     i_seg_new_MPs = None
-        
-        if n_add_total==0:
+
+        if n_add_total == 0:
             nel_new_MPs = np.array([])
             x_new_MPs = np.array([])
             y_new_MPs = np.array([])
@@ -196,13 +198,9 @@ class SEY_model_ECLOUD(object):
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-
-
         event_type = flag_truesec
         event_info = {}
 
         return nel_emit_tot_events, event_type, event_info,\
-               nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
-               nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
-
-
+            nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
+            nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
