@@ -128,7 +128,7 @@ from tune_analysis import tune_analysis
 qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(x_i, xp_i, y_i, yp_i)
 
 pl.close('all')
-ms.mystyle(fontsz=14)
+ms.mystyle_arial(fontsz=14)
 pl.figure(1)
 sp1 = pl.subplot(2,1,1)
 pl.plot(np.mean(x_i, axis=0), '.-b', markersize=5, linewidth=2, label='PyHT')
