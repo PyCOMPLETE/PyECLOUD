@@ -68,7 +68,7 @@ class BuildupSimulation(object):
                                                     skip_beam=skip_beam,
                                                     skip_pyeclsaver=skip_pyeclsaver,
                                                     skip_spacech_ele=skip_spacech_ele,
-                                                    spacech_ele = spacech_ele,
+                                                    spacech_ele=spacech_ele,
                                                     ignore_kwargs=ignore_kwargs,
                                                     **kwargs)
 
@@ -298,7 +298,7 @@ class BuildupSimulation(object):
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)
 
         for cloud in self.cloud_list:
-            cloud.pyeclsaver.load_from_output(fname=cloud.pyeclsaver.filen_main_outp.split('/')[-1], load_output_folder=cloud.pyeclsaver.copy_main_outp_folder, last_t=self.beamtim.tt_curr)
+            cloud.pyeclsaver.load_from_output(last_t=self.beamtim.tt_curr)
             cloud.pyeclsaver.i_checkp = i_checkp + 1
             cloud.pyeclsaver.t_last_checkp = self.beamtim.tt_curr
             cloud.pyeclsaver.t_last_En_hist = dict_state['t_last_En_hist']

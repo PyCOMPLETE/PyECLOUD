@@ -2,7 +2,7 @@
 
 machine_param_file='machine_parameters.input'
 secondary_emission_parameters_file='secondary_emission_parameters.input'
-beam_parameters_file='beam.beam' 
+beam_parameters_file='beam.beam'
 
 logfile_path = './logfile.txt'
 progress_path = './progress.txt'
@@ -25,7 +25,7 @@ En_hist_max= 5000.  #eV
 
 t_ion=100.;        #s
 
-N_mp_max=250000;   #size of allocated vectors 
+N_mp_max=250000;   #size of allocated vectors
 
 #Regen parameters
 
@@ -52,7 +52,7 @@ Nvz_regen=51;#it must be odd!
 
 
 #Sp_ch params
-Dt_sc = .5e-9 
+Dt_sc = .5e-9
 Dh_sc = .3e-3
 t_sc_ON=0e-9;		#s
 sparse_solver = 'klu'
@@ -83,6 +83,4 @@ Dx_hist_det = 0.5e-3
 checkpoint_folder = './LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/checkpoints/subfolder/'
 checkpoint_DT = 3.*25e-9
 copy_main_outp_folder = './LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/output_files/subfolder/'
-#copy_main_outp_DT = 3.*25e-9
-
-
+#copy_main_outp_DT = None
