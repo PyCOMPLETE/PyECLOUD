@@ -64,7 +64,7 @@ N_dec = 2
 
 i_photog = 0
 
-for pass_ind in range(firs_pass,last_pass):
+for pass_ind in range(firs_pass, last_pass):
 
     filename_rho = 'rho_video/rho_pass%d.mat'%pass_ind
 
@@ -74,13 +74,13 @@ for pass_ind in range(firs_pass,last_pass):
     rho_video = dict_ecl_video['rho_video']
     t_video = squeeze(dict_ecl_video['t_video'].real)
     b_spac = squeeze(dict_pyecltest['b_spac'].real)
-    (nphotog,_,_) = rho_video.shape
+    (nphotog, _, _) = rho_video.shape
 
     #subprocess.check_call(('rm',  '*.png'))
 
     for ii in xrange(0, nphotog, N_dec):
-        print 'Pass %d %d/%d'%(pass_ind,ii,nphotog)
-        imm = np.squeeze(rho_video[ii,:,:])
+        print 'Pass %d %d/%d'%(pass_ind, ii, nphotog)
+        imm = np.squeeze(rho_video[ii, :, :])
         if flag_log:
             imm = np.log10(np.abs(imm))
         imshow(imm.T, cmap=None, norm=None, aspect=None, interpolation=None,
@@ -89,7 +89,7 @@ for pass_ind in range(firs_pass,last_pass):
         title(('passage = %d' % floor(t_video[ii] / b_spac)))
         #xlabel('x [m]')
         #ylabel('y [m]')
-        filename = str('Pass%05d_%05d' % (pass_ind,ii)) + '.png'
+        filename = str('Pass%05d_%05d' % (pass_ind, ii)) + '.png'
         savefig(filename, dpi=100)
         clf()
         i_photog += 1

@@ -78,7 +78,7 @@ class DummyBeamTim(object):
                 Ey_n_beam = 0. * MP_e.y_mp[0:MP_e.N_mp]
             else:
                 # compute beam electric field
-                Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+                Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         else:
             Ex_n_beam = 0.
             Ey_n_beam = 0.
@@ -135,7 +135,7 @@ class Ecloud(object):
                     spacech_ele=space_charge_obj,
                     ignore_kwargs=extra_allowed_kwargs,
                     skip_pyeclsaver=(save_pyecl_outp_as is None),
-                    filen_main_outp = save_pyecl_outp_as,
+                    filen_main_outp=save_pyecl_outp_as,
                     **self.kwargs)
 
         if self.cloudsim.config_dict['track_method'] == 'Boris':
@@ -273,12 +273,12 @@ class Ecloud(object):
 
         if not hasattr(self, 'efieldmap'):
             from Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
-            self.efieldmap = Transverse_Efield_map(xg = self.spacech_ele.xg, yg = self.spacech_ele.yg,
+            self.efieldmap = Transverse_Efield_map(xg=self.spacech_ele.xg, yg=self.spacech_ele.yg,
                 Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud,
-                slicer = self.slicer,
-                flag_clean_slices = True,
-                x_beam_offset = self.x_beam_offset, y_beam_offset = self.y_beam_offset,
-                slice_by_slice_mode = self.slice_by_slice_mode)
+                slicer=self.slicer,
+                flag_clean_slices=True,
+                x_beam_offset=self.x_beam_offset, y_beam_offset=self.y_beam_offset,
+                slice_by_slice_mode=self.slice_by_slice_mode)
 
             self._ecloud_track = self.track
 
@@ -386,10 +386,10 @@ class Ecloud(object):
 
                 # beam field
                 self.beam_PyPIC_state.scatter(
-                            x_mp = slic.x[ix] + self.x_beam_offset,
-                            y_mp = slic.y[ix] + self.y_beam_offset,
-                            nel_mp = slic.x[ix] * 0. + slic.particlenumber_per_mp / dz,
-                            charge = slic.charge)
+                            x_mp=slic.x[ix] + self.x_beam_offset,
+                            y_mp=slic.y[ix] + self.y_beam_offset,
+                            nel_mp=slic.x[ix] * 0. + slic.particlenumber_per_mp / dz,
+                            charge=slic.charge)
                 self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
 
                 #build dummy beamtim object

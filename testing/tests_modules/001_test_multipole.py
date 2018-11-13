@@ -25,7 +25,7 @@ plt.close('all')
 Dt = 5e-13
 N_steps = 1
 
-chamb = ellip_cham_geom_object(3.,3.)
+chamb = ellip_cham_geom_object(3., 3.)
 N_mp_max = 1e4
 nel_mp_ref_0 = -1
 fact_split = -1
@@ -42,26 +42,26 @@ Nvz_regen = -1
 regen_hist_cut = -1
 
 
-xx_raw = np.arange(-1,1.01, 0.2) * 1
+xx_raw = np.arange(-1, 1.01, 0.2) * 1
 N_mp = int(len(xx_raw)**2)
 
 fig2 = ms.figure('Fields at x or y = 0')
-sp2 = plt.subplot(2,2,1)
+sp2 = plt.subplot(2, 2, 1)
 sp2.set_title('At y = 0')
 sp2.set_xlabel('x [m]')
 sp2.set_ylabel(r'$B_y$ [T]')
 sp2.grid(True)
 
-sp3 = plt.subplot(2,2,2)
+sp3 = plt.subplot(2, 2, 2)
 sp3.set_title('At x = 0')
 sp3.set_xlabel('y [m]')
 sp3.set_ylabel(r'$B_x$ [T]')
 sp3.grid(True)
 
 
-angles = np.pi / 4. * np.array([0,1,2,3,4], dtype=float)
+angles = np.pi / 4. * np.array([0, 1, 2, 3, 4], dtype=float)
 for angle_ctr, angle in enumerate(angles):
-    ms.figure('Angle %.1f' % angle, figsize=(16,12))
+    ms.figure('Angle %.1f' % angle, figsize=(16, 12))
     angle_deg = angle / np.pi * 180
     plt.suptitle('Angle = %.2f deg' % angle_deg)
     for order, title in enumerate(['Dipole', 'Quadrupole', 'Sextupole', 'Octupole']):
@@ -101,7 +101,7 @@ for angle_ctr, angle in enumerate(angles):
         Ex_n = np.zeros_like(x_mpB)
         Ey_n = np.zeros_like(x_mpB)
 
-        MP_eB = pusher.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
+        MP_eB = pusher.step(MP_eB, Ex_n[0:N_mp], Ey_n[0:N_mp])
 
         del_vx = (MP_eB.vx_mp - vx_mpB)
         del_vy = (MP_eB.vy_mp - vy_mpB)
@@ -113,7 +113,7 @@ for angle_ctr, angle in enumerate(angles):
         bx = del_vy / Dt * m_e / vz_mpB / (-q_e)
 
         sp_ctr = order + 1
-        sp = plt.subplot(4,4,sp_ctr)
+        sp = plt.subplot(4, 4, sp_ctr)
         #title2 = title + ' B_multip = %s' % B_multip
         sp.set_title(title)
         sp.set_xlabel('x [m]')
@@ -138,17 +138,17 @@ for angle_ctr, angle in enumerate(angles):
 
         if angle_ctr == 0:
             color = ms.colorprog(order, 4)
-            xx_plot = np.linspace(-1,1,1e3)
-            sp2.plot(x_mpB[mask], by[mask],'.', label=title, color=color)
+            xx_plot = np.linspace(-1, 1, 1e3)
+            sp2.plot(x_mpB[mask], by[mask], '.', label=title, color=color)
             sp2.plot(xx_plot, xx_plot**order, color=color)
-            sp3.plot(y_mpB[mask2], bx[mask2],'.', label=title, color=color)
+            sp3.plot(y_mpB[mask2], bx[mask2], '.', label=title, color=color)
             if order % 2 == 0:
                 sp3.plot(xx_plot, np.zeros_like(xx_plot), color=color)
             else:
                 sp3.plot(xx_plot, (xx_plot)**order * (-1)**((order - 1) / 2), color=color)
 
-    sp2.set_ylim(-1.1,1.1)
-    sp3.set_ylim(-1.1,1.1)
+    sp2.set_ylim(-1.1, 1.1)
+    sp3.set_ylim(-1.1, 1.1)
     #sp3.legend(loc='upper left', bbox_to_anchor=(1,1))
 sp3.legend(loc='upper right', framealpha=0.5)
 

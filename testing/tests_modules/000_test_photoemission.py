@@ -24,7 +24,7 @@ ms.mystyle()
 parser = argparse.ArgumentParser()
 parser.add_argument('-o', help='Define output of plots')
 parser.add_argument('--noshow', action='store_true')
-parser.add_argument('--energy-dist', choices=['gaussian', 'lognormal', 'lorentz', 'rect',], default='gaussian')
+parser.add_argument('--energy-dist', choices=['gaussian', 'lognormal', 'lorentz', 'rect', ], default='gaussian')
 parser.add_argument('--angle-dist', choices=['cosine_2D', 'cosine_3D'], default='cosine_3D')
 args = parser.parse_args()
 
@@ -39,7 +39,7 @@ def gauss(xx, mu, sig):
 def lorentz(xx, mu, sig):
     return stats.cauchy.pdf(xx, mu, sig)
 
-def x_angle_dist(angle_dist,x):
+def x_angle_dist(angle_dist, x):
     if angle_dist == 'cosine_2D':
         return np.cos(x)
     elif angle_dist == 'cosine_3D':
@@ -97,16 +97,16 @@ def test_model_1():
     velocities = np.array([MP_e.vx_mp, MP_e.vy_mp, MP_e.vz_mp]).T
     energies = np.sum(velocities**2, axis=1) * m_e / 2 / e
 
-    sp = plt.subplot(2,2,1)
+    sp = plt.subplot(2, 2, 1)
     sp.grid(True)
     sp.set_xlabel('X dimension')
     sp.set_ylabel('Y dimension')
     sp.set_title('Positions of %.1e new MPs' % len(xx))
-    circ = plt.Circle([0,0],1, fill=False, color='black')
+    circ = plt.Circle([0, 0], 1, fill=False, color='black')
     sp.add_artist(circ)
     sp.plot(xx, yy, '.')
 
-    sp = plt.subplot(2,2,2)
+    sp = plt.subplot(2, 2, 2)
     sp.grid(True)
     sp.set_title('Histogram of angles\nrel. to center')
     sp.set_xlabel('Angles [rad]')
@@ -117,13 +117,13 @@ def test_model_1():
     yy = refl_frac / np.pi + (1 - refl_frac) * gauss(xx_a, 0, alimit)
     sp.plot(xx_a, yy, color='g', lw=3)
 
-    sp = plt.subplot(2,2,3)
+    sp = plt.subplot(2, 2, 3)
     sp.grid(True)
     sp.set_title('Histogram of energies')
     sp.set_xlabel('Energies [eV]')
     mask = energies < 30
     sp.hist(energies[mask], bins=40, normed=True)
-    xx = np.linspace(0.5,30,1e5)
+    xx = np.linspace(0.5, 30, 1e5)
     if args.energy_dist == 'lognormal':
         yy = lognormal(xx, mu, sig)
     elif args.energy_dist == 'gaussian':
@@ -136,7 +136,7 @@ def test_model_1():
         mask = np.logical_and(xx > mu - sig / 2, mu + sig / 2 > xx)
         yy[mask] = 1 / sig
 
-    sp.plot(xx,yy, color='g', lw=3)
+    sp.plot(xx, yy, color='g', lw=3)
 
     xx, yy = MP_e.x_mp, MP_e.y_mp
 
@@ -147,7 +147,7 @@ def test_model_1():
     cos_normal = -(xx * vx + yy * vy) / (np.sqrt(vx**2 + vy**2 + vz**2) * np.sqrt(xx**2 + yy**2))
     angles_v = np.arccos(cos_normal)
 
-    sp = plt.subplot(2,2,4)
+    sp = plt.subplot(2, 2, 4)
     sp.grid(True)
     sp.set_title('Histogram of velocity vector\nrel. to normal')
     sp.set_xlabel(r'$\theta$ [rad]')
@@ -177,7 +177,7 @@ def test_model_2():
     MP_e = init_mp(N_mp_max, chamb_rect)
     phem_rect.generate(MP_e, 1 / c * N_mp_max, 1)
 
-    sp = plt.subplot(2,2,1)
+    sp = plt.subplot(2, 2, 1)
     sp.grid(True)
     sp.set_xlabel('X dimension')
     sp.set_ylabel('Y dimension')
@@ -189,26 +189,26 @@ def test_model_2():
     hist, bins = np.histogram(angles_generated, n_dist)
     factor_hist = np.trapz(hist, angles)
 
-    sp = plt.subplot(2,2,2)
+    sp = plt.subplot(2, 2, 2)
     sp.grid(True)
     sp.set_xlabel('Angles [rad]')
     sp.set_ylabel('Normalized # generated')
     sp.set_title('Sin$^2$ distribution - from file')
-    sp.plot(angles, np.sin(angles)**2 / np.pi, color='g',lw=3)
+    sp.plot(angles, np.sin(angles)**2 / np.pi, color='g', lw=3)
     sp.step(angles, hist / factor_hist, color='b')
 
     chamb_segment_x = np.concatenate([
-        (np.linspace(-1,1, 100))[:-1],
+        (np.linspace(-1, 1, 100))[:-1],
         (np.ones(100, float))[:-1],
-        (np.linspace(1,-1, 100))[:-1],
+        (np.linspace(1, -1, 100))[:-1],
         (np.ones(100, float) * -1)[:-1],
     ])
 
     chamb_segment_y = np.concatenate([
         (np.ones(100, float) * -1)[:-1],
-        (np.linspace(-1,1, 100))[:-1],
+        (np.linspace(-1, 1, 100))[:-1],
         (np.ones(100, float))[:-1],
-        (np.linspace(1,-1, 100))[:-1],
+        (np.linspace(1, -1, 100))[:-1],
     ])
 
     phem_pdf = []
@@ -242,13 +242,13 @@ def test_model_2():
     phem_segment = gen_photoemission_class.photoemission_per_segment(
         chamb_phem, args.energy_dist, sig, mu, k_pe_st, args.angle_dist, None, None)
 
-    sp = plt.subplot(2,2,3)
+    sp = plt.subplot(2, 2, 3)
     sp.grid(True)
     sp.set_xlabel('X dimension')
     sp.set_ylabel('Y dimension')
     sp.set_title('Chamber vertexes')
-    sp.set_ylim(-1.1,1.1)
-    sp.set_xlim(-1.1,1.1)
+    sp.set_ylim(-1.1, 1.1)
+    sp.set_xlim(-1.1, 1.1)
     sp.plot(chamb_rect.Vx, chamb_rect.Vy, lw=3, marker='o', label='Rect')
     sp.plot(chamb_phem.Vx, chamb_phem.Vy, ls='None', marker='.', label='Photoem.')
     sp.legend(title='Chamber', loc='best')
@@ -256,7 +256,7 @@ def test_model_2():
     MP_e = init_mp(N_mp_max, chamb_rect)
     phem_segment.generate(MP_e, 1 / c * N_mp_max, 1)
 
-    sp = plt.subplot(2,2,4)
+    sp = plt.subplot(2, 2, 4)
     sp.grid(True)
     sp.set_xlabel('Angles [rad]')
     sp.set_ylabel('Normalized # generated')
@@ -266,20 +266,20 @@ def test_model_2():
     hist, bins = np.histogram(angles_generated, n_dist)
     factor_hist = np.trapz(hist, angles)
 
-    sp.plot(angles, np.sin(angles)**2 / np.pi, color='g',lw=3)
+    sp.plot(angles, np.sin(angles)**2 / np.pi, color='g', lw=3)
     sp.step(angles, hist / factor_hist, color='b')
 
 ## Photoemission model 'per_segment' (3)
 def test_model_3():
     # Non-convex chamber
     my_chamb_dict = {
-        'Vx': arr([-1,-1,1,1,1.1,1.1,1,1]),
-        'Vy': arr([1,-1,-1,-0.3,-0.5,0.5,0.3,1]),
+        'Vx': arr([-1, -1, 1, 1, 1.1, 1.1, 1, 1]),
+        'Vy': arr([1, -1, -1, -0.3, -0.5, 0.5, 0.3, 1]),
     }
     my_chamb_dict['x_sem_ellip_insc'] = 0.98 * my_chamb_dict['Vx'].max()
     my_chamb_dict['y_sem_ellip_insc'] = 0.98 * my_chamb_dict['Vy'].max()
 
-    my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1,0.1, 0.1, 0.1, 0.3,0.1,0.1,0.1])), 3)
+    my_chamb_dict['phem_cdf'] = np.round(np.cumsum(arr([0.1, 0.1, 0.1, 0.1, 0.3, 0.1, 0.1, 0.1])), 3)
 
     chamb_seg = gipfi.polyg_cham_geom_object(my_chamb_dict, False, flag_assume_convex=False, flag_verbose_stdout=True)
     chamb_photo_seg = gipfi.polyg_cham_photoemission(my_chamb_dict)
@@ -291,7 +291,7 @@ def test_model_3():
     MP_e = init_mp(N_mp_max, chamb_seg)
     phem_seg.generate(MP_e, 1 / c * N_mp_max, 1)
 
-    sp = plt.subplot(2,2,1)
+    sp = plt.subplot(2, 2, 1)
     sp.grid(True)
     sp.set_xlabel('x')
     sp.set_ylabel('y')

@@ -27,8 +27,8 @@ angles = np.interp(u_sam, cdf, theta_unif)
 # Save
 pyecl_phem_filename = 'inv_cdf_phem_ang_distrib'
 sio.savemat(pyecl_phem_filename, {
-    'u_sam':u_sam,
-    'angles':angles}, oned_as='row')
+    'u_sam': u_sam,
+    'angles': angles}, oned_as='row')
 
 
 pl.close('all')

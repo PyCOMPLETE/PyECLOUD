@@ -54,7 +54,7 @@ elif optics_mode == 'non-smooth':
     with open('CLIC_DR_n260_optics.pkl') as fid:
         optics = pickle.load(fid)
     optics.pop('circumference')
-    machine = CLIC_DR(machine_configuration=machine_configuration, optics_mode = 'non-smooth',  **optics)
+    machine = CLIC_DR(machine_configuration=machine_configuration, optics_mode='non-smooth',  **optics)
 
 
 # define bunch
@@ -121,14 +121,14 @@ bunch_slicer.add_statistics(sliceset=bunch_slices, beam=beam, statistics=True)
 # define a beam monitor
 from PyHEADTAIL.monitors.monitors import SliceMonitor
 beam_monitor = SliceMonitor(filename='bunch_evolution_A%d_%db_%dips_%dturns_%.2fnTorr'%(A, n_bunches, n_segments, n_turns, P_nTorr),
-                            n_steps = n_turns * n_segments, slicer=bunch_slicer, write_buffer_every=100)
+                            n_steps=n_turns * n_segments, slicer=bunch_slicer, write_buffer_every=100)
 
 
 # initialize ion cloud with single kick per bunch
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 ecloud_sk = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / n_segments, slicer=bunch_slicer,
             Dt_ref=Dt_ref, pyecl_input_folder='./pyecloud_config', beam_monitor=beam_monitor,
-            chamb_type = chamb_type, PyPICmode = 'FFT_OpenBoundary',
+            chamb_type=chamb_type, PyPICmode='FFT_OpenBoundary',
             x_aper=x_aper, y_aper=y_aper,
             filename_chm=filename_chm, Dh_sc=Dh_sc,
             init_unif_edens_flag=init_unif_edens_flag,
@@ -139,7 +139,7 @@ ecloud_sk = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / n_segments, slicer
             Temp_K=Temp_K, E_init_ion=E_init_ion,
             N_mp_max=N_mp_max,
             nel_mp_ref_0=nel_mp_ref_0,
-            B_multip =B_multip_per_eV * machine.p0 / e * c,
+            B_multip=B_multip_per_eV * machine.p0 / e * c,
             switch_model='perfect_absorber',
             kick_mode_for_beam_field=True,
             verbose=True)
@@ -157,7 +157,7 @@ machine.install_after_each_transverse_segment(ecloud_sk)
 # run simulation
 print 'Start track...'
 t_start_sw = time.mktime(time.localtime())
-print 'Time for initialization ',(t_start_sw - t_start), 's'
+print 'Time for initialization ', (t_start_sw - t_start), 's'
 for i_turn in xrange(n_turns):
     print 'Turn %d'%(i_turn + 1)
     machine.track(beam)

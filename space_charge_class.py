@@ -51,34 +51,34 @@
 
 import numpy as np
 
-na = lambda x:np.array([x])
+na = lambda x: np.array([x])
 
 class space_charge:
     #@profile
 
-    def __init__(self,chamb, Dh, Dt_sc=None, PyPICmode = 'FiniteDifferences_ShortleyWeller' ,sparse_solver = 'scipy_slu',
+    def __init__(self, chamb, Dh, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
                     f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
 
         print 'Start space charge init.'
 
         if PyPICmode == 'FiniteDifferences_ShortleyWeller':
             import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
-            self.PyPICobj = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
+            self.PyPICobj = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb=chamb, Dh=Dh, sparse_solver=sparse_solver)
             #To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
             self.xn = self.PyPICobj.xn
             self.yn = self.PyPICobj.yn
         elif PyPICmode == 'ShortleyWeller_WithTelescopicGrids':
             import PyPIC.FiniteDifferences_ShortleyWeller_SquareGrid as PIC_FDSW
-            PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
+            PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb=chamb, Dh=Dh, sparse_solver=sparse_solver)
             import PyPIC.MultiGrid as PIC_MG
-            self.PyPICobj = PIC_MG.AddTelescopicGrids(pic_main = PyPICmain, f_telescope = f_telescope, target_grid = target_grid,
-                                        N_nodes_discard = N_nodes_discard, N_min_Dh_main = N_min_Dh_main, sparse_solver = sparse_solver)
+            self.PyPICobj = PIC_MG.AddTelescopicGrids(pic_main=PyPICmain, f_telescope=f_telescope, target_grid=target_grid,
+                                        N_nodes_discard=N_nodes_discard, N_min_Dh_main=N_min_Dh_main, sparse_solver=sparse_solver)
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
 
         elif PyPICmode == 'FiniteDifferences_Staircase':
             import PyPIC.FiniteDifferences_Staircase_SquareGrid as PIC_FDSQ
-            self.PyPICobj = PIC_FDSQ.FiniteDifferences_Staircase_SquareGrid(chamb = chamb, Dh = Dh, sparse_solver = sparse_solver)
+            self.PyPICobj = PIC_FDSQ.FiniteDifferences_Staircase_SquareGrid(chamb=chamb, Dh=Dh, sparse_solver=sparse_solver)
             #To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
             self.xn = self.PyPICobj.xn
             self.yn = self.PyPICobj.yn
@@ -86,7 +86,7 @@ class space_charge:
             if chamb.chamb_type != 'rect':
                 raise ValueError('''PyPICmode = 'FFT_PEC_Boundary' can be used only if chamb_type = 'rect' ''' )
             import PyPIC.FFT_PEC_Boundary_SquareGrid as PIC_FFT_PEC
-            self.PyPICobj = PIC_FFT_PEC.FFT_PEC_Boundary_SquareGrid(x_aper = chamb.x_aper, y_aper = chamb.y_aper, Dh = Dh)
+            self.PyPICobj = PIC_FFT_PEC.FFT_PEC_Boundary_SquareGrid(x_aper=chamb.x_aper, y_aper=chamb.y_aper, Dh=Dh)
             #To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
@@ -95,9 +95,9 @@ class space_charge:
                 raise ValueError('''PyPICmode = 'FFT_OpenBoundary' can be used only if chamb_type = 'rect' ''' )
             import PyPIC.FFT_OpenBoundary as PIC_FFT_Open
             if len(np.atleast_1d(Dh)) == 2:
-                self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary(x_aper = chamb.x_aper, y_aper = chamb.y_aper, dx = Dh[0], dy = Dh[1])
+                self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary(x_aper=chamb.x_aper, y_aper=chamb.y_aper, dx=Dh[0], dy=Dh[1])
             else:
-                self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary(x_aper = chamb.x_aper, y_aper = chamb.y_aper, Dh = Dh)
+                self.PyPICobj = PIC_FFT_Open.FFT_OpenBoundary(x_aper=chamb.x_aper, y_aper=chamb.y_aper, Dh=Dh)
 
             #To be replaced by a property to make it general (from PyPIC modules not having xn, yn)
             self.xn = None #not implemented in this mode (for now)
@@ -155,15 +155,15 @@ class space_charge:
     #@profile
     def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
         # scatter
-        self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], charge = MP_e.charge, flag_add = not(flag_reset))
+        self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], charge=MP_e.charge, flag_add=not(flag_reset))
         # solve
         if flag_solve:
             self.PyPICobj.solve()
 
     #@profile
-    def compute_spchg_efield_from_rho(self, rho, flag_verbose = True):
-        self.PyPICobj.solve(rho = rho, flag_verbose = flag_verbose)
+    def compute_spchg_efield_from_rho(self, rho, flag_verbose=True):
+        self.PyPICobj.solve(rho=rho, flag_verbose=flag_verbose)
 
     def get_sc_eletric_field(self, MP_e):
-        Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp])
+        Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         return Ex_sc_n, Ey_sc_n

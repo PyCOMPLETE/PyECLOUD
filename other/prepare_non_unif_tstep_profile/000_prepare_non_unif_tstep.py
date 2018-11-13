@@ -38,9 +38,9 @@ ppb_vect = np.atleast_1d(np.float_(np.array(filling_pattern)))
 sigmaz_vect = 0 * ppb_vect + sigmaz
 
 N_slots = len(ppb_vect)
-t = np.arange(0.,N_slots * b_spac + t_end + 2 * Dt, Dt);
+t = np.arange(0., N_slots * b_spac + t_end + 2 * Dt, Dt);
 
-t_coarse = np.arange(0.,N_slots * b_spac + t_end + 2 * Dt, Dt_coarse);
+t_coarse = np.arange(0., N_slots * b_spac + t_end + 2 * Dt, Dt_coarse);
 
 t_fine_add_single = []
 
@@ -53,7 +53,7 @@ for i_step, t_step in enumerate(t_coarse):
 t_fine_add_single = np.array(t_fine_add_single)
 
 t_fine_add = []
-for ii in range(0,N_slots):
+for ii in range(0, N_slots):
 	t_fine_add += list(t_fine_add_single + b_spac * ii)
 
 t_nunif = np.array(sorted(list(t_coarse) + t_fine_add))
@@ -63,7 +63,7 @@ zz = c * t;
 val = 0. * t;
 
 
-for ii in range(0,N_slots):
+for ii in range(0, N_slots):
     if np.mod(ii, N_slots / 20) == 0:
         print ('Beam profile generation %.0f'%(float(ii) / float(N_slots) * 100) + """%""")
 

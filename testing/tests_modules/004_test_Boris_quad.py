@@ -16,7 +16,7 @@ fact_Bmap = 12. * 0.6
 
 
 dynamicsB = dynB.pusher_Boris(Dt, 0., B, 0.,
-                            B_map_file, fact_Bmap, None,N_sub_steps=N_sub_steps)
+                            B_map_file, fact_Bmap, None, N_sub_steps=N_sub_steps)
 
 chamb = ellip_cham_geom_object(.02, .02)
 N_mp_max = 1000
@@ -41,8 +41,8 @@ MP_eB = MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
 
 
 N_mp = 1
-Ex_n = array([0.,0.])
-Ey_n = array([0.,0.])
+Ex_n = array([0., 0.])
+Ey_n = array([0., 0.])
 
 # x_mpB=array([0.,1.])
 # y_mpB=array([1.,0.])
@@ -92,7 +92,7 @@ for ii in range(N_steps):
     y_lisB.append(MP_eB.y_mp.copy())
     z_lisB.append(MP_eB.z_mp.copy())
 
-    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
+    MP_eB = dynamicsB.step(MP_eB, Ex_n[0:N_mp], Ey_n[0:N_mp])
 
 
 x_lisB = array(x_lisB)
@@ -106,14 +106,14 @@ pl.close('all')
 for ii in range(len(x_lisB[1])):
 
     pl.figure(ii)
-    sp1 = pl.subplot(3,1,1)
-    pl.plot(x_lisB[:,ii],'.-')
+    sp1 = pl.subplot(3, 1, 1)
+    pl.plot(x_lisB[:, ii], '.-')
 
-    pl.subplot(3,1,2, sharex=sp1)
-    pl.plot(y_lisB[:,ii],'.-')
+    pl.subplot(3, 1, 2, sharex=sp1)
+    pl.plot(y_lisB[:, ii], '.-')
 
-    pl.subplot(3,1,3, sharex=sp1)
-    pl.plot(z_lisB[:,ii],'.-')
+    pl.subplot(3, 1, 3, sharex=sp1)
+    pl.plot(z_lisB[:, ii], '.-')
 
     #pl.figure(100+ii)
     #pl.plot(y_lisB[:,ii], z_lisB[:,ii],'.-')
@@ -122,7 +122,7 @@ for ii in range(len(x_lisB[1])):
     #pl.ylabel('z')
 
     pl.figure(200 + ii)
-    pl.plot(x_lisB[:,ii], y_lisB[:,ii],'.-')
+    pl.plot(x_lisB[:, ii], y_lisB[:, ii], '.-')
     #pl.xlim(-np.max(np.abs(x_lisB[:,ii])), np.max(np.abs(x_lisB[:,ii])))
     #pl.ylim(-np.max(np.abs(y_lisB[:,ii])), np.max(np.abs(y_lisB[:,ii])))
     pl.axis('equal')

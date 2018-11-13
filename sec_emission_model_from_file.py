@@ -62,7 +62,7 @@ class SEY_model_from_file(SEY_model_ECLOUD):
 
     def __init__(self, sey_file, flag_costheta_delta_scale, flag_costheta_Emax_shift,
                     E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
         """
         - sey file is the path to a mat file of the correct format, either an absolute path or in the sey_files folder.
@@ -170,7 +170,7 @@ class SEY_model_from_file(SEY_model_ECLOUD):
 
         return delta, ref_frac
 
-    def SEY_process(self, nel_impact,E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = self.SEY_values(E_impact_eV, costheta_impact)
         flag_elast = (rand(len(ref_frac)) < ref_frac);

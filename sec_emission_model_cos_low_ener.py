@@ -49,11 +49,11 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from numpy import sqrt, exp, cos,pi
+from numpy import sqrt, exp, cos, pi
 from numpy.random import rand
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
-def yield_fun2(E,costheta,Emax,del_max,R0,E0):
+def yield_fun2(E, costheta, Emax, del_max, R0, E0):
 
     s = 1.35;
 
@@ -75,9 +75,9 @@ def yield_fun2(E,costheta,Emax,del_max,R0,E0):
 
 
 class SEY_model_cos_le(SEY_model_ECLOUD):
-    def __init__(self, Emax,del_max,R0, E0=30.,
+    def __init__(self, Emax, del_max, R0, E0=30.,
                     E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
 
             self.E_th = E_th
@@ -99,8 +99,8 @@ class SEY_model_cos_le(SEY_model_ECLOUD):
             self.E0 = E0
             print 'Secondary emission model: Cosine Low Energy E0=%f'%self.E0
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac = yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
+            yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0);
             flag_elast = (rand(len(ref_frac)) < ref_frac);
             flag_truesec = ~(flag_elast);
             nel_emit = nel_impact * yiel;

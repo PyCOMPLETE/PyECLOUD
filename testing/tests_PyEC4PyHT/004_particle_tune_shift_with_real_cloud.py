@@ -13,7 +13,7 @@ B_multip = [0.]
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing  import shortSPS
-machine = shortSPS(n_segments = n_segments, machine_configuration = 'Q20-injection-like')
+machine = shortSPS(n_segments=n_segments, machine_configuration='Q20-injection-like')
 
 # remove synchrotron motion
 machine.one_turn_map.remove(machine.longitudinal_map)
@@ -40,7 +40,7 @@ Dh_sc = 2 * x_aper / 128
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
+slicer = UniformBinSlicer(n_slices=64, n_sigma_z=3.)
 
 
 init_unif_edens_flag = 1
@@ -79,10 +79,10 @@ for i in range(n_turns):
     print 'Turn', i
     sys.stdout.flush()
 
-    x_i[:,i] = bunch.x[:n_record]
-    xp_i[:,i] = bunch.xp[:n_record]
-    y_i[:,i] = bunch.y[:n_record]
-    yp_i[:,i] = bunch.yp[:n_record]
+    x_i[:, i] = bunch.x[:n_record]
+    xp_i[:, i] = bunch.xp[:n_record]
+    y_i[:, i] = bunch.y[:n_record]
+    yp_i[:, i] = bunch.yp[:n_record]
 print '\nDONE'
 
 from tune_analysis import tune_analysis
@@ -98,7 +98,7 @@ pl.figure(2)
 pl.plot(np.abs(qx_i), np.abs(qy_i), '.')
 pl.plot([np.modf(machine.Q_x)[0]], [np.modf(machine.Q_y)[0]], 'r.')
 #plt.plot([np.abs(qx_centroid)], [np.abs(qy_centroid)], 'og')
-pl.xlabel('$Q_x$');pl.ylabel('$Q_y$')
+pl.xlabel('$Q_x$'); pl.ylabel('$Q_y$')
 pl.axis('equal')
 
 pl.show()

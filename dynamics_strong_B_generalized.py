@@ -110,7 +110,7 @@ class pusher_strong_B_generalized():
 
 
 #    def step(self, xn, yn, zn, vxn, vyn, vzn,Ex_n,Ey_n):
-    def step(self, MP_e, Ex_n,Ey_n):
+    def step(self, MP_e, Ex_n, Ey_n):
 
         if MP_e.N_mp > 0:
             xn = MP_e.x_mp[0:MP_e.N_mp]
@@ -121,8 +121,8 @@ class pusher_strong_B_generalized():
             vzn = MP_e.vz_mp[0:MP_e.N_mp]
 
             if self.flag_B_map:
-                Bx_n,By_n = iff.int_field(xn,yn,self.xmin,self.ymin,\
-                                      self.dx,self.dy,self.Bmap_x,self.Bmap_y)
+                Bx_n, By_n = iff.int_field(xn, yn, self.xmin, self.ymin,\
+                                      self.dx, self.dy, self.Bmap_x, self.Bmap_y)
                 # the rescaling factor has already been applied to the map
             elif self.analyt_quad_grad1:
                 # the rescaling factor has to be applied here

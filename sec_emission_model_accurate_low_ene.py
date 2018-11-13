@@ -53,7 +53,7 @@ from numpy import sqrt, exp
 from numpy.random import rand
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
-def yield_fun3(E,costheta,Emax,del_max,R0,E0):
+def yield_fun3(E, costheta, Emax, del_max, R0, E0):
 
     s = 1.35;
 
@@ -73,9 +73,9 @@ def yield_fun3(E,costheta,Emax,del_max,R0,E0):
 
 
 class SEY_model_acc_low_ene(SEY_model_ECLOUD):
-    def __init__(self, Emax,del_max,R0,E0=150,
+    def __init__(self, Emax, del_max, R0, E0=150,
                     E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
 
             self.E_th = E_th
@@ -96,9 +96,9 @@ class SEY_model_acc_low_ene(SEY_model_ECLOUD):
             self.R0 = R0
             self.E0 = E0
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
-            del_true_sec, del_reflected, ref_frac = yield_fun3(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
+            del_true_sec, del_reflected, ref_frac = yield_fun3(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0);
             ref_prob = del_reflected;
             beta_ts = del_true_sec / (1. - del_reflected);
 

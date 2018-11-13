@@ -71,7 +71,7 @@ for variab in out_var_curr:
     print variab, dict_curr_list[0][variab].shape
 
 
-for ii,k in enumerate(out_var_curr):
+for ii, k in enumerate(out_var_curr):
     if '__' in k or k == 'el_dens_at_probes':
         print('Skipped %s' % k)
         continue
@@ -87,21 +87,21 @@ for ii,k in enumerate(out_var_curr):
         out_var_curr_tot = dict_curr_list[0][k] * 0
         for i_curr, dict_curr in enumerate(dict_curr_list):
             col = color_list[i_curr]
-            pl.plot(dict_curr[k], label=cloud_name_list[i_curr], color = col)
+            pl.plot(dict_curr[k], label=cloud_name_list[i_curr], color=col)
             out_var_curr_tot += dict_curr[k]
         if out_var_curr[ii] not in var_no_sum_list:
-            pl.plot(out_var_curr_tot,'b', label='curr_sim')
+            pl.plot(out_var_curr_tot, 'b', label='curr_sim')
 
         #Plot vector for the reference simulation
         if (k in out_var_ref) and (dict_ref[k].shape != ()):
 
-            pl.plot(dict_ref[k],'r', label='ref_sim')
-            print ii,k,'ref_sim'
+            pl.plot(dict_ref[k], 'r', label='ref_sim')
+            print ii, k, 'ref_sim'
 
         else:
             print '%s not  in reference'%k
 
-        pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
+        pl.legend(prop={'size': myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
         ms.sciy()
         pl.savefig(folder_plot + '/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
@@ -127,7 +127,7 @@ for ii,k in enumerate(out_var_curr):
         cbar.formatter.set_powerlimits((0, 0))
         cbar.update_ticks()
         ms.sciy()
-        print ii,k,'curr_sim'
+        print ii, k, 'curr_sim'
 
         try:
             ind_in_mat = n_pass
@@ -139,11 +139,11 @@ for ii,k in enumerate(out_var_curr):
             out_var_curr_tot = dict_curr[k][ind_in_mat] * 0
             for i_curr, dict_curr in enumerate(dict_curr_list):
                 col = color_list[i_curr]
-                sp3.plot(dict_curr[k][ind_in_mat], label=cloud_name_list[i_curr], color = col)
+                sp3.plot(dict_curr[k][ind_in_mat], label=cloud_name_list[i_curr], color=col)
                 out_var_curr_tot += dict_curr[k][ind_in_mat]
             if out_var_curr[ii] not in var_no_sum_list:
-                sp3.plot(out_var_curr_tot,'b', label='curr_sim')
-            sp3.legend(prop={'size':myfontsz},  loc='best')
+                sp3.plot(out_var_curr_tot, 'b', label='curr_sim')
+            sp3.legend(prop={'size': myfontsz},  loc='best')
             sp3.set_title(' num pass equal to [%d]'%ind_in_mat, fontsize=titlesz)
             sp3.tick_params(labelsize=labelsz)
             ms.sciy()
@@ -153,11 +153,11 @@ for ii,k in enumerate(out_var_curr):
             out_var_curr_tot = dict_curr[k] * 0
             for i_curr, dict_curr in enumerate(dict_curr_list):
                 col = color_list[i_curr]
-                sp4.plot(np.sum(dict_curr[k], axis=0), label=cloud_name_list[i_curr], color = col)
+                sp4.plot(np.sum(dict_curr[k], axis=0), label=cloud_name_list[i_curr], color=col)
                 out_var_curr_tot += dict_curr[k]
             if out_var_curr[ii] not in var_no_sum_list:
-                sp4.plot(np.sum(out_var_curr_tot, axis=0),'b', label='curr_sim')
-            sp4.legend(prop={'size':myfontsz},  loc='best')
+                sp4.plot(np.sum(out_var_curr_tot, axis=0), 'b', label='curr_sim')
+            sp4.legend(prop={'size': myfontsz},  loc='best')
             sp4.set_title('e- per slice', fontsize=titlesz)
             sp4.tick_params(labelsize=labelsz)
             ms.sciy()
@@ -167,16 +167,16 @@ for ii,k in enumerate(out_var_curr):
             out_var_curr_tot = dict_curr[k] * 0
             for i_curr, dict_curr in enumerate(dict_curr_list):
                 col = color_list[i_curr]
-                sp5.plot(np.sum(dict_curr[k], axis=1), label=cloud_name_list[i_curr], color = col)
+                sp5.plot(np.sum(dict_curr[k], axis=1), label=cloud_name_list[i_curr], color=col)
                 out_var_curr_tot += dict_curr[k]
             if out_var_curr[ii] not in var_no_sum_list:
-                sp5.plot(np.sum(out_var_curr_tot, axis=1),'b', label='curr_sim')
-            sp5.legend(prop={'size':myfontsz},  loc='best', )
+                sp5.plot(np.sum(out_var_curr_tot, axis=1), 'b', label='curr_sim')
+            sp5.legend(prop={'size': myfontsz},  loc='best', )
             sp5.set_title('e- per passage', fontsize=titlesz)
             sp5.tick_params(labelsize=labelsz)
             ms.sciy()
 
-            gs2.tight_layout(fig,rect=[0.45, 0, 1, 1],pad=1.08, h_pad=0.5)
+            gs2.tight_layout(fig, rect=[0.45, 0, 1, 1], pad=1.08, h_pad=0.5)
 
         except IOError as goterror:
             print 'Skipped. Got:',  goterror
@@ -194,7 +194,7 @@ for ii,k in enumerate(out_var_curr):
             cbar.formatter.set_powerlimits((0, 0))
             cbar.update_ticks()
             ms.sciy()
-            print ii,k,'ref_sim'
+            print ii, k, 'ref_sim'
 
             try:
 
@@ -203,21 +203,21 @@ for ii,k in enumerate(out_var_curr):
                     ind_in_mat = 3
 
                 #Plot number of e- for the reference passage
-                sp3.plot(dict_ref[k][ind_in_mat],'r', label='ref_sim')
-                sp3.legend(prop={'size':myfontsz},  loc='best')
+                sp3.plot(dict_ref[k][ind_in_mat], 'r', label='ref_sim')
+                sp3.legend(prop={'size': myfontsz},  loc='best')
                 ms.sciy()
 
                 #Plot number of e- for each slice
-                sp4.plot(np.sum(dict_ref[k], axis=0),'r', label='ref_sim')
-                sp4.legend(prop={'size':myfontsz},  loc='best')
+                sp4.plot(np.sum(dict_ref[k], axis=0), 'r', label='ref_sim')
+                sp4.legend(prop={'size': myfontsz},  loc='best')
                 ms.sciy()
 
                 #Plot number of e- for each passage
-                sp5.plot(np.sum(dict_ref[k], axis=1),'r', label='ref_sim')
-                sp5.legend(prop={'size':myfontsz},  loc='best')
+                sp5.plot(np.sum(dict_ref[k], axis=1), 'r', label='ref_sim')
+                sp5.legend(prop={'size': myfontsz},  loc='best')
                 ms.sciy()
 
-                gs2.tight_layout(fig,rect=[0.45, 0, 1, 1], pad=1.08,h_pad=1.5)
+                gs2.tight_layout(fig, rect=[0.45, 0, 1, 1], pad=1.08, h_pad=1.5)
 
             except IOError as goterror:
                     print 'Skipped. Got:',  goterror
@@ -227,7 +227,7 @@ for ii,k in enumerate(out_var_curr):
         else:
             print '%s not  in reference'%k
 
-        gs1.tight_layout(fig,rect=[0, 0, 0.45, 1],pad=1.08)
+        gs1.tight_layout(fig, rect=[0, 0, 0.45, 1], pad=1.08)
         top = 0.9
         bottom = max(gs1.bottom, gs2.bottom)
 

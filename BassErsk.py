@@ -5,10 +5,10 @@ from errffor import errf
 def wfun(z):
     x = z.real
     y = z.imag
-    wx,wy = errf(x,y)
+    wx, wy = errf(x, y)
     return wx + 1j * wy
 
-def BassErsk(xin,yin,sigmax,sigmay):
+def BassErsk(xin, yin, sigmax, sigmay):
 
     x = abs(xin);
     y = abs(yin);
@@ -41,7 +41,7 @@ def BassErsk(xin,yin,sigmax,sigmay):
 
     return Ex, Ey
 
-def ImageTerms(x,y,a,b,x0,y0, nimag):
+def ImageTerms(x, y, a, b, x0, y0, nimag):
 
     eps0 = 8.854187817620e-12;
 
@@ -63,7 +63,7 @@ def ImageTerms(x,y,a,b,x0,y0, nimag):
         Ecpx = 0 + 0j
 
         q = conj(q)
-        for nn in range(1,nimag + 1):
+        for nn in range(1, nimag + 1):
             Ecpx = Ecpx + exp(-nn * mu1) * ( (cosh(nn * mu0) * cos(nn * phi0)) / (cosh(nn * mu1)) + 1j * (sinh(nn * mu0) * sin(nn * phi0)) / (sinh(nn * mu1))   ) * (sinh(nn * q)) / (sinh(q))
 
         Ecpx = Ecpx / (4 * pi * eps0) * 4 / g

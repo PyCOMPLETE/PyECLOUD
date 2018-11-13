@@ -16,7 +16,7 @@ n_part_per_turn = 5000
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing  import shortSPS
-machine = shortSPS(n_segments = n_segments, machine_configuration = 'Q20-injection-like')
+machine = shortSPS(n_segments=n_segments, machine_configuration='Q20-injection-like')
 
 # remove synchrotron motion
 machine.one_turn_map.remove(machine.longitudinal_map)
@@ -69,7 +69,7 @@ Dh_sc = 2 * x_aper / 128 / 2.
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, z_cuts=(-3 * bunch.sigma_z(), 3 * bunch.sigma_z()))
+slicer = UniformBinSlicer(n_slices=64, z_cuts=(-3 * bunch.sigma_z(), 3 * bunch.sigma_z()))
 
 
 init_unif_edens_flag = 1
@@ -110,10 +110,10 @@ for i in range(n_turns):
     print 'Turn', i
     sys.stdout.flush()
 
-    x_i[:,i] = bunch.x[:n_record]
-    xp_i[:,i] = bunch.xp[:n_record]
-    y_i[:,i] = bunch.y[:n_record]
-    yp_i[:,i] = bunch.yp[:n_record]
+    x_i[:, i] = bunch.x[:n_record]
+    xp_i[:, i] = bunch.xp[:n_record]
+    y_i[:, i] = bunch.y[:n_record]
+    yp_i[:, i] = bunch.yp[:n_record]
 print '\nDONE'
 
 from tune_analysis import tune_analysis
@@ -122,13 +122,13 @@ qx_i, qy_i, qx_centroid, qy_centroid = tune_analysis(x_i, xp_i, y_i, yp_i)
 pl.close('all')
 ms.mystyle(fontsz=14)
 pl.figure(1)
-sp1 = pl.subplot(2,1,1)
+sp1 = pl.subplot(2, 1, 1)
 pl.plot(np.mean(x_i, axis=0), '.-b', markersize=5, linewidth=2, label='PyHT')
 pl.ylabel('<x>')
 pl.grid('on')
 ms.sciy()
-pl.legend(prop={'size':14})
-pl.subplot(2,1,2, sharex=sp1)
+pl.legend(prop={'size': 14})
+pl.subplot(2, 1, 2, sharex=sp1)
 pl.plot(np.mean(y_i, axis=0), '.-b', markersize=5, linewidth=2, label='PyHT')
 pl.xlabel('Turn'); pl.ylabel('<y>')
 pl.grid('on')
@@ -140,23 +140,23 @@ pl.figure(2)
 pl.plot(np.abs(qx_i), np.abs(qy_i), '.', label='PyHT', markersize=3)
 pl.plot(np.abs(qx_ht), np.abs(qy_ht), '.r', label='HT', markersize=3)
 pl.plot([np.modf(machine.Q_x)[0]], [np.modf(machine.Q_y)[0]], 'go')
-pl.xlabel('$Q_x$');pl.ylabel('$Q_y$')
-pl.legend(prop={'size':14})
+pl.xlabel('$Q_x$'); pl.ylabel('$Q_y$')
+pl.legend(prop={'size': 14})
 pl.grid('on')
 pl.axis('equal')
 #pl.savefig(filename.split('_prb.dat')[0]+'_footprint.png', dpi=200)
 
 
 pl.figure(3)
-pl.subplot(2,1,1)
-pl.plot(bunch.z[:n_record],np.abs(qx_i) - np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
-pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qx_ht) - np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
+pl.subplot(2, 1, 1)
+pl.plot(bunch.z[:n_record], np.abs(qx_i) - np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
+pl.plot(dict_HT['z0_HT'][:n_record], np.abs(qx_ht) - np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
 pl.ylabel('$\Delta Q_x$')
 pl.grid('on')
-pl.legend(prop={'size':14})
-pl.subplot(2,1,2)
-pl.plot(bunch.z[:n_record],np.abs(qy_i) - np.modf(machine.Q_x)[0], '.', markersize=3)
-pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qy_ht) - np.modf(machine.Q_x)[0], '.r', markersize=3)
+pl.legend(prop={'size': 14})
+pl.subplot(2, 1, 2)
+pl.plot(bunch.z[:n_record], np.abs(qy_i) - np.modf(machine.Q_x)[0], '.', markersize=3)
+pl.plot(dict_HT['z0_HT'][:n_record], np.abs(qy_ht) - np.modf(machine.Q_x)[0], '.r', markersize=3)
 pl.ylabel('$\Delta Q_y$')
 pl.xlabel('z [m]')
 pl.grid('on')

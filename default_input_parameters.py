@@ -4,7 +4,7 @@ from scipy.constants import m_p, m_e, e as qe
 # This most importantly excludes python lists. Tuples may be used in their place.
 
 parameters_dict = {
-    'superparameters':{'pi'}, #are allowed anywhere and can be repeated (for backwards compatibility)
+    'superparameters': {'pi'}, #are allowed anywhere and can be repeated (for backwards compatibility)
     'simulation_parameters': {
         'mandatory': {
 
@@ -48,7 +48,7 @@ parameters_dict = {
             'Nbin_En_hist',
             'En_hist_max',
         },
-        'optional':{
+        'optional': {
             # Secondary beams
             'secondary_beams_file_list': (),
 

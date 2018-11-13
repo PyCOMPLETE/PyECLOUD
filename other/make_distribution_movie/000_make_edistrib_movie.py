@@ -24,7 +24,7 @@ num_passage = 2
 folder_sim = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver/'
 main_outp_filename = 'Pyecltest_angle3D.mat'
 
-passlist = range(first_passage,first_passage + num_passage)
+passlist = range(first_passage, first_passage + num_passage)
 
 x_beam_pos = 0.
 y_beam_pos = 0.
@@ -42,7 +42,7 @@ yfield_cut_lim = 7 #5000.
 denslim = 1.e11;
 
 N_dec = 1
-lim_dens = [10,14]
+lim_dens = [10, 14]
 flag_log = True
 outp_filname = 'pass%d.avi'%passlist[0]
 
@@ -94,21 +94,21 @@ for pass_ind in passlist:
     t_video = np.squeeze(obout_ecl_video.t_video.real)
     b_spac = np.squeeze(obout.b_spac.real)
 
-    (nphotog,_,_) = rho_video.shape
+    (nphotog, _, _) = rho_video.shape
 
     for ii in xrange(0, nphotog, N_dec):
 
-		fig = pl.figure(1,figsize=(4.5,6)) #,figsize=(4.5,6)
+		fig = pl.figure(1, figsize=(4.5, 6)) #,figsize=(4.5,6)
 		t_curr = t_video[ii]
 		cendens_curr = np.interp(t_curr, t, cendens)
 		lam_b1_curr = np.interp(t_curr, t, lam_b1)
 		cendens_curr = np.interp(t_curr, t, cendens)
 
-		print 'Pass %d %d/%d'%(pass_ind,ii,nphotog)
+		print 'Pass %d %d/%d'%(pass_ind, ii, nphotog)
 
-		imm = np.squeeze(rho_video[ii,:,:])
-		imm_ex = np.squeeze(ex_video[ii,:,:])
-		imm_ey = np.squeeze(ey_video[ii,:,:])
+		imm = np.squeeze(rho_video[ii, :, :])
+		imm_ex = np.squeeze(ex_video[ii, :, :])
+		imm_ey = np.squeeze(ey_video[ii, :, :])
 		immlin = imm.copy()
 
 		if flag_log:
@@ -116,7 +116,7 @@ for pass_ind in passlist:
 			imm = np.log10((imm))
 			imm[immlin < 10**lim_dens[0]] = lim_dens[0]
 
-		pl.subplot(2,1,1)
+		pl.subplot(2, 1, 1)
 		ax = pl.gca()
 		im = ax.imshow(imm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
 		   alpha=None, vmin=lim_dens[0], vmax=lim_dens[1], origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
@@ -133,7 +133,7 @@ for pass_ind in passlist:
 		clb = pl.colorbar(im, cax=cax)
 		clb.set_label('log10(e- dens.)')
 
-		pl.subplot(2,1,2)
+		pl.subplot(2, 1, 2)
 		mask_t_win = np.logical_and(t > t_curr - tbeam_win_length / 2., t < t_curr + tbeam_win_length / 2.)
 		pl.plot(c * (t[mask_t_win] - t_curr), lam_b1[mask_t_win])
 		#pl.plot(-c*(t[mask_t_win]-t_curr), lam_b2[mask_t_win], 'r')
@@ -141,12 +141,12 @@ for pass_ind in passlist:
 
 		pl.grid('on')
 
-		pl.axvline(0,linestyle='--',color='k')
+		pl.axvline(0, linestyle='--', color='k')
 		pl.xlabel('(s-s0) [m]')
 		pl.ylabel('beam prof. [p/m]')
 
-		pl.subplots_adjust(top=0.85,right=0.8, left=0.15, hspace=0.3, wspace=0.5)
-		filename = str('Pass%05d_%05d' % (pass_ind,ii)) + '.png'
+		pl.subplots_adjust(top=0.85, right=0.8, left=0.15, hspace=0.3, wspace=0.5)
+		filename = str('Pass%05d_%05d' % (pass_ind, ii)) + '.png'
 		pl.savefig(filename, dpi=150)
 		pl.clf()
 

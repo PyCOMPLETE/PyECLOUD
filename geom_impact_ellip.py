@@ -108,9 +108,9 @@ class ellip_cham_geom_object:
             if self.flag_verbose_file:
                 x_nan = x_in[mask_nan]
                 y_nan = y_in[mask_nan]
-                fbckt = open('bcktr_errors.txt','a')
+                fbckt = open('bcktr_errors.txt', 'a')
                 for ii_bk in xrange(len(y_nan)):
-                    fbckt.write('%e\t%e\tnan\n'%(x_nan[ii_bk],y_nan[ii_bk]))
+                    fbckt.write('%e\t%e\tnan\n'%(x_nan[ii_bk], y_nan[ii_bk]))
                 fbckt.close()
 
         t0 = resc_fac * t0;
@@ -150,9 +150,9 @@ class ellip_cham_geom_object:
                 y_int_pat = y_int[flag_impact]
 
                 if self.flag_verbose_file:
-                    fbckt = open('bcktr_errors.txt','a')
+                    fbckt = open('bcktr_errors.txt', 'a')
                     for ii_bk in xrange(len(x_int_pat)):
-                        fbckt.write('%e\t%e\n'%(x_int_pat[ii_bk],y_int_pat[ii_bk]))
+                        fbckt.write('%e\t%e\n'%(x_int_pat[ii_bk], y_int_pat[ii_bk]))
 
                     fbckt.close()
 
@@ -172,7 +172,7 @@ class ellip_cham_geom_object:
                 print 'err inside'
                 raise ValueError('Outside after backtracking!!!!')
 
-        par_cross = arctan2(a * y_int,b * x_int);
+        par_cross = arctan2(a * y_int, b * x_int);
 
         Dx = -a * sin(par_cross);
         Dy = b * cos(par_cross);
@@ -192,5 +192,5 @@ class ellip_cham_geom_object:
 
         i_found = None
 
-        return  x_int,y_int,z_int,Nx,Ny, i_found
+        return  x_int, y_int, z_int, Nx, Ny, i_found
 

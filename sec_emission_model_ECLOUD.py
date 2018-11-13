@@ -81,9 +81,9 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 class SEY_model_ECLOUD(object):
     def __init__(
-                    self, Emax,del_max,R0,
+                    self, Emax, del_max, R0,
                     E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
                 ):
 
@@ -110,10 +110,10 @@ class SEY_model_ECLOUD(object):
 
         print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = yield_fun2(
-            E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s,
+            E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0, s=self.s,
             flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
         flag_elast = (rand(len(ref_frac)) < ref_frac)
         flag_truesec = ~(flag_elast)

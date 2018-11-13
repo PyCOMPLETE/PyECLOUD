@@ -11,10 +11,10 @@ def obj_to_dict(obj):
 	dict_out = {}
 	members = dir(obj)
 	for member in members:
-		exec "dict_out['%s'] = obj.%s"%(member,member)
+		exec "dict_out['%s'] = obj.%s"%(member, member)
 	return dict_out
 
-def myloadmat(filename, squeeze = True):
+def myloadmat(filename, squeeze=True):
 	import scipy.io as sio
 	dict_var = sio.loadmat(filename)
 	if squeeze:
@@ -26,7 +26,7 @@ def myloadmat(filename, squeeze = True):
 	return dict_var
 
 
-def myloadmat_to_obj(filename, squeeze = True):
+def myloadmat_to_obj(filename, squeeze=True):
 	return  obj_from_dict(myloadmat(filename, squeeze=squeeze))
 
 
@@ -58,7 +58,7 @@ def bunchh5_to_obj(filename):
 
 def bunchh5list_to_dict(filename_list):
 	bunch_dict = bunchh5_to_dict(filename_list[0])
-	for i_file in xrange(1,len(filename_list)):
+	for i_file in xrange(1, len(filename_list)):
 		bunch_dict_curr = bunchh5_to_dict(filename_list[i_file])
 		for kk in bunch_dict.keys():
 			bunch_dict[kk] = np.array(list(bunch_dict[kk]) + list(bunch_dict_curr[kk]))

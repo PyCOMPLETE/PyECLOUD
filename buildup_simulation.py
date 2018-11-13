@@ -97,7 +97,7 @@ class BuildupSimulation(object):
                 else:
                     raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
-    def run(self, t_end_sim = None):
+    def run(self, t_end_sim=None):
 
         beamtim = self.beamtim
 
@@ -118,7 +118,7 @@ class BuildupSimulation(object):
             self.sim_time_step()
 
             if beamtim.flag_new_bunch_pass:
-                print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
+                print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
 
             ## every bunch passage
             if t_end_sim is not None:
@@ -206,11 +206,11 @@ class BuildupSimulation(object):
             ## Gas ionization (main and secondary beams)
             if(beamtim.tt_curr < t_ion and gas_ion_flag == 1):
                 MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt_curr, beamtim.sigmax, beamtim.sigmay,
-                                          x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
+                                          x_beam_pos=beamtim.x_beam_pos, y_beam_pos=beamtim.y_beam_pos)
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
                         MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt_curr, sec_beam.sigmax, sec_beam.sigmay,
-                                                  x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
+                                                  x_beam_pos=sec_beam.x_beam_pos, y_beam_pos=sec_beam.y_beam_pos)
 
             ## Photoemission (main and secondary beams)
             if (photoem_flag != 0):
@@ -239,7 +239,7 @@ class BuildupSimulation(object):
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, cloud_list, rho_cloud = cloud.rho)
+                                                            sec_beams_list, cloud_list, rho_cloud=cloud.rho)
 
             ## Every bunch passage
             if beamtim.flag_new_bunch_pass:

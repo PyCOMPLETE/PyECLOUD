@@ -13,7 +13,7 @@ B_multip = [0.]
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing  import shortSPS
-machine = shortSPS(n_segments = n_segments, machine_configuration = 'Q20-injection-like')
+machine = shortSPS(n_segments=n_segments, machine_configuration='Q20-injection-like')
 
 # remove synchrotron motion
 machine.one_turn_map.remove(machine.longitudinal_map)
@@ -41,7 +41,7 @@ import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 #~ slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
 z_cut = 3 * bunch.sigma_z()
-slicer = UniformBinSlicer(n_slices = 64, z_cuts=(-z_cut, z_cut))
+slicer = UniformBinSlicer(n_slices=64, z_cuts=(-z_cut, z_cut))
 
 init_unif_edens_flag = 1
 init_unif_edens = 1e11
@@ -69,9 +69,9 @@ ecloud.track(bunch)
 # create an electric field map object to store the field
 from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
 L_interaction = machine.circumference / len(machine.transverse_map)
-efieldmap = Transverse_Efield_map(xg = ecloud.spacech_ele.xg, yg = ecloud.spacech_ele.yg,
+efieldmap = Transverse_Efield_map(xg=ecloud.spacech_ele.xg, yg=ecloud.spacech_ele.yg,
         Ex=ecloud.Ex_ele_last_track, Ey=ecloud.Ey_ele_last_track, slicer=ecloud.slicer,
- 	L_interaction=L_interaction, flag_clean_slices = False)
+ 	L_interaction=L_interaction, flag_clean_slices=False)
 
 # install ecloud field kick after each segment of the machine
 machine.install_after_each_transverse_segment(efieldmap)
@@ -96,10 +96,10 @@ for i in range(n_turns):
     sys.stdout.write('\rturn %d'%i)
     sys.stdout.flush()
 
-    x_i[:,i] = bunch_for_tracking.x[:]
-    xp_i[:,i] = bunch_for_tracking.xp[:]
-    y_i[:,i] = bunch_for_tracking.y[:]
-    yp_i[:,i] = bunch_for_tracking.yp[:]
+    x_i[:, i] = bunch_for_tracking.x[:]
+    xp_i[:, i] = bunch_for_tracking.xp[:]
+    y_i[:, i] = bunch_for_tracking.y[:]
+    yp_i[:, i] = bunch_for_tracking.yp[:]
 print '\nDONE'
 
 from tune_analysis import tune_analysis
@@ -115,7 +115,7 @@ pl.figure(2)
 pl.plot(np.abs(qx_i), np.abs(qy_i), '.')
 pl.plot([np.modf(machine.Q_x)[0]], [np.modf(machine.Q_y)[0]], 'r.')
 #plt.plot([np.abs(qx_centroid)], [np.abs(qy_centroid)], 'og')
-pl.xlabel('$Q_x$');pl.ylabel('$Q_y$')
+pl.xlabel('$Q_x$'); pl.ylabel('$Q_y$')
 pl.axis('equal')
 
 pl.show()

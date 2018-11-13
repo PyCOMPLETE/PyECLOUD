@@ -60,12 +60,12 @@ import scipy.stats as stats
 def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit, E_th, En_impact_eV, thresh_low_energy):
 
     if switch_no_increase_energy == 0:
-        en_eV = random.lognormal(mufit,sigmafit,Ngen)
+        en_eV = random.lognormal(mufit, sigmafit, Ngen)
         flag_above_th = (en_eV > E_th)
         Nabove_th = np.sum(flag_above_th)
 
         while Nabove_th > 0:
-            en_eV[flag_above_th] = random.lognormal(mufit,sigmafit,Nabove_th)
+            en_eV[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
 
             flag_above_th = (en_eV > E_th)
             Nabove_th = np.sum(flag_above_th)
@@ -91,14 +91,14 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
         en_eV_le = (en_eV_le + 2.) * sigma_le
 
         #generate high energy
-        en_eV_he = random.lognormal(mufit,sigmafit,N_high_ene)
+        en_eV_he = random.lognormal(mufit, sigmafit, N_high_ene)
 
-        flag_above_th = np.logical_or(en_eV_he > E_th,(en_eV_he - En_impact_eV[flag_high_energy]) > 0)
+        flag_above_th = np.logical_or(en_eV_he > E_th, (en_eV_he - En_impact_eV[flag_high_energy]) > 0)
         Nabove_th = np.sum(flag_above_th)
 
         while Nabove_th > 0:
-            en_eV_he[flag_above_th] = random.lognormal(mufit,sigmafit,Nabove_th)
-            flag_above_th = np.logical_or(en_eV_he > E_th,(en_eV_he - En_impact_eV[flag_high_energy]) > 0)
+            en_eV_he[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
+            flag_above_th = np.logical_or(en_eV_he > E_th, (en_eV_he - En_impact_eV[flag_high_energy]) > 0)
             Nabove_th = np.sum(flag_above_th)
 
         en_eV[flag_high_energy] = en_eV_he

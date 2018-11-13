@@ -10,7 +10,7 @@ for filename in files:
             content = fid.read()
         if 'giovanni.iadarola@cern.ch' in content:
             content = content.replace('PyECLOUD Version 7.6.0', 'PyECLOUD Version 7.6.0')
-            with open(filename,'w') as fid:
+            with open(filename, 'w') as fid:
                 fid.write(content)
 
 os.system('rm *.pyold')

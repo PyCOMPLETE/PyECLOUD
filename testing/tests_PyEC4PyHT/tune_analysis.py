@@ -9,10 +9,10 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 		qx_i = np.empty(macroparticlenumber)
 		qy_i = np.empty(macroparticlenumber)
 
-		spectrum_x = np.abs(np.fft.fft(x_i, axis = 1))[:,:n_turns / 2]
+		spectrum_x = np.abs(np.fft.fft(x_i, axis=1))[:, :n_turns / 2]
 		tune_peak_x = np.float_(np.argmax(spectrum_x, axis=1)) / float(n_turns)
 
-		spectrum_y = np.abs(np.fft.fft(y_i, axis = 1))[:,:n_turns / 2]
+		spectrum_y = np.abs(np.fft.fft(y_i, axis=1))[:, :n_turns / 2]
 		tune_peak_y = np.float_(np.argmax(spectrum_y, axis=1)) / float(n_turns)
 
 		print 'analysing particle spectra ... this may take some time.'
@@ -21,9 +21,9 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 			SX = Sussix()
 			SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=tune_peak_x[p_idx], tuney=tune_peak_y[p_idx])
 
-			SX.sussix(x_i[p_idx,:], xp_i[p_idx,:],
-					  y_i[p_idx,:], yp_i[p_idx,:],
-					  x_i[p_idx,:], xp_i[p_idx,:])
+			SX.sussix(x_i[p_idx, :], xp_i[p_idx, :],
+					  y_i[p_idx, :], yp_i[p_idx, :],
+					  x_i[p_idx, :], xp_i[p_idx, :])
 			qx_i[p_idx] = SX.ox[0]
 			qy_i[p_idx] = SX.oy[0]
 

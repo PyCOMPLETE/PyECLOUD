@@ -13,9 +13,9 @@ N_steps = 10000
 B = 0.1
 N_sub_steps = 10
 
-dynamicsd = dyndip.pusher_dipole_magnet(Dt,B)
+dynamicsd = dyndip.pusher_dipole_magnet(Dt, B)
 dynamicsB = dynB.pusher_Boris(Dt, 0., B, 0.,
-                            None, None, None,N_sub_steps=N_sub_steps)
+                            None, None, None, N_sub_steps=N_sub_steps)
 
 chamb = ellip_cham_geom_object(.02, .02)
 N_mp_max = 1000
@@ -44,16 +44,16 @@ MP_ed = MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
 
 
 N_mp = 2
-Ex_n = array([0.001,0.001])
-Ey_n = array([1.,0.])
+Ex_n = array([0.001, 0.001])
+Ey_n = array([1., 0.])
 
-x_mpB = array([0.,0.])
-y_mpB = array([0.,0.])
-z_mpB = array([0.,0.])
+x_mpB = array([0., 0.])
+y_mpB = array([0., 0.])
+z_mpB = array([0., 0.])
 
-vx_mpB = array([1.,0.])
-vy_mpB = array([0.,0.])
-vz_mpB = array([0.,1.])
+vx_mpB = array([1., 0.])
+vy_mpB = array([0., 0.])
+vz_mpB = array([0., 1.])
 
 MP_eB.x_mp = x_mpB.copy()
 MP_eB.y_mp = y_mpB.copy()
@@ -95,9 +95,9 @@ for ii in range(N_steps):
     y_lisd.append(MP_ed.y_mp.copy())
     z_lisd.append(MP_ed.z_mp.copy())
 
-    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
+    MP_eB = dynamicsB.step(MP_eB, Ex_n[0:N_mp], Ey_n[0:N_mp])
 
-    MP_ed = dynamicsd.step(MP_ed,Ex_n[0:N_mp],Ey_n[0:N_mp])
+    MP_ed = dynamicsd.step(MP_ed, Ex_n[0:N_mp], Ey_n[0:N_mp])
 
 
 x_lisB = array(x_lisB)
@@ -114,20 +114,20 @@ pl.close('all')
 for ii in range(len(x_lisB[1])):
 
     pl.figure(ii)
-    pl.subplot(3,1,1)
-    pl.plot(x_lisd[:,ii])
+    pl.subplot(3, 1, 1)
+    pl.plot(x_lisd[:, ii])
     pl.hold('on')
-    pl.plot(x_lisB[:,ii],'.r')
+    pl.plot(x_lisB[:, ii], '.r')
 
-    pl.subplot(3,1,2)
-    pl.plot(y_lisd[:,ii])
+    pl.subplot(3, 1, 2)
+    pl.plot(y_lisd[:, ii])
     pl.hold('on')
-    pl.plot(y_lisB[:,ii],'.r')
+    pl.plot(y_lisB[:, ii], '.r')
 
-    pl.subplot(3,1,3)
-    pl.plot(z_lisd[:,ii])
+    pl.subplot(3, 1, 3)
+    pl.plot(z_lisd[:, ii])
     pl.hold('on')
-    pl.plot(z_lisB[:,ii],'.r')
+    pl.plot(z_lisB[:, ii], '.r')
 
 
 pl.show()

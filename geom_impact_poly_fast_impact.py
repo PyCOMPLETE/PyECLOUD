@@ -109,8 +109,8 @@ class polyg_cham_geom_object(object):
         if self.area < 0:
             raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
 
-        Nx = -np.diff(Vy,1)
-        Ny = np.diff(Vx,1)
+        Nx = -np.diff(Vy, 1)
+        Ny = np.diff(Vx, 1)
 
         norm_N = np.sqrt(Nx**2 + Ny**2)
         Nx = Nx / norm_N
@@ -135,7 +135,7 @@ class polyg_cham_geom_object(object):
         self.flag_assume_convex = flag_assume_convex
 
         if self.flag_verbose_file:
-            fbckt = open('bcktr_errors.txt','w')
+            fbckt = open('bcktr_errors.txt', 'w')
             fbckt.write('kind,x_in,y_in,x_out, y_out\n')
             fbckt.close()
 
@@ -158,8 +158,8 @@ class polyg_cham_geom_object(object):
         N_impacts = len(x_in)
         self.N_mp_impact = self.N_mp_impact + N_impacts
 
-        x_int,y_int,z_int,Nx_int,Ny_int, i_found = gipc.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out,
-                              self.Vx,  self.Vy,self.Nx,  self.Ny,  self.N_edg, resc_fac)
+        x_int, y_int, z_int, Nx_int, Ny_int, i_found = gipc.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out,
+                              self.Vx,  self.Vy, self.Nx,  self.Ny,  self.N_edg, resc_fac)
 
         mask_found = i_found >= 0
 
@@ -170,7 +170,7 @@ class polyg_cham_geom_object(object):
             y_int[mask_not_found] = y_in[mask_not_found]
 
             #compute some kind of normal ....
-            par_cross = arctan2(self.cx * y_in[mask_not_found],self.cy * x_int[mask_not_found])
+            par_cross = arctan2(self.cx * y_in[mask_not_found], self.cy * x_int[mask_not_found])
 
             Dx = -self.cx * sin(par_cross)
             Dy = self.cy * cos(par_cross)
@@ -202,7 +202,7 @@ class polyg_cham_geom_object(object):
                 print('End reporting backtrack error of kind 1')
 
             if self.flag_verbose_file:
-                with open('bcktr_errors.txt','a') as fbckt:
+                with open('bcktr_errors.txt', 'a') as fbckt:
                     for i_err in xrange(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         fbckt.write('1,' + lcurr + '\n')
@@ -228,7 +228,7 @@ class polyg_cham_geom_object(object):
                     print('End reporting backtrack error of kind 2')
 
                 if self.flag_verbose_file:
-                    with open('bcktr_errors.txt','a') as fbckt:
+                    with open('bcktr_errors.txt', 'a') as fbckt:
                         for i_err in xrange(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('2,' + lcurr + '\n')
@@ -261,7 +261,7 @@ class polyg_cham_geom_object(object):
                     print('End reporting backtrack error of kind 3')
 
                 if self.flag_verbose_file:
-                    with open('bcktr_errors.txt','a') as fbckt:
+                    with open('bcktr_errors.txt', 'a') as fbckt:
                         for i_err in xrange(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('3,' + lcurr + '\n')
@@ -285,7 +285,7 @@ class polyg_cham_geom_object(object):
             num_points = self.N_edg
             for A in xrange(num_points):
 
-                B = np.mod((A + 1),num_points)
+                B = np.mod((A + 1), num_points)
                 C = np.mod((B + 1), num_points)
 
                 BAx = self.Vx[A] - self.Vx[B]

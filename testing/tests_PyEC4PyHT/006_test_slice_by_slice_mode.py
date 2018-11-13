@@ -25,14 +25,14 @@ n_part_per_turn = 5000
 
 appo = np.loadtxt(filename)
 
-parid = np.reshape(appo[:,0], (-1, n_part_per_turn))[::N_kicks,:]
-x = np.reshape(appo[:,1], (-1, n_part_per_turn))[::N_kicks,:]
-xp = np.reshape(appo[:,2], (-1, n_part_per_turn))[::N_kicks,:]
-y = np.reshape(appo[:,3], (-1, n_part_per_turn))[::N_kicks,:]
-yp = np.reshape(appo[:,4], (-1, n_part_per_turn))[::N_kicks,:]
-z = np.reshape(appo[:,5], (-1, n_part_per_turn))[::N_kicks,:]
-zp = np.reshape(appo[:,6], (-1, n_part_per_turn))[::N_kicks,:]
-N_turns = len(x[:,0])
+parid = np.reshape(appo[:, 0], (-1, n_part_per_turn))[::N_kicks, :]
+x = np.reshape(appo[:, 1], (-1, n_part_per_turn))[::N_kicks, :]
+xp = np.reshape(appo[:, 2], (-1, n_part_per_turn))[::N_kicks, :]
+y = np.reshape(appo[:, 3], (-1, n_part_per_turn))[::N_kicks, :]
+yp = np.reshape(appo[:, 4], (-1, n_part_per_turn))[::N_kicks, :]
+z = np.reshape(appo[:, 5], (-1, n_part_per_turn))[::N_kicks, :]
+zp = np.reshape(appo[:, 6], (-1, n_part_per_turn))[::N_kicks, :]
+N_turns = len(x[:, 0])
 
 pl.close('all')
 ms.mystyle(fontsz=14)
@@ -41,7 +41,7 @@ ms.mystyle(fontsz=14)
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing import SPS
-machine = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', accQ_x=20., accQ_y=20.)
+machine = SPS(n_segments=N_kicks, machine_configuration='Q20-injection', accQ_x=20., accQ_y=20.)
 machine.one_turn_map.remove(machine.longitudinal_map) # We apply it separately
 
 
@@ -61,7 +61,7 @@ Dh_sc = 2 * x_aper / 128 / 2
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
+slicer = UniformBinSlicer(n_slices=64, n_sigma_z=3.)
 
 init_unif_edens_flag = 1
 init_unif_edens = 2e11
@@ -92,12 +92,12 @@ machine.one_turn_map = new_one_turn_map
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=30000, intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 
 # replace first particles with HEADTAIL ones
-bunch.x[:n_part_per_turn] = x[0,:]
-bunch.xp[:n_part_per_turn] = xp[0,:]
-bunch.y[:n_part_per_turn] = y[0,:]
-bunch.yp[:n_part_per_turn] = yp[0,:]
-bunch.z[:n_part_per_turn] = z[0,:]
-bunch.dp[:n_part_per_turn] = zp[0,:]
+bunch.x[:n_part_per_turn] = x[0, :]
+bunch.xp[:n_part_per_turn] = xp[0, :]
+bunch.y[:n_part_per_turn] = y[0, :]
+bunch.yp[:n_part_per_turn] = yp[0, :]
+bunch.z[:n_part_per_turn] = z[0, :]
+bunch.dp[:n_part_per_turn] = zp[0, :]
 
 # save id and momenta before track
 id_before = bunch.id[bunch.id <= n_part_per_turn]
@@ -139,42 +139,42 @@ for ii in xrange(N_turns - 1):
 	yp_after = np.take(yp_after, indsort)
 	z_after = np.take(z_after, indsort)
 
-	fig = pl.figure(100, figsize=(18,10))
+	fig = pl.figure(100, figsize=(18, 10))
 	pl.clf()
-	sp1 = pl.subplot(2,3,1)
-	pl.plot(z_after,  (100 * np.abs((xp_after - xp_before) - (xp[ii + 1, :] - xp[0, :])) / np.std(xp[ii + 1, :] - xp[0, :])), '.r', markersize = 2)
+	sp1 = pl.subplot(2, 3, 1)
+	pl.plot(z_after,  (100 * np.abs((xp_after - xp_before) - (xp[ii + 1, :] - xp[0, :])) / np.std(xp[ii + 1, :] - xp[0, :])), '.r', markersize=2)
 	pl.grid('on')
 	pl.ylabel('''error($\Delta$x')/$\Delta$x' [%]''')
-	pl.subplot(2,3,4, sharex=sp1)
-	pl.plot(z_after,  (xp[ii + 1, :] - xp[0, :]), '.r', label='HT', markersize = 2)
-	pl.plot(z_after,  (xp_after - xp_before), '.b', label='PyHT', markersize = 2)
+	pl.subplot(2, 3, 4, sharex=sp1)
+	pl.plot(z_after,  (xp[ii + 1, :] - xp[0, :]), '.r', label='HT', markersize=2)
+	pl.plot(z_after,  (xp_after - xp_before), '.b', label='PyHT', markersize=2)
 	ms.sciy()
 	pl.grid('on')
 	pl.ylabel("$\Delta$x'")
 	pl.xlabel('z[m]')
-	pl.legend(prop = {'size':14})
-	pl.subplot(2,3,3)
-	pl.hist((100 * np.abs((xp_after - xp_before) - (xp[ii + 1, :] - xp[0, :])) / np.std(xp[ii + 1, :] - xp[0, :])), bins=100, range=(0,100))
+	pl.legend(prop={'size': 14})
+	pl.subplot(2, 3, 3)
+	pl.hist((100 * np.abs((xp_after - xp_before) - (xp[ii + 1, :] - xp[0, :])) / np.std(xp[ii + 1, :] - xp[0, :])), bins=100, range=(0, 100))
 	pl.xlabel('Error_x [%]')
 	pl.ylabel('Occurrences')
-	pl.xlim(0,100)
+	pl.xlim(0, 100)
 	rms_err_x = np.std(100 * np.abs((xp_after - xp_before) - (xp[ii + 1, :] - xp[0, :])) / np.std(xp[ii + 1, :] - xp[0, :]))
 
-	sp1 = pl.subplot(2,3,2)
-	pl.plot(z_after,  (100 * np.abs((yp_after - yp_before) - (yp[ii + 1, :] - yp[0, :])) / np.std(yp[ii + 1, :] - yp[0, :])), '.r', markersize = 2)
+	sp1 = pl.subplot(2, 3, 2)
+	pl.plot(z_after,  (100 * np.abs((yp_after - yp_before) - (yp[ii + 1, :] - yp[0, :])) / np.std(yp[ii + 1, :] - yp[0, :])), '.r', markersize=2)
 	pl.grid('on')
 	pl.ylabel('''error($\Delta$y')/$\Delta$y' [%]''')
-	pl.subplot(2,3,5, sharex=sp1)
-	pl.plot(z_after,  (yp[ii + 1, :] - yp[0, :]), '.r', label='HT', markersize = 2)
-	pl.plot(z_after,  (yp_after - yp_before), '.b', label='PyHT', markersize = 2)
+	pl.subplot(2, 3, 5, sharex=sp1)
+	pl.plot(z_after,  (yp[ii + 1, :] - yp[0, :]), '.r', label='HT', markersize=2)
+	pl.plot(z_after,  (yp_after - yp_before), '.b', label='PyHT', markersize=2)
 	ms.sciy()
 	pl.grid('on')
 	pl.ylabel("$\Delta$y'")
 	pl.xlabel('z[m]')
-	pl.legend(prop = {'size':14})
-	pl.subplot(2,3,6)
-	pl.hist((100 * np.abs((yp_after - yp_before) - (yp[ii + 1, :] - yp[0, :])) / np.std(yp[ii + 1, :] - yp[0, :])), bins=100, range=(0,100))
-	pl.xlim(0,100)
+	pl.legend(prop={'size': 14})
+	pl.subplot(2, 3, 6)
+	pl.hist((100 * np.abs((yp_after - yp_before) - (yp[ii + 1, :] - yp[0, :])) / np.std(yp[ii + 1, :] - yp[0, :])), bins=100, range=(0, 100))
+	pl.xlim(0, 100)
 	pl.xlabel('Error_y [%]')
 	pl.ylabel('Occurrences')
 	rms_err_y = np.std(100 * np.abs((yp_after - yp_before) - (yp[ii + 1, :] - yp[0, :])) / np.std(yp[ii + 1, :] - yp[0, :]))
@@ -191,8 +191,8 @@ for ii in xrange(N_turns - 1):
 	time.sleep(1.)
 
 pl.figure(1000)
-pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
-pl.plot(rms_err_y_list, '.-', markersize = 10, linewidth=2, label='y')
+pl.plot(rms_err_x_list, '.-', markersize=10, linewidth=2, label='x')
+pl.plot(rms_err_y_list, '.-', markersize=10, linewidth=2, label='y')
 pl.grid('on')
 pl.ylabel('''Relative r.m.s. error [%]''')
 pl.xlabel('Turn')

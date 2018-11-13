@@ -55,7 +55,7 @@ import int_field_for as iff
 from boris_step import boris_step
 
 
-def crprod(bx, by, bz, cx,cy,cz):
+def crprod(bx, by, bz, cx, cy, cz):
     ax = by * cz - bz * cy
     ay = bz * cx - bx * cz
     az = bx * cy - by * cx
@@ -70,7 +70,7 @@ class B_none():
         self.B0y = B0y
         self.B0z = B0z
 
-    def get_B(self, xn,yn):
+    def get_B(self, xn, yn):
             Bx_n = 0 * xn + self.B0x
             By_n = 0 * xn + self.B0y
             Bz_n = 0 * xn + self.B0z
@@ -85,7 +85,7 @@ class B_quad():
         self.B0z = B0z
         self.fact_Bmap = fact_Bmap
 
-    def get_B(self,xn,yn):
+    def get_B(self, xn, yn):
         Bx_n = self.fact_Bmap * yn.copy()
         By_n = self.fact_Bmap * xn.copy()
         Bx_n = Bx_n + self.B0x
@@ -112,9 +112,9 @@ class B_file():
         self.dx = self.xx[1] - self.xx[0];
         self.dy = self.yy[1] - self.yy[0];
 
-    def get_B(self, xn,yn):
-                Bx_n,By_n = iff.int_field(xn,yn,self.xmin,self.ymin,\
-                                      self.dx,self.dy,self.Bmap_x,self.Bmap_y)
+    def get_B(self, xn, yn):
+                Bx_n, By_n = iff.int_field(xn, yn, self.xmin, self.ymin,\
+                                      self.dx, self.dy, self.Bmap_x, self.Bmap_y)
                 # the rescaling factor has already been applied to the map
                 Bx_n = Bx_n + self.B0x
                 By_n = By_n + self.B0y
@@ -149,7 +149,7 @@ class pusher_Boris():
         print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
-    def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0.):
 
         if MP_e.N_mp > 0:
 
@@ -167,9 +167,9 @@ class pusher_Boris():
                 Ez_n = 0. * xn1
 
             for ii in range(self.N_sub_steps):
-                Bx_n, By_n, Bz_n = self.B_ob.get_B(xn1,yn1)
-                boris_step(self.Dtt,xn1,yn1,zn1,vxn1,vyn1,vzn1,
-                           Ex_n,Ey_n,Ez_n,Bx_n,By_n,Bz_n,mass,charge)
+                Bx_n, By_n, Bz_n = self.B_ob.get_B(xn1, yn1)
+                boris_step(self.Dtt, xn1, yn1, zn1, vxn1, vyn1, vzn1,
+                           Ex_n, Ey_n, Ez_n, Bx_n, By_n, Bz_n, mass, charge)
 
             MP_e.x_mp[0:MP_e.N_mp] = xn1
             MP_e.y_mp[0:MP_e.N_mp] = yn1
@@ -180,7 +180,7 @@ class pusher_Boris():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n,Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
 
         if MP_e.N_mp > 0:
 
@@ -198,9 +198,9 @@ class pusher_Boris():
                 Ez_n = 0. * xn1
 
             for ii in range(N_sub_steps):
-                Bx_n, By_n, Bz_n = self.B_ob.get_B(xn1,yn1)
-                boris_step(Dt_substep,xn1,yn1,zn1,vxn1,vyn1,vzn1,
-                           Ex_n,Ey_n,Ez_n,Bx_n,By_n,Bz_n,mass,charge)
+                Bx_n, By_n, Bz_n = self.B_ob.get_B(xn1, yn1)
+                boris_step(Dt_substep, xn1, yn1, zn1, vxn1, vyn1, vzn1,
+                           Ex_n, Ey_n, Ez_n, Bx_n, By_n, Bz_n, mass, charge)
 
             MP_e.x_mp[0:MP_e.N_mp] = xn1
             MP_e.y_mp[0:MP_e.N_mp] = yn1

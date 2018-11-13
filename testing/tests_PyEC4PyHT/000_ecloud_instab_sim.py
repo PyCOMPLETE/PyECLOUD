@@ -19,7 +19,7 @@ N_mp_max = N_MP_ele_init * 4.
 
 # define the machine
 from machines_for_testing import SPS
-machine = SPS(n_segments = n_segments, machine_configuration = 'Q26-injection')
+machine = SPS(n_segments=n_segments, machine_configuration='Q26-injection')
 
 # compute sigma x and y
 inj_optics = machine.transverse_map.get_injection_optics()
@@ -37,7 +37,7 @@ nel_mp_ref_0 = init_unif_edens * 4 * x_aper * y_aper / N_MP_ele_init
 # define an electron cloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 2.)
+slicer = UniformBinSlicer(n_slices=64, n_sigma_z=2.)
 ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / n_segments, slicer=slicer ,
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
@@ -61,6 +61,6 @@ bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.
 # simulate
 for i_turn in xrange(N_turns):
 	print 'Turn', i_turn
-	machine.track(bunch, verbose = True)
+	machine.track(bunch, verbose=True)
 
 

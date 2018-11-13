@@ -82,7 +82,7 @@ class pusher_Boris_multipole():
         print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
-    def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0.):
 
         if MP_e.N_mp > 0:
 
@@ -102,7 +102,7 @@ class pusher_Boris_multipole():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n,Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
 
         if MP_e.N_mp > 0:
 

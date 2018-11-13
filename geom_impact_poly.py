@@ -50,7 +50,7 @@
 #-End-preamble---------------------------------------------------------
 
 
-from numpy import squeeze, array,diff, max, sum, sqrt,\
+from numpy import squeeze, array, diff, max, sum, sqrt,\
                   logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
 import scipy.io as sio
 
@@ -87,8 +87,8 @@ class polyg_cham_geom_object:
         Vx = array(Vx)
         Vy = array(Vy)
 
-        Nx = -diff(Vy,1)
-        Ny = diff(Vx,1)
+        Nx = -diff(Vy, 1)
+        Ny = diff(Vx, 1)
 
         norm_N = sqrt(Nx**2 + Ny**2)
         Nx = Nx / norm_N
@@ -112,7 +112,7 @@ class polyg_cham_geom_object:
         self.flag_verbose_file = flag_verbose_file
 
         if self.flag_verbose_file:
-            fbckt = open('bcktr_errors.txt','w')
+            fbckt = open('bcktr_errors.txt', 'w')
             fbckt.write('kind,x_in,y_in,x_out, y_out\n')
             fbckt.close()
 
@@ -157,7 +157,7 @@ class polyg_cham_geom_object:
 
             mask_updatemin = logical_and(t_curr >= 0, t_curr < t_min)
             t_min[mask_updatemin] = t_curr[mask_updatemin]
-            mask_found = logical_or(mask_updatemin,mask_found)
+            mask_found = logical_or(mask_updatemin, mask_found)
             i_found[mask_updatemin] = ii
 
             mask_same_min = (t_curr == t_min)
@@ -185,7 +185,7 @@ class polyg_cham_geom_object:
             y_int[mask_not_found] = y_in[mask_not_found];
 
             #compute some kind of normal ....
-            par_cross = arctan2(self.cx * y_in[mask_not_found],self.cy * x_int[mask_not_found]);
+            par_cross = arctan2(self.cx * y_in[mask_not_found], self.cy * x_int[mask_not_found]);
 
             Dx = -self.cx * sin(par_cross);
             Dy = self.cy * cos(par_cross);
@@ -217,7 +217,7 @@ class polyg_cham_geom_object:
                 print """End reporting backtrack error of kind 1"""
 
             if self.flag_verbose_file:
-                with open('bcktr_errors.txt','a') as fbckt:
+                with open('bcktr_errors.txt', 'a') as fbckt:
                     for i_err in xrange(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         fbckt.write('1,' + lcurr + '\n')
@@ -243,7 +243,7 @@ class polyg_cham_geom_object:
                     print """End reporting backtrack error of kind 2"""
 
                 if self.flag_verbose_file:
-                    with open('bcktr_errors.txt','a') as fbckt:
+                    with open('bcktr_errors.txt', 'a') as fbckt:
                         for i_err in xrange(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('2,' + lcurr + '\n')
@@ -276,14 +276,14 @@ class polyg_cham_geom_object:
                     print """End reporting backtrack error of kind 3"""
 
                 if self.flag_verbose_file:
-                    with open('bcktr_errors.txt','a') as fbckt:
+                    with open('bcktr_errors.txt', 'a') as fbckt:
                         for i_err in xrange(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e'%(x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('3,' + lcurr + '\n')
 
                 raise ValueError('Outside after backtracking!!!!')
 
-        return  x_int,y_int,z_int,Nx_int,Ny_int, i_found
+        return  x_int, y_int, z_int, Nx_int, Ny_int, i_found
 
 
 

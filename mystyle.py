@@ -30,16 +30,16 @@ def mystyle(fontsz=16):
 def mystyle_arial(fontsz=16, dist_tick_lab=10):
 
     mystyle(fontsz)
-    rc('font',**{'family':'sans-serif','sans-serif':['arial'], 'size':fontsz})
-    rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=dist_tick_lab)
+    rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
+    rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
 
 def sciy():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0,0),axis='y')
+    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 def scix():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0,0),axis='x')
+    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 
-def colorprog(i_prog, Nplots, v1 = .9, v2 = 1., cm='hsv'):
+def colorprog(i_prog, Nplots, v1=.9, v2=1., cm='hsv'):
     if hasattr(Nplots, '__len__'):
         Nplots = len(Nplots)
     if cm == 'hsv':
@@ -58,14 +58,14 @@ def comb_legend(sp1, sp2, *args, **kwargs):
     sp2.legend(lines + lines2, labels + labels2, *args, **kwargs)
 
 
-def mystyle_2(fontsz=16, dist_tick_lab=10, figsize=(12,10)):
+def mystyle_2(fontsz=16, dist_tick_lab=10, figsize=(12, 10)):
     rcdefaults()
     RcParams[u'axes.grid'] = True
     RcParams[u'axes.linewidth'] = 2.0
     RcParams[u'figure.facecolor'] = 'w'
 
-    rc('font',**{'family':'sans-serif','sans-serif':['arial'], 'size':fontsz})
-    rc(('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=dist_tick_lab)
+    rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
+    rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
 
 
 def figure(title, figs=None, figsize=(12, 10), **kwargs):

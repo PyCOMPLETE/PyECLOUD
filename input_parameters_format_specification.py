@@ -118,12 +118,12 @@ def import_module_from_file(module_name, file_name):
     # The importlib.util method requires the file name to end with '.py'.
     # Also, loading the module from a temporary directory does not leave any .pyc files.
     dir_name = '/tmp/PyECLOUD_%i' % os.getpid()
-    real_module_name = module_name + '_%s' % str(time.time()).replace('.','_')
+    real_module_name = module_name + '_%s' % str(time.time()).replace('.', '_')
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
 
     try:
-        new_file_name = dir_name + '/temp_file_%s.py' % (module_name + '_' + str(time.time())).replace('.','_')
+        new_file_name = dir_name + '/temp_file_%s.py' % (module_name + '_' + str(time.time())).replace('.', '_')
         shutil.copy(file_name, new_file_name)
 
         # As we use pi in many old input files

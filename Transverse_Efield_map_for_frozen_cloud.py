@@ -59,8 +59,8 @@ class Transverse_Efield_map(object):
         x = self.get_beam_x(beam)[pid]
         y = self.get_beam_y(beam)[pid]
 
-        self.pic.efx = np.squeeze(self.Ex[sid,:,:])
-        self.pic.efy = np.squeeze(self.Ey[sid,:,:])
+        self.pic.efx = np.squeeze(self.Ex[sid, :, :])
+        self.pic.efy = np.squeeze(self.Ey[sid, :, :])
 
         centroid_x = 0
         centroid_y = 0

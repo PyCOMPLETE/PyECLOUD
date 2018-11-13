@@ -79,7 +79,7 @@ class photoemission_base(object):
         #generate points and normals
         z_in = z_out = np.zeros_like(x_out, float)
         x_int, y_int, _, Norm_x, Norm_y, i_found = self.chamb.impact_point_and_normal(
-            x_in, y_in, z_in,x_out, y_out, z_out, resc_fac=self.resc_fac)
+            x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=self.resc_fac)
 
         #generate energies (the same distr. for all photoelectr.)
         En_gen = self.get_energy(Nint_new_MP) #in eV

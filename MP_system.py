@@ -56,7 +56,7 @@ from scipy.constants import e, m_e
 
 
 class MP_positions:
-    def __init__(self,x,y,z):
+    def __init__(self, x, y, z):
         self.x_mp = x.copy()
         self.y_mp = y.copy()
         self.z_mp = z.copy()
@@ -68,13 +68,13 @@ class MP_system:
                  N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e):
 
         N_mp_max = int(N_mp_max)
-        self.x_mp = np.zeros(N_mp_max,float)
-        self.y_mp = np.zeros(N_mp_max,float)
-        self.z_mp = np.zeros(N_mp_max,float)
-        self.vx_mp = np.zeros(N_mp_max,float)
-        self.vy_mp = np.zeros(N_mp_max,float)
-        self.vz_mp = np.zeros(N_mp_max,float)
-        self.nel_mp = np.zeros(N_mp_max,float)
+        self.x_mp = np.zeros(N_mp_max, float)
+        self.y_mp = np.zeros(N_mp_max, float)
+        self.z_mp = np.zeros(N_mp_max, float)
+        self.vx_mp = np.zeros(N_mp_max, float)
+        self.vy_mp = np.zeros(N_mp_max, float)
+        self.vz_mp = np.zeros(N_mp_max, float)
+        self.nel_mp = np.zeros(N_mp_max, float)
         self.N_mp = 0;
 
         self.nel_mp_ref = nel_mp_ref_0
@@ -98,10 +98,10 @@ class MP_system:
         self.charge = charge
         self.mass = mass
 
-        xg_hist_reg = np.arange(0,chamb.x_aper + 2. * Dx_hist_reg,Dx_hist_reg,float)
+        xg_hist_reg = np.arange(0, chamb.x_aper + 2. * Dx_hist_reg, Dx_hist_reg, float)
         xgr_hist_reg = xg_hist_reg[1:]
         xgr_hist_reg = xgr_hist_reg[::-1]#reverse array
-        self.xg_hist_reg = np.concatenate((-xgr_hist_reg,xg_hist_reg),0)
+        self.xg_hist_reg = np.concatenate((-xgr_hist_reg, xg_hist_reg), 0)
         self.Nxg_hist_reg = len(self.xg_hist_reg);
         self.bias_x_hist_reg = min(self.xg_hist_reg);
         self.Dx_hist_reg = Dx_hist_reg
@@ -116,7 +116,7 @@ class MP_system:
 
     def clean_small_MPs(self):
 
-        print "Start clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
+        print "Start clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
 
         flag_clean = (self.nel_mp < self.nel_mp_cl_th);
         flag_keep = ~(flag_clean)
@@ -133,7 +133,7 @@ class MP_system:
 
         self.nel_mp[self.N_mp:] = 0.0
 
-        print "Done clean. N_mp=%d Nel=%e"%(self.N_mp,np.sum(self.nel_mp[0:self.N_mp]))
+        print "Done clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
 
     def set_nel_mp_ref(self, val):
         self.nel_mp_ref = val
@@ -153,7 +153,7 @@ class MP_system:
                     new_nel_mp_ref = self.nel_mp_ref_0
 
                 #if new_nel_mp_ref>self.nel_mp_ref_0:removed from version 3.16
-                print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+                print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg);
 
                 self.set_nel_mp_ref(new_nel_mp_ref)
 
@@ -184,14 +184,14 @@ class MP_system:
 
                 chrg = np.sum(self.nel_mp);
                 erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]));
-                print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+                print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg);
 
     def check_for_regeneration(self):
 
         if (self.N_mp > self.N_mp_regen or (self.N_mp < self.N_mp_regen_low and self.nel_mp_ref > self.nel_mp_ref_0)):
             chrg = np.sum(self.nel_mp);
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]));
-            print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+            print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg);
 
             new_nel_mp_ref = chrg / self.N_mp_after_regen;
             if new_nel_mp_ref < self.nel_mp_ref_0:
@@ -199,8 +199,8 @@ class MP_system:
 
             self.set_nel_mp_ref(new_nel_mp_ref)
 
-            hist_vect = np.zeros(self.Nxg_hist_reg,float)
-            histf.compute_hist(self.x_mp[0:self.N_mp],self.nel_mp[0:self.N_mp],self.bias_x_hist_reg,self.Dx_hist_reg,hist_vect)
+            hist_vect = np.zeros(self.Nxg_hist_reg, float)
+            histf.compute_hist(self.x_mp[0:self.N_mp], self.nel_mp[0:self.N_mp], self.bias_x_hist_reg, self.Dx_hist_reg, hist_vect)
             nel_tot = np.sum(hist_vect)
 
             #eliminate the negligible part of the x histogram
@@ -272,15 +272,15 @@ class MP_system:
             indices_nonzero_cells = np.array(list(set(indexes)))
             indices_nonzero_cells = np.sort(indices_nonzero_cells)
 
-            vect_dens = dict(zip(indices_nonzero_cells,np.zeros(len(indices_nonzero_cells))))
+            vect_dens = dict(zip(indices_nonzero_cells, np.zeros(len(indices_nonzero_cells))))
             #lil_matrix((Nx_reg*Ny_reg*Nvx_reg*Nvy_reg*Nvz_reg,1));#allocate a sparse matrix
             #
 
-            for i_mp in range(0,self.N_mp):
+            for i_mp in range(0, self.N_mp):
                 index_curr = indexes[i_mp]
                 vect_dens[index_curr] = vect_dens[index_curr] + self.nel_mp[i_mp];
 
-            nonzero_cells = np.array(map(vect_dens.get,indices_nonzero_cells))
+            nonzero_cells = np.array(map(vect_dens.get, indices_nonzero_cells))
 
             #%% retrieve indices of nonempty cells
             #% NB use C-like indices
@@ -333,8 +333,8 @@ class MP_system:
             #
             #
             #
-            self.x_mp = 0 * self.x_mp;self.y_mp = 0 * self.y_mp;self.z_mp = 0 * self.z_mp;
-            self.vx_mp = 0 * self.vx_mp;self.vy_mp = 0 * self.vy_mp;self.vz_mp = 0 * self.vz_mp;
+            self.x_mp = 0 * self.x_mp; self.y_mp = 0 * self.y_mp; self.z_mp = 0 * self.z_mp;
+            self.vx_mp = 0 * self.vx_mp; self.vy_mp = 0 * self.vy_mp; self.vz_mp = 0 * self.vz_mp;
             self.nel_mp = 0 * self.nel_mp;
             self.nel_mp[0:N_mp_expect] = np.ones(N_mp_expect) * self.nel_mp_ref;
             #
@@ -379,7 +379,7 @@ class MP_system:
 
             chrg = np.sum(self.nel_mp);
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]));
-            print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp,chrg,erg);
+            print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg);
 
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
 
@@ -400,12 +400,12 @@ class MP_system:
                 x_temp = (x_max - x_min) * rand(Nint_new_MP) + x_min
                 y_temp = (y_max - y_min) * rand(Nint_new_MP) + y_min
 
-                flag_np = self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+                flag_np = self.chamb.is_outside(x_temp, y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
                 Nout = np.sum(flag_np);
                 while(Nout > 0):
                     x_temp[flag_np] = (x_max - x_min) * rand(Nout) + x_min
                     y_temp[flag_np] = (y_max - y_min) * rand(Nout) + y_min
-                    flag_np = self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+                    flag_np = self.chamb.is_outside(x_temp, y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
                     Nout = np.sum(flag_np);
 
                 self.x_mp[self.N_mp:self.N_mp + Nint_new_MP] = x_temp;#Be careful to the indexing when translating to python
@@ -444,7 +444,7 @@ class MP_system:
             x_temp = (x_max - x_min) * rand(Nint_new_MP) + x_min
             y_temp = (y_max - y_min) * rand(Nint_new_MP) + y_min
 
-            flag_keep = ~self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+            flag_keep = ~self.chamb.is_outside(x_temp, y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
             x_temp = x_temp[flag_keep]
             y_temp = y_temp[flag_keep]
             Nint_new_MP = len(x_temp)
@@ -496,14 +496,14 @@ class MP_system:
 
     def extract_dict(self):
         dict_MP = {
-            'x_mp':self.x_mp[:self.N_mp].copy(),
-            'y_mp':self.y_mp[:self.N_mp].copy(),
-            'z_mp':self.z_mp[:self.N_mp].copy(),
-            'vx_mp':self.vx_mp[:self.N_mp].copy(),
-            'vy_mp':self.vy_mp[:self.N_mp].copy(),
-            'vy_mp':self.vz_mp[:self.N_mp].copy(),
-            'nel_mp':self.nel_mp[:self.N_mp].copy(),
-            'N_mp':self.N_mp,
+            'x_mp': self.x_mp[:self.N_mp].copy(),
+            'y_mp': self.y_mp[:self.N_mp].copy(),
+            'z_mp': self.z_mp[:self.N_mp].copy(),
+            'vx_mp': self.vx_mp[:self.N_mp].copy(),
+            'vy_mp': self.vy_mp[:self.N_mp].copy(),
+            'vy_mp': self.vz_mp[:self.N_mp].copy(),
+            'nel_mp': self.nel_mp[:self.N_mp].copy(),
+            'N_mp': self.N_mp,
             }
         return dict_MP
 

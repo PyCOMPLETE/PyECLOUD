@@ -71,7 +71,7 @@ class pusher_dipole_magnet():
         self.omegac = omegac
 
 #    def step(self, xn, yn, zn, vxn, vyn, vzn,Ex_n,Ey_n):
-    def step(self, MP_e, Ex_n,Ey_n):
+    def step(self, MP_e, Ex_n, Ey_n):
 
         if MP_e.N_mp > 0:
             xn = MP_e.x_mp[0:MP_e.N_mp]

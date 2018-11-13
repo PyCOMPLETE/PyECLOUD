@@ -21,7 +21,7 @@ ms.mystyle(fontsz=14)
 # define machine for PyHEADTAIL
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from machines_for_testing import SPS
-machine = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', accQ_x=20., accQ_y=20.)
+machine = SPS(n_segments=N_kicks, machine_configuration='Q20-injection', accQ_x=20., accQ_y=20.)
 machine.one_turn_map.remove(machine.longitudinal_map) # We apply it separately
 
 
@@ -41,7 +41,7 @@ Dh_sc = 2 * x_aper / 128 / 2
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
+slicer = UniformBinSlicer(n_slices=64, n_sigma_z=3.)
 
 init_unif_edens_flag = 1
 init_unif_edens = 2e11
@@ -90,7 +90,7 @@ t_end_slice = time.mktime(time.localtime())
 print 'Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns))
 
 # Simulate bunch mode
-machine_whole_bunch = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', accQ_x=20., accQ_y=20.)
+machine_whole_bunch = SPS(n_segments=N_kicks, machine_configuration='Q20-injection', accQ_x=20., accQ_y=20.)
 
 
 ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / N_kicks, slicer=slicer,

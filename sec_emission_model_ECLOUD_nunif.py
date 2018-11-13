@@ -54,7 +54,7 @@ from numpy.random import rand
 import numpy as np
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
-def yield_fun2(E,costheta,Emax,del_max,R0,E0):
+def yield_fun2(E, costheta, Emax, del_max, R0, E0):
 
     s = 1.35;
 
@@ -75,9 +75,9 @@ def yield_fun2(E,costheta,Emax,del_max,R0,E0):
 
 
 class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
-    def __init__(self, chamb, Emax,del_max,R0,E0=150.,
+    def __init__(self, chamb, Emax, del_max, R0, E0=150.,
                     E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
 
             if chamb.chamb_type != 'polyg':
@@ -108,13 +108,13 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
 
             print 'Secondary emission model: ECLOUD non uniform E0=%f'%self.E0
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
             Emax_mp = take(self.Emax_segments, i_impact)
             del_max_mp = take(self.del_max_segments, i_impact)
             R0_mp = take(self.R0_segments, i_impact)
 
-            yiel, ref_frac = yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp, E0=self.E0);
+            yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, Emax_mp, del_max_mp, R0_mp, E0=self.E0);
             flag_elast = (rand(len(ref_frac)) < ref_frac);
             flag_truesec = ~(flag_elast);
             nel_emit = nel_impact * yiel;

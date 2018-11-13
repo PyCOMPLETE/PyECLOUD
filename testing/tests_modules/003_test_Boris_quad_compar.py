@@ -95,7 +95,7 @@ vz_mpB = array([223792.460031])
 
 
 dynamicsB = dynB.pusher_Boris(Dt, 0., B, 0.,
-                            B_map_file, fact_Bmap, None,N_sub_steps=N_sub_steps)
+                            B_map_file, fact_Bmap, None, N_sub_steps=N_sub_steps)
 
 dynamicsGen = dyngen.pusher_strong_B_generalized(Dt, 0., B,
                  B_map_file, fact_Bmap, 1e-6)
@@ -169,8 +169,8 @@ for ii in range(N_steps):
     y_lisg.append(MP_eg.y_mp.copy())
     z_lisg.append(MP_eg.z_mp.copy())
 
-    MP_eB = dynamicsB.step(MP_eB,Ex_n[0:N_mp],Ey_n[0:N_mp])
-    MP_eg = dynamicsGen.step(MP_eg,Ex_n[0:N_mp],Ey_n[0:N_mp])
+    MP_eB = dynamicsB.step(MP_eB, Ex_n[0:N_mp], Ey_n[0:N_mp])
+    MP_eg = dynamicsGen.step(MP_eg, Ex_n[0:N_mp], Ey_n[0:N_mp])
 
 
 x_lisB = array(x_lisB)
@@ -187,17 +187,17 @@ pl.close('all')
 for ii in range(len(x_lisB[1])):
 
     pl.figure(ii)
-    sp1 = pl.subplot(3,1,1)
-    pl.plot(x_lisB[:,ii],'.-')
-    pl.plot(x_lisg[:,ii],'.r')
+    sp1 = pl.subplot(3, 1, 1)
+    pl.plot(x_lisB[:, ii], '.-')
+    pl.plot(x_lisg[:, ii], '.r')
 
-    pl.subplot(3,1,2, sharex=sp1)
-    pl.plot(y_lisB[:,ii],'.-')
-    pl.plot(y_lisg[:,ii],'.r')
+    pl.subplot(3, 1, 2, sharex=sp1)
+    pl.plot(y_lisB[:, ii], '.-')
+    pl.plot(y_lisg[:, ii], '.r')
 
-    pl.subplot(3,1,3, sharex=sp1)
-    pl.plot(z_lisB[:,ii],'.-')
-    pl.plot(z_lisg[:,ii],'.r')
+    pl.subplot(3, 1, 3, sharex=sp1)
+    pl.plot(z_lisB[:, ii], '.-')
+    pl.plot(z_lisg[:, ii], '.r')
     #pl.figure(100+ii)
     #pl.plot(y_lisB[:,ii], z_lisB[:,ii],'.-')
     #pl.axis('equal')
@@ -205,8 +205,8 @@ for ii in range(len(x_lisB[1])):
     #pl.ylabel('z')
 
     pl.figure(200 + ii)
-    pl.plot(x_lisB[:,ii], y_lisB[:,ii],'.-')
-    pl.plot(x_lisg[:,ii], y_lisg[:,ii],'.r')
+    pl.plot(x_lisB[:, ii], y_lisB[:, ii], '.-')
+    pl.plot(x_lisg[:, ii], y_lisg[:, ii], '.r')
     #pl.xlim(-np.max(np.abs(x_lisB[:,ii])), np.max(np.abs(x_lisB[:,ii])))
     #pl.ylim(-np.max(np.abs(y_lisB[:,ii])), np.max(np.abs(y_lisB[:,ii])))
     pl.axis('equal')
