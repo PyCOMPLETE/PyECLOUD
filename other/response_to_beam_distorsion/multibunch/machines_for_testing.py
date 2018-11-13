@@ -13,15 +13,15 @@ class LHC(Synchrotron):
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Injection':
-			p0 			= 450e9 * e /c
+		if machine_configuration == 'Injection':
+			p0 			= 450e9 * e / c
 			p_increment = 0.
 			accQ_x		= 64.28
 			accQ_y		= 59.31
 			V_RF		= 6e6
 			dphi_RF		= 0.
-		elif machine_configuration=='6.5_TeV_collision_tunes':
-			p0 			= 6500e9 * e /c
+		elif machine_configuration == '6.5_TeV_collision_tunes':
+			p0 			= 6500e9 * e / c
 			p_increment = 0.
 			accQ_x		= 64.31
 			accQ_y		= 59.32
@@ -30,11 +30,11 @@ class LHC(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
+		if optics_mode == 'smooth':
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
-			circumference = h_RF*2.5e-9*c
+			circumference = h_RF * 2.5e-9 * c
 
 			name = None
 
@@ -48,7 +48,7 @@ class LHC(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
+		elif optics_mode == 'non-smooth':
 			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
@@ -61,11 +61,11 @@ class LHC(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']

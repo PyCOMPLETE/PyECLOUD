@@ -27,4 +27,4 @@ def scix():
 
 
 def colorprog(i_prog, Nplots, v1 = .9, v2 = 1.):
-	return hsv_to_rgb(float(i_prog)/float(Nplots), v1, v2)
+	return hsv_to_rgb(float(i_prog) / float(Nplots), v1, v2)

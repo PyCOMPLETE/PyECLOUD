@@ -9,11 +9,11 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 		qx_i = np.empty(macroparticlenumber)
 		qy_i = np.empty(macroparticlenumber)
 
-		spectrum_x = np.abs(np.fft.fft(x_i, axis = 1))[:,:n_turns/2]
-		tune_peak_x = np.float_(np.argmax(spectrum_x, axis=1))/float(n_turns)
+		spectrum_x = np.abs(np.fft.fft(x_i, axis = 1))[:,:n_turns / 2]
+		tune_peak_x = np.float_(np.argmax(spectrum_x, axis=1)) / float(n_turns)
 
-		spectrum_y = np.abs(np.fft.fft(y_i, axis = 1))[:,:n_turns/2]
-		tune_peak_y = np.float_(np.argmax(spectrum_y, axis=1))/float(n_turns)
+		spectrum_y = np.abs(np.fft.fft(y_i, axis = 1))[:,:n_turns / 2]
+		tune_peak_y = np.float_(np.argmax(spectrum_y, axis=1)) / float(n_turns)
 
 		print 'analysing particle spectra ... this may take some time.'
 		for p_idx in xrange(macroparticlenumber):
@@ -36,11 +36,11 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 
 		#print x_centroid.shape
 
-		spectrum_x_centroid = np.abs(np.fft.fft(x_centroid))[:n_turns/2]
-		tune_peak_x_centroid = np.float_(np.argmax(spectrum_x_centroid))/float(n_turns)
+		spectrum_x_centroid = np.abs(np.fft.fft(x_centroid))[:n_turns / 2]
+		tune_peak_x_centroid = np.float_(np.argmax(spectrum_x_centroid)) / float(n_turns)
 
-		spectrumy_centroid = np.abs(np.fft.fft(x_centroid))[:n_turns/2]
-		tune_peak_y_centroid = np.float_(np.argmax(spectrumy_centroid))/float(n_turns)
+		spectrumy_centroid = np.abs(np.fft.fft(x_centroid))[:n_turns / 2]
+		tune_peak_y_centroid = np.float_(np.argmax(spectrumy_centroid)) / float(n_turns)
 
 		SX = Sussix()
 		SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=tune_peak_x_centroid, tuney=tune_peak_y_centroid)

@@ -14,7 +14,7 @@ class CLIC_DR(Synchrotron):
 
 		longitudinal_mode = 'non-linear' # we have to take the non-linear to try the multibunch
 		alpha		= 0.0001276102729
-		p0 			= 2.86e9 * e/c
+		p0 			= 2.86e9 * e / c
 		p_increment = 0.
 		accQ_x		= 48.35
 		accQ_y		= 10.40
@@ -22,12 +22,12 @@ class CLIC_DR(Synchrotron):
 		charge		= -e
 		RF_at		= 'end_of_transverse'
 
-		if machine_configuration =='CLIC_DR_1GHz':
+		if machine_configuration == 'CLIC_DR_1GHz':
 			h_RF 	= 1425
 			V_RF    = 5.1e6
 			dphi_RF = 0
 
-		elif machine_configuration =='CLIC_DR_2GHz':
+		elif machine_configuration == 'CLIC_DR_2GHz':
 			h_RF 	= 2851
 			V_RF    = 4.5e6
 			dphi_RF = 0
@@ -35,7 +35,7 @@ class CLIC_DR(Synchrotron):
 		else:
 			raise ValueError('ERROR: unknown machine configuration', machine_configuration)
 
-		if optics_mode=='smooth':
+		if optics_mode == 'smooth':
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
@@ -53,7 +53,7 @@ class CLIC_DR(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
+		elif optics_mode == 'non-smooth':
 			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
@@ -69,11 +69,11 @@ class CLIC_DR(Synchrotron):
 			try:
 				D_x 	= kwargs['D_x']
 			except KeyError:
-				D_x 	= 0*np.array(kwargs['s'])
+				D_x 	= 0 * np.array(kwargs['s'])
 			try:
 				D_y 	= kwargs['D_y']
 			except KeyError:
-				D_y 	= 0*np.array(kwargs['s'])
+				D_y 	= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']

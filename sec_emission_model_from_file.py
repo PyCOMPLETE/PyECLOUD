@@ -136,7 +136,7 @@ class SEY_model_from_file(SEY_model_ECLOUD):
     def SEY_values(self, E_impact_eV, costheta_impact):
 
         delta_true = np.zeros_like(E_impact_eV, dtype=float)
-        delta_elast= np.zeros_like(E_impact_eV, dtype=float)
+        delta_elast = np.zeros_like(E_impact_eV, dtype=float)
 
         mask_fit = (E_impact_eV > self.energy_eV_max)
         mask_regular = ~mask_fit
@@ -147,7 +147,7 @@ class SEY_model_from_file(SEY_model_ECLOUD):
 
         if self.flag_costheta_Emax_shift:
             # recompute Delta True
-            E_impact_eV_scaled = E_impact_eV/(1.+0.7*(1.-costheta_impact))
+            E_impact_eV_scaled = E_impact_eV / (1. + 0.7 * (1. - costheta_impact))
 
             mask_fit = (E_impact_eV_scaled > self.energy_eV_max)
             mask_regular = ~mask_fit
@@ -156,26 +156,26 @@ class SEY_model_from_file(SEY_model_ECLOUD):
             delta_true[mask_fit] = self.extrapolate_const_true + self.extrapolate_grad_true * E_impact_eV_scaled[mask_fit]
 
         if self.flag_costheta_delta_scale:
-            factor_costheta = np.exp(0.5*(1.-costheta_impact))
+            factor_costheta = np.exp(0.5 * (1. - costheta_impact))
             delta_true *= factor_costheta
 
-        delta_true[delta_true<1e-10] = 0. # We get rid of negative values
-        delta_elast[delta_elast<1e-10] = 0. # We get rid of negative values
+        delta_true[delta_true < 1e-10] = 0. # We get rid of negative values
+        delta_elast[delta_elast < 1e-10] = 0. # We get rid of negative values
 
         delta = delta_true + delta_elast
 
-        ref_frac=0.*delta
-        mask_non_zero=(delta>0)
-        ref_frac[mask_non_zero]=delta_elast[mask_non_zero]/delta[mask_non_zero]
+        ref_frac = 0. * delta
+        mask_non_zero = (delta > 0)
+        ref_frac[mask_non_zero] = delta_elast[mask_non_zero] / delta[mask_non_zero]
 
         return delta, ref_frac
 
     def SEY_process(self, nel_impact,E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = self.SEY_values(E_impact_eV, costheta_impact)
-        flag_elast=(rand(len(ref_frac))<ref_frac);
-        flag_truesec=~(flag_elast);
-        nel_emit=nel_impact*yiel;
+        flag_elast = (rand(len(ref_frac)) < ref_frac);
+        flag_truesec = ~(flag_elast);
+        nel_emit = nel_impact * yiel;
 
         return nel_emit, flag_elast, flag_truesec
 
@@ -183,10 +183,10 @@ class SEY_model_from_file(SEY_model_ECLOUD):
         """
         Linear interpolation of the energy - SEY curve.
         """
-        index_float = (energy_eV - self.energy_eV_min)/self.delta_e
+        index_float = (energy_eV - self.energy_eV_min) / self.delta_e
         index_remainder, index_int = np.modf(index_float)
         index_int = index_int.astype(int)
-        return self.sey_true[index_int] + index_remainder*self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder*self.sey_elast_diff[index_int]
+        return self.sey_true[index_int] + index_remainder * self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder * self.sey_elast_diff[index_int]
 
     def interp_regular(self, energy_eV):
         #This fails if the input is not in ascending order.

@@ -45,7 +45,7 @@ class Transverse_Efield_map(object):
         sid = 0
         for _ in xrange(slices.n_slices):
 
-            sid-=1
+            sid -= 1
 
             # select particles in the slice
             pid = slices.particle_indices_of_slice(sid)
@@ -73,7 +73,7 @@ class Transverse_Efield_map(object):
             y - centroid_y + self.y_beam_offset)
 
         # kick beam particles
-        fact_kick = beam.charge / (beam.p0*beam.beta*c) * self.L_interaction
+        fact_kick = beam.charge / (beam.p0 * beam.beta * c) * self.L_interaction
         beam.xp[pid] += fact_kick * Ex_sc_p
         beam.yp[pid] += fact_kick * Ey_sc_p
 

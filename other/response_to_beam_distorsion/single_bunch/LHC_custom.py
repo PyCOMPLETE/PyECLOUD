@@ -6,14 +6,14 @@ class LHC(BasicSynchrotron):
 
     def __init__(self, n_segments, machine_configuration, **kwargs):
 
-        circumference     = 35640*2.5e-9*c
+        circumference     = 35640 * 2.5e-9 * c
         longitudinal_mode = 'non-linear'
         p_increment       = 0.
         charge            = e
         mass              = m_p
         alpha             = 3.225e-04
 
-        if machine_configuration =='HLLHC-injection':
+        if machine_configuration == 'HLLHC-injection':
             alpha_x        = 0.
             beta_x         = 92.7
             D_x            = 0.
@@ -28,9 +28,9 @@ class LHC(BasicSynchrotron):
             V_RF           = 8e6
             dphi_RF        = 0.
 
-            p0 = 450.e9 * e /c
+            p0 = 450.e9 * e / c
 
-        elif machine_configuration =='HLLHC-collision':
+        elif machine_configuration == 'HLLHC-collision':
             alpha_x        = 0.
             beta_x         = 92.7
             D_x            = 0.
@@ -45,7 +45,7 @@ class LHC(BasicSynchrotron):
             V_RF           = 16e6
             dphi_RF        = 0.
 
-            p0 = 7000e9 * e /c
+            p0 = 7000e9 * e / c
 
         else:
             raise ValueError('ERROR: unknown machine configuration', machine_configuration)

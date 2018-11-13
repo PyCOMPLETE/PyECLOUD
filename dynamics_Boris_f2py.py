@@ -56,9 +56,9 @@ from boris_step import boris_step
 
 
 def crprod(bx, by, bz, cx,cy,cz):
-    ax = by*cz-bz*cy
-    ay = bz*cx-bx*cz
-    az = bx*cy-by*cx
+    ax = by * cz - bz * cy
+    ay = bz * cx - bx * cz
+    az = bx * cy - by * cx
 
     return ax, ay, az
 
@@ -66,51 +66,51 @@ def crprod(bx, by, bz, cx,cy,cz):
 class B_none():
 
     def __init__(self, B0x, B0y, B0z):
-        self.B0x=B0x
-        self.B0y=B0y
-        self.B0z=B0z
+        self.B0x = B0x
+        self.B0y = B0y
+        self.B0z = B0z
 
     def get_B(self, xn,yn):
-            Bx_n = 0*xn + self.B0x
-            By_n = 0*xn+ self.B0y
-            Bz_n = 0*xn + self.B0z
+            Bx_n = 0 * xn + self.B0x
+            By_n = 0 * xn + self.B0y
+            Bz_n = 0 * xn + self.B0z
             return Bx_n, By_n, Bz_n
 
 
 class B_quad():
 
     def __init__(self, B0x, B0y, B0z, fact_Bmap):
-        self.B0x=B0x
-        self.B0y=B0y
-        self.B0z=B0z
+        self.B0x = B0x
+        self.B0y = B0y
+        self.B0z = B0z
         self.fact_Bmap = fact_Bmap
 
     def get_B(self,xn,yn):
-        Bx_n = self.fact_Bmap*yn.copy()
-        By_n = self.fact_Bmap*xn.copy()
+        Bx_n = self.fact_Bmap * yn.copy()
+        By_n = self.fact_Bmap * xn.copy()
         Bx_n = Bx_n + self.B0x
         By_n = By_n + self.B0y
-        Bz_n = 0*xn + self.B0z
+        Bz_n = 0 * xn + self.B0z
         return Bx_n, By_n, Bz_n
 
 class B_file():
 
     def __init__(self, B0x, B0y, B0z, fact_Bmap, B_map_file):
         print 'Loading B map'
-        dict_Bmap=sio.loadmat(B_map_file)
+        dict_Bmap = sio.loadmat(B_map_file)
 
-        self.Bmap_x = fact_Bmap*squeeze(dict_Bmap['Bx'].real)
-        self.Bmap_y = fact_Bmap*squeeze(dict_Bmap['By'].real)
-        self.xx=squeeze(dict_Bmap['xx'].T)
-        self.yy=squeeze(dict_Bmap['yy'].T)
-        self.B0x=B0x
-        self.B0y=B0y
-        self.B0z=B0z
+        self.Bmap_x = fact_Bmap * squeeze(dict_Bmap['Bx'].real)
+        self.Bmap_y = fact_Bmap * squeeze(dict_Bmap['By'].real)
+        self.xx = squeeze(dict_Bmap['xx'].T)
+        self.yy = squeeze(dict_Bmap['yy'].T)
+        self.B0x = B0x
+        self.B0y = B0y
+        self.B0z = B0z
 
-        self.xmin=min(self.xx);
-        self.ymin=min(self.yy);
-        self.dx=self.xx[1]-self.xx[0];
-        self.dy=self.yy[1]-self.yy[0];
+        self.xmin = min(self.xx);
+        self.ymin = min(self.yy);
+        self.dx = self.xx[1] - self.xx[0];
+        self.dy = self.yy[1] - self.yy[0];
 
     def get_B(self, xn,yn):
                 Bx_n,By_n = iff.int_field(xn,yn,self.xmin,self.ymin,\
@@ -118,7 +118,7 @@ class B_file():
                 # the rescaling factor has already been applied to the map
                 Bx_n = Bx_n + self.B0x
                 By_n = By_n + self.B0y
-                Bz_n = 0*xn + self.B0z
+                Bz_n = 0 * xn + self.B0z
                 return Bx_n, By_n, Bz_n
 
 
@@ -146,12 +146,12 @@ class pusher_Boris():
         else:
             self.B_ob = B_file(B0x, B0y, B0z, fact_Bmap, B_map_file)
 
-        print "N_subst_init=%d"% self.N_sub_steps
+        print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
     def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
 
-        if MP_e.N_mp>0:
+        if MP_e.N_mp > 0:
 
             xn1 = MP_e.x_mp[0:MP_e.N_mp]
             yn1 = MP_e.y_mp[0:MP_e.N_mp]
@@ -163,8 +163,8 @@ class pusher_Boris():
             mass = MP_e.mass
             charge = MP_e.charge
 
-            if  Ez_n==0.:
-                Ez_n = 0.*xn1
+            if  Ez_n == 0.:
+                Ez_n = 0. * xn1
 
             for ii in range(self.N_sub_steps):
                 Bx_n, By_n, Bz_n = self.B_ob.get_B(xn1,yn1)
@@ -182,7 +182,7 @@ class pusher_Boris():
 
     def stepcustomDt(self, MP_e, Ex_n,Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
 
-        if MP_e.N_mp>0:
+        if MP_e.N_mp > 0:
 
             xn1 = MP_e.x_mp[0:MP_e.N_mp]
             yn1 = MP_e.y_mp[0:MP_e.N_mp]
@@ -194,8 +194,8 @@ class pusher_Boris():
             mass = MP_e.mass
             charge = MP_e.charge
 
-            if  Ez_n==0.:
-                Ez_n = 0.*xn1
+            if  Ez_n == 0.:
+                Ez_n = 0. * xn1
 
             for ii in range(N_sub_steps):
                 Bx_n, By_n, Bz_n = self.B_ob.get_B(xn1,yn1)

@@ -32,7 +32,7 @@ N_tests = 100
 hist_list = []
 
 for irep in xrange(N_tests):
-    print 'Test %d/%d'%(irep+1, N_tests)
+    print 'Test %d/%d'%(irep + 1, N_tests)
     # Build MP object
     MPe = mps.MP_system(
         N_mp_max = N_mp_test,
@@ -53,7 +53,7 @@ for irep in xrange(N_tests):
         charge=-1.602176565e-19,
         mass=9.10938291e-31)
 
-    ob.generate(MPe, lambda_t = float(N_mp_test), Dt=1.*3e-8*0.1)
+    ob.generate(MPe, lambda_t = float(N_mp_test), Dt=1. * 3e-8 * 0.1)
 
     theta_part = np.arctan2(MPe.y_mp[:MPe.N_mp], MPe.x_mp[:MPe.N_mp])
 
@@ -62,18 +62,18 @@ for irep in xrange(N_tests):
     hist_list.append(hist)
 
 combined_hist = np.mean(np.array(hist_list), axis=0)
-combined_hist_norm = combined_hist/np.trapz(combined_hist, 0.5*(x_hist[:-1]+x_hist[1:]))
+combined_hist_norm = combined_hist / np.trapz(combined_hist, 0.5 * (x_hist[:-1] + x_hist[1:]))
 
 pl.close('all')
 pl.figure(1)
-pl.plot(0.5*(x_hist[:-1]+x_hist[1:]), combined_hist_norm)
+pl.plot(0.5 * (x_hist[:-1] + x_hist[1:]), combined_hist_norm)
 
 # plot original data
 input_fname = 'smooth200T_radianes.hist'
 data = np.loadtxt(input_fname)
 theta_data = data[:, 0]
 distr_data = data[:, 1]
-dist_norm = distr_data/np.trapz(distr_data, theta_data)
+dist_norm = distr_data / np.trapz(distr_data, theta_data)
 pl.plot(theta_data, dist_norm, 'r')
 
 pl.show()

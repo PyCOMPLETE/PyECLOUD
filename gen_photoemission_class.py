@@ -68,10 +68,10 @@ class photoemission_base(object):
         if self.flag_continuous_emission:
             lambda_t = self.mean_lambda
 
-        DNel = k_pe_st*c*lambda_t*Dt
-        N_new_MP = DNel/nel_mp_ref
+        DNel = k_pe_st * c * lambda_t * Dt
+        N_new_MP = DNel / nel_mp_ref
         rest, Nint_new_MP = np.modf(N_new_MP)
-        return int(Nint_new_MP+int(random.rand()<rest))
+        return int(Nint_new_MP + int(random.rand() < rest))
 
     def gen_energy_and_set_MPs(self, Nint_new_MP, x_in, y_in, x_out, y_out, MP_e):
         # Assumes convex_chamber
@@ -148,7 +148,7 @@ class photoemission(photoemission_base):
             y_out = np.zeros(Nint_new_MP)
 
             #for each one generate flag refl
-            refl_flag = (random.rand(Nint_new_MP)<self.refl_frac)
+            refl_flag = (random.rand(Nint_new_MP) < self.refl_frac)
             gauss_flag = ~refl_flag
 
             #generate psi for refl. photons generation
@@ -156,21 +156,21 @@ class photoemission(photoemission_base):
             if N_refl > 0:
                 u_gen = random.rand(N_refl)
                 if self.flag_unif:
-                    psi_gen = 2.*np.pi*u_gen
-                    x_out[refl_flag] = self.out_radius*np.cos(psi_gen)
-                    y_out[refl_flag] = self.out_radius*np.sin(psi_gen)
+                    psi_gen = 2. * np.pi * u_gen
+                    x_out[refl_flag] = self.out_radius * np.cos(psi_gen)
+                    y_out[refl_flag] = self.out_radius * np.sin(psi_gen)
                 else:
                     psi_gen = np.interp(u_gen, self.u_sam_CDF_refl, self.inv_CDF_refl)
                     x_in[refl_flag] = self.x0_refl
-                    x_out[refl_flag] = -2.*self.out_radius*np.cos(psi_gen)+self.x0_refl
-                    y_out[refl_flag] = 2.*self.out_radius*np.sin(psi_gen)
+                    x_out[refl_flag] = -2. * self.out_radius * np.cos(psi_gen) + self.x0_refl
+                    y_out[refl_flag] = 2. * self.out_radius * np.sin(psi_gen)
 
             #generate theta for nonreflected photon generation
             N_gauss = np.sum(gauss_flag)
-            if N_gauss>0:
+            if N_gauss > 0:
                 theta_gen = random.normal(0, self.alimit, N_gauss)
-                x_out[gauss_flag] = self.out_radius*np.cos(theta_gen)
-                y_out[gauss_flag] = self.out_radius*np.sin(theta_gen)
+                x_out[gauss_flag] = self.out_radius * np.cos(theta_gen)
+                y_out[gauss_flag] = self.out_radius * np.sin(theta_gen)
 
             self.gen_energy_and_set_MPs(Nint_new_MP, x_in, y_in, x_out, y_out, MP_e)
 
@@ -216,13 +216,13 @@ class photoemission_from_file(photoemission_base):
         if Nint_new_MP > 0:
 
             if self.flag_unif:
-                theta_gen = random.rand(Nint_new_MP)*2*np.pi
+                theta_gen = random.rand(Nint_new_MP) * 2 * np.pi
             else:
                 cdf_gen = random.rand(Nint_new_MP)
                 theta_gen = np.interp(cdf_gen, self.u_sam, self.angles)
 
-            x_out = self.out_radius*np.cos(theta_gen)
-            y_out = self.out_radius*np.sin(theta_gen)
+            x_out = self.out_radius * np.cos(theta_gen)
+            y_out = self.out_radius * np.sin(theta_gen)
 
             x_in = y_in = np.zeros(Nint_new_MP)
             self.gen_energy_and_set_MPs(Nint_new_MP, x_in, y_in, x_out, y_out, MP_e)

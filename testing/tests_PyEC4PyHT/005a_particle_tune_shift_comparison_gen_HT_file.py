@@ -35,7 +35,7 @@ parid = np.reshape(appo[:,0], (-1, n_part_per_turn))[::N_kicks,:]
 x = np.reshape(appo[:,1], (-1, n_part_per_turn))[::N_kicks,:]
 xp = np.reshape(appo[:,2], (-1, n_part_per_turn))[::N_kicks,:]
 y = np.reshape(appo[:,3], (-1, n_part_per_turn))[::N_kicks,:]
-yp =np.reshape(appo[:,4], (-1, n_part_per_turn))[::N_kicks,:]
+yp = np.reshape(appo[:,4], (-1, n_part_per_turn))[::N_kicks,:]
 z = np.reshape(appo[:,5], (-1, n_part_per_turn))[::N_kicks,:]
 dp = np.reshape(appo[:,6], (-1, n_part_per_turn))[::N_kicks,:]
 n_turns = len(x[:,0])
@@ -52,7 +52,7 @@ xp0_HT = xp[0,:]
 y0_HT = y[0,:]
 yp0_HT = yp[0,:]
 z0_HT = z[0,:]
-dp0_HT =dp[0,:]
+dp0_HT = dp[0,:]
 
 
 # Save

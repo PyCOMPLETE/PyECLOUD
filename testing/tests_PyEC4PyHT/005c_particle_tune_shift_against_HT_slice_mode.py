@@ -44,8 +44,8 @@ epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
 inj_optics = machine.transverse_map.get_injection_optics()
-sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
+sigma_x = np.sqrt(inj_optics['beta_x'] * epsn_x / machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y'] * epsn_y / machine.betagamma)
 
 
 # generate a bunch
@@ -58,26 +58,26 @@ bunch.y[:n_part_per_turn] = dict_HT['y0_HT']
 bunch.yp[:n_part_per_turn] = dict_HT['yp0_HT']
 bunch.z[:n_part_per_turn] = dict_HT['z0_HT']
 bunch.dp[:n_part_per_turn] = dict_HT['dp0_HT']
-n_turns= dict_HT['n_turns']
+n_turns = dict_HT['n_turns']
 
 
 # define apertures and Dh_sc to simulate headtail conditions
-x_aper  = 20*sigma_x
-y_aper  = 20*sigma_y
-Dh_sc = 2*x_aper/128/2.
+x_aper  = 20 * sigma_x
+y_aper  = 20 * sigma_y
+Dh_sc = 2 * x_aper / 128 / 2.
 
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
-slicer = UniformBinSlicer(n_slices = 64, z_cuts=(-3*bunch.sigma_z(), 3*bunch.sigma_z()))
+slicer = UniformBinSlicer(n_slices = 64, z_cuts=(-3 * bunch.sigma_z(), 3 * bunch.sigma_z()))
 
 
-init_unif_edens_flag=1
-init_unif_edens=1e11
+init_unif_edens_flag = 1
+init_unif_edens = 1e11
 N_MP_ele_init = 100000
-N_mp_max = N_MP_ele_init*4.
+N_mp_max = N_MP_ele_init * 4.
 
-nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
+nel_mp_ref_0 = init_unif_edens * 4 * x_aper * y_aper / N_MP_ele_init
 
 new_one_turn_map = []
 ecloud_list = []
@@ -85,7 +85,7 @@ for ele in machine.one_turn_map:
     new_one_turn_map.append(ele)
     if ele in machine.transverse_map:
         new_ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
-                L_ecloud=machine.circumference/machine.transverse_map.n_segments,
+                L_ecloud =machine.circumference / machine.transverse_map.n_segments,
                 slicer=slicer,
                 Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
                 x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
@@ -129,12 +129,12 @@ for ii in xrange(n_turns):
         ec.finalize_and_reinitialize()
 
     # id and momenta after track
-    id_after = bunch.id[bunch.id<=n_part_per_turn]
-    x_after = bunch.x[bunch.id<=n_part_per_turn]
-    y_after = bunch.y[bunch.id<=n_part_per_turn]
-    z_after = bunch.z[bunch.id<=n_part_per_turn]
-    xp_after = bunch.xp[bunch.id<=n_part_per_turn]
-    yp_after = bunch.yp[bunch.id<=n_part_per_turn]
+    id_after = bunch.id[bunch.id <= n_part_per_turn]
+    x_after = bunch.x[bunch.id <= n_part_per_turn]
+    y_after = bunch.y[bunch.id <= n_part_per_turn]
+    z_after = bunch.z[bunch.id <= n_part_per_turn]
+    xp_after = bunch.xp[bunch.id <= n_part_per_turn]
+    yp_after = bunch.yp[bunch.id <= n_part_per_turn]
 
     # sort id and momenta after track
     indsort = np.argsort(id_after)
@@ -184,14 +184,14 @@ pl.axis('equal')
 
 pl.figure(3)
 pl.subplot(2,1,1)
-pl.plot(z_after[:n_record],np.abs(qx_i)-np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
-pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qx_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
+pl.plot(z_after[:n_record],np.abs(qx_i) - np.modf(machine.Q_x)[0], '.', markersize=3, label='PyHT')
+pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qx_ht) - np.modf(machine.Q_x)[0], '.r', markersize=3, label='HT')
 pl.ylabel('$\Delta Q_x$')
 pl.grid('on')
 pl.legend(prop={'size':14})
 pl.subplot(2,1,2)
-pl.plot(z_after[:n_record],np.abs(qy_i)-np.modf(machine.Q_x)[0], '.', markersize=3)
-pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qy_ht)-np.modf(machine.Q_x)[0], '.r', markersize=3)
+pl.plot(z_after[:n_record],np.abs(qy_i) - np.modf(machine.Q_x)[0], '.', markersize=3)
+pl.plot(dict_HT['z0_HT'][:n_record],np.abs(qy_ht) - np.modf(machine.Q_x)[0], '.r', markersize=3)
 pl.ylabel('$\Delta Q_y$')
 pl.xlabel('z [m]')
 pl.grid('on')

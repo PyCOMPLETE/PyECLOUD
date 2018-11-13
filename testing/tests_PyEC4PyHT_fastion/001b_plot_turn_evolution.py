@@ -35,7 +35,7 @@ pl.ylim(-3e-6, 3e-6)
 pl.subplots_adjust(left = 0.21, hspace = 0.3)
 
 
-for ii in xrange(N_turns+1):
+for ii in xrange(N_turns + 1):
 
 	pl.clf()
 	sp3 = pl.subplot(2,1,1)

@@ -17,7 +17,7 @@ distr_unif = np.interp(theta_unif, theta_data, distr_data)
 
 # Build CDF
 integ = cumtrapz(distr_unif, theta_unif)
-cdf = np.concatenate((np.array([0.]), integ))/np.max(integ)
+cdf = np.concatenate((np.array([0.]), integ)) / np.max(integ)
 
 # Invert
 N_u_sam = 10000

@@ -60,12 +60,12 @@ class impact_management_perfect_absorber(impact_management):
     #@profile
     def backtrack_and_second_emiss(self, old_pos, MP_e):
 
-        self.Nel_impact_last_step=0.
-        self.Nel_emit_last_step=0.
-        self.En_imp_last_step_eV=0.
-        self.En_emit_last_step_eV=0.
+        self.Nel_impact_last_step = 0.
+        self.Nel_emit_last_step = 0.
+        self.En_imp_last_step_eV = 0.
+        self.En_emit_last_step_eV = 0.
 
-        if MP_e.N_mp>0:
+        if MP_e.N_mp > 0:
 
             x_mp_old = old_pos.x_mp
             y_mp_old = old_pos.y_mp
@@ -87,7 +87,7 @@ class impact_management_perfect_absorber(impact_management):
             scrub_en_th = self.scrub_en_th
 
             ## impact management
-            N_mp_old=N_mp
+            N_mp_old = N_mp
 
             #~ # check flag_impact array has right size (if not regenerate it)
             #~ if len(self.flag_impact) != len(x_mp):
@@ -97,17 +97,17 @@ class impact_management_perfect_absorber(impact_management):
             self.flag_impact = np.zeros_like(x_mp, dtype=bool)
 
             # detect impact
-            self.flag_impact[:N_mp]=chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
+            self.flag_impact[:N_mp] = chamb.is_outside(x_mp[0:N_mp],y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
 
-            Nimpact=int(np.sum(self.flag_impact))
+            Nimpact = int(np.sum(self.flag_impact))
 
-            if Nimpact>0:
+            if Nimpact > 0:
 
                 if flag_seg:
                     raise ValueError('Segment identification not implemented for perfect absorber! Sorry...')
 
                 # load segment endpoints
-                x_in=x_mp_old[self.flag_impact[:N_mp_old]];y_in=y_mp_old[self.flag_impact[:N_mp_old]];z_in=z_mp_old[self.flag_impact[:N_mp_old]]
+                x_in = x_mp_old[self.flag_impact[:N_mp_old]];y_in = y_mp_old[self.flag_impact[:N_mp_old]];z_in = z_mp_old[self.flag_impact[:N_mp_old]]
 
                 # just to have them back in the chamber
                 x_emit = x_in
@@ -115,36 +115,36 @@ class impact_management_perfect_absorber(impact_management):
                 z_emit = z_in
 
                 # load velocities and charges
-                vx_impact=vx_mp[self.flag_impact]; vy_impact=vy_mp[self.flag_impact];vz_impact=vz_mp[self.flag_impact]
-                nel_impact =nel_mp[self.flag_impact]
+                vx_impact = vx_mp[self.flag_impact]; vy_impact = vy_mp[self.flag_impact];vz_impact = vz_mp[self.flag_impact]
+                nel_impact = nel_mp[self.flag_impact]
 
                 # compute impact velocities, energy and angle
-                v_impact_mod=np.sqrt(vx_impact*vx_impact+vy_impact*vy_impact+vz_impact*vz_impact)
-                E_impact_eV=0.5*MP_e.mass/qe*v_impact_mod*v_impact_mod
+                v_impact_mod = np.sqrt(vx_impact * vx_impact + vy_impact * vy_impact + vz_impact * vz_impact)
+                E_impact_eV = 0.5 * MP_e.mass / qe * v_impact_mod * v_impact_mod
 
                 #electron histogram
                 histf.compute_hist(x_emit,nel_impact,bias_x_hist,Dx_hist,self.nel_impact_hist_tot)
-                histf.compute_hist(x_emit,nel_impact*(E_impact_eV>scrub_en_th),bias_x_hist,Dx_hist,self.nel_impact_hist_scrub)
-                histf.compute_hist(x_emit,nel_impact*E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
+                histf.compute_hist(x_emit,nel_impact * (E_impact_eV > scrub_en_th),bias_x_hist,Dx_hist,self.nel_impact_hist_scrub)
+                histf.compute_hist(x_emit,nel_impact * E_impact_eV,bias_x_hist,Dx_hist,self.energ_eV_impact_hist)
 
-                En_imp_hist=E_impact_eV.copy()
-                En_imp_hist[En_imp_hist>En_hist_max]=En_hist_max
+                En_imp_hist = E_impact_eV.copy()
+                En_imp_hist[En_imp_hist > En_hist_max] = En_hist_max
                 histf.compute_hist(En_imp_hist,nel_impact,0.,DEn_hist,self.En_hist_line)
 
-                nel_emit = 0*nel_impact
+                nel_emit = 0 * nel_impact
 
-                self.Nel_impact_last_step=np.sum(nel_impact)
-                self.Nel_emit_last_step=np.sum(nel_emit)
-                self.En_imp_last_step_eV=np.sum(E_impact_eV*nel_impact)
+                self.Nel_impact_last_step = np.sum(nel_impact)
+                self.Nel_emit_last_step = np.sum(nel_emit)
+                self.En_imp_last_step_eV = np.sum(E_impact_eV * nel_impact)
 
                 # absorb
-                x_mp[self.flag_impact]=x_emit
-                y_mp[self.flag_impact]=y_emit
-                z_mp[self.flag_impact]=z_emit
-                vx_mp[self.flag_impact]=0.
-                vy_mp[self.flag_impact]=0.
-                vz_mp[self.flag_impact]=0.
-                nel_mp[self.flag_impact]=0.
+                x_mp[self.flag_impact] = x_emit
+                y_mp[self.flag_impact] = y_emit
+                z_mp[self.flag_impact] = z_emit
+                vx_mp[self.flag_impact] = 0.
+                vy_mp[self.flag_impact] = 0.
+                vz_mp[self.flag_impact] = 0.
+                nel_mp[self.flag_impact] = 0.
 
                 MP_e.x_mp = x_mp
                 MP_e.y_mp = y_mp

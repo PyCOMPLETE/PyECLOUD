@@ -48,7 +48,7 @@ def update_module(module, new_module):
     """
     for attr in dir(new_module):
 
-        if attr=='pi': continue
+        if attr == 'pi': continue
 
         value = getattr(new_module, attr)
         if attr.startswith('_') or isinstance(value, types.ModuleType):
@@ -123,12 +123,12 @@ def import_module_from_file(module_name, file_name):
         os.mkdir(dir_name)
 
     try:
-        new_file_name = dir_name+'/temp_file_%s.py' % (module_name+'_'+str(time.time())).replace('.','_')
+        new_file_name = dir_name + '/temp_file_%s.py' % (module_name + '_' + str(time.time())).replace('.','_')
         shutil.copy(file_name, new_file_name)
 
         # As we use pi in many old input files
         with open(new_file_name, 'r') as fid: content = fid.read()
-        content = "from numpy import pi\n\n"+content
+        content = "from numpy import pi\n\n" + content
         with open(new_file_name, 'w') as fid: fid.write(content)
 
         if sys.version_info.major == 2:

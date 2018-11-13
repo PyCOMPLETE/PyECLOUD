@@ -17,18 +17,18 @@ n_segments = 1
 bunch_intensity = 1e11
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
-sigma_z = 1.000000e-09/4.*299792458.
+sigma_z = 1.000000e-09 / 4. * 299792458.
 
 machine_configuration = 'Injection'
 
 n_slices = 150
-z_cut = 2.5e-9*clight/2
+z_cut = 2.5e-9 * clight / 2
 
 min_inten_slice4EC = 1e3
 non_linear_long_matching = False
 b_spac_s = 25e-9
 #Here head is left and tail is right
-filling_pattern = 1*(60*[1.]+5*[0])
+filling_pattern = 1 * (60 * [1.] + 5 * [0])
 
 macroparticlenumber = 100000
 
@@ -38,14 +38,14 @@ machine = LHC(machine_configuration=machine_configuration, beta_x=85.00, beta_y=
 list_bunches = gmb.gen_matched_multibunch_beam(machine, macroparticlenumber, filling_pattern, b_spac_s, bunch_intensity, epsn_x, epsn_y, sigma_z, non_linear_long_matching, min_inten_slice4EC)
 
 for bb in list_bunches[::-1][30:]:
-    bb.x+=3e-3
+    bb.x += 3e-3
 
 # Slice bunches
 import PyPARIS.slicing_tool as st
 list_slices = []
 for bb in list_bunches:
     these_slices = st.slice_a_bunch(bb, z_cut=z_cut, n_slices=n_slices)
-    list_slices+=these_slices
+    list_slices += these_slices
 
 # Build e-cloud
 print('Build ecloud...')
@@ -62,9 +62,9 @@ ecloud = PyEC4PyHT.Ecloud(
         #B_multip = [0.],
         #~ PyPICmode = 'ShortleyWeller_WithTelescopicGrids',
         #~ f_telescope = 0.3,
-        target_grid = {'x_min_target':-5*list_bunches[-1].sigma_x(), 'x_max_target':5*list_bunches[-1].sigma_x(),
-                       'y_min_target':-5*list_bunches[-1].sigma_y(),'y_max_target':5*list_bunches[-1].sigma_y(),
-                       'Dh_target':.2*list_bunches[-1].sigma_x()},
+        target_grid = {'x_min_target':-5 * list_bunches[-1].sigma_x(), 'x_max_target':5 * list_bunches[-1].sigma_x(),
+                       'y_min_target':-5 * list_bunches[-1].sigma_y(),'y_max_target':5 * list_bunches[-1].sigma_y(),
+                       'Dh_target':.2 * list_bunches[-1].sigma_x()},
         #~ N_nodes_discard = 10.,
         #~ N_min_Dh_main = 10,
         #x_beam_offset = x_beam_offset,
@@ -77,7 +77,7 @@ print('Done.')
 
 # REMEBMBER TO START POPPING FROM THE RIGHT SIDE
 print('Start cloud sim')
-for ii in xrange(len(list_slices)-1, -1, -1):
+for ii in xrange(len(list_slices) - 1, -1, -1):
     ecloud.track(list_slices[ii])
 #~ for cc in ecloud.cloudsim.cloud_list:
     #~ cc.pyeclsaver.t_last_save = 0.
@@ -86,14 +86,14 @@ for ii in xrange(len(list_slices)-1, -1, -1):
 print('End cloud sim')
 
 # Some plotting
-bucket_length_m = machine.circumference/(machine.longitudinal_map.harmonics[0])
-b_spac_m =  b_spac_s*machine.beta*clight
-b_spac_buckets = np.round(b_spac_m/bucket_length_m)
+bucket_length_m = machine.circumference / (machine.longitudinal_map.harmonics[0])
+b_spac_m =  b_spac_s * machine.beta * clight
+b_spac_buckets = np.round(b_spac_m / bucket_length_m)
 
 beam = sum(list_bunches)
 
 # Build profile of the full beam
-thin_slicer = UniformBinSlicer(n_slices=10000, z_cuts=(-len(filling_pattern)*bucket_length_m*b_spac_buckets, bucket_length_m))
+thin_slicer = UniformBinSlicer(n_slices=10000, z_cuts=(-len(filling_pattern) * bucket_length_m * b_spac_buckets, bucket_length_m))
 thin_slice_set = beam.get_slices(thin_slicer, statistics=True)
 
 import matplotlib.pyplot as plt

@@ -104,7 +104,7 @@ for dirpath, _, filenames in os.walk('.'):
 
             prev_line = line
 
-        new_lines = [x+'\n' for ctr, x in enumerate(new_lines) if ctr+1 != len(new_lines)]
+        new_lines = [x + '\n' for ctr, x in enumerate(new_lines) if ctr + 1 != len(new_lines)]
 
         with open(path, 'w') as f:
             f.writelines(new_lines)

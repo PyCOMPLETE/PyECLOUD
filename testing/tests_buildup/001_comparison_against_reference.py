@@ -50,7 +50,7 @@ if args.folder:
 ref_folder = sim_folder
 curr_folder = sim_folder
 
-folder_plot = sim_folder+'/comparison_plots'
+folder_plot = sim_folder + '/comparison_plots'
 
 
 try:
@@ -63,8 +63,8 @@ except OSError as err:
 myfontsz = 10
 ms.mystyle_arial(fontsz=myfontsz)
 
-dict_ref = mlm.myloadmat(ref_folder+'/Pyecltest_angle%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
-dict_curr = mlm.myloadmat(curr_folder+'/Pyecltest_angle%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
+dict_ref = mlm.myloadmat(ref_folder + '/Pyecltest_angle%s_ref.mat' % args.angle_dist_func) # load dictionary of the reference simulation
+dict_curr = mlm.myloadmat(curr_folder + '/Pyecltest_angle%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
 
 
 out_var_ref = dict_ref.keys()       # returns the list of keys
@@ -86,17 +86,17 @@ for ii,k in enumerate(out_var_curr):
         print('Skipped %s' % k)
         continue
 
-    if len(dict_curr[k].shape)==1:  # var is a vector!
+    if len(dict_curr[k].shape) == 1:  # var is a vector!
 
         #Plot vector for the current simulation
-        fig=pl.figure(ii)
+        fig = pl.figure(ii)
         pl.subplots_adjust(right=0.75)
         pl.title(out_var_curr[ii], fontsize=myfontsz)
 
         pl.plot(dict_curr[k],'b', label='curr_sim')
         print ii,k,'curr_sim'
 
-        if (k in out_var_ref) and (dict_ref[k].shape!=()):
+        if (k in out_var_ref) and (dict_ref[k].shape != ()):
 
             #Plot vector for the reference simulation
             pl.plot(dict_ref[k],'--r', label='ref_sim')
@@ -108,11 +108,11 @@ for ii,k in enumerate(out_var_curr):
         pl.legend(prop={'size':myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
         ms.sciy()
         pl.suptitle(sim_folder)
-        pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
+        pl.savefig(folder_plot + '/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
-    elif len(dict_curr[k].shape)==2:  # var is a matrix!!!!!!!!!!!!!!!!!
+    elif len(dict_curr[k].shape) == 2:  # var is a matrix!!!!!!!!!!!!!!!!!
 
-        fig=pl.figure(ii)
+        fig = pl.figure(ii)
         pl.subplots_adjust(top=1.2)
         pl.suptitle(out_var_curr[ii], fontsize=myfontsz)
         gs1 = gridspec.GridSpec(2, 1)
@@ -123,7 +123,7 @@ for ii,k in enumerate(out_var_curr):
         sp1.set_title('curr_sim', fontsize=myfontsz)
         pl.pcolormesh(dict_curr[k])
         sp1.tick_params(labelsize=10)
-        cbar=pl.colorbar()
+        cbar = pl.colorbar()
         cbar.ax.tick_params(labelsize=10)
         cbar.formatter.set_powerlimits((0, 0))
         cbar.update_ticks()
@@ -136,7 +136,7 @@ for ii,k in enumerate(out_var_curr):
                 ind_in_mat = 3
 
             #Plot number of e- for the reference passage
-            sp3=fig.add_subplot(gs2[0])
+            sp3 = fig.add_subplot(gs2[0])
             sp3.plot(dict_curr[k][ind_in_mat],'b', label='curr_sim')
             sp3.legend(prop={'size':myfontsz},  loc='best')
             sp3.set_title('index equal to [%d]'%ind_in_mat, fontsize=myfontsz)
@@ -144,7 +144,7 @@ for ii,k in enumerate(out_var_curr):
             ms.sciy()
 
             #Plot number of e- for each slice
-            sp4=fig.add_subplot(gs2[1])
+            sp4 = fig.add_subplot(gs2[1])
             sp4.plot(np.sum(dict_curr[k], axis=0),'b', label='curr_sim')
             sp4.legend(prop={'size':myfontsz},  loc='best')
             #~ sp4.set_title('e- per slice')
@@ -152,7 +152,7 @@ for ii,k in enumerate(out_var_curr):
             ms.sciy()
 
             #Plot number of e- for each passage
-            sp5=fig.add_subplot(gs2[2])
+            sp5 = fig.add_subplot(gs2[2])
             sp5.plot(np.sum(dict_curr[k], axis=1),'b', label='curr_sim')
             sp5.legend(prop={'size':myfontsz},  loc='best')
             #~ sp5.set_title('e- per passage')
@@ -166,13 +166,13 @@ for ii,k in enumerate(out_var_curr):
         except IndexError as goterror:
             print 'Skipped. Got:',  goterror
 
-        if (k in out_var_ref) and  (dict_ref[k].shape!=()):
+        if (k in out_var_ref) and  (dict_ref[k].shape != ()):
 
             #Plot matrix for the reference simulation
-            sp2= fig.add_subplot(gs1[1])
+            sp2 = fig.add_subplot(gs1[1])
             sp2.set_title('ref_sim', fontsize=myfontsz)
             pl.pcolormesh(dict_ref[k])
-            cbar=pl.colorbar()
+            cbar = pl.colorbar()
             cbar.ax.tick_params(labelsize=10)
             cbar.formatter.set_powerlimits((0, 0))
             cbar.update_ticks()
@@ -215,8 +215,8 @@ for ii,k in enumerate(out_var_curr):
         gs1.update(top=top, bottom=bottom)
         gs2.update(top=top, bottom=bottom)
 
-        pl.suptitle(sim_folder+'\n'+k)
-        pl.savefig(folder_plot+'/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
+        pl.suptitle(sim_folder + '\n' + k)
+        pl.savefig(folder_plot + '/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
 print 'Saved comparison plots in:'
 print folder_plot

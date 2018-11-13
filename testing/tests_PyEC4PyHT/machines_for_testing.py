@@ -11,8 +11,8 @@ class SPS(Synchrotron):
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Q26-injection':
-			p0 		= 26e9 * e /c
+		if machine_configuration == 'Q26-injection':
+			p0 		= 26e9 * e / c
 			p_increment 	= 0.
 			accQ_x		= 26.13
 			accQ_y		= 26.18
@@ -23,8 +23,8 @@ class SPS(Synchrotron):
 			D_x 		= 0
 			beta_y 		= 42.
 			D_y 		= 0
-		elif machine_configuration=='Q20-injection':
-			p0 		= 26e9 * e /c
+		elif machine_configuration == 'Q20-injection':
+			p0 		= 26e9 * e / c
 			p_increment 	= 0.
 			accQ_x		= 20.13
 			accQ_y		= 20.18
@@ -38,11 +38,11 @@ class SPS(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
+		if optics_mode == 'smooth':
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
-			circumference = 1100*2*np.pi
+			circumference = 1100 * 2 * np.pi
 
 			name = None
 
@@ -51,7 +51,7 @@ class SPS(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
+		elif optics_mode == 'non-smooth':
 			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
@@ -64,11 +64,11 @@ class SPS(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']
@@ -113,18 +113,18 @@ class shortSPS(Synchrotron):
 	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
 
 		longitudinal_mode = 'linear'
-		h_RF       	= 4620/6
+		h_RF       	= 4620 / 6
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Q20-injection-like':
-			p0 		= 26e9 * e /c
+		if machine_configuration == 'Q20-injection-like':
+			p0 		= 26e9 * e / c
 			p_increment 	= 0.
 			accQ_x		= 5.13
 			accQ_y		= 5.18
 			V_RF		= 5.75e6
 			dphi_RF		= 0.
-			alpha		= 6*0.00308642
+			alpha		= 6 * 0.00308642
 			beta_x 		= 54.6
 			D_x 		= 0
 			beta_y 		= 54.6
@@ -132,11 +132,11 @@ class shortSPS(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
+		if optics_mode == 'smooth':
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
-			circumference = 1100*2*np.pi/6.
+			circumference = 1100 * 2 * np.pi / 6.
 
 			name = None
 
@@ -145,7 +145,7 @@ class shortSPS(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
+		elif optics_mode == 'non-smooth':
 			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
@@ -158,11 +158,11 @@ class shortSPS(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']
@@ -212,15 +212,15 @@ class LHC(Synchrotron):
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Injection':
-			p0 			= 450e9 * e /c
+		if machine_configuration == 'Injection':
+			p0 			= 450e9 * e / c
 			p_increment = 0.
 			accQ_x		= 64.28
 			accQ_y		= 59.31
 			V_RF		= 6e6
 			dphi_RF		= 0.
-		elif machine_configuration=='6.5_TeV_collision_tunes':
-			p0 			= 6500e9 * e /c
+		elif machine_configuration == '6.5_TeV_collision_tunes':
+			p0 			= 6500e9 * e / c
 			p_increment = 0.
 			accQ_x		= 64.31
 			accQ_y		= 59.32
@@ -229,7 +229,7 @@ class LHC(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
+		if optics_mode == 'smooth':
 			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
@@ -247,7 +247,7 @@ class LHC(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
+		elif optics_mode == 'non-smooth':
 			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
@@ -260,11 +260,11 @@ class LHC(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']

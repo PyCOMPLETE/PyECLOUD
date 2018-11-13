@@ -28,7 +28,7 @@ del_true_mat, del_elast_mat = impact_man.extract_sey_curves(n_rep, E_impact_eV_t
 pl.close('all')
 ms.mystyle_arial()
 
-fig1 = pl.figure(1, figsize=(2*8,6))
+fig1 = pl.figure(1, figsize=(2 * 8,6))
 fig1.set_facecolor('w')
 sp1 = fig1.add_subplot(1,2,1)
 sp2 = fig1.add_subplot(1,2,2, sharex=sp1)

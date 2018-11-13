@@ -57,24 +57,24 @@ import electron_emission as ee
 def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
 
     if flag_costheta_delta_scale:
-        del_max_tilde=del_max*exp(0.5*(1.-costheta))
+        del_max_tilde = del_max * exp(0.5 * (1. - costheta))
     else:
-        del_max_tilde=del_max
+        del_max_tilde = del_max
 
     if flag_costheta_Emax_shift:
-        E_max_tilde=Emax*(1.+0.7*(1.-costheta))
+        E_max_tilde = Emax * (1. + 0.7 * (1. - costheta))
     else:
-        E_max_tilde=Emax
+        E_max_tilde = Emax
 
-    x=E/E_max_tilde
+    x = E / E_max_tilde
 
-    true_sec=del_max_tilde*(s*x)/(s-1.+x**s)
-    reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2.
+    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s)
+    reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0)))**2.
 
-    delta=true_sec+reflected
-    ref_frac=0.*delta
-    mask_non_zero=(delta>0)
-    ref_frac[mask_non_zero]=reflected[mask_non_zero]/delta[mask_non_zero]
+    delta = true_sec + reflected
+    ref_frac = 0. * delta
+    mask_non_zero = (delta > 0)
+    ref_frac[mask_non_zero] = reflected[mask_non_zero] / delta[mask_non_zero]
 
     return delta, ref_frac
 
@@ -115,7 +115,7 @@ class SEY_model_ECLOUD(object):
         yiel, ref_frac = yield_fun2(
             E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0, s=self.s,
             flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
-        flag_elast = (rand(len(ref_frac))<ref_frac)
+        flag_elast = (rand(len(ref_frac)) < ref_frac)
         flag_truesec = ~(flag_elast)
         nel_emit = nel_impact * yiel
 

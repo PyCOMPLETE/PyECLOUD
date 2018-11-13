@@ -43,7 +43,7 @@ def colorprog(i_prog, Nplots, v1 = .9, v2 = 1., cm='hsv'):
     if hasattr(Nplots, '__len__'):
         Nplots = len(Nplots)
     if cm == 'hsv':
-        return hsv_to_rgb(float(i_prog)/float(Nplots), v1, v2)
+        return hsv_to_rgb(float(i_prog) / float(Nplots), v1, v2)
     elif cm == 'rainbow':
         return [pl.cm.rainbow(k) for k in np.linspace(0, 1, Nplots)][i_prog]
     else:

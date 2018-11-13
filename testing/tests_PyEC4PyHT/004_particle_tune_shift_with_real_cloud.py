@@ -24,8 +24,8 @@ epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
 inj_optics = machine.transverse_map.get_injection_optics()
-sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
+sigma_x = np.sqrt(inj_optics['beta_x'] * epsn_x / machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y'] * epsn_y / machine.betagamma)
 
 
 # generate a bunch
@@ -33,9 +33,9 @@ bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.
 
 
 # define apertures and Dh_sc to simulate headtail conditions
-x_aper  = 20*sigma_x
-y_aper  = 20*sigma_y
-Dh_sc = 2*x_aper/128
+x_aper  = 20 * sigma_x
+y_aper  = 20 * sigma_y
+Dh_sc = 2 * x_aper / 128
 
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
@@ -43,15 +43,15 @@ from PyHEADTAIL.particles.slicing import UniformBinSlicer
 slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
 
 
-init_unif_edens_flag=1
-init_unif_edens=1e11
+init_unif_edens_flag = 1
+init_unif_edens = 1e11
 N_MP_ele_init = 100000
-N_mp_max = N_MP_ele_init*4.
+N_mp_max = N_MP_ele_init * 4.
 
-nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
+nel_mp_ref_0 = init_unif_edens * 4 * x_aper * y_aper / N_MP_ele_init
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/machine.transverse_map.n_segments, slicer=slicer,
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / machine.transverse_map.n_segments, slicer=slicer,
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,

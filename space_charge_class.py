@@ -105,7 +105,7 @@ class space_charge:
         else:
             raise ValueError('PyPICmode not racognized')
 
-        self.Dh=self.PyPICobj.Dh
+        self.Dh = self.PyPICobj.Dh
         self.xg = self.PyPICobj.xg
         self.Nxg = self.PyPICobj.Nxg
         self.bias_x = self.PyPICobj.bias_x
@@ -114,12 +114,12 @@ class space_charge:
         self.bias_y = self.PyPICobj.bias_y
 
         self.Dt_sc = Dt_sc
-        self.t_last_recom=0.;
+        self.t_last_recom = 0.;
 
         self.U_sc_eV_stp = 0.
 
-        self.flag_decimate=(self.Dt_sc is not None)
-        self.last_recomputation_check=False
+        self.flag_decimate = (self.Dt_sc is not None)
+        self.last_recomputation_check = False
 
         print 'Done space charge init.'
 
@@ -140,10 +140,10 @@ class space_charge:
         return self.PyPICobj.efy
 
     def check_for_recomputation(self, t_curr=None):
-        flag_recompute=True
+        flag_recompute = True
 
         if self.flag_decimate:
-            flag_recompute = (t_curr - self.t_last_recom)>=self.Dt_sc
+            flag_recompute = (t_curr - self.t_last_recom) >= self.Dt_sc
 
         if flag_recompute:
             self.t_last_recom = t_curr

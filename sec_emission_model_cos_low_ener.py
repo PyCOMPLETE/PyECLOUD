@@ -55,21 +55,21 @@ from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 def yield_fun2(E,costheta,Emax,del_max,R0,E0):
 
-    s=1.35;
+    s = 1.35;
 
-    del_max_tilde=del_max*exp(0.5*(1.-costheta));
-    E_max_tilde=Emax*(1.+0.7*(1.-costheta));
+    del_max_tilde = del_max * exp(0.5 * (1. - costheta));
+    E_max_tilde = Emax * (1. + 0.7 * (1. - costheta));
 
-    x=E/E_max_tilde;
+    x = E / E_max_tilde;
 
-    true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
-    reflected=0.*true_sec
-    mask_ref=E<E0
-    reflected[mask_ref]=R0*(cos(0.5*pi*E[mask_ref]/E0)**2.);
+    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s);
+    reflected = 0. * true_sec
+    mask_ref = E < E0
+    reflected[mask_ref] = R0 * (cos(0.5 * pi * E[mask_ref] / E0)**2.);
 
-    delta=true_sec+reflected;
+    delta = true_sec + reflected;
 
-    ref_frac=reflected/delta;
+    ref_frac = reflected / delta;
 
     return delta, ref_frac
 
@@ -100,10 +100,10 @@ class SEY_model_cos_le(SEY_model_ECLOUD):
             print 'Secondary emission model: Cosine Low Energy E0=%f'%self.E0
 
     def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
-            flag_elast=(rand(len(ref_frac))<ref_frac);
-            flag_truesec=~(flag_elast);
-            nel_emit=nel_impact*yiel;
+            yiel, ref_frac = yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
+            flag_elast = (rand(len(ref_frac)) < ref_frac);
+            flag_truesec = ~(flag_elast);
+            nel_emit = nel_impact * yiel;
 
             return  nel_emit, flag_elast, flag_truesec
 

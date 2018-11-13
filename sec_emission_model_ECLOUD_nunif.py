@@ -56,20 +56,20 @@ from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 def yield_fun2(E,costheta,Emax,del_max,R0,E0):
 
-    s=1.35;
+    s = 1.35;
 
-    del_max_tilde=del_max*exp(0.5*(1.-costheta));
-    E_max_tilde=Emax*(1.+0.7*(1.-costheta));
+    del_max_tilde = del_max * exp(0.5 * (1. - costheta));
+    E_max_tilde = Emax * (1. + 0.7 * (1. - costheta));
 
-    x=E/E_max_tilde;
+    x = E / E_max_tilde;
 
-    true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
-    reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2.;
+    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s);
+    reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0)))**2.;
 
-    delta=true_sec+reflected;
-    ref_frac=0.*delta
-    mask_non_zero=(delta>0)
-    ref_frac[mask_non_zero]=reflected[mask_non_zero]/delta[mask_non_zero];
+    delta = true_sec + reflected;
+    ref_frac = 0. * delta
+    mask_non_zero = (delta > 0)
+    ref_frac[mask_non_zero] = reflected[mask_non_zero] / delta[mask_non_zero];
 
     return delta, ref_frac
 
@@ -80,7 +80,7 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
                     switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
                     ):
 
-            if chamb.chamb_type!='polyg':
+            if chamb.chamb_type != 'polyg':
                 raise ValueError("""ECLOUD_nunif can be used only with chamb_type='polyg'!!!""")
 
             self.E_th = E_th
@@ -100,11 +100,11 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
             self.R0_segments = np.float_(chamb.R0_segments)
             self.Emax_segments = np.float_(chamb.Emax_segments)
 
-            self.del_max_segments[chamb.del_max_segments<0.]=del_max
-            self.R0_segments[chamb.R0_segments<0.]=R0
-            self.Emax_segments[chamb.Emax_segments<0.]=Emax
+            self.del_max_segments[chamb.del_max_segments < 0.] = del_max
+            self.R0_segments[chamb.R0_segments < 0.] = R0
+            self.Emax_segments[chamb.Emax_segments < 0.] = Emax
 
-            self.E0=E0
+            self.E0 = E0
 
             print 'Secondary emission model: ECLOUD non uniform E0=%f'%self.E0
 
@@ -114,10 +114,10 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
             del_max_mp = take(self.del_max_segments, i_impact)
             R0_mp = take(self.R0_segments, i_impact)
 
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp, E0=self.E0);
-            flag_elast=(rand(len(ref_frac))<ref_frac);
-            flag_truesec=~(flag_elast);
-            nel_emit=nel_impact*yiel;
+            yiel, ref_frac = yield_fun2(E_impact_eV,costheta_impact,Emax_mp,del_max_mp,R0_mp, E0=self.E0);
+            flag_elast = (rand(len(ref_frac)) < ref_frac);
+            flag_truesec = ~(flag_elast);
+            nel_emit = nel_impact * yiel;
 
             return  nel_emit, flag_elast, flag_truesec
 

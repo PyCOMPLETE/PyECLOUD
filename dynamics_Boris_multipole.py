@@ -79,12 +79,12 @@ class pusher_Boris_multipole():
 
         print "Tracker: Boris multipole"
 
-        print "N_subst_init=%d"% self.N_sub_steps
+        print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
     def step(self, MP_e, Ex_n,Ey_n, Ez_n=0.):
 
-        if MP_e.N_mp>0:
+        if MP_e.N_mp > 0:
 
             xn1 = MP_e.x_mp[0:MP_e.N_mp]
             yn1 = MP_e.y_mp[0:MP_e.N_mp]
@@ -93,7 +93,7 @@ class pusher_Boris_multipole():
             vyn1 = MP_e.vy_mp[0:MP_e.N_mp]
             vzn1 = MP_e.vz_mp[0:MP_e.N_mp]
 
-            if Ez_n!=0.:
+            if Ez_n != 0.:
                 raise ValueError('Oooops! Not implemented....')
 
             boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_field, self.B_field_skew,
@@ -104,7 +104,7 @@ class pusher_Boris_multipole():
 
     def stepcustomDt(self, MP_e, Ex_n,Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
 
-        if MP_e.N_mp>0:
+        if MP_e.N_mp > 0:
 
             xn1 = MP_e.x_mp[0:MP_e.N_mp]
             yn1 = MP_e.y_mp[0:MP_e.N_mp]
@@ -113,7 +113,7 @@ class pusher_Boris_multipole():
             vyn1 = MP_e.vy_mp[0:MP_e.N_mp]
             vzn1 = MP_e.vz_mp[0:MP_e.N_mp]
 
-            if Ez_n!=0.:
+            if Ez_n != 0.:
                 raise ValueError('Oooops! Not implemented....')
 
             boris_step_multipole(N_sub_steps, Dt_substep, self.B_field, self.B_field_skew,

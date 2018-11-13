@@ -30,32 +30,32 @@ epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
 inj_optics = machine.transverse_map.get_injection_optics()
-sigma_x = np.sqrt(inj_optics['beta_x']*epsn_x/machine.betagamma)
-sigma_y = np.sqrt(inj_optics['beta_y']*epsn_y/machine.betagamma)
+sigma_x = np.sqrt(inj_optics['beta_x'] * epsn_x / machine.betagamma)
+sigma_y = np.sqrt(inj_optics['beta_y'] * epsn_y / machine.betagamma)
 
 # define apertures and Dh_sc to simulate headtail conditions
-x_aper  = 20*sigma_x
-y_aper  = 20*sigma_y
-Dh_sc = 2*x_aper/128/2
+x_aper  = 20 * sigma_x
+y_aper  = 20 * sigma_y
+Dh_sc = 2 * x_aper / 128 / 2
 
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 slicer = UniformBinSlicer(n_slices = 64, n_sigma_z = 3.)
 
-init_unif_edens_flag=1
-init_unif_edens=2e11
+init_unif_edens_flag = 1
+init_unif_edens = 2e11
 N_MP_ele_init = 100000
-N_mp_max = N_MP_ele_init*4.
+N_mp_max = N_MP_ele_init * 4.
 
-nel_mp_ref_0 = init_unif_edens*4*x_aper*y_aper/N_MP_ele_init
+nel_mp_ref_0 = init_unif_edens * 4 * x_aper * y_aper / N_MP_ele_init
 
 new_one_turn_map = []
 ecloud_list = []
 for ele in machine.one_turn_map:
 	new_one_turn_map.append(ele)
 	if ele in machine.transverse_map:
-		new_ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer,
+		new_ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / N_kicks, slicer=slicer,
 						Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 						x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 						init_unif_edens_flag=init_unif_edens_flag,
@@ -87,13 +87,13 @@ for ii in xrange(N_turns):
 	for ec in ecloud_list:
 		ec.finalize_and_reinitialize()
 t_end_slice = time.mktime(time.localtime())
-print 'Sliced %.2e s per turn'%((t_end_slice-t_start_slice)/float(N_turns))
+print 'Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns))
 
 # Simulate bunch mode
 machine_whole_bunch = SPS(n_segments = N_kicks, machine_configuration = 'Q20-injection', accQ_x=20., accQ_y=20.)
 
 
-ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference/N_kicks, slicer=slicer,
+ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / N_kicks, slicer=slicer,
 				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
 				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
 				init_unif_edens_flag=init_unif_edens_flag,
@@ -111,5 +111,5 @@ for ii in xrange(N_turns):
 t_end_bunch = time.mktime(time.localtime())
 
 print '\n\n'
-print 'Sliced %.2e s per turn'%((t_end_slice-t_start_slice)/float(N_turns))
-print 'Full bunch %.2e s per turn'%((t_end_bunch-t_start_bunch)/float(N_turns))
+print 'Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns))
+print 'Full bunch %.2e s per turn'%((t_end_bunch - t_start_bunch) / float(N_turns))
