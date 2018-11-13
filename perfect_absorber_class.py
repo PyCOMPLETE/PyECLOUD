@@ -155,11 +155,7 @@ class impact_management_perfect_absorber(impact_management):
 
         return MP_e
 
-    def extract_sey_curves(self,n_rep, E_impact_eV_test, cos_theta_test):
-
-        sey_mod = self.sey_mod
-
-        nel_impact = 1. + 0.*E_impact_eV_test
+    def extract_sey_curves(self, n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
         del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
@@ -168,4 +164,3 @@ class impact_management_perfect_absorber(impact_management):
         print('Done extracting SEY curves.')
 
         return del_true_mat, del_elast_mat
-
