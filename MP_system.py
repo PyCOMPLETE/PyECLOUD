@@ -365,7 +365,7 @@ class MP_system:
                 #(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
                 Nout = np.sum(flag_np)
                 while(Nout > 0):
-            #        indices=find(flag_np);
+                    #        indices=find(flag_np);
                     x_temp[flag_np] = x_nonzero_temp[flag_np] + Dx_reg * (rand(Nout) - 0.5)
                     y_temp[flag_np] = y_nonzero_temp[flag_np] + Dy_reg * (rand(Nout) - 0.5)
                     flag_np = self.chamb.is_outside(x_temp, y_temp)
