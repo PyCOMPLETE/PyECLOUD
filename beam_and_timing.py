@@ -255,7 +255,7 @@ class beam_and_timing:
                 raise ValueError('Aspect ratio MUST be provided for multigrid beam field computation!')
             if target_grid_beam is None:
                 raise ValueError('Target grid MUST be provided for multigrid beam field computation!')
-            if  N_nodes_discard_beam is None:
+            if N_nodes_discard_beam is None:
                 raise ValueError(' N_nodes_discard_beam MUST be provided for multigrid beam field computation!')
             if N_min_Dh_main_beam is None:
                 raise ValueError(' N_min_Dh_main_beam MUST be provided for multigrid beam field computation!')

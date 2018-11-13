@@ -108,5 +108,5 @@ class SEY_model_acc_low_ene(SEY_model_ECLOUD):
             nel_emit = nel_impact
             nel_emit[flag_truesec] = nel_impact[flag_truesec] * beta_ts[flag_truesec]
 
-            return  nel_emit, flag_elast, flag_truesec
+            return nel_emit, flag_elast, flag_truesec
 

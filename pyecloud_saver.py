@@ -290,7 +290,7 @@ class pyecloud_saver:
         self.xg_hist_det = -1
         self.nel_hist_det = -1
         if x_min_hist_det is not None:
-            if x_max_hist_det is None or y_min_hist_det is None or  y_max_hist_det is None or  Dx_hist_det is None:
+            if x_max_hist_det is None or y_min_hist_det is None or y_max_hist_det is None or Dx_hist_det is None:
                 raise ValueError('x_min_hist_det is not None but one among x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det is None!')
 
             self.flag_hist_det = True
@@ -729,7 +729,7 @@ class pyecloud_saver:
     def _MP_state_save(self, MP_e, beamtim):
         #MP state save
         if self.flag_save_MP_state:
-            if  (MP_e.N_mp > 0) and (self.i_obs < self.N_obs):
+            if (MP_e.N_mp > 0) and (self.i_obs < self.N_obs):
                 if (beamtim.tt_curr >= self.t_obs[self.i_obs]):
                     if self.flag_multiple_clouds:
                         filename_MP_state = 'MP_state_%s_%d'%(self.cloud_name, self.i_obs)

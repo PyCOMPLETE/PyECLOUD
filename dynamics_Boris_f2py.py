@@ -163,7 +163,7 @@ class pusher_Boris():
             mass = MP_e.mass
             charge = MP_e.charge
 
-            if  Ez_n == 0.:
+            if Ez_n == 0.:
                 Ez_n = 0. * xn1
 
             for ii in range(self.N_sub_steps):
@@ -194,7 +194,7 @@ class pusher_Boris():
             mass = MP_e.mass
             charge = MP_e.charge
 
-            if  Ez_n == 0.:
+            if Ez_n == 0.:
                 Ez_n = 0. * xn1
 
             for ii in range(N_sub_steps):

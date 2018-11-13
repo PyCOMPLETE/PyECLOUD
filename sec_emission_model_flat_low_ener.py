@@ -105,5 +105,5 @@ class SEY_model_flat_le(SEY_model_ECLOUD):
             flag_truesec = ~(flag_elast)
             nel_emit = nel_impact * yiel
 
-            return  nel_emit, flag_elast, flag_truesec
+            return nel_emit, flag_elast, flag_truesec
 

@@ -30,7 +30,7 @@ def dict_of_arrays_and_scalar_from_h5(filename):
 			f_dict[kk] = np.array(fid[kk]).copy()
 			if f_dict[kk].shape == ():
 				f_dict[kk] = f_dict[kk].tolist()
-	return  f_dict
+	return f_dict
 
 dict_HT = dict_of_arrays_and_scalar_from_h5('footprint_HT.h5ref')
 

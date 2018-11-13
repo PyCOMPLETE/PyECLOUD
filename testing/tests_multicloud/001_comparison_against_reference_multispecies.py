@@ -183,7 +183,7 @@ for ii, k in enumerate(out_var_curr):
         except IndexError as goterror:
             print 'Skipped. Got:',  goterror
 
-        if (k in out_var_ref) and  (dict_ref[k].shape != ()):
+        if (k in out_var_ref) and (dict_ref[k].shape != ()):
 
             #Plot matrix for the reference simulation
             sp2 = fig.add_subplot(gs1[1])

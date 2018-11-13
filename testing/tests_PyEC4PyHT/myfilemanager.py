@@ -27,7 +27,7 @@ def myloadmat(filename, squeeze=True):
 
 
 def myloadmat_to_obj(filename, squeeze=True):
-	return  obj_from_dict(myloadmat(filename, squeeze=squeeze))
+	return obj_from_dict(myloadmat(filename, squeeze=squeeze))
 
 
 def dict_of_arrays_and_scalar_from_h5(filename):
@@ -38,10 +38,10 @@ def dict_of_arrays_and_scalar_from_h5(filename):
 			f_dict[kk] = np.array(fid[kk]).copy()
 			if f_dict[kk].shape == ():
 				f_dict[kk] = f_dict[kk].tolist()
-	return  f_dict
+	return f_dict
 
 def object_with_arrays_and_scalar_from_h5(filename):
-	return  obj_from_dict(dict_of_arrays_and_scalar_from_h5(filename))
+	return obj_from_dict(dict_of_arrays_and_scalar_from_h5(filename))
 
 def bunchh5_to_dict(filename):
 	import h5py
@@ -54,7 +54,7 @@ def bunchh5_to_dict(filename):
 	return bunch_dict
 
 def bunchh5_to_obj(filename):
-	return  obj_from_dict(bunchh5_to_dict(filename))
+	return obj_from_dict(bunchh5_to_dict(filename))
 
 def bunchh5list_to_dict(filename_list):
 	bunch_dict = bunchh5_to_dict(filename_list[0])
@@ -66,4 +66,4 @@ def bunchh5list_to_dict(filename_list):
 	return bunch_dict
 
 def bunchh5list_to_obj(filename_list):
-	return  obj_from_dict(bunchh5list_to_dict(filename_list))
+	return obj_from_dict(bunchh5list_to_dict(filename_list))

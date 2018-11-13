@@ -119,5 +119,5 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
             flag_truesec = ~(flag_elast)
             nel_emit = nel_impact * yiel
 
-            return  nel_emit, flag_elast, flag_truesec
+            return nel_emit, flag_elast, flag_truesec
 

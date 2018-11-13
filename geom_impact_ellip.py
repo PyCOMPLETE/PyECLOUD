@@ -192,5 +192,5 @@ class ellip_cham_geom_object:
 
         i_found = None
 
-        return  x_int, y_int, z_int, Nx, Ny, i_found
+        return x_int, y_int, z_int, Nx, Ny, i_found
 
