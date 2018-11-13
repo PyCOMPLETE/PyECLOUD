@@ -97,7 +97,6 @@ class BuildupSimulation(object):
                 else:
                     raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
-
     def run(self, t_end_sim = None):
 
         beamtim = self.beamtim

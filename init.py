@@ -301,35 +301,35 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
                 sey_mod=SEY_model_ECLOUD(
                                             thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                             **kwargs_secem)
             elif thiscloud.switch_model in (1, 'ACC_LOW'):
                 sey_mod=SEY_model_acc_low_ene(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                             **kwargs_secem)
             elif thiscloud.switch_model == 'ECLOUD_nunif':
                 sey_mod=SEY_model_ECLOUD_non_unif(chamb, thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                             **kwargs_secem)
             elif thiscloud.switch_model == 'cos_low_ene':
                 sey_mod=SEY_model_cos_le(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                             **kwargs_secem)
             elif thiscloud.switch_model == 'flat_low_ene':
                 sey_mod=SEY_model_flat_le(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
@@ -343,8 +343,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                     sey_file_path = pyecl_input_folder+'/'+thiscloud.sey_file+'.mat'
                 else:
                     sey_file_path = thiscloud.sey_file
-                sey_mod = SEY_model_from_file(sey_file_path, 
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                sey_mod = SEY_model_from_file(sey_file_path,
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
@@ -359,7 +359,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             impact_man_class=imc.impact_management
 
-        impact_man = impact_man_class(chamb, sey_mod, 
+        impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
                                       flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
                                       )
@@ -437,7 +437,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
-
 
         # Initial electron density
         if thiscloud.init_unif_flag==1:

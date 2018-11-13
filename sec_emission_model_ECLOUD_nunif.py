@@ -76,14 +76,13 @@ def yield_fun2(E,costheta,Emax,del_max,R0,E0):
 
 class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
     def __init__(self, chamb, Emax,del_max,R0,E0=150.,
-                    E_th=None, sigmafit=None, mufit=None, 
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+                    E_th=None, sigmafit=None, mufit=None,
+                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None,
                     ):
-            
+
             if chamb.chamb_type!='polyg':
                 raise ValueError("""ECLOUD_nunif can be used only with chamb_type='polyg'!!!""")
 
-            
             self.E_th = E_th
             self.sigmafit = sigmafit
             self.mufit = mufit
@@ -96,7 +95,6 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
                 self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
             else:
                 self.angle_dist_func = None
-
 
             self.del_max_segments = np.float_(chamb.del_max_segments)
             self.R0_segments = np.float_(chamb.R0_segments)

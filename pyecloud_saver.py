@@ -183,7 +183,6 @@ class pyecloud_saver:
             self.t_sec_beams = -1
             self.sec_beam_profiles = -1
 
-
         # extract SEY curves
         if self.extract_sey:
             n_rep = 10000
@@ -412,7 +411,6 @@ class pyecloud_saver:
             if not os.path.isdir(self.checkpoint_folder):
                 os.makedirs(self.checkpoint_folder)
 
-
     def _checkpoint_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                     sec_beams_list, flag_multiple_clouds, cloud_list):
         # First check if it is time to save a checkpoint
@@ -461,7 +459,6 @@ class pyecloud_saver:
         if self.flag_copy_main_output:
             if (beamtim.tt_curr - self.t_last_copy >= self.copy_main_outp_DT):
                 self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
-
 
     def load_from_output(self, last_t=None):
 
@@ -647,7 +644,6 @@ class pyecloud_saver:
             self.y_el_dens_probes = np.array(self.y_el_dens_probes)
             self.r_el_dens_probes = np.array(self.r_el_dens_probes)
 
-
     def _stepbystep_data_save(self, impact_man, MP_e, beamtim):
         #save step by step data
         # Vars to be accumulated
@@ -689,7 +685,6 @@ class pyecloud_saver:
                     flag_center=((MP_e.x_mp-self.x_el_dens_probes[ii])**2 + (MP_e.y_mp-self.y_el_dens_probes[ii])**2)<self.r_el_dens_probes[ii]**2;
                     flag_center[MP_e.N_mp:]=False
                     self.el_dens_at_probes[ii, self.i_last_save]=np.sum(MP_e.nel_mp[flag_center])/(np.pi*self.r_el_dens_probes[ii]**2)
-
 
             if self.flag_detailed_MP_info==1:
                 self.N_mp_time[self.i_last_save]=MP_e.N_mp
