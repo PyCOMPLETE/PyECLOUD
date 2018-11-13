@@ -32,8 +32,8 @@ bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.
 
 
 # define apertures and Dh_sc to simulate headtail conditions
-x_aper  = 20 * sigma_x
-y_aper  = 20 * sigma_y
+x_aper = 20 * sigma_x
+y_aper = 20 * sigma_y
 Dh_sc = 2 * x_aper / 128 / 2
 
 # ecloud
@@ -103,7 +103,7 @@ for i in range(n_turns):
 print '\nDONE'
 
 from tune_analysis import tune_analysis
-qx_i, qy_i, qx_centroid, qy_centroid  = tune_analysis(x_i, xp_i, y_i, yp_i)
+qx_i, qy_i, qx_centroid, qy_centroid = tune_analysis(x_i, xp_i, y_i, yp_i)
 
 pl.close('all')
 pl.figure(1)

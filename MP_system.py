@@ -264,9 +264,9 @@ class MP_system:
             #
             #
             indexes = (ix_mp - 1) * self.Ny_reg * self.Nvx_reg * self.Nvy_reg * self.Nvz_reg\
-                          + (iy_mp - 1)     * self.Nvx_reg * self.Nvy_reg * self.Nvz_reg\
-                          + (ivx_mp - 1)                 * self.Nvy_reg * self.Nvz_reg\
-                          + (ivy_mp - 1)                              * self.Nvz_reg\
+                          + (iy_mp - 1) * self.Nvx_reg * self.Nvy_reg * self.Nvz_reg\
+                          + (ivx_mp - 1) * self.Nvy_reg * self.Nvz_reg\
+                          + (ivy_mp - 1) * self.Nvz_reg\
                           + ivz_mp - 1;
             indexes = np.int_(indexes)
             indices_nonzero_cells = np.array(list(set(indexes)))

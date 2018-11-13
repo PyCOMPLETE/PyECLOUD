@@ -41,17 +41,17 @@ class beam_descr_from_fil:
             raise ValueError('If sigmax =-1 valid betafx and nemittx MUST be provided!')
 
         if cc.sigmax == -1:
-            gemittx  = cc.nemittx / (beta_rel * gamma_rel)
-            cc.sigmax   = np.sqrt(cc.betafx * gemittx + cc.Dx**2 * cc.Dp_p**2)
-            cc.sigmax   = cc.sigmax.real
+            gemittx = cc.nemittx / (beta_rel * gamma_rel)
+            cc.sigmax = np.sqrt(cc.betafx * gemittx + cc.Dx**2 * cc.Dp_p**2)
+            cc.sigmax = cc.sigmax.real
 
         if (cc.sigmay == -1) and ((cc.betafy is None) or (cc.nemitty is None)):
             raise ValueError('If sigmay =-1 valid betafy and nemitty MUST be provided!')
 
         if cc.sigmay == -1:
-            gemitty  = cc.nemitty / (beta_rel * gamma_rel)
-            cc.sigmay   = np.sqrt(cc.betafy * gemitty + cc.Dy**2 * cc.Dp_p**2)
-            cc.sigmay   = cc.sigmay.real
+            gemitty = cc.nemitty / (beta_rel * gamma_rel)
+            cc.sigmay = np.sqrt(cc.betafy * gemitty + cc.Dy**2 * cc.Dp_p**2)
+            cc.sigmay = cc.sigmay.real
 
         self.sigmax = cc.sigmax
         self.sigmay = cc.sigmay

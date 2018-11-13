@@ -95,7 +95,7 @@ class LHC(Synchrotron):
 					str2print = repr(kwargs[attr])
 				self.prints('Synchrotron init. From kwargs: %s = %s'
 							% (attr, str2print))
-				temp =  kwargs[attr]
+				temp = kwargs[attr]
 				exec('%s = temp'%attr)
 
 		if i_octupole_focusing is not None or i_octupole_defocusing is not None:
@@ -108,7 +108,7 @@ class LHC(Synchrotron):
 		if octupole_knob is not None:
 			if i_octupole_focusing is not None or i_octupole_defocusing is not None:
 				raise ValueError('octupole_knobs and octupole currents cannot be used at the same time!')
-			i_octupole_focusing, i_octupole_defocusing =  self._octupole_currents_from_octupole_knobs(octupole_knob, p0)
+			i_octupole_focusing, i_octupole_defocusing = self._octupole_currents_from_octupole_knobs(octupole_knob, p0)
 			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)
 			self.i_octupole_focusing = i_octupole_focusing
 			self.i_octupole_defocusing = i_octupole_defocusing
@@ -146,9 +146,9 @@ class LHC(Synchrotron):
 			i_max = 550.  # [A]
 			E_max = 7000. # [GeV]
 
-			app_x  = E_max * (267065. * i_octupole_focusing / i_max -
+			app_x = E_max * (267065. * i_octupole_focusing / i_max -
 				7856. * i_octupole_defocusing / i_max)
-			app_y  = E_max * (9789. * i_octupole_focusing / i_max -
+			app_y = E_max * (9789. * i_octupole_focusing / i_max -
 				277203. * i_octupole_defocusing / i_max)
 			app_xy = E_max * (-102261. * i_octupole_focusing / i_max +
 				93331. * i_octupole_defocusing / i_max)

@@ -42,7 +42,7 @@ yfield_cut_lim = 7 #5000.
 denslim = 1.e11;
 
 N_dec = 1
-lim_dens =  [10,14]
+lim_dens = [10,14]
 flag_log = True
 outp_filname = 'pass%d.avi'%passlist[0]
 

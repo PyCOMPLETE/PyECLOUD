@@ -119,18 +119,18 @@ class SEY_model_from_file(SEY_model_ECLOUD):
         self.sey_elast_diff = np.append(np.diff(sey_elast), 0.)
 
         # This merely populates the object namespace
-        self.energy_eV              = energy_eV
-        self.sey_true               = sey_true
-        self.sey_elast              = sey_elast
-        self.sey_file               = sey_file
+        self.energy_eV = energy_eV
+        self.sey_true = sey_true
+        self.sey_elast = sey_elast
+        self.sey_file = sey_file
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
-        self.energy_eV_min          = energy_eV.min()
-        self.energy_eV_max          = energy_eV.max()
-        self.delta_e                = delta_e
-        self.extrapolate_grad_true  = extrapolate_grad_true
+        self.energy_eV_min = energy_eV.min()
+        self.energy_eV_max = energy_eV.max()
+        self.delta_e = delta_e
+        self.extrapolate_grad_true = extrapolate_grad_true
         self.extrapolate_const_true = extrapolate_const_true
-        self.extrapolate_grad_elast  = extrapolate_grad_elast
+        self.extrapolate_grad_elast = extrapolate_grad_elast
         self.extrapolate_const_elast = extrapolate_const_elast
 
     def SEY_values(self, E_impact_eV, costheta_impact):

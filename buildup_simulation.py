@@ -122,7 +122,7 @@ class BuildupSimulation(object):
 
             ## every bunch passage
             if t_end_sim is not None:
-                if beamtim.tt_curr >    t_end_sim:
+                if beamtim.tt_curr > t_end_sim:
                     print 'Reached user defined t_end_sim --> Ending simulation'
                     break
 

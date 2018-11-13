@@ -155,7 +155,7 @@ class pusher_strong_B_generalized():
             vB_Bmod = (vxn * By_n - vyn * Bx_n) / B_mod
             EB_Bmodsq = (Ex_n * By_n - Ey_n * Bx_n) / (B_mod * B_mod)
 
-            Dz =  vzn * sinwcDt / omegac + vB_Bmod * coswcDt / omegac + \
+            Dz = vzn * sinwcDt / omegac + vB_Bmod * coswcDt / omegac + \
                 EB_Bmodsq * (self.Dt - sinwcDt / omegac) - vB_Bmod / omegac
 
             Dz_tilde = (vzn * (1 - coswcDt) + vB_Bmod * sinwcDt) / (omegac * omegac) + \
@@ -188,7 +188,7 @@ class pusher_strong_B_generalized():
             MP_e.z_mp[0:MP_e.N_mp] = zn1
             MP_e.vx_mp[0:MP_e.N_mp] = vxn1
             MP_e.vy_mp[0:MP_e.N_mp] = vyn1
-            MP_e.vz_mp[0:MP_e.N_mp]  = vzn1
+            MP_e.vz_mp[0:MP_e.N_mp] = vzn1
 
         return MP_e
 

@@ -67,7 +67,7 @@ def bunch_train4(t,b_spac,t_offs,ppb_vect, sigmaz_vect):
         if np.mod(ii, N_bucket / 20) == 0:
             print ('Beam profile generation %.0f'%(float(ii) / float(N_bucket) * 100) + """%""")
 
-        ppb  =  ppb_vect[ii]
+        ppb = ppb_vect[ii]
         sigmaz = sigmaz_vect[ii]
         if sigmaz > 0:
             z0 = c * (t_offs + ii * b_spac);
@@ -233,8 +233,8 @@ class beam_and_timing:
                 for jj in range(len(yy)):
                     x = xx[ii];
                     y = yy[jj];
-                    Ex_imag,Ey_imag  = BE.ImageTerms(x,y,a,b,0,0, nimag)
-                    Ex_BE,Ey_BE      = BE.BassErsk(x,y,sigmax,sigmay)
+                    Ex_imag,Ey_imag = BE.ImageTerms(x,y,a,b,0,0, nimag)
+                    Ex_BE,Ey_BE = BE.BassErsk(x,y,sigmax,sigmay)
                     Ex[ii,jj] = Ex_BE + Ex_imag
                     Ey[ii,jj] = Ey_BE + Ey_imag
                     Ex_beam = Ex.real

@@ -24,12 +24,12 @@ class CLIC_DR(Synchrotron):
 
 		if machine_configuration == 'CLIC_DR_1GHz':
 			h_RF 	= 1425
-			V_RF    = 5.1e6
+			V_RF = 5.1e6
 			dphi_RF = 0
 
 		elif machine_configuration == 'CLIC_DR_2GHz':
 			h_RF 	= 2851
-			V_RF    = 4.5e6
+			V_RF = 4.5e6
 			dphi_RF = 0
 
 		else:
@@ -106,7 +106,7 @@ class CLIC_DR(Synchrotron):
 					str2print = repr(kwargs[attr])
 				self.prints('Synchrotron init. From kwargs: %s = %s'
 							% (attr, str2print))
-				temp =  kwargs[attr]
+				temp = kwargs[attr]
 				exec('%s = temp'%attr)
 
 		super(CLIC_DR, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,

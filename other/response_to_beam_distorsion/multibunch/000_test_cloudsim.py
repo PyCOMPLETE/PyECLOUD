@@ -87,7 +87,7 @@ print('End cloud sim')
 
 # Some plotting
 bucket_length_m = machine.circumference / (machine.longitudinal_map.harmonics[0])
-b_spac_m =  b_spac_s * machine.beta * clight
+b_spac_m = b_spac_s * machine.beta * clight
 b_spac_buckets = np.round(b_spac_m / bucket_length_m)
 
 beam = sum(list_bunches)

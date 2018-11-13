@@ -96,8 +96,8 @@ print 'sigma_x = %.2e, sigma_y = %.2e'%(sigma_x, sigma_y)
 
 # define apertures and PIC grid size
 chamb_type = 'rect'
-x_aper  = 15 * sigma_x
-y_aper  = 15 * sigma_y
+x_aper = 15 * sigma_x
+y_aper = 15 * sigma_y
 
 Dh_x = x_aper / 125.
 Dh_y = y_aper / 125.

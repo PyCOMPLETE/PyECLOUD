@@ -130,7 +130,7 @@ gs2 = gridspec.GridSpec(2, 1)
 
 
 sp1 = fig.add_subplot(gs1[0])
-obcham =  mlm.myloadmat_to_obj( 'LHC_chm_ver.mat')
+obcham = mlm.myloadmat_to_obj( 'LHC_chm_ver.mat')
 sp1.plot(obcham.Vx * 1e3, obcham.Vy * 1e3, 'b')
 sp1.plot(ecloud_singlegrid.x_probes * 1e3, ecloud_singlegrid.y_probes * 1e3, 'or', markersize=3)
 sp1.plot(x_beam_offset, y_beam_offset, '*k', markersize=4)

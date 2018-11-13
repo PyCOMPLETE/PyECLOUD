@@ -88,7 +88,7 @@ class impact_management(object):
         if flag_cos_angle_hist:
             self.cos_angle_width = cos_angle_width
             N_angles = int(1. / cos_angle_width) + 1
-            self.cos_angle_hist  = np.zeros(N_angles, float)
+            self.cos_angle_hist = np.zeros(N_angles, float)
             print 'Saving cosine of angle of incident electrons.'
         else:
             print 'Not saving cosine of angle of incident electrons.'
@@ -237,9 +237,9 @@ class impact_management(object):
                 self.Nel_emit_last_step = np.sum(nel_emit_tot_events)
 
                 # Replace old MPs
-                x_mp[flag_impact]  = x_replace
-                y_mp[flag_impact]  = y_replace
-                z_mp[flag_impact]  = z_replace
+                x_mp[flag_impact] = x_replace
+                y_mp[flag_impact] = y_replace
+                z_mp[flag_impact] = z_replace
                 vx_mp[flag_impact] = vx_replace
                 vy_mp[flag_impact] = vy_replace
                 vz_mp[flag_impact] = vz_replace

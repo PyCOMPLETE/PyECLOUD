@@ -67,7 +67,7 @@ for ii in range(0,N_slots):
     if np.mod(ii, N_slots / 20) == 0:
         print ('Beam profile generation %.0f'%(float(ii) / float(N_slots) * 100) + """%""")
 
-    ppb  =  ppb_vect[ii]
+    ppb = ppb_vect[ii]
     sigmaz = sigmaz_vect[ii]
     if sigmaz > 0:
         z0 = c * (t_offs + ii * b_spac);

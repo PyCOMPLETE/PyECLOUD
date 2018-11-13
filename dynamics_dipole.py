@@ -96,7 +96,7 @@ class pusher_dipole_magnet():
             MP_e.z_mp[0:MP_e.N_mp] = zn1
             MP_e.vx_mp[0:MP_e.N_mp] = vxn1
             MP_e.vy_mp[0:MP_e.N_mp] = vyn1
-            MP_e.vz_mp[0:MP_e.N_mp]  = vzn1
+            MP_e.vz_mp[0:MP_e.N_mp] = vzn1
 
         return MP_e
 

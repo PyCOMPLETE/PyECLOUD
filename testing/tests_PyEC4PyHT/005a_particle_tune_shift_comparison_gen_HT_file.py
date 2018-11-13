@@ -45,7 +45,7 @@ print 'Done!'
 # compute tunes from headtail data
 print 'Tune analysis for headtail...'
 from tune_analysis import tune_analysis
-qx_ht, qy_ht, qx_centroid_ht, qy_centroid_ht  = tune_analysis(x[:, :n_record].T, xp[:, :n_record].T, y[:, :n_record].T, yp[:, :n_record].T)
+qx_ht, qy_ht, qx_centroid_ht, qy_centroid_ht = tune_analysis(x[:, :n_record].T, xp[:, :n_record].T, y[:, :n_record].T, yp[:, :n_record].T)
 
 x0_HT = x[0,:]
 xp0_HT = xp[0,:]

@@ -46,8 +46,8 @@ sigma_x = np.sqrt(inj_optics['beta_x'] * epsn_x / machine.betagamma)
 sigma_y = np.sqrt(inj_optics['beta_y'] * epsn_y / machine.betagamma)
 
 # define apertures and Dh_sc to simulate headtail conditions
-x_aper  = 20 * sigma_x
-y_aper  = 20 * sigma_y
+x_aper = 20 * sigma_x
+y_aper = 20 * sigma_y
 Dh_sc = 2 * x_aper / 128 / 2
 
 # ecloud
