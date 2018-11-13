@@ -123,7 +123,7 @@ class pusher_strong_B_generalized():
 
             if self.flag_B_map:
                 Bx_n, By_n = iff.int_field(xn, yn, self.xmin, self.ymin,\
-                                      self.dx, self.dy, self.Bmap_x, self.Bmap_y)
+                                           self.dx, self.dy, self.Bmap_x, self.Bmap_y)
                 # the rescaling factor has already been applied to the map
             elif self.analyt_quad_grad1:
                 # the rescaling factor has to be applied here
@@ -160,8 +160,8 @@ class pusher_strong_B_generalized():
                 EB_Bmodsq * (self.Dt - sinwcDt / omegac) - vB_Bmod / omegac
 
             Dz_tilde = (vzn * (1 - coswcDt) + vB_Bmod * sinwcDt) / (omegac * omegac) + \
-                       EB_Bmodsq * (self.Dt * self.Dt / 2. + (coswcDt - 1.) / (omegac * omegac)) \
-                       - vB_Bmod * self.Dt / omegac
+                EB_Bmodsq * (self.Dt * self.Dt / 2. + (coswcDt - 1.) / (omegac * omegac)) \
+                - vB_Bmod * self.Dt / omegac
 
             vzn1 = vzn * coswcDt - vB_Bmod * sinwcDt + EB_Bmodsq * (1. - coswcDt)
             vxn1 = vxn - qm * (Ex_n * self.Dt - By_n * Dz)

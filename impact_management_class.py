@@ -259,7 +259,7 @@ class impact_management(object):
                 N_new_MPs = len(nel_new_MPs)
                 if N_new_MPs > 0:
                     MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs,
-                                        vx_new_MPs, vy_new_MPs, vz_new_MPs)
+                                     vx_new_MPs, vy_new_MPs, vz_new_MPs)
 
                     #subtract new macroparticles
                     v_new_MPs_mod = np.sqrt(vx_new_MPs**2 + vy_new_MPs**2 + vz_new_MPs**2)

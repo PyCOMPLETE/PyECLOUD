@@ -81,25 +81,25 @@ nel_mp_ref_0 = init_unif_edens * 4 * x_aper * y_aper / N_MP_ele_init
 Dh_ext = 2e-3
 
 ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / machine.transverse_map.n_segments, slicer=slicer,
-				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
-				x_aper=x_aper, y_aper=y_aper,
-				init_unif_edens_flag=init_unif_edens_flag,
-				init_unif_edens=init_unif_edens,
-				N_mp_max=N_mp_max,
-				nel_mp_ref_0=nel_mp_ref_0,
-				B_multip=B_multip,
-                PyPICmode='ShortleyWeller_WithTelescopicGrids',
-                f_telescope=0.3,
-                Dh_sc=Dh_ext,
-                target_grid={'x_min_target': -4 * bunch.sigma_x(), 'x_max_target': 4 * bunch.sigma_x(),
-                       'y_min_target': -4 * bunch.sigma_y(), 'y_max_target': 4 * bunch.sigma_y(),
-                       'Dh_target': Dh_sc},
-                N_nodes_discard=10.,
-                N_min_Dh_main=10,)
+                          Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
+                          x_aper=x_aper, y_aper=y_aper,
+                          init_unif_edens_flag=init_unif_edens_flag,
+                          init_unif_edens=init_unif_edens,
+                          N_mp_max=N_mp_max,
+                          nel_mp_ref_0=nel_mp_ref_0,
+                          B_multip=B_multip,
+                          PyPICmode='ShortleyWeller_WithTelescopicGrids',
+                          f_telescope=0.3,
+                          Dh_sc=Dh_ext,
+                          target_grid={'x_min_target': -4 * bunch.sigma_x(), 'x_max_target': 4 * bunch.sigma_x(),
+                                       'y_min_target': -4 * bunch.sigma_y(), 'y_max_target': 4 * bunch.sigma_y(),
+                                       'Dh_target': Dh_sc},
+                          N_nodes_discard=10.,
+                          N_min_Dh_main=10,)
 
 # generate a bunch
 bunch_for_map = machine.generate_6D_Gaussian_bunch(n_macroparticles=500000,
-	intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
+                                                   intensity=1.15e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=0.2)
 ecloud.track_once_and_replace_with_recorded_field_map(bunch_for_map)
 
 machine.install_after_each_transverse_segment(ecloud)

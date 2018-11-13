@@ -91,15 +91,15 @@ class ellip_cham_geom_object:
         x_in__x_out = x_in * x_out
 
         t0 = (a**2 * y_insq - a**2 * y_in__y_out + \
-          sqrt(a**4 * b**2 * y_insq - 2 * a**4 * b**2 * y_in__y_out \
-              + a**4 * b**2 * y_outsq +  \
-            a**2 * b**4 * x_insq - 2 * a**2 * b**4 * x_in__x_out +  \
-            a**2 * b**4 * x_outsq - a**2 * b**2 * x_insq * \
-            y_outsq + 2 * a**2 * b**2 * x_in__x_out * y_in__y_out -  \
-            a**2 * b**2 * x_outsq * y_insq) + b**2 * x_insq -  \
-            b**2 * x_in__x_out) / (a**2 * y_insq -  \
-            2 * a**2 * y_in__y_out + a**2 * y_outsq + b**2 * x_insq -  \
-            2 * b**2 * x_in__x_out + b**2 * x_outsq)
+              sqrt(a**4 * b**2 * y_insq - 2 * a**4 * b**2 * y_in__y_out \
+                   + a**4 * b**2 * y_outsq +  \
+                   a**2 * b**4 * x_insq - 2 * a**2 * b**4 * x_in__x_out +  \
+                   a**2 * b**4 * x_outsq - a**2 * b**2 * x_insq * \
+                   y_outsq + 2 * a**2 * b**2 * x_in__x_out * y_in__y_out -  \
+                   a**2 * b**2 * x_outsq * y_insq) + b**2 * x_insq -  \
+              b**2 * x_in__x_out) / (a**2 * y_insq -  \
+                                     2 * a**2 * y_in__y_out + a**2 * y_outsq + b**2 * x_insq -  \
+                                     2 * b**2 * x_in__x_out + b**2 * x_outsq)
 
         # Handle pathological cases
         mask_nan = isnan(t0)

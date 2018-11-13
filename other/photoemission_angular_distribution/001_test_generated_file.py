@@ -16,15 +16,15 @@ chamb = gie.ellip_cham_geom_object(x_aper=2e-2, y_aper=1e-2)
 
 # Build object used by pyecloud
 ob = gp.photoemission_from_file(inv_CDF_all_photoem_file=file_to_test,
-    chamb=chamb, resc_fac=1.,
-    energy_distribution='gaussian',
-    e_pe_sigma=3.,
-    e_pe_max=10.,
-    k_pe_st=1.,
-    out_radius=10e-2,
-    photoelectron_angle_distribution='cosine_3D',
-    beamtim=None,
-    flag_continuous_emission=False)
+                                chamb=chamb, resc_fac=1.,
+                                energy_distribution='gaussian',
+                                e_pe_sigma=3.,
+                                e_pe_max=10.,
+                                k_pe_st=1.,
+                                out_radius=10e-2,
+                                photoelectron_angle_distribution='cosine_3D',
+                                beamtim=None,
+                                flag_continuous_emission=False)
 
 N_mp_test = 100000
 N_tests = 100

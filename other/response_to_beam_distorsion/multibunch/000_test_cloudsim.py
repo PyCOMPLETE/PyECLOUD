@@ -33,7 +33,7 @@ filling_pattern = 1 * (60 * [1.] + 5 * [0])
 macroparticlenumber = 100000
 
 machine = LHC(machine_configuration=machine_configuration, beta_x=85.00, beta_y=90.0,
-                        optics_mode='smooth', n_segments=n_segments, RF_at='end_of_transverse')
+              optics_mode='smooth', n_segments=n_segments, RF_at='end_of_transverse')
 
 list_bunches = gmb.gen_matched_multibunch_beam(machine, macroparticlenumber, filling_pattern, b_spac_s, bunch_intensity, epsn_x, epsn_y, sigma_z, non_linear_long_matching, min_inten_slice4EC)
 
@@ -63,8 +63,8 @@ ecloud = PyEC4PyHT.Ecloud(
         #~ PyPICmode = 'ShortleyWeller_WithTelescopicGrids',
         #~ f_telescope = 0.3,
         target_grid={'x_min_target': -5 * list_bunches[-1].sigma_x(), 'x_max_target': 5 * list_bunches[-1].sigma_x(),
-                       'y_min_target': -5 * list_bunches[-1].sigma_y(), 'y_max_target': 5 * list_bunches[-1].sigma_y(),
-                       'Dh_target': .2 * list_bunches[-1].sigma_x()},
+                     'y_min_target': -5 * list_bunches[-1].sigma_y(), 'y_max_target': 5 * list_bunches[-1].sigma_y(),
+                     'Dh_target': .2 * list_bunches[-1].sigma_x()},
         #~ N_nodes_discard = 10.,
         #~ N_min_Dh_main = 10,
         #x_beam_offset = x_beam_offset,
@@ -111,7 +111,7 @@ sp1.plot(thin_slice_set.z_centers, thin_slice_set.charge_per_slice)
 for ibuf, ss in enumerate(list_slices):
         sp1.axvline(x=ss.slice_info['z_bin_center'], color='k', alpha=0.5, linestyle='--')
         sp1.axvspan(xmin=ss.slice_info['z_bin_left'], xmax=ss.slice_info['z_bin_right'],
-            color={0: 'r', 1: 'b'}[ibuf%2], alpha=0.3)
+                    color={0: 'r', 1: 'b'}[ibuf%2], alpha=0.3)
         sp2.stem([ss.slice_info['z_bin_center']], [ss.slice_info['interact_with_EC']])
         sp3.stem([ss.slice_info['z_bin_center']], [ss.slice_info['i_slice']])
 sp2.grid('on')
@@ -125,7 +125,7 @@ spb3 = plt.subplot(3, 1, 3, sharex=sp1)
 for ibun, bun in enumerate(list_bunches):
         spb1.axvline(x=bun.slice_info['z_bin_center'], color='k', alpha=0.5, linestyle='--')
         spb1.axvspan(xmin=bun.slice_info['z_bin_left'], xmax=bun.slice_info['z_bin_right'],
-            color={0: 'r', 1: 'b'}[ibun%2], alpha=0.3)
+                     color={0: 'r', 1: 'b'}[ibun%2], alpha=0.3)
         spb2.stem([bun.slice_info['z_bin_center']], [bun.slice_info['interact_with_EC']])
         spb3.stem([bun.slice_info['z_bin_center']], [bun.slice_info['i_bunch']])
 spb2.grid('on')

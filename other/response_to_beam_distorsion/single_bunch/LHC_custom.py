@@ -89,11 +89,11 @@ class LHC(BasicSynchrotron):
             self.i_octupole_defocusing = i_octupole_defocusing
 
         super(LHC, self).__init__(optics_mode='smooth', circumference=circumference, n_segments=n_segments,
-             alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-             accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-             alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-             h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-             charge=charge, mass=mass, RF_at='end_of_transverse')
+                                  alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
+                                  accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
+                                  alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
+                                  h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
+                                  charge=charge, mass=mass, RF_at='end_of_transverse')
 
     def _anharmonicities_from_octupole_current_settings(self, i_octupole_focusing, i_octupole_defocusing):
                 """Calculate the constants of proportionality app_x, app_y and
@@ -122,11 +122,11 @@ class LHC(BasicSynchrotron):
                 E_max = 7000. # [GeV]
 
                 app_x = E_max * (267065. * i_octupole_focusing / i_max -
-                    7856. * i_octupole_defocusing / i_max)
+                                 7856. * i_octupole_defocusing / i_max)
                 app_y = E_max * (9789. * i_octupole_focusing / i_max -
-                    277203. * i_octupole_defocusing / i_max)
+                                 277203. * i_octupole_defocusing / i_max)
                 app_xy = E_max * (-102261. * i_octupole_focusing / i_max +
-                    93331. * i_octupole_defocusing / i_max)
+                                  93331. * i_octupole_defocusing / i_max)
 
                 # Convert to SI units.
                 convert_to_SI = e / (1.e-9 * c)

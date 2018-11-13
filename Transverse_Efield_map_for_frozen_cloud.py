@@ -7,8 +7,8 @@ from PyPIC.PyPIC_Scatter_Gather import PyPIC_Scatter_Gather
 
 class Transverse_Efield_map(object):
     def __init__(self, xg, yg, Ex, Ey, L_interaction, slicer,
-            flag_clean_slices=False, wrt_slice_centroid=False,
-            x_beam_offset=0., y_beam_offset=0., slice_by_slice_mode=False):
+                 flag_clean_slices=False, wrt_slice_centroid=False,
+                 x_beam_offset=0., y_beam_offset=0., slice_by_slice_mode=False):
 
         self.slicer = slicer
         self.L_interaction = L_interaction

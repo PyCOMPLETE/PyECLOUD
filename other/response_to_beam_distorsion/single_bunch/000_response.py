@@ -16,14 +16,14 @@ machine_configuration = 'HLLHC-injection'
 machine = LHC(n_segments=1, machine_configuration=machine_configuration)
 
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000,
-                intensity=1.15e11, epsn_x=2.5e-6, epsn_y=2.5e-6, sigma_z=0.11)
+                                           intensity=1.15e11, epsn_x=2.5e-6, epsn_y=2.5e-6, sigma_z=0.11)
 
 bunch.x[bunch.z < 5e-2] += 1e-3
 
 
 ecloud_ele = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
-            L_ecloud=1., slicer=None,
-            Dt_ref=25e-12, pyecl_input_folder='pyecloud_config',
+                              L_ecloud=1., slicer=None,
+                              Dt_ref=25e-12, pyecl_input_folder='pyecloud_config',
        )
 
 
@@ -55,7 +55,7 @@ y_beam_offset = 0.
 vmax = 3e12
 i_y = np.argmin(np.abs(ecloud_ele.spacech_ele.yg - y_beam_offset))
 plt.pcolormesh(np.array(z_centers), ecloud_ele.spacech_ele.xg, -1 / qe * ecloud_ele.rho_ele_last_track[:, :, i_y].T, vmax=vmax,
-    shading='Gouraud'
+               shading='Gouraud'
     )
 plt.ylim(-4e-3, 4e-3)
 plt.colorbar()

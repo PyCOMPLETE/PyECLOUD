@@ -74,8 +74,8 @@ def yield_fun3(E, costheta, Emax, del_max, R0, E0):
 
 class SEY_model_acc_low_ene(SEY_model_ECLOUD):
     def __init__(self, Emax, del_max, R0, E0=150,
-                    E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
+                 E_th=None, sigmafit=None, mufit=None,
+                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
 
             self.E_th = E_th

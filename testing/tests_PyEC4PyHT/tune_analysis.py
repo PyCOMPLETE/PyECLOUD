@@ -22,8 +22,8 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 			SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=tune_peak_x[p_idx], tuney=tune_peak_y[p_idx])
 
 			SX.sussix(x_i[p_idx, :], xp_i[p_idx, :],
-					  y_i[p_idx, :], yp_i[p_idx, :],
-					  x_i[p_idx, :], xp_i[p_idx, :])
+                            y_i[p_idx, :], yp_i[p_idx, :],
+                            x_i[p_idx, :], xp_i[p_idx, :])
 			qx_i[p_idx] = SX.ox[0]
 			qy_i[p_idx] = SX.oy[0]
 
@@ -45,8 +45,8 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 		SX = Sussix()
 		SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=tune_peak_x_centroid, tuney=tune_peak_y_centroid)
 		SX.sussix(x_centroid, xp_centroid,
-				  y_centroid, yp_centroid,
-				  x_centroid, xp_centroid)
+                    y_centroid, yp_centroid,
+                    x_centroid, xp_centroid)
 		qx_centroid = SX.ox[0]
 		qy_centroid = SX.oy[0]
 

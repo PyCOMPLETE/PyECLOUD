@@ -159,7 +159,7 @@ class polyg_cham_geom_object(object):
         self.N_mp_impact = self.N_mp_impact + N_impacts
 
         x_int, y_int, z_int, Nx_int, Ny_int, i_found = gipc.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out,
-                              self.Vx,  self.Vy, self.Nx,  self.Ny,  self.N_edg, resc_fac)
+                                                                                    self.Vx,  self.Vy, self.Nx,  self.Ny,  self.N_edg, resc_fac)
 
         mask_found = i_found >= 0
 

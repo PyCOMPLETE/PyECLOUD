@@ -19,8 +19,8 @@ data_SEY = data_table[:, 1]
 
 ###  Resample data
 dict_resampled = rss.resample_sey_data(energy_eV_samples=data_energy_eV,
-                    sey_true_samples=data_SEY, sey_elast_samples=data_SEY * 0.,
-                    uniform_dE=delta_E_unif_eV, range_extrapolate_right=range_for_extrap_eV)
+                                       sey_true_samples=data_SEY, sey_elast_samples=data_SEY * 0.,
+                                       uniform_dE=delta_E_unif_eV, range_extrapolate_right=range_for_extrap_eV)
 
 
 ### Save resampled data
@@ -40,7 +40,7 @@ nel_impact = ene_test_eV * 0. + 1.
 costheta_impact = ene_test_eV * 0. + 1.
 
 sey_test, refl, notrefl = se_obj.SEY_process(nel_impact=nel_impact, E_impact_eV=ene_test_eV,
-                            costheta_impact=costheta_impact, i_impact=None)
+                                             costheta_impact=costheta_impact, i_impact=None)
 
 
 # Plots!

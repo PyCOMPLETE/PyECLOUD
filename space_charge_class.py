@@ -57,7 +57,7 @@ class space_charge:
     #@profile
 
     def __init__(self, chamb, Dh, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
-                    f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
+                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
 
         print 'Start space charge init.'
 
@@ -72,7 +72,7 @@ class space_charge:
             PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb=chamb, Dh=Dh, sparse_solver=sparse_solver)
             import PyPIC.MultiGrid as PIC_MG
             self.PyPICobj = PIC_MG.AddTelescopicGrids(pic_main=PyPICmain, f_telescope=f_telescope, target_grid=target_grid,
-                                        N_nodes_discard=N_nodes_discard, N_min_Dh_main=N_min_Dh_main, sparse_solver=sparse_solver)
+                                                      N_nodes_discard=N_nodes_discard, N_min_Dh_main=N_min_Dh_main, sparse_solver=sparse_solver)
             self.xn = None #not implemented in this mode (for now)
             self.yn = None #not implemented in this mode (for now)
 

@@ -74,7 +74,7 @@ def bunch_train4(t, b_spac, t_offs, ppb_vect, sigmaz_vect):
             mask_to_be_updated = (np.abs(zz - z0) < (10. * sigmaz))
 
             val[mask_to_be_updated] = val[mask_to_be_updated] + ppb / (sigmaz * np.sqrt(2 * np.pi)) *\
-               np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz))
+                np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz))
 
     return val
 
@@ -176,9 +176,9 @@ class beam_and_timing:
             #rho=1./(2.*pi*sigmax*sigmay)*exp(-(scb.xn-x_beam_pos)**2/(2.*sigmax**2)-(scb.yn-y_beam_pos)**2/(2.*sigmay**2))
 
             rho = 1. / (4. * Dh_beam_field**2) * (sspe.erf((scb.xn - x_beam_pos) / (np.sqrt(2) * sigmax) + Dh_beam_field / (2 * np.sqrt(2) * sigmax))\
-                       - sspe.erf((scb.xn - x_beam_pos) / (np.sqrt(2) * sigmax) - Dh_beam_field / (2 * np.sqrt(2) * sigmax)))\
-                       * (sspe.erf((scb.yn - y_beam_pos) / (np.sqrt(2) * sigmay) + Dh_beam_field / (2 * np.sqrt(2) * sigmay))\
-                       - sspe.erf((scb.yn - y_beam_pos) / (np.sqrt(2) * sigmay) - Dh_beam_field / (2 * np.sqrt(2) * sigmay)))
+                                                  - sspe.erf((scb.xn - x_beam_pos) / (np.sqrt(2) * sigmax) - Dh_beam_field / (2 * np.sqrt(2) * sigmax)))\
+                * (sspe.erf((scb.yn - y_beam_pos) / (np.sqrt(2) * sigmay) + Dh_beam_field / (2 * np.sqrt(2) * sigmay))\
+                   - sspe.erf((scb.yn - y_beam_pos) / (np.sqrt(2) * sigmay) - Dh_beam_field / (2 * np.sqrt(2) * sigmay)))
 
             scb.compute_spchg_efield_from_rho(rho, flag_verbose=True)
 
@@ -264,22 +264,22 @@ class beam_and_timing:
             PyPICmain = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb=chamb, Dh=Dh_beam_field, sparse_solver='PyKLU')
             import PyPIC.MultiGrid as PIC_MG
             PyPICobj = PIC_MG.AddTelescopicGrids(pic_main=PyPICmain, f_telescope=f_telescope_beam, target_grid=target_grid_beam,
-                                        N_nodes_discard=N_nodes_discard_beam, N_min_Dh_main=N_min_Dh_main_beam, sparse_solver='PyKLU')
+                                                 N_nodes_discard=N_nodes_discard_beam, N_min_Dh_main=N_min_Dh_main_beam, sparse_solver='PyKLU')
 
             # set rho
             # PyPICmain.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(PyPICmain.xn-x_beam_pos)**2/(2.*sigmax**2)-(PyPICmain.yn-y_beam_pos)**2/(2.*sigmay**2))
             PyPICmain.rho = 1. / (4. * Dh_beam_field**2) * (sspe.erf((PyPICmain.xn - x_beam_pos) / (np.sqrt(2) * sigmax) + Dh_beam_field / (2 * np.sqrt(2) * sigmax))\
-                            - sspe.erf((PyPICmain.xn - x_beam_pos) / (np.sqrt(2) * sigmax) - Dh_beam_field / (2 * np.sqrt(2) * sigmax)))\
-                            * (sspe.erf((PyPICmain.yn - y_beam_pos) / (np.sqrt(2) * sigmay) + Dh_beam_field / (2 * np.sqrt(2) * sigmay))\
-                            - sspe.erf((PyPICmain.yn - y_beam_pos) / (np.sqrt(2) * sigmay) - Dh_beam_field / (2 * np.sqrt(2) * sigmay)))
+                                                            - sspe.erf((PyPICmain.xn - x_beam_pos) / (np.sqrt(2) * sigmax) - Dh_beam_field / (2 * np.sqrt(2) * sigmax)))\
+                * (sspe.erf((PyPICmain.yn - y_beam_pos) / (np.sqrt(2) * sigmay) + Dh_beam_field / (2 * np.sqrt(2) * sigmay))\
+                   - sspe.erf((PyPICmain.yn - y_beam_pos) / (np.sqrt(2) * sigmay) - Dh_beam_field / (2 * np.sqrt(2) * sigmay)))
             for pic_dual in PyPICobj.pic_list:
                 pic = pic_dual.pic_internal
                 dh = pic_dual.pic_internal.Dh
                 #pic.rho=1./(2.*np.pi*sigmax*sigmay)*np.exp(-(pic.xn-x_beam_pos)**2/(2.*sigmax**2)-(pic.yn-y_beam_pos)**2/(2.*sigmay**2))
                 pic.rho = 1. / (4. * dh**2) * (sspe.erf((pic.xn - x_beam_pos) / (np.sqrt(2) * sigmax) + dh / (2 * np.sqrt(2) * sigmax))\
-                        - sspe.erf((pic.xn - x_beam_pos) / (np.sqrt(2) * sigmax) - dh / (2 * np.sqrt(2) * sigmax)))\
-                        * (sspe.erf((pic.yn - y_beam_pos) / (np.sqrt(2) * sigmay) + dh / (2 * np.sqrt(2) * sigmay))\
-                        - sspe.erf((pic.yn - y_beam_pos) / (np.sqrt(2) * sigmay) - dh / (2 * np.sqrt(2) * sigmay)))
+                                               - sspe.erf((pic.xn - x_beam_pos) / (np.sqrt(2) * sigmax) - dh / (2 * np.sqrt(2) * sigmax)))\
+                    * (sspe.erf((pic.yn - y_beam_pos) / (np.sqrt(2) * sigmay) + dh / (2 * np.sqrt(2) * sigmay))\
+                       - sspe.erf((pic.yn - y_beam_pos) / (np.sqrt(2) * sigmay) - dh / (2 * np.sqrt(2) * sigmay)))
 
             PyPICobj.solve()
 
@@ -304,8 +304,8 @@ class beam_and_timing:
             if flag_PyPIC_state_mode:
                 raise ValueError('You cannot save the field maps in multigrid mode! Sorry...')
             sio.savemat(save_beam_field_file_as,  {'xx': xx_beam, 'yy': yy_beam, 'Ex': Ex_beam, 'Ey': Ey_beam,\
-                       'sigmax': sigmax, 'sigmay': sigmay,\
-                       'x_aper': chamb.x_aper, 'y_aper': chamb.y_aper}, oned_as='row')
+                                                   'sigmax': sigmax, 'sigmay': sigmay,\
+                                                   'x_aper': chamb.x_aper, 'y_aper': chamb.y_aper}, oned_as='row')
 
         if not flag_PyPIC_state_mode:
 
@@ -370,7 +370,7 @@ class beam_and_timing:
         if (self.lam_t_curr > self.lam_th_beam_field) and (MP_e.N_mp > 0):
             ## compute beam electric field
             Ex_n_beam, Ey_n_beam = iff.int_field(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
-                                               self.xmin_beam, self.ymin_beam, self.dx_beam, self.dy_beam, self.Ex_beam, self.Ey_beam)
+                                                 self.xmin_beam, self.ymin_beam, self.dx_beam, self.dy_beam, self.Ex_beam, self.Ey_beam)
             Ex_n_beam = self.beam_charge * self.lam_t_curr * Ex_n_beam
             Ey_n_beam = self.beam_charge * self.lam_t_curr * Ey_n_beam
 

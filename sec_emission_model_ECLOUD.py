@@ -122,8 +122,8 @@ class SEY_model_ECLOUD(object):
         return nel_emit, flag_elast, flag_truesec
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
-                                vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
-                                v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
+                           vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
+                           v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
         nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
 

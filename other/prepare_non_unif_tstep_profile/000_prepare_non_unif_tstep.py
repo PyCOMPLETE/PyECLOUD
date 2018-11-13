@@ -74,7 +74,7 @@ for ii in range(0, N_slots):
         mask_to_be_updated = (np.abs(zz - z0) < (10. * sigmaz))
 
         val[mask_to_be_updated] = val[mask_to_be_updated] + ppb / (sigmaz * np.sqrt(2 * np.pi)) *\
-           np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz))
+            np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz))
 
 
 val_nunif = np.interp(t_nunif, t, val)

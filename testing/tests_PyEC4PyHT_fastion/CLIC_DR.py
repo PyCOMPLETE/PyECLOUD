@@ -105,13 +105,13 @@ class CLIC_DR(Synchrotron):
 				else:
 					str2print = repr(kwargs[attr])
 				self.prints('Synchrotron init. From kwargs: %s = %s'
-							% (attr, str2print))
+                                    % (attr, str2print))
 				temp = kwargs[attr]
 				exec('%s = temp'%attr)
 
 		super(CLIC_DR, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-             alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-             accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-             alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-             h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-             charge=charge, mass=mass, RF_at=RF_at, wrap_z=wrap_z)
+                                alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
+                                accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
+                                alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
+                                h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
+                                charge=charge, mass=mass, RF_at=RF_at, wrap_z=wrap_z)

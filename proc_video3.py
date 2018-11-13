@@ -84,7 +84,7 @@ for pass_ind in range(firs_pass, last_pass):
         if flag_log:
             imm = np.log10(np.abs(imm))
         imshow(imm.T, cmap=None, norm=None, aspect=None, interpolation=None,
-           alpha=None, vmin=None, vmax=None, origin='lower', extent=None)
+               alpha=None, vmin=None, vmax=None, origin='lower', extent=None)
         colorbar()
         title(('passage = %d' % floor(t_video[ii] / b_spac)))
         #xlabel('x [m]')

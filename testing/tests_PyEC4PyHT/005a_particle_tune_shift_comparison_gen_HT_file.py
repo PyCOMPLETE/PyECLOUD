@@ -58,17 +58,17 @@ dp0_HT = dp[0, :]
 # Save
 import h5py
 dict_save = {\
-'qx_ht': qx_ht,
-'qy_ht': qy_ht,
-'qx_centroid_ht': qx_centroid_ht,
-'qy_centroid_ht': qy_centroid_ht,
-'x0_HT': x0_HT,
-'xp0_HT': xp0_HT,
-'y0_HT': y0_HT,
-'yp0_HT': yp0_HT,
-'z0_HT': z0_HT,
-'dp0_HT': dp0_HT,
-'n_turns': n_turns}
+    'qx_ht': qx_ht,
+    'qy_ht': qy_ht,
+    'qx_centroid_ht': qx_centroid_ht,
+    'qy_centroid_ht': qy_centroid_ht,
+    'x0_HT': x0_HT,
+    'xp0_HT': xp0_HT,
+    'y0_HT': y0_HT,
+    'yp0_HT': yp0_HT,
+    'z0_HT': z0_HT,
+    'dp0_HT': dp0_HT,
+    'n_turns': n_turns}
 
 with h5py.File('footprint_HT.h5', 'w') as fid:
         for kk in dict_save.keys():

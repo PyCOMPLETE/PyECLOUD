@@ -119,7 +119,7 @@ for pass_ind in passlist:
 		pl.subplot(2, 1, 1)
 		ax = pl.gca()
 		im = ax.imshow(imm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
-		   alpha=None, vmin=lim_dens[0], vmax=lim_dens[1], origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+                 alpha=None, vmin=lim_dens[0], vmax=lim_dens[1], origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
 
 		pl.plot(Vx * 1e3, Vy * 1e3, 'y', linewidth=1.5)
 		pl.axis('equal')

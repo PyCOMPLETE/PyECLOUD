@@ -137,7 +137,7 @@ class polyg_cham_geom_object:
             flag_inside_chk = array(N_pts * [True])
             for ii in xrange(self.N_edg):
                 flag_inside_chk[flag_inside_chk] = ((y_mp_chk[flag_inside_chk] - self.Vy[ii]) * (self.Vx[ii + 1] - self.Vx[ii])\
-                                          - (x_mp_chk[flag_inside_chk] - self.Vx[ii]) * (self.Vy[ii + 1] - self.Vy[ii])) > 0
+                                                    - (x_mp_chk[flag_inside_chk] - self.Vx[ii]) * (self.Vy[ii + 1] - self.Vy[ii])) > 0
             flag_outside[flag_outside] = ~flag_inside_chk
 
         return flag_outside
@@ -164,7 +164,7 @@ class polyg_cham_geom_object:
             if mask_same_min.any():
                 mask_upd_i_found = array(N_impacts * [False])
                 t_border = ((y_out[mask_same_min] - y_in[mask_same_min]) * (x_in[mask_same_min] - self.Vx[ii]) + (x_in[mask_same_min] - x_out[mask_same_min]) * (y_in[mask_same_min] - self.Vy[ii])) / \
-                         ((y_out[mask_same_min] - y_in[mask_same_min]) * (self.Vx[ii + 1] - self.Vx[ii]) + (x_in[mask_same_min] - x_out[mask_same_min]) * (self.Vy[ii + 1] - self.Vy[ii]))
+                    ((y_out[mask_same_min] - y_in[mask_same_min]) * (self.Vx[ii + 1] - self.Vx[ii]) + (x_in[mask_same_min] - x_out[mask_same_min]) * (self.Vy[ii + 1] - self.Vy[ii]))
                 mask_upd_i_found[mask_same_min] = logical_and(t_border >= 0., t_border <= 1.)
                 i_found[mask_upd_i_found] = ii
 

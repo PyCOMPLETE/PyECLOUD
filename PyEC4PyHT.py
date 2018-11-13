@@ -93,8 +93,8 @@ class Ecloud(object):
         if hasattr(self, 'efieldmap'):
             raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
         return Ecloud(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder, self.flag_clean_slices,
-                self.slice_by_slice_mode, self.spacech_ele, self.kick_mode_for_beam_field,
-                self.beam_monitor, self.verbose, self.save_pyecl_outp_as, **self.kwargs)
+                      self.slice_by_slice_mode, self.spacech_ele, self.kick_mode_for_beam_field,
+                      self.beam_monitor, self.verbose, self.save_pyecl_outp_as, **self.kwargs)
 
     def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
                  slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
@@ -274,11 +274,11 @@ class Ecloud(object):
         if not hasattr(self, 'efieldmap'):
             from Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
             self.efieldmap = Transverse_Efield_map(xg=self.spacech_ele.xg, yg=self.spacech_ele.yg,
-                Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud,
-                slicer=self.slicer,
-                flag_clean_slices=True,
-                x_beam_offset=self.x_beam_offset, y_beam_offset=self.y_beam_offset,
-                slice_by_slice_mode=self.slice_by_slice_mode)
+                                                   Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud,
+                                                   slicer=self.slicer,
+                                                   flag_clean_slices=True,
+                                                   x_beam_offset=self.x_beam_offset, y_beam_offset=self.y_beam_offset,
+                                                   slice_by_slice_mode=self.slice_by_slice_mode)
 
             self._ecloud_track = self.track
 
@@ -417,10 +417,10 @@ class Ecloud(object):
 
             # Perform cloud simulation step
             self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim,
-                    Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps,
-                    kick_mode_for_beam_field=self.kick_mode_for_beam_field,
-                    force_recompute_space_charge=force_recompute_space_charge,
-                    skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
+                                        Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps,
+                                        kick_mode_for_beam_field=self.kick_mode_for_beam_field,
+                                        force_recompute_space_charge=force_recompute_space_charge,
+                                        skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
 
             if interact_with_EC:
                 # Build MP_system-like object with beam coordinates
@@ -494,16 +494,16 @@ class Ecloud(object):
             if thiscloud.pyeclsaver is not None:
                 thiscloud.pyeclsaver.extract_sey = False
                 thiscloud.pyeclsaver.start_observing(cc.Dt, thiscloud.MP_e, None, thiscloud.impact_man,
-                                       thisconf.r_center, thisconf.Dt_En_hist, thisconf.logfile_path, thisconf.progress_path,
-                                       flag_detailed_MP_info=thisconf.flag_detailed_MP_info, flag_movie=thisconf.flag_movie,
-                                       flag_sc_movie=thisconf.flag_sc_movie, save_mp_state_time_file=thisconf.save_mp_state_time_file,
-                                       flag_presence_sec_beams=self.cloudsim.flag_presence_sec_beams, sec_beams_list=self.cloudsim.sec_beams_list, dec_fac_secbeam_prof=thisconf.dec_fac_secbeam_prof,
-                                       el_density_probes=thisconf.el_density_probes, save_simulation_state_time_file=thisconf.save_simulation_state_time_file,
-                                       x_min_hist_det=thisconf.x_min_hist_det, x_max_hist_det=thisconf.x_max_hist_det,
-                                       y_min_hist_det=thisconf.y_min_hist_det, y_max_hist_det=thisconf.y_max_hist_det,
-                                       Dx_hist_det=thisconf.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thisconf.filen_main_outp,
-                                       flag_cos_angle_hist=thisconf.flag_cos_angle_hist, cos_angle_width=thisconf.cos_angle_width,
-                                       flag_multiple_clouds=(len(self.cloudsim.cloud_list) > 1), cloud_name=thisconf.cloud_name, flag_last_cloud=(thiscloud is self.cloudsim.cloud_list[-1]))
+                                                     thisconf.r_center, thisconf.Dt_En_hist, thisconf.logfile_path, thisconf.progress_path,
+                                                     flag_detailed_MP_info=thisconf.flag_detailed_MP_info, flag_movie=thisconf.flag_movie,
+                                                     flag_sc_movie=thisconf.flag_sc_movie, save_mp_state_time_file=thisconf.save_mp_state_time_file,
+                                                     flag_presence_sec_beams=self.cloudsim.flag_presence_sec_beams, sec_beams_list=self.cloudsim.sec_beams_list, dec_fac_secbeam_prof=thisconf.dec_fac_secbeam_prof,
+                                                     el_density_probes=thisconf.el_density_probes, save_simulation_state_time_file=thisconf.save_simulation_state_time_file,
+                                                     x_min_hist_det=thisconf.x_min_hist_det, x_max_hist_det=thisconf.x_max_hist_det,
+                                                     y_min_hist_det=thisconf.y_min_hist_det, y_max_hist_det=thisconf.y_max_hist_det,
+                                                     Dx_hist_det=thisconf.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thisconf.filen_main_outp,
+                                                     flag_cos_angle_hist=thisconf.flag_cos_angle_hist, cos_angle_width=thisconf.cos_angle_width,
+                                                     flag_multiple_clouds=(len(self.cloudsim.cloud_list) > 1), cloud_name=thisconf.cloud_name, flag_last_cloud=(thiscloud is self.cloudsim.cloud_list[-1]))
 
                 thiscloud.pyeclsaver.filen_main_outp = thiscloud.pyeclsaver.filen_main_outp.split('.mat')[0].split('__iter')[0] + '__iter%d.mat'%self.i_reinit
 

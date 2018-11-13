@@ -114,7 +114,7 @@ class B_file():
 
     def get_B(self, xn, yn):
                 Bx_n, By_n = iff.int_field(xn, yn, self.xmin, self.ymin,\
-                                      self.dx, self.dy, self.Bmap_x, self.Bmap_y)
+                                           self.dx, self.dy, self.Bmap_x, self.Bmap_y)
                 # the rescaling factor has already been applied to the map
                 Bx_n = Bx_n + self.B0x
                 By_n = By_n + self.B0y

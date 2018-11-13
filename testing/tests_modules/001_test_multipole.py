@@ -76,8 +76,8 @@ for angle_ctr, angle in enumerate(angles):
         pusher = dbu.pusher_Boris_multipole(Dt, B_multip=B_multip, N_sub_steps=1, B_skew=B_skew)
 
         MP_eB = MPs.MP_system(N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
-                            N_mp_regen_low, N_mp_regen, N_mp_after_regen,
-                            Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
+                              N_mp_regen_low, N_mp_regen, N_mp_after_regen,
+                              Dx_hist, Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen, regen_hist_cut, chamb)
 
         x_mpB, y_mpB = np.meshgrid(xx_raw, xx_raw)
         x_mpB = x_mpB.flatten()

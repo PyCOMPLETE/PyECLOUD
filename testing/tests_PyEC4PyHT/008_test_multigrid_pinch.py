@@ -27,7 +27,7 @@ sparse_solver = 'PyKLU'#'scipy_slu'
 #============================
 from machines_for_testing import LHC
 machine = LHC(machine_configuration=machine_configuration,
-                        optics_mode='smooth', n_segments=n_segments, p0=p0_GeV * 1e9 * e / c)
+              optics_mode='smooth', n_segments=n_segments, p0=p0_GeV * 1e9 * e / c)
 
 bunch = machine.generate_6D_Gaussian_bunch(
                                         n_macroparticles=3000000, intensity=1e11,
@@ -43,13 +43,13 @@ Dx_probe = bunch.sigma_x()
 Dy_probe = bunch.sigma_y()
 
 probes_position = [{'x' : x_beam_offset, 'y': y_beam_offset + Dy_probe},
-                    {'x' : x_beam_offset, 'y': y_beam_offset - Dy_probe},
-                    {'x' : x_beam_offset + Dx_probe, 'y': y_beam_offset},
-                    {'x' : x_beam_offset - Dx_probe, 'y': y_beam_offset},
-                    {'x' : x_beam_offset, 'y': y_beam_offset + (2 * Dy_probe)},
-                    {'x' : x_beam_offset, 'y': y_beam_offset - (2 * Dy_probe)},
-                    {'x' : x_beam_offset + (2 * Dx_probe), 'y': y_beam_offset},
-                    {'x' : x_beam_offset - (2 * Dx_probe), 'y': y_beam_offset}]
+                   {'x' : x_beam_offset, 'y': y_beam_offset - Dy_probe},
+                   {'x' : x_beam_offset + Dx_probe, 'y': y_beam_offset},
+                   {'x' : x_beam_offset - Dx_probe, 'y': y_beam_offset},
+                   {'x' : x_beam_offset, 'y': y_beam_offset + (2 * Dy_probe)},
+                   {'x' : x_beam_offset, 'y': y_beam_offset - (2 * Dy_probe)},
+                   {'x' : x_beam_offset + (2 * Dx_probe), 'y': y_beam_offset},
+                   {'x' : x_beam_offset - (2 * Dx_probe), 'y': y_beam_offset}]
 
 
 n_probes = len(probes_position)
@@ -83,8 +83,8 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         PyPICmode='ShortleyWeller_WithTelescopicGrids',
         f_telescope=0.3,
         target_grid={'x_min_target': -5 * bunch.sigma_x(), 'x_max_target': 5 * bunch.sigma_x(),
-                       'y_min_target': -5 * bunch.sigma_y(), 'y_max_target': 5 * bunch.sigma_y(),
-                       'Dh_target': .2 * bunch.sigma_x()},
+                     'y_min_target': -5 * bunch.sigma_y(), 'y_max_target': 5 * bunch.sigma_y(),
+                     'Dh_target': .2 * bunch.sigma_x()},
         N_nodes_discard=10.,
         N_min_Dh_main=10,
         x_beam_offset=x_beam_offset,
@@ -146,9 +146,9 @@ sp1.grid('on')
 
 sp2 = fig.add_subplot(gs2[0])
 sp2.plot(np.array(n_probes * list(slices.z_centers)) * 1e2,
-    ecloud_singlegrid.Ex_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
+         ecloud_singlegrid.Ex_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
 sp2.plot(np.array(n_probes * list(slices.z_centers)) * 1e2,
-    ecloud_multigrid.Ex_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
+         ecloud_multigrid.Ex_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
 sp2.set_ylabel('Ex at probes [V/m]')
 sp2.set_xlabel('z [cm]')
 sp2.grid('on')
@@ -157,9 +157,9 @@ ms.sciy()
 
 sp3 = fig.add_subplot(gs2[1])
 sp3.plot(np.array(n_probes * list(slices.z_centers)) * 1e2,
-    ecloud_singlegrid.Ey_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
+         ecloud_singlegrid.Ey_ele_last_track_at_probes.T.flatten(), 'b.', markersize=6, label='single')
 sp3.plot(np.array(n_probes * list(slices.z_centers)) * 1e2,
-    ecloud_multigrid.Ey_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
+         ecloud_multigrid.Ey_ele_last_track_at_probes.T.flatten(), 'r.', markersize=6, label='multi')
 
 sp3.set_ylabel('Ey at probes [V/m]')
 sp3.set_xlabel('z [cm]')
@@ -207,7 +207,7 @@ pl.figure(2, figsize=(16, 9)).patch.set_facecolor('w')
 pl.subplots_adjust(hspace=0.5, wspace=0.3, left=.07, right=.95)
 sp1 = pl.subplot(2, 3, 1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
-	np.log10(np.sqrt(Ex_singlegrid_matrix**2 + Ey_singlegrid_matrix**2).T), vmin=vmin, vmax=vmax)
+              np.log10(np.sqrt(Ex_singlegrid_matrix**2 + Ey_singlegrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
@@ -223,7 +223,7 @@ sp1.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 sp2 = pl.subplot(2, 3, 4, sharex=sp1)#, sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
-	np.log10(np.sqrt(Ex_multigrid_matrix**2 + Ey_multigrid_matrix**2).T), vmin=vmin, vmax=vmax)
+              np.log10(np.sqrt(Ex_multigrid_matrix**2 + Ey_multigrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
@@ -239,7 +239,7 @@ sp2.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 sp3 = pl.subplot(2, 3, 2)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
-	Ex_singlegrid_matrix.T)#, vmin=vmin, vmax=vmax)
+              Ex_singlegrid_matrix.T)#, vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
@@ -254,7 +254,7 @@ sp3.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 sp4 = pl.subplot(2, 3, 5, sharex=sp1)#, sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
-	Ex_multigrid_matrix.T)#, vmin=vmin, vmax=vmax)
+              Ex_multigrid_matrix.T)#, vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')

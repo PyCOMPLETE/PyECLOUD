@@ -102,17 +102,17 @@ class pyecloud_saver:
         self.extract_sey = True
 
     def start_observing(self, Dt_ref, MP_e, beamtim, impact_man,
-                 r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info=0,
-                 cos_angle_width=0.05, flag_cos_angle_hist=True,
-                 flag_movie=0, flag_sc_movie=0, save_mp_state_time_file=-1,
-                 flag_presence_sec_beams=False, sec_beams_list=[], dec_fac_secbeam_prof=1,
-                 el_density_probes=[],
-                 save_simulation_state_time_file=-1,
-                 x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
-                 filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
-                 flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
-                 checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                 copy_main_outp_DT=None):
+                        r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info=0,
+                        cos_angle_width=0.05, flag_cos_angle_hist=True,
+                        flag_movie=0, flag_sc_movie=0, save_mp_state_time_file=-1,
+                        flag_presence_sec_beams=False, sec_beams_list=[], dec_fac_secbeam_prof=1,
+                        el_density_probes=[],
+                        save_simulation_state_time_file=-1,
+                        x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
+                        filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
+                        flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
+                        checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
+                        copy_main_outp_DT=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -151,11 +151,11 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                    initial_size_t_vect=1000)
+                                   initial_size_t_vect=1000)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
-                    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det)
+                                     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det)
 
         # Init energy and cos angle histogram saving
         self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
@@ -216,7 +216,7 @@ class pyecloud_saver:
 
         # Check for simulation save state
         self._sim_state_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                              sec_beams_list, self.flag_multiple_clouds, cloud_list)
+                             sec_beams_list, self.flag_multiple_clouds, cloud_list)
 
         # Check for save video charge density
         self._rho_video_save(spacech_ele, beamtim, rho_cloud)
@@ -255,7 +255,7 @@ class pyecloud_saver:
 
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                       sec_beams_list, self.flag_multiple_clouds, cloud_list)
+                                  sec_beams_list, self.flag_multiple_clouds, cloud_list)
 
             self._copy_main_outp_save(beamtim)
 
@@ -265,7 +265,7 @@ class pyecloud_saver:
         return impact_man
 
     def _pass_by_pass_data_init(self, impact_man,
-                    x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det):
+                                x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det):
 
         #pass by pass data
         self.t_hist = []
@@ -412,7 +412,7 @@ class pyecloud_saver:
                 os.makedirs(self.checkpoint_folder)
 
     def _checkpoint_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                    sec_beams_list, flag_multiple_clouds, cloud_list):
+                         sec_beams_list, flag_multiple_clouds, cloud_list):
         # First check if it is time to save a checkpoint
         if (self.flag_save_checkpoint):
             if (beamtim.tt_curr - self.t_last_checkp >= self.checkpoint_DT):
@@ -420,7 +420,7 @@ class pyecloud_saver:
                 outpath = self.checkpoint_folder + 'simulation_checkpoint_%d.pkl'%(self.i_checkp)
 
                 self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                            sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
+                                            sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
                 if self.copy_main_outp_folder is not None:
                     self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
 
@@ -737,7 +737,7 @@ class pyecloud_saver:
                         filename_MP_state = 'MP_state_%d'%(self.i_obs)
                     path_MP_state = self.folder_outp + '/' + filename_MP_state
                     sio.savemat(path_MP_state, {'tt': beamtim.tt_curr, 'N_mp': MP_e.N_mp, 'x_mp': MP_e.x_mp[0:MP_e.N_mp], 'y_mp': MP_e.y_mp[0:MP_e.N_mp], 'z_mp': MP_e.z_mp[0:MP_e.N_mp],\
-                                                    'vx_mp': MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp': MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp': MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp': MP_e.nel_mp[0:MP_e.N_mp]}, oned_as='row')
+                                                'vx_mp': MP_e.vx_mp[0:MP_e.N_mp], 'vy_mp': MP_e.vy_mp[0:MP_e.N_mp], 'vz_mp': MP_e.vz_mp[0:MP_e.N_mp], 'nel_mp': MP_e.nel_mp[0:MP_e.N_mp]}, oned_as='row')
 
                     print('Save MP state in: ' + path_MP_state)
                     self.i_obs = self.i_obs + 1
@@ -760,7 +760,7 @@ class pyecloud_saver:
             self.i_obs_sim = 0
 
     def _sim_state_single_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                    sec_beams_list, flag_multiple_clouds, cloud_list, outfile):
+                               sec_beams_list, flag_multiple_clouds, cloud_list, outfile):
 
         if self.flag_last_cloud:
 
@@ -777,14 +777,14 @@ class pyecloud_saver:
                 cloud.pyeclsaver = 'removed'
 
             dict_state = {
-            'beamtim': beamtim,
-            'spacech_ele': spacech_ele,
-            't_sc_ON': t_sc_ON,
-            'flag_presence_sec_beams': flag_presence_sec_beams,
-            'sec_beams_list': sec_beams_list,
-            'flag_multiple_clouds': self.flag_multiple_clouds,
-            'cloud_list': cloud_list,
-            't_last_En_hist': self.t_last_En_hist}
+                'beamtim': beamtim,
+                'spacech_ele': spacech_ele,
+                't_sc_ON': t_sc_ON,
+                'flag_presence_sec_beams': flag_presence_sec_beams,
+                'sec_beams_list': sec_beams_list,
+                'flag_multiple_clouds': self.flag_multiple_clouds,
+                'cloud_list': cloud_list,
+                't_last_En_hist': self.t_last_En_hist}
 
             with open(outfile, 'wb') as fid:
                 # use best protocol available
@@ -799,7 +799,7 @@ class pyecloud_saver:
             print('Save simulation state in: ' + outfile)
 
     def _sim_state_save(self, beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                    sec_beams_list, flag_multiple_clouds, cloud_list):
+                        sec_beams_list, flag_multiple_clouds, cloud_list):
         #Simulation state save
         if self.flag_save_simulation_state:
             if self.i_obs_sim < self.N_obs_sim:
@@ -808,7 +808,7 @@ class pyecloud_saver:
                     outpath = self.folder_outp + '/' + filename_simulation_state
 
                     self._sim_state_single_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
-                        sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
+                                                sec_beams_list, flag_multiple_clouds, cloud_list, outpath)
 
                     self.i_obs_sim = self.i_obs_sim + 1
 
@@ -892,7 +892,7 @@ class pyecloud_saver:
                 filename_efield = self.folder_outp + '/efield_video/efield_pass%d.mat'%(beamtim.pass_numb - 1)
                 print('Saving %s'%filename_efield)
                 sio.savemat(filename_efield, {'xg_sc': spacech_ele.xg, 'yg_sc': spacech_ele.yg, 't_efield_video': self.t_efield_video,
-                                          'efx_video': self.efx_video, 'efy_video': self.efy_video}, oned_as='row')
+                                              'efx_video': self.efx_video, 'efy_video': self.efy_video}, oned_as='row')
                 print('Done')
                 self.efx_video = []
                 self.efy_video = []
@@ -929,7 +929,7 @@ class pyecloud_saver:
                 pass
 
     def _energy_and_cos_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
-                cos_angle_width):
+                                        cos_angle_width):
         # Energy histogram init
         self.Dt_En_hist = Dt_En_hist
         self.t_last_En_hist = -1.

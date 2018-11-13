@@ -52,13 +52,13 @@ nel_mp_ref_0 = init_unif_edens * 4 * x_aper * y_aper / N_MP_ele_init
 
 
 ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / machine.transverse_map.n_segments, slicer=slicer,
-				Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
-				x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
-				init_unif_edens_flag=init_unif_edens_flag,
-				init_unif_edens=init_unif_edens,
-				N_mp_max=N_mp_max,
-				nel_mp_ref_0=nel_mp_ref_0,
-				B_multip=B_multip)
+                          Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
+                          x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
+                          init_unif_edens_flag=init_unif_edens_flag,
+                          init_unif_edens=init_unif_edens,
+                          N_mp_max=N_mp_max,
+                          nel_mp_ref_0=nel_mp_ref_0,
+                          B_multip=B_multip)
 
 ecloud.save_ele_distributions_last_track = True
 ecloud.save_ele_potential_and_field = True
@@ -70,8 +70,8 @@ ecloud.track(bunch)
 from PyHEADTAIL.field_maps.Transverse_Efield_map import Transverse_Efield_map
 L_interaction = machine.circumference / len(machine.transverse_map)
 efieldmap = Transverse_Efield_map(xg=ecloud.spacech_ele.xg, yg=ecloud.spacech_ele.yg,
-        Ex=ecloud.Ex_ele_last_track, Ey=ecloud.Ey_ele_last_track, slicer=ecloud.slicer,
- 	L_interaction=L_interaction, flag_clean_slices=False)
+                                  Ex=ecloud.Ex_ele_last_track, Ey=ecloud.Ey_ele_last_track, slicer=ecloud.slicer,
+                                  L_interaction=L_interaction, flag_clean_slices=False)
 
 # install ecloud field kick after each segment of the machine
 machine.install_after_each_transverse_segment(efieldmap)
