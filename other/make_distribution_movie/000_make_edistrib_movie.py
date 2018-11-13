@@ -30,7 +30,7 @@ x_beam_pos = 0.
 y_beam_pos = 0.
 
 color_beam = 'r'
-tbeam_win_length = bunch_spacing * num_passage;
+tbeam_win_length = bunch_spacing * num_passage
 
 ########
 
@@ -39,7 +39,7 @@ tbeam_win_length = bunch_spacing * num_passage;
 xfield_cut_lim = 7 #5000.
 yfield_cut_lim = 7 #5000.
 
-denslim = 1.e11;
+denslim = 1.e11
 
 N_dec = 1
 lim_dens = [10, 14]

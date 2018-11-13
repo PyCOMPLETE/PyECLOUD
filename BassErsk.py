@@ -10,40 +10,40 @@ def wfun(z):
 
 def BassErsk(xin, yin, sigmax, sigmay):
 
-    x = abs(xin);
-    y = abs(yin);
+    x = abs(xin)
+    y = abs(yin)
 
-    eps0 = 8.854187817620e-12;
+    eps0 = 8.854187817620e-12
 
     if sigmax > sigmay:
 
-        S = sqrt(2 * (sigmax * sigmax - sigmay * sigmay));
-        factBE = 1 / (2 * eps0 * sqrt(pi) * S);
-        etaBE = sigmay / sigmax * x + 1j * sigmax / sigmay * y;
-        zetaBE = x + 1j * y;
+        S = sqrt(2 * (sigmax * sigmax - sigmay * sigmay))
+        factBE = 1 / (2 * eps0 * sqrt(pi) * S)
+        etaBE = sigmay / sigmax * x + 1j * sigmax / sigmay * y
+        zetaBE = x + 1j * y
 
-        val = factBE * (wfun(zetaBE / S) - exp( -x * x / (2 * sigmax * sigmax) - y * y / (2 * sigmay * sigmay)) * wfun(etaBE / S) );
+        val = factBE * (wfun(zetaBE / S) - exp( -x * x / (2 * sigmax * sigmax) - y * y / (2 * sigmay * sigmay)) * wfun(etaBE / S) )
 
-        Ex = abs(val.imag) * sign(xin);
-        Ey = abs(val.real) * sign(yin);
+        Ex = abs(val.imag) * sign(xin)
+        Ey = abs(val.real) * sign(yin)
 
     else:
 
-        S = sqrt(2 * (sigmay * sigmay - sigmax * sigmax));
-        factBE = 1 / (2 * eps0 * sqrt(pi) * S);
-        etaBE = sigmax / sigmay * y + 1j * sigmay / sigmax * x;
-        yetaBE = y + 1j * x;
+        S = sqrt(2 * (sigmay * sigmay - sigmax * sigmax))
+        factBE = 1 / (2 * eps0 * sqrt(pi) * S)
+        etaBE = sigmax / sigmay * y + 1j * sigmay / sigmax * x
+        yetaBE = y + 1j * x
 
-        val = factBE * (wfun(yetaBE / S) - exp( -y * y / (2 * sigmay * sigmay) - x * x / (2 * sigmax * sigmax)) * wfun(etaBE / S) );
+        val = factBE * (wfun(yetaBE / S) - exp( -y * y / (2 * sigmay * sigmay) - x * x / (2 * sigmax * sigmax)) * wfun(etaBE / S) )
 
-        Ey = abs(val.imag) * sign(yin);
-        Ex = abs(val.real) * sign(xin);
+        Ey = abs(val.imag) * sign(yin)
+        Ex = abs(val.real) * sign(xin)
 
     return Ex, Ey
 
 def ImageTerms(x, y, a, b, x0, y0, nimag):
 
-    eps0 = 8.854187817620e-12;
+    eps0 = 8.854187817620e-12
 
     if abs((a - b) / a) > 1e-3:
         g = sqrt(a * a - b * b)

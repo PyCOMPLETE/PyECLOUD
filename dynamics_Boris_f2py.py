@@ -107,10 +107,10 @@ class B_file():
         self.B0y = B0y
         self.B0z = B0z
 
-        self.xmin = min(self.xx);
-        self.ymin = min(self.yy);
-        self.dx = self.xx[1] - self.xx[0];
-        self.dy = self.yy[1] - self.yy[0];
+        self.xmin = min(self.xx)
+        self.ymin = min(self.yy)
+        self.dx = self.xx[1] - self.xx[0]
+        self.dy = self.yy[1] - self.yy[0]
 
     def get_B(self, xn, yn):
                 Bx_n, By_n = iff.int_field(xn, yn, self.xmin, self.ymin,\

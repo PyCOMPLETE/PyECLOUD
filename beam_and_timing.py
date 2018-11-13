@@ -58,10 +58,10 @@ import int_field_for as iff
 
 def bunch_train4(t, b_spac, t_offs, ppb_vect, sigmaz_vect):
 
-    c = 299792458.;
-    zz = c * t;
-    N_bucket = len(ppb_vect);
-    val = 0. * t;
+    c = 299792458.
+    zz = c * t
+    N_bucket = len(ppb_vect)
+    val = 0. * t
 
     for ii in range(0, N_bucket):
         if np.mod(ii, N_bucket / 20) == 0:
@@ -70,11 +70,11 @@ def bunch_train4(t, b_spac, t_offs, ppb_vect, sigmaz_vect):
         ppb = ppb_vect[ii]
         sigmaz = sigmaz_vect[ii]
         if sigmaz > 0:
-            z0 = c * (t_offs + ii * b_spac);
+            z0 = c * (t_offs + ii * b_spac)
             mask_to_be_updated = (np.abs(zz - z0) < (10. * sigmaz))
 
             val[mask_to_be_updated] = val[mask_to_be_updated] + ppb / (sigmaz * np.sqrt(2 * np.pi)) *\
-               np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz));
+               np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz))
 
     return val
 
@@ -115,7 +115,7 @@ class beam_and_timing:
                 t = t_primary_beam
             else:
                 N_bunches = len(ppb_vect)
-                t = np.arange(0., N_bunches * b_spac + t_end + 2 * Dt, Dt);
+                t = np.arange(0., N_bunches * b_spac + t_end + 2 * Dt, Dt)
 
             t_inter = t[-1]
 
@@ -128,7 +128,7 @@ class beam_and_timing:
                 else:
                     raise ValueError('Bunch length is not defined!!!')
 
-            lam_t_array = bunch_train4(t, b_spac, t_offs, ppb_vect, sigmaz_vect);
+            lam_t_array = bunch_train4(t, b_spac, t_offs, ppb_vect, sigmaz_vect)
             print 'Done beam profile generation.'
         else:
             print 'Loading beam profile from file:'
@@ -157,7 +157,7 @@ class beam_and_timing:
 
         Nt = len(t)
         lam_t_array = fact_beam * lam_t_array
-        lam_t_array = lam_t_array + coast_dens;
+        lam_t_array = lam_t_array + coast_dens
 
         N_pass_tot = int(np.ceil(t_inter / b_spac))
 
@@ -212,13 +212,13 @@ class beam_and_timing:
             a = chamb.x_aper
             b = chamb.y_aper
 
-            xmax = a * 1.02;
-            ymax = b * 1.02;
-            xx = np.linspace(-xmax, xmax, Nx);
-            yy = np.linspace(-ymax, ymax, Ny);
+            xmax = a * 1.02
+            ymax = b * 1.02
+            xx = np.linspace(-xmax, xmax, Nx)
+            yy = np.linspace(-ymax, ymax, Ny)
 
-            Ex = np.zeros((len(xx), len(yy)), dtype=complex);
-            Ey = np.zeros((len(xx), len(yy)), dtype=complex);
+            Ex = np.zeros((len(xx), len(yy)), dtype=complex)
+            Ey = np.zeros((len(xx), len(yy)), dtype=complex)
             print 'Start beam field map generation.'
             for ii in range(len(xx)):
 
@@ -231,8 +231,8 @@ class beam_and_timing:
                         fprog.close()
 
                 for jj in range(len(yy)):
-                    x = xx[ii];
-                    y = yy[jj];
+                    x = xx[ii]
+                    y = yy[jj]
                     Ex_imag, Ey_imag = BE.ImageTerms(x, y, a, b, 0, 0, nimag)
                     Ex_BE, Ey_BE = BE.BassErsk(x, y, sigmax, sigmay)
                     Ex[ii, jj] = Ex_BE + Ex_imag
@@ -309,10 +309,10 @@ class beam_and_timing:
 
         if not flag_PyPIC_state_mode:
 
-            xmin_beam = np.min(xx_beam);
-            ymin_beam = np.min(yy_beam);
-            dx_beam = xx_beam[1] - xx_beam[0];
-            dy_beam = yy_beam[1] - yy_beam[0];
+            xmin_beam = np.min(xx_beam)
+            ymin_beam = np.min(yy_beam)
+            dx_beam = xx_beam[1] - xx_beam[0]
+            dy_beam = yy_beam[1] - yy_beam[0]
 
             self.Ex_beam = Ex_beam
             self.Ey_beam = Ey_beam
@@ -356,7 +356,7 @@ class beam_and_timing:
         self.tt_curr = self.t[self.ii_curr]
         self.Dt_curr = self.t[self.ii_curr + 1] - self.t[self.ii_curr]
         self.lam_t_curr = self.lam_t_array[self.ii_curr]
-        self.pass_numb = int(np.floor(self.tt_curr / self.b_spac));
+        self.pass_numb = int(np.floor(self.tt_curr / self.b_spac))
         self.flag_new_bunch_pass = (self.pass_numb > self._pass_numb_old)
 
         if self.flag_new_bunch_pass:
@@ -371,8 +371,8 @@ class beam_and_timing:
             ## compute beam electric field
             Ex_n_beam, Ey_n_beam = iff.int_field(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
                                                self.xmin_beam, self.ymin_beam, self.dx_beam, self.dy_beam, self.Ex_beam, self.Ey_beam)
-            Ex_n_beam = self.beam_charge * self.lam_t_curr * Ex_n_beam;
-            Ey_n_beam = self.beam_charge * self.lam_t_curr * Ey_n_beam;
+            Ex_n_beam = self.beam_charge * self.lam_t_curr * Ex_n_beam
+            Ey_n_beam = self.beam_charge * self.lam_t_curr * Ey_n_beam
 
         else:
             Ex_n_beam = 0.
@@ -385,8 +385,8 @@ class beam_and_timing:
         if (self.lam_t_curr > self.lam_th_beam_field) and (MP_e.N_mp > 0):
             ## compute beam electric field
             Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-            Ex_n_beam = self.beam_charge * self.lam_t_curr * Ex_n_beam;
-            Ey_n_beam = self.beam_charge * self.lam_t_curr * Ey_n_beam;
+            Ex_n_beam = self.beam_charge * self.lam_t_curr * Ex_n_beam
+            Ey_n_beam = self.beam_charge * self.lam_t_curr * Ey_n_beam
         else:
             Ex_n_beam = 0.
             Ey_n_beam = 0.

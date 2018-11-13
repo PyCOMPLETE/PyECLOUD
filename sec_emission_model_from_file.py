@@ -173,9 +173,9 @@ class SEY_model_from_file(SEY_model_ECLOUD):
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = self.SEY_values(E_impact_eV, costheta_impact)
-        flag_elast = (rand(len(ref_frac)) < ref_frac);
-        flag_truesec = ~(flag_elast);
-        nel_emit = nel_impact * yiel;
+        flag_elast = (rand(len(ref_frac)) < ref_frac)
+        flag_truesec = ~(flag_elast)
+        nel_emit = nel_impact * yiel
 
         return nel_emit, flag_elast, flag_truesec
 

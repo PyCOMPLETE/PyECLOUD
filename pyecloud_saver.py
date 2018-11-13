@@ -301,8 +301,8 @@ class pyecloud_saver:
             self.Dx_hist_det = Dx_hist_det
 
             self.xg_hist_det = np.arange(x_min_hist_det - Dx_hist_det, x_max_hist_det + Dx_hist_det + 0.1 * Dx_hist_det, Dx_hist_det, float)
-            self.Nxg_hist_det = len(self.xg_hist_det);
-            self.bias_x_hist_det = min(self.xg_hist_det);
+            self.Nxg_hist_det = len(self.xg_hist_det)
+            self.bias_x_hist_det = min(self.xg_hist_det)
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
@@ -609,13 +609,13 @@ class pyecloud_saver:
         #step by step data
         self.t = np.zeros(initial_size_t_vect, dtype=float)
         self.lam_t_array = 0 * self.t
-        self.Nel_timep = 0. * self.t;
-        self.Nel_imp_time = 0. * self.t;
-        self.Nel_emit_time = 0. * self.t;
-        self.En_imp_eV_time = 0. * self.t;
-        self.En_emit_eV_time = 0. * self.t;
-        self.En_kin_eV_time = 0. * self.t;
-        self.cen_density = 0. * self.t;
+        self.Nel_timep = 0. * self.t
+        self.Nel_imp_time = 0. * self.t
+        self.Nel_emit_time = 0. * self.t
+        self.En_imp_eV_time = 0. * self.t
+        self.En_emit_eV_time = 0. * self.t
+        self.En_kin_eV_time = 0. * self.t
+        self.cen_density = 0. * self.t
 
         if self.flag_detailed_MP_info == 1:
             self.N_mp_time = 0. * self.t
@@ -673,16 +673,16 @@ class pyecloud_saver:
             self.En_imp_last_step_group_eV = 0
             self.En_emit_last_step_group_eV = 0
 
-            self.Nel_timep[self.i_last_save] = np.sum(MP_e.nel_mp[0:MP_e.N_mp]);
-            self.En_kin_eV_time[self.i_last_save] = np.sum(0.5 * MP_e.mass / qe * MP_e.nel_mp[0:MP_e.N_mp] * (MP_e.vx_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp] + MP_e.vy_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp] + MP_e.vz_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp]));
+            self.Nel_timep[self.i_last_save] = np.sum(MP_e.nel_mp[0:MP_e.N_mp])
+            self.En_kin_eV_time[self.i_last_save] = np.sum(0.5 * MP_e.mass / qe * MP_e.nel_mp[0:MP_e.N_mp] * (MP_e.vx_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp] + MP_e.vy_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp] + MP_e.vz_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp]))
 
-            flag_center = ((MP_e.x_mp**2 + MP_e.y_mp**2) < self.r_center**2);
+            flag_center = ((MP_e.x_mp**2 + MP_e.y_mp**2) < self.r_center**2)
             flag_center[MP_e.N_mp:] = False
             self.cen_density[self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_center * self.r_center)
 
             if self.flag_el_dens_probes:
                 for ii in xrange(self.N_el_dens_probes):
-                    flag_center = ((MP_e.x_mp - self.x_el_dens_probes[ii])**2 + (MP_e.y_mp - self.y_el_dens_probes[ii])**2) < self.r_el_dens_probes[ii]**2;
+                    flag_center = ((MP_e.x_mp - self.x_el_dens_probes[ii])**2 + (MP_e.y_mp - self.y_el_dens_probes[ii])**2) < self.r_el_dens_probes[ii]**2
                     flag_center[MP_e.N_mp:] = False
                     self.el_dens_at_probes[ii, self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_el_dens_probes[ii]**2)
 

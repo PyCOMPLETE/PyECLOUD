@@ -54,9 +54,10 @@ from numpy import sqrt, sin, cos, squeeze, sum
 import scipy.io as sio
 import int_field_for as iff
 
-me = 9.10938291e-31;
-qe = 1.602176565e-19;
-qm = qe / me; #formulas are already written for a negative charge
+me = 9.10938291e-31
+qe = 1.602176565e-19
+qm = qe / me
+#formulas are already written for a negative charge
 
 
 class pusher_strong_B_generalized():
@@ -88,10 +89,10 @@ class pusher_strong_B_generalized():
             self.xx = squeeze(dict_Bmap['xx'].T)
             self.yy = squeeze(dict_Bmap['yy'].T)
 
-            self.xmin = min(self.xx);
-            self.ymin = min(self.yy);
-            self.dx = self.xx[1] - self.xx[0];
-            self.dy = self.yy[1] - self.yy[0];
+            self.xmin = min(self.xx)
+            self.ymin = min(self.yy)
+            self.dx = self.xx[1] - self.xx[0]
+            self.dy = self.yy[1] - self.yy[0]
 
             #            ####Debug
 #            import pylab as pl
@@ -148,7 +149,7 @@ class pusher_strong_B_generalized():
             if N_B_zero > 0:
                 B_mod[flag_B_zero] = 1.
 
-            omegac = B_mod * qm;
+            omegac = B_mod * qm
             sinwcDt = sin(omegac * self.Dt)
             coswcDt = cos(omegac * self.Dt)
 
@@ -174,13 +175,13 @@ class pusher_strong_B_generalized():
             if N_B_zero > 0:
 
                 xn1[flag_B_zero] = xn[flag_B_zero] + vxn[flag_B_zero] * self.Dt\
-                    - 0.5 * qm * Ex_n[flag_B_zero] * self.Dt * self.Dt;
+                    - 0.5 * qm * Ex_n[flag_B_zero] * self.Dt * self.Dt
                 yn1[flag_B_zero] = yn[flag_B_zero] + vyn[flag_B_zero] * self.Dt\
-                    - 0.5 * qm * Ey_n[flag_B_zero] * self.Dt * self.Dt;
+                    - 0.5 * qm * Ey_n[flag_B_zero] * self.Dt * self.Dt
                 zn1[flag_B_zero] = zn[flag_B_zero] + vzn[flag_B_zero] * self.Dt
 
-                vxn1[flag_B_zero] = vxn[flag_B_zero] - qm * Ex_n[flag_B_zero] * self.Dt;
-                vyn1[flag_B_zero] = vyn[flag_B_zero] - qm * Ey_n[flag_B_zero] * self.Dt;
+                vxn1[flag_B_zero] = vxn[flag_B_zero] - qm * Ex_n[flag_B_zero] * self.Dt
+                vyn1[flag_B_zero] = vyn[flag_B_zero] - qm * Ey_n[flag_B_zero] * self.Dt
                 vzn1[flag_B_zero] = vzn[flag_B_zero]
 
             MP_e.x_mp[0:MP_e.N_mp] = xn1

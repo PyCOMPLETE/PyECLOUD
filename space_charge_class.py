@@ -114,7 +114,7 @@ class space_charge:
         self.bias_y = self.PyPICobj.bias_y
 
         self.Dt_sc = Dt_sc
-        self.t_last_recom = 0.;
+        self.t_last_recom = 0.
 
         self.U_sc_eV_stp = 0.
 

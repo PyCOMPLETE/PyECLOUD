@@ -71,7 +71,7 @@ class ellip_cham_geom_object:
         self.flag_verbose_file = flag_verbose_file
 
     def is_outside(self, x_mp, y_mp):
-        return (((x_mp / self.x_aper)**2 + (y_mp / self.y_aper)**2) >= 1);
+        return (((x_mp / self.x_aper)**2 + (y_mp / self.y_aper)**2) >= 1)
 
     def is_convex(self):
         return True
@@ -83,12 +83,12 @@ class ellip_cham_geom_object:
         a = self.x_aper
         b = self.y_aper
 
-        x_insq = x_in * x_in;
-        y_insq = y_in * y_in;
-        x_outsq = x_out * x_out;
-        y_outsq = y_out * y_out;
-        y_in__y_out = y_in * y_out;
-        x_in__x_out = x_in * x_out;
+        x_insq = x_in * x_in
+        y_insq = y_in * y_in
+        x_outsq = x_out * x_out
+        y_outsq = y_out * y_out
+        y_in__y_out = y_in * y_out
+        x_in__x_out = x_in * x_out
 
         t0 = (a**2 * y_insq - a**2 * y_in__y_out + \
           sqrt(a**4 * b**2 * y_insq - 2 * a**4 * b**2 * y_in__y_out \
@@ -99,7 +99,7 @@ class ellip_cham_geom_object:
             a**2 * b**2 * x_outsq * y_insq) + b**2 * x_insq -  \
             b**2 * x_in__x_out) / (a**2 * y_insq -  \
             2 * a**2 * y_in__y_out + a**2 * y_outsq + b**2 * x_insq -  \
-            2 * b**2 * x_in__x_out + b**2 * x_outsq);
+            2 * b**2 * x_in__x_out + b**2 * x_outsq)
 
         # Handle pathological cases
         mask_nan = isnan(t0)
@@ -113,37 +113,37 @@ class ellip_cham_geom_object:
                     fbckt.write('%e\t%e\tnan\n'%(x_nan[ii_bk], y_nan[ii_bk]))
                 fbckt.close()
 
-        t0 = resc_fac * t0;
+        t0 = resc_fac * t0
 
-        t0[t0 < 1.e-2] = 0;
+        t0[t0 < 1.e-2] = 0
 
-        flag_ident = (((x_in - x_out) * (x_in - x_out) + (y_in - y_out) * (y_in - y_out)) / (x_out * x_out + y_out * y_out)) < 1e-8;
-        t0[flag_ident] = 0;
+        flag_ident = (((x_in - x_out) * (x_in - x_out) + (y_in - y_out) * (y_in - y_out)) / (x_out * x_out + y_out * y_out)) < 1e-8
+        t0[flag_ident] = 0
 
         if sum(abs(t0.imag)) > 0:
             print 'imag detected'
             raise ValueError('Backtracking: complex t0!!!!')
 
-        x_int = t0 * x_out + (1 - t0) * x_in;
-        y_int = t0 * y_out + (1 - t0) * y_in;
-        z_int = t0 * z_out + (1 - t0) * z_in;
+        x_int = t0 * x_out + (1 - t0) * x_in
+        y_int = t0 * y_out + (1 - t0) * y_in
+        z_int = t0 * z_out + (1 - t0) * z_in
 
         if flag_robust:
-            flag_impact = (((x_int / a)**2 + (y_int / b)**2) > 1);
+            flag_impact = (((x_int / a)**2 + (y_int / b)**2) > 1)
 
             if flag_impact.any():
                 self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
                 ntrials = 10
                 while (sum(flag_impact) > 0 and ntrials > 0):
-                    t0[flag_impact] = 0.9 * t0[flag_impact];
-                    x_int = t0 * x_out + (1 - t0) * x_in;
-                    y_int = t0 * y_out + (1 - t0) * y_in;
-                    z_int = t0 * z_out + (1 - t0) * z_in;
+                    t0[flag_impact] = 0.9 * t0[flag_impact]
+                    x_int = t0 * x_out + (1 - t0) * x_in
+                    y_int = t0 * y_out + (1 - t0) * y_in
+                    z_int = t0 * z_out + (1 - t0) * z_in
 
-                    flag_impact = (((x_int / a)**2 + (y_int / b)**2) > 1);
+                    flag_impact = (((x_int / a)**2 + (y_int / b)**2) > 1)
                     ntrials = ntrials - 1
 
-            flag_impact = (((x_int / a)**2 + (y_int / b)**2) >= 1);
+            flag_impact = (((x_int / a)**2 + (y_int / b)**2) >= 1)
             if sum(flag_impact) > 0:
 
                 x_int_pat = x_int[flag_impact]
@@ -167,28 +167,28 @@ class ellip_cham_geom_object:
                 x_int[flag_impact] = x_pr * a
                 y_int[flag_impact] = y_pr * b
 
-            flag_impact = (((x_int / a)**2 + (y_int / b)**2) >= 1);
+            flag_impact = (((x_int / a)**2 + (y_int / b)**2) >= 1)
             if sum(flag_impact) > 0:
                 print 'err inside'
                 raise ValueError('Outside after backtracking!!!!')
 
-        par_cross = arctan2(a * y_int, b * x_int);
+        par_cross = arctan2(a * y_int, b * x_int)
 
-        Dx = -a * sin(par_cross);
-        Dy = b * cos(par_cross);
+        Dx = -a * sin(par_cross)
+        Dy = b * cos(par_cross)
 
-        Nx = -Dy;
-        Ny = Dx;
+        Nx = -Dy
+        Ny = Dx
 
-        neg_flag = ((Nx * x_int + Ny * y_int) > 0);
+        neg_flag = ((Nx * x_int + Ny * y_int) > 0)
 
-        Nx[neg_flag] = -Nx[neg_flag];
-        Ny[neg_flag] = -Ny[neg_flag];
+        Nx[neg_flag] = -Nx[neg_flag]
+        Ny[neg_flag] = -Ny[neg_flag]
 
-        nor = sqrt(Nx * Nx + Ny * Ny);
+        nor = sqrt(Nx * Nx + Ny * Ny)
 
-        Nx = Nx / nor;
-        Ny = Ny / nor;
+        Nx = Nx / nor
+        Ny = Ny / nor
 
         i_found = None
 

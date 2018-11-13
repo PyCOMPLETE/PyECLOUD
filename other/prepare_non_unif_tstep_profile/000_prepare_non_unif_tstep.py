@@ -15,7 +15,7 @@ t_offs = 2.5e-9
 filling_pattern = 1 * (30 * [1.] + 5 * [0])
 
 b_spac = 25e-9
-t_end = 1e-9;
+t_end = 1e-9
 
 
 # Parameters of the non-unif
@@ -38,9 +38,9 @@ ppb_vect = np.atleast_1d(np.float_(np.array(filling_pattern)))
 sigmaz_vect = 0 * ppb_vect + sigmaz
 
 N_slots = len(ppb_vect)
-t = np.arange(0., N_slots * b_spac + t_end + 2 * Dt, Dt);
+t = np.arange(0., N_slots * b_spac + t_end + 2 * Dt, Dt)
 
-t_coarse = np.arange(0., N_slots * b_spac + t_end + 2 * Dt, Dt_coarse);
+t_coarse = np.arange(0., N_slots * b_spac + t_end + 2 * Dt, Dt_coarse)
 
 t_fine_add_single = []
 
@@ -58,9 +58,9 @@ for ii in range(0, N_slots):
 
 t_nunif = np.array(sorted(list(t_coarse) + t_fine_add))
 
-c = 299792458.;
-zz = c * t;
-val = 0. * t;
+c = 299792458.
+zz = c * t
+val = 0. * t
 
 
 for ii in range(0, N_slots):
@@ -70,11 +70,11 @@ for ii in range(0, N_slots):
     ppb = ppb_vect[ii]
     sigmaz = sigmaz_vect[ii]
     if sigmaz > 0:
-        z0 = c * (t_offs + ii * b_spac);
+        z0 = c * (t_offs + ii * b_spac)
         mask_to_be_updated = (np.abs(zz - z0) < (10. * sigmaz))
 
         val[mask_to_be_updated] = val[mask_to_be_updated] + ppb / (sigmaz * np.sqrt(2 * np.pi)) *\
-           np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz));
+           np.exp(-(zz[mask_to_be_updated] - z0) * (zz[mask_to_be_updated] - z0) / (2 * sigmaz * sigmaz))
 
 
 val_nunif = np.interp(t_nunif, t, val)

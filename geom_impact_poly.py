@@ -168,9 +168,9 @@ class polyg_cham_geom_object:
                 mask_upd_i_found[mask_same_min] = logical_and(t_border >= 0., t_border <= 1.)
                 i_found[mask_upd_i_found] = ii
 
-        t_min = resc_fac * t_min;
-        x_int = t_min * x_out + (1. - t_min) * x_in;
-        y_int = t_min * y_out + (1. - t_min) * y_in;
+        t_min = resc_fac * t_min
+        x_int = t_min * x_out + (1. - t_min) * x_in
+        y_int = t_min * y_out + (1. - t_min) * y_in
         z_int = 0 * t_min
 
         Nx_int = zeros(N_impacts)
@@ -181,22 +181,22 @@ class polyg_cham_geom_object:
         if sum(mask_found) < N_impacts:
             mask_not_found = ~mask_found
 
-            x_int[mask_not_found] = x_in[mask_not_found];
-            y_int[mask_not_found] = y_in[mask_not_found];
+            x_int[mask_not_found] = x_in[mask_not_found]
+            y_int[mask_not_found] = y_in[mask_not_found]
 
             #compute some kind of normal ....
-            par_cross = arctan2(self.cx * y_in[mask_not_found], self.cy * x_int[mask_not_found]);
+            par_cross = arctan2(self.cx * y_in[mask_not_found], self.cy * x_int[mask_not_found])
 
-            Dx = -self.cx * sin(par_cross);
-            Dy = self.cy * cos(par_cross);
+            Dx = -self.cx * sin(par_cross)
+            Dy = self.cy * cos(par_cross)
 
-            Nx_corr = -Dy;
-            Ny_corr = Dx;
+            Nx_corr = -Dy
+            Ny_corr = Dx
 
-            neg_flag = ((Nx_corr * x_int[mask_not_found] + Ny_corr * y_int[mask_not_found]) > 0);
+            neg_flag = ((Nx_corr * x_int[mask_not_found] + Ny_corr * y_int[mask_not_found]) > 0)
 
-            Nx_corr[neg_flag] = -Nx_corr[neg_flag];
-            Ny_corr[neg_flag] = -Ny_corr[neg_flag];
+            Nx_corr[neg_flag] = -Nx_corr[neg_flag]
+            Ny_corr[neg_flag] = -Ny_corr[neg_flag]
 
             Nx_int[mask_not_found] = Nx_corr
             Ny_int[mask_not_found] = Ny_corr
@@ -226,8 +226,8 @@ class polyg_cham_geom_object:
             flag_impact = self.is_outside(x_int, y_int)
             if flag_impact.any():
                 self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
-                x_int[flag_impact] = x_in[flag_impact];
-                y_int[flag_impact] = y_in[flag_impact];
+                x_int[flag_impact] = x_in[flag_impact]
+                y_int[flag_impact] = y_in[flag_impact]
                 x_in_error = x_in[flag_impact]
                 y_in_error = y_in[flag_impact]
                 x_out_error = x_out[flag_impact]
