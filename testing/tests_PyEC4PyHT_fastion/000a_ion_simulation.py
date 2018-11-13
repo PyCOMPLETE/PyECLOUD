@@ -110,8 +110,8 @@ machine.buncher.add_statistics(sliceset=bunch_slots, beam=beam, statistics=True)
 
 mask_filled_slots = bunch_slots.n_macroparticles_per_slice > 0
 n_filled_slots = np.sum(mask_filled_slots)
-z_cuts_filled_slots = (np.min(bunch_slots.z_bins[mask_filled_slots]),
-                       np.max(bunch_slots.z_bins[np.append(mask_filled_slots, True)]))
+z_cuts_filled_slots = (np.min(bunch_slots.z_bins[:-1][mask_filled_slots]),
+                       np.max(bunch_slots.z_bins[1:][mask_filled_slots]))
 
 bunch_slicer = UniformBinSlicer(n_filled_slots, z_cuts=z_cuts_filled_slots)
 bunch_slices = beam.get_slices(bunch_slicer)
