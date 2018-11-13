@@ -54,11 +54,11 @@
 	\parbox[t]{1.0\linewidth}{
 		\centering \fontsize{50pt}{80pt}\selectfont % The first argument for fontsize is the font size of the text and the second is the line spacing - you may need to play with these for your particular title
 		\vspace*{0.7cm} % Space between the start of the title and the top of the grey box
-		
+
 		\hfill PyECLOUD \\
 		\hfill Reference \\
 		\hfill Manual\par
-		
+
 		\vspace*{0.7cm} % Space between the end of the title and the bottom of the grey box
 	}
 }
@@ -71,7 +71,7 @@
 %	AUTHOR NAME AND INFORMATION SECTION
 %----------------------------------------------------------------------------------------
 
-{\centering \large 
+{\centering \large
 \hfill Giovanni Iadarola, \\
 \hfill Eleonora Belli, Philipp, Dijkstal,\\
 \hfill Lotta Mether, Annalisa Romano,\\
@@ -99,7 +99,7 @@ This input file has to be named \textbf{simulation\_parameters.input}.
 \begin{longtable}
 {p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead
-\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{ 
+\rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
 \textbf{Other input filenames.} The following variables specify the names of the other three input files which define the physical model of the simulation.}\\
 \hline
 \textbf{machine\_param\_file} & Name of the machine parameter file.\\
@@ -115,7 +115,7 @@ This input file has to be named \textbf{simulation\_parameters.input}.
 {p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead
 \rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
-\textbf{Secondary beams} The code can simulate the EC buildup in the presence of more than one circulating beam. For this purpose a list of secondary beam files (one for each beam) has to be provided. 
+\textbf{Secondary beams} The code can simulate the EC buildup in the presence of more than one circulating beam. For this purpose a list of secondary beam files (one for each beam) has to be provided.
 In the presence of secondary beams, the master beam determines the length of the simulation, the energy used for the calculation of the bending field, and the bunch spacing used for regeneration and saving purposes.
 }\\
 \hline
@@ -146,7 +146,7 @@ In the presence of secondary beams, the master beam determines the length of the
 \hline
 \textbf{Dt} & [s] Simulation time step. This input is not considered if beam profile is imported from file.\\
 \hline
-\textbf{t\_end} & [s] Extra time interval after the specified beam profile. 
+\textbf{t\_end} & [s] Extra time interval after the specified beam profile.
 
 Only coasting beam present in this interval. The value of this variable can also be negative in order to stop the simulation before the end of the specified profile. \\
 \hline
@@ -158,7 +158,7 @@ Only coasting beam present in this interval. The value of this variable can also
 \rowcolor{Gray}\multicolumn{2}{p{.97\textwidth}}{
 \textbf{Negligible beam linear density} }\\
 \hline
-\textbf{lam\_th} & [beam part/m] When the linear density of the beam is below this value, 
+\textbf{lam\_th} & [beam part/m] When the linear density of the beam is below this value,
 primary electrons are not generated and beam forces on the electrons are neglected.\\
 \hline
 \end{longtable}
@@ -171,7 +171,7 @@ primary electrons are not generated and beam forces on the electrons are neglect
 \textbf{MP management settings}
 }\\ \hline
 \textbf{N\_mp\_max}&	Size of the arrays allocated to store the MP sizes, positions and velocities. MP regeneration settings must be set such that this number of MPs is never exceeded.\\ \hline
-\textbf{N\_mp\_regen}& 	MP regeneration threshold. When the total number of MPs exceeds N\_mp\_regen a regeneration of the set of MPs is applied and a new Nref is chosen in order to get a target number of MPs. The check is performed at each t=n*b\_spac with n an integer.\\ \hline 
+\textbf{N\_mp\_regen}& 	MP regeneration threshold. When the total number of MPs exceeds N\_mp\_regen a regeneration of the set of MPs is applied and a new Nref is chosen in order to get a target number of MPs. The check is performed at each t=n*b\_spac with n an integer.\\ \hline
 \textbf{N\_mp\_regen\_low}&	Lower MP regeneration threshold. When the total number of MPs becomes smaller than N\_mp\_regen\_low a regeneration of the set of MPs is applied and a new Nref is chosen in order to get a target number of MPs. The check is performed at each t=n*b\_spac with n an integer.\\ \hline
 \textbf{t\_ON\_regen\_low}&	For t< t\_ON\_regen\_low the lower MP regeneration check is not performed.\\ \hline
 \textbf{N\_mp\_after\_regen}&	Target number of MPs obtained after regeneration.\\ \hline
@@ -180,12 +180,12 @@ primary electrons are not generated and beam forces on the electrons are neglect
 \textbf{nel\_mp\_ref\_0}&	[e-/m] Initial MP size.\\ \hline
 \textbf{Nx\_regen, Ny\_regen, Nvx\_regen, Nvy\_regen, Nvz\_regen}&	Number of mesh points in each dimension for the generation of the uniform grid for the 5-D phase space used for the MP regeneration.\\ \hline
 \textbf{regen\_hist\_cut}&	Defines a threshold value for the phase space density, below which no electrons are generated.\\ \hline
-\textbf{N\_mp\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it) 
+\textbf{N\_mp\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it)
 
 Soft regeneration threshold. The check is performed at each t=n*b\_spac with n an integer. N\_mp\_soft\_regen should be smaller than N\_mp\_regen.\\ \hline
-\textbf{N\_mp\_after\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it) 
+\textbf{N\_mp\_after\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it)
 
-Target number of MPs obtained after a soft regeneration.\\ 
+Target number of MPs obtained after a soft regeneration.\\
 \hline
 \end{longtable}
 
@@ -256,7 +256,7 @@ Target number of MPs obtained after a soft regeneration.\\
 True/False toggles to save detailed information of pathological impacts in output file and stdout respectively.\\ \hline
 \textbf{dec\_fac\_secbeam\_prof}&
 	(optional -- default=1)
-	
+
 Decimation factor to decrease the number of points of the longitudinal beam profile of secondary beams.\\ \hline
 \textbf{el\_density\_probes}& 	(optional -- default: no probes)
 
@@ -264,6 +264,18 @@ Decimation factor to decrease the number of points of the longitudinal beam prof
 \textbf{save\_simulation\_state\_time\_file}&	(optional -- default: no simulation state is saved)
 
 [s] List of instants at which the full simulation state is saved on file (pickle files). The list can also be provided as a .mat file.\\ \hline
+\textbf{checkpoint\_folder}& (optional -- default: no checkpoints are saved)
+
+Path to folder where checkpoints are saved.\\ \hline
+\textbf{checkpoint\_DT}& (optional -- default: no checkpoints are saved)
+
+Time interval in seconds between checkpoints being saved.\\ \hline
+\textbf{copy\_main\_outp\_folder}& (optional --default: output is not copied)
+
+Path to folder for storing backups of the output. Backups are needed to restart a simulation from a checkpoint.\\ \hline
+\textbf{copy\_main\_outp\_DT}& (optional -- default: output is only copied if a checkpoint is saved)
+
+Enables backing up the output file in regular intervals.\\ \hline
 \textbf{x\_min\_hist\_det,  x\_max\_hist\_det,  y\_min\_hist\_det,  y\_max\_hist\_det,  Dx\_hist\_det}&	(optional -- default: no detailed histogram is saved)
 
 [m] Defines a region of the chamber where a detailed horizontal distribution histogram is saved (\_det stands for detailed). \\
@@ -283,7 +295,7 @@ Decimation factor to decrease the number of points of the longitudinal beam prof
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Additional clouds} Simulations with multiple clouds can be enabled with the following input parameter. See Section~\ref{sec:multicloud} for a detailed description of this simulation mode.
 }\\ \hline
-\textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline	
+\textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline
 List of names of additional cloud files.\\ \hline
 \end{longtable}
 
@@ -437,7 +449,7 @@ The Lorentz and normal distributions are cut at 0 to prevent negative energies o
     \multicolumn{2}{p{.97\textwidth}}{\textbf{A part of photoelectrons is generated in the corner of the beam screen on direct impact of photons (non-reflected). The reflected photons generated elsewhere.}}
 \\ \hline
 \textbf{inv\_CDF\_refl\_photoem\_file} & Name of a .mat file providing the inverse of the Cumulative Distribution Function (CDF) for the angular distribution of the reflected photons.
-If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have uniform angular distribution and no file needs to be provided. 
+If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have uniform angular distribution and no file needs to be provided.
 \\ \hline
 \textbf{refl\_frac} & Fraction of photoelectrons generated by reflected photons.
 \\ \hline
@@ -465,7 +477,7 @@ If inv\_CDF\_refl\_photoem\_file = `unif\_no\_file' the reflected photons have u
 \textbf{init\_unif\_flag} & (optional -- default=0) \newline
 (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables uniform electron distribution at the beginning of the simulation.
 \\ \hline
-\textbf{Nel\_init\_unif} & Initial number of electrons. 
+\textbf{Nel\_init\_unif} & Initial number of electrons.
 \\ \hline
 \textbf{E\_init\_unif} & [eV] Initial energy of the generated electrons.
 \\ \hline
@@ -550,7 +562,7 @@ When beam\_field\_file = `computeBE' the following parameters must be provided:}
 When flag\_bunched\_beam = 1 the following parameters must be provided:}\\ \hline
 \textbf{sigmaz}&	[m] Bunch length (1$\sigma$). \\ \hline
 \textbf{t\_offs}&	[s] Delay in the longitudinal profile (n.b. if t\_offs=0 only half of the first bunch is simulated).\\ \hline
-\textbf{filling\_pattern\_file}&	Name of a file providing the intensities of the different bunches (zeros for empty slots). 
+\textbf{filling\_pattern\_file}&	Name of a file providing the intensities of the different bunches (zeros for empty slots).
 The data can be provided also in form of a python list with no need to provide an input file, e.g. filling\_pattern\_file=4*(72*[1.]+8*[0.]).\\ \hline
 \multicolumn{2}{p{.97\textwidth}}{
 When flag\_bunched\_beam = 0 the following parameter must be provided:}\\ \hline
@@ -565,7 +577,7 @@ When flag\_bunched\_beam = 0 the following parameter must be provided:}\\ \hline
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Choice of the model}}\\ \hline
-\textbf{switch\_model}&	(optional -- default=0) 
+\textbf{switch\_model}&	(optional -- default=0)
 
 Different secondary emission models:
 \begin{enumerate}
@@ -575,7 +587,7 @@ Different secondary emission models:
 \item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
 \item switch\_model = `flat\_low\_ene' for flat low energy dependence.
 \item switch\_model = `from\_file` for interpolation of a user-specified curve.
-\end{enumerate}\\ 
+\end{enumerate}\\
 \hline
 \end{longtable}
 
@@ -622,13 +634,13 @@ The more accurate is the 3D cosine distribution which takes into account the sur
 \subsection{Simulations with multiple clouds}
 \label{sec:multicloud}
 
-The code provides the option of including more than one cloud in the simulation. Each cloud is influenced by the other clouds only through their space charge. This option is switched on by providing a list of names of additional cloud files  in the standard input, as follows. 
+The code provides the option of including more than one cloud in the simulation. Each cloud is influenced by the other clouds only through their space charge. This option is switched on by providing a list of names of additional cloud files  in the standard input, as follows.
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
 \multicolumn{2}{p{.97\textwidth}}{
 In the \textbf{simulation\_parameters.input} file:}\\ \hline
-\textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline	
+\textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline
 List of names of additional cloud files.\\ \hline
 \end{longtable}
 
@@ -638,10 +650,10 @@ Each cloud file should contain a subset of the input parameters specified in the
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Mandatory cloud parameters}}\\ \hline
-\textbf{cloud\_mass} & See Simulation parameters section.\\ 
+\textbf{cloud\_mass} & See Simulation parameters section.\\
 \textbf{cloud\_mass} \\ \hline
-\textbf{gas\_ion\_flag} & See Machine parameters section.\\ 
-\textbf{photoem\_flag} & \\%Flag for photoemission.\\ 
+\textbf{gas\_ion\_flag} & See Machine parameters section.\\
+\textbf{photoem\_flag} & \\%Flag for photoemission.\\
 \textbf{init\_unif\_flag} & \\%Flag for initial uniform electron distribution.\\
 \textbf{init\_unif\_edens\_flag} & \\ \hline%Flag for initial uniform electron density.\\ \hline
 \textbf{switch\_model} & See Secondary emission parameters section.\\ \hline
@@ -657,14 +669,14 @@ In addition, a cloud file can contain the following optional parameters. Any opt
 \textbf{Saving settings} &  \\
 \textbf{Log and progress files} & \\ \hline
 \textbf{N\_sub\_steps} & See under ``Tracking and magnetic field'' in the Machine parameters section.\\ \hline
-\textbf{Residual gas ionization parameters} & See the Machine parameters section for the detailed list of parameters and their usage.\\ 
-\textbf{Photoemission parameters} & \\ 
+\textbf{Residual gas ionization parameters} & See the Machine parameters section for the detailed list of parameters and their usage.\\
+\textbf{Photoemission parameters} & \\
 \textbf{Uniform initial distribution} & \\
 \textbf{Uniform initial density} & \\ \hline
 \textbf{Secondary emission parameters} & As listed in the Secondary emission parameters section.\\ \hline
 \end{longtable}
 
-Each cloud produces its own .mat output file, as described in the following chapter. The file is named according to the main output file name and the cloud file name. 
+Each cloud produces its own .mat output file, as described in the following chapter. The file is named according to the main output file name and the cloud file name.
 
 \newpage
 
@@ -679,7 +691,7 @@ The number of these steps is denoted $N\_{\mathrm{step}}$ in the following.
 \begin{longtable}
     {p{0.35\textwidth}p{0.05\textwidth}p{0.53\textwidth}}
     \hline\endfirsthead\hline\endhead
-    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
+    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{
     \textbf{Variables saved at every time step}}
     \\ \hline
     t($N\_{\mathrm{steps}}$) & [s] & The time at all time steps where the output is saved.  \\ \hline
@@ -700,17 +712,17 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
 \begin{longtable}
     {p{0.35\textwidth}p{0.05\textwidth}p{0.53\textwidth}}
     \hline\endfirsthead\hline\endhead
-    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
+    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{
     \textbf{Variables saved at each bunch passage}}
     \\\hline
     t\_hist($N\_{\mathrm{pass}}$) & [s] & The time at which data for the bunch passages are saved.\\\hline
-    
+
     En\_hist &  & Energy spectrum of the impacting electrons (electron per time interval and per energy bin). The last bin contains all electrons falling outside the selected enegy interval. \\\hline
     t\_En\_hist & [s] & The time at which the electron energy spectrum is saved.\\\hline
     En\_g\_hist &[eV]& Center of the energy bins used to save the energy spectrum.\\\hline
-    
+
     xg\_hist($N\_{\mathrm{bins}}$) & [m] & The $x$ coordinates corresponding to related histogram bins.\\\hline
-    
+
     N\_mp\_corrected\_pass($N\_{\mathrm{pass}}$) & & Number of times a MP tracking error occurred. \\\hline
     N\_mp\_impact\_pass($N\_{\mathrm{pass}}$) & & Number of MPs that impacted. \\\hline
     N\_mp\_pass($N\_{\mathrm{pass}}$) & & Number of current MPs.\\\hline
@@ -724,7 +736,7 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
 \begin{longtable}
     {p{0.30\textwidth}p{0.05\textwidth}p{0.58\textwidth}}
     \hline\endfirsthead\hline\endhead
-    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{ 
+    \rowcolor{Gray}\multicolumn{3}{p{.97\textwidth}}{
     \textbf{Other variables}}
     \\\hline
     dec\_fact\_out & & Timestep output is only saved every nth time step, where n corresponds to dec\_fact\_out.\\\hline
