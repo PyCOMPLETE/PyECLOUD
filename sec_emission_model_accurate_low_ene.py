@@ -53,6 +53,7 @@ from numpy import sqrt, exp
 from numpy.random import rand
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
+
 def yield_fun3(E, costheta, Emax, del_max, R0, E0):
 
     s = 1.35

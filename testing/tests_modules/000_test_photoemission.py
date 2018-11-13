@@ -30,14 +30,18 @@ args = parser.parse_args()
 
 arr = lambda x: np.array(x, dtype=float)
 
+
 def lognormal(xx, mu, sig):
     return 1 / (xx * sig * np.sqrt(2 * np.pi)) * np.exp(-(np.log(xx) - mu)**2 / (2 * sig**2))
+
 
 def gauss(xx, mu, sig):
     return 1 / (sig * np.sqrt(2 * np.pi)) * np.exp(-(xx - mu)**2 / (2 * sig**2))
 
+
 def lorentz(xx, mu, sig):
     return stats.cauchy.pdf(xx, mu, sig)
+
 
 def x_angle_dist(angle_dist, x):
     if angle_dist == 'cosine_2D':
@@ -51,6 +55,7 @@ def x_angle_dist(angle_dist, x):
 # Sample size of generated photoelectrons
 k_pe_st = 1
 refl_frac = 20e-2
+
 
 def init_mp(N_mp_max, chamb):
     nel_mp_ref = 1
@@ -73,6 +78,8 @@ else:
 # since the normal vector of the surface is the particle position.
 # It is also easy to show the theoretical function of the spatial distribution together
 # with a histogram of the actual positions using the module.
+
+
 def test_model_1():
 
     alimit = 0.05
@@ -155,6 +162,8 @@ def test_model_1():
     sp.plot(xx_a[xx_a > 0], x_angle_dist(args.angle_dist, xx_a[xx_a > 0]), color='g', lw=3)
 
 # Photoemission model 'from_file' (2)
+
+
 def test_model_2():
     # Generate a sinusoidal-squared distribution on a square chamber.
     # This also tests the rectangular chamber module
@@ -270,6 +279,8 @@ def test_model_2():
     sp.step(angles, hist / factor_hist, color='b')
 
 ## Photoemission model 'per_segment' (3)
+
+
 def test_model_3():
     # Non-convex chamber
     my_chamb_dict = {

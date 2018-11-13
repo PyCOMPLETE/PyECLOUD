@@ -4,6 +4,7 @@ from scipy.constants import c, e as qe
 from . import input_parameters_format_specification as inp_spec
 from . import myloadmat_to_obj as mlm
 
+
 class beam_descr_from_fil:
     def __init__(self, beamfilename, betafx_from_mach_parms_file, Dx_from_mach_parms_file,
                  betafy_from_mach_parms_file, Dy_from_mach_parms_file):

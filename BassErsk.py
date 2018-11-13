@@ -2,11 +2,13 @@ from cmath import *
 from numpy import *
 from errffor import errf
 
+
 def wfun(z):
     x = z.real
     y = z.imag
     wx, wy = errf(x, y)
     return wx + 1j * wy
+
 
 def BassErsk(xin, yin, sigmax, sigmay):
 
@@ -40,6 +42,7 @@ def BassErsk(xin, yin, sigmax, sigmay):
         Ex = abs(val.real) * sign(xin)
 
     return Ex, Ey
+
 
 def ImageTerms(x, y, a, b, x0, y0, nimag):
 

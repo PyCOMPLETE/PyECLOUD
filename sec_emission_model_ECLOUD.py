@@ -54,6 +54,7 @@ from numpy import sqrt, exp
 from numpy.random import rand
 import electron_emission as ee
 
+
 def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
 
     if flag_costheta_delta_scale:

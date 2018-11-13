@@ -12,6 +12,7 @@ def mystyle(fontsz=16):
 	rcdefaults()
 	rc('font', **font)
 
+
 def mystyle_arial(fontsz=16, dist_tick_lab=10):
 
 	rcdefaults()
@@ -21,6 +22,7 @@ def mystyle_arial(fontsz=16, dist_tick_lab=10):
 
 def sciy():
 	pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
+
 
 def scix():
 	pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='x')

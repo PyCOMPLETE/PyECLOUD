@@ -58,8 +58,10 @@ import numpy.random as random
 
 import geom_impact_poly_cython as gipc
 
+
 class PyECLOUD_ChamberException(ValueError):
     pass
+
 
 class polyg_cham_geom_object(object):
 

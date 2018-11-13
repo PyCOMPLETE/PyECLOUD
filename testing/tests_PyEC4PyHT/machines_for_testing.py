@@ -2,6 +2,7 @@ from PyHEADTAIL.machines.synchrotron import Synchrotron
 import numpy as np
 from scipy.constants import c, e, m_p
 
+
 class SPS(Synchrotron):
 
 	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
@@ -108,6 +109,7 @@ class SPS(Synchrotron):
                             h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
                             charge=charge, mass=mass)
 
+
 class shortSPS(Synchrotron):
 
 	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
@@ -201,6 +203,7 @@ class shortSPS(Synchrotron):
                                  alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
                                  h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
                                  charge=charge, mass=mass)
+
 
 class LHC(Synchrotron):
 

@@ -6,8 +6,10 @@ import shutil
 import types
 from .default_input_parameters import parameters_dict
 
+
 class PyECLOUD_ConfigException(Exception):
     pass
+
 
 def assert_module_has_parameters(module, module_name):
 
@@ -41,6 +43,7 @@ def assert_module_has_parameters(module, module_name):
     if err_msg:
         raise PyECLOUD_ConfigException(err_msg)
 
+
 def update_module(module, new_module):
     """
     Similar as the dict.update method, but for modules.
@@ -57,6 +60,7 @@ def update_module(module, new_module):
             raise PyECLOUD_ConfigException('Parameter %s is specified in %s and %s!' % (attr, module.__name__, new_module.__name__))
         else:
             setattr(module, attr, value)
+
 
 def update_config_dict(config_dict, module, module_name, verbose=False, default_obj=None):
 

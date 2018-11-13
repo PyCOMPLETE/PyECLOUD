@@ -58,6 +58,7 @@ import scipy.io as sio
 from numpy.random import rand
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
+
 class SEY_model_from_file(SEY_model_ECLOUD):
 
     def __init__(self, sey_file, flag_costheta_delta_scale, flag_costheta_Emax_shift,

@@ -93,6 +93,7 @@ class B_quad():
         Bz_n = 0 * xn + self.B0z
         return Bx_n, By_n, Bz_n
 
+
 class B_file():
 
     def __init__(self, B0x, B0y, B0z, fact_Bmap, B_map_file):

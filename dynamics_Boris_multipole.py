@@ -53,6 +53,7 @@ import math
 import numpy as np
 from boris_cython import boris_step_multipole
 
+
 class pusher_Boris_multipole():
 
     def __init__(self, Dt, N_sub_steps=1, B_multip=None, B_skew=None):

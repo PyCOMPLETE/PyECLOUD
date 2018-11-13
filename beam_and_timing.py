@@ -56,6 +56,7 @@ import scipy.special as sspe
 from numpy import array
 import int_field_for as iff
 
+
 def bunch_train4(t, b_spac, t_offs, ppb_vect, sigmaz_vect):
 
     c = 299792458.

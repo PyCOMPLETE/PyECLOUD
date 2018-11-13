@@ -54,6 +54,7 @@ from numpy import squeeze, array, diff, max, sum, sqrt,\
                   logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
 import scipy.io as sio
 
+
 class polyg_cham_geom_object:
     def __init__(self, filename_chm, flag_non_unif_sey,
                  flag_verbose_file=False, flag_verbose_stdout=False):

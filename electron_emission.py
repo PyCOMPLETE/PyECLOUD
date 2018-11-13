@@ -57,6 +57,8 @@ from scipy.constants import e as qe
 import scipy.stats as stats
 
 # Secondary electron secondaries
+
+
 def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit, E_th, En_impact_eV, thresh_low_energy):
 
     if switch_no_increase_energy == 0:
@@ -126,11 +128,15 @@ def velocities_angle_cosine_3D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
     return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass)
 
 # This has been the behavior of the code until the error was spotted.
+
+
 def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
     sin_theta_p = random.rand(N_new_MP)
     return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass)
 
 # Avoid code duplication
+
+
 def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass):
     v_gen_mod = np.sqrt(2. * qe / mass * En_gen)
 
@@ -147,6 +153,8 @@ def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass):
     return vx_gen, vy_gen, vz_gen
 
 # Interface
+
+
 def get_angle_dist_func(string):
     if string == 'cosine_3D':
         print('Using cosine_3D emission angle distribution.')
@@ -179,20 +187,25 @@ For more info, see presentation by P. Dijkstal on the angle of emission
 of generated electrons (https://indico.cern.ch/event/673160/).
 """)
 
+
 def specular_velocity(vx_impact, vy_impact, Norm_x, Norm_y, v_impact_n):
     vx_emit = vx_impact - 2 * v_impact_n * Norm_x
     vy_emit = vy_impact - 2 * v_impact_n * Norm_y
     return vx_emit, vy_emit
 
 # Photoelectron energy classes
+
+
 class _gen_energy_base(object):
     def __init__(self, e_pe_sigma, e_pe_max):
         self.e_pe_sigma = e_pe_sigma
         self.e_pe_max = e_pe_max
 
+
 class _lognormal(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         return random.lognormal(self.e_pe_max, self.e_pe_sigma, N_int_new_MP)
+
 
 class _gaussian(_gen_energy_base):
     def __call__(self, N_int_new_MP):
@@ -205,13 +218,16 @@ class _gaussian(_gen_energy_base):
             N_neg = np.sum(flag_negat)
         return En_gen
 
+
 class _rect(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         return self.e_pe_max + (random.rand(N_int_new_MP) - 0.5) * self.e_pe_sigma
 
+
 class _mono(_gen_energy_base):
     def __call__(self, N_int_new_MP):
         return np.ones(N_int_new_MP) * self.e_pe_max
+
 
 class _lorentz(_gen_energy_base):
     def __init__(self, e_pe_sigma, e_pe_max):
@@ -225,6 +241,8 @@ class _lorentz(_gen_energy_base):
         return stats.cauchy.ppf(xx_rand, self.e_pe_max, self.e_pe_sigma)
 
 # Interface
+
+
 def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
 
     if energy_distribution == 'lognormal':

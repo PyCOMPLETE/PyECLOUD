@@ -27,17 +27,21 @@ def mystyle(fontsz=16):
 #   print fontsz
     rc('font', **font)
 
+
 def mystyle_arial(fontsz=16, dist_tick_lab=10):
 
     mystyle(fontsz)
     rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
     rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
 
+
 def sciy():
     pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
+
 def scix():
     pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
+
 
 def colorprog(i_prog, Nplots, v1=.9, v2=1., cm='hsv'):
     if hasattr(Nplots, '__len__'):
@@ -48,6 +52,7 @@ def colorprog(i_prog, Nplots, v1=.9, v2=1., cm='hsv'):
         return [pl.cm.rainbow(k) for k in np.linspace(0, 1, Nplots)][i_prog]
     else:
         raise ValueError('What?!')
+
 
 def comb_legend(sp1, sp2, *args, **kwargs):
     """

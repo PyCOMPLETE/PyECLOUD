@@ -54,6 +54,7 @@ import numpy as np
 
 na = np.array
 
+
 def rect_cham_geom_object(x_aper, y_aper, flag_non_unif_sey, **kwargs):
     chamber = gipfi.polyg_cham_geom_object(
         {

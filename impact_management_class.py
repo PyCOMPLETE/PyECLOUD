@@ -54,6 +54,7 @@ import hist_for as histf
 import seg_impact as segi
 from scipy.constants import e as qe
 
+
 class impact_management(object):
     def __init__(
                     self, chamb, sey_mod,

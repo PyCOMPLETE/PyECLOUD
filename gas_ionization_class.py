@@ -55,6 +55,7 @@ from numpy.random import randn
 from numpy import *
 from scipy.constants import c, k, e
 
+
 class residual_gas_ionization:
 
     def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion):

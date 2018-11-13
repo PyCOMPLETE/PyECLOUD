@@ -60,8 +60,10 @@ import myloadmat_to_obj as mlm
 import init
 import buildup_simulation as bsim
 
+
 class Empty(object):
     pass
+
 
 class DummyBeamTim(object):
     def __init__(self, PyPIC_state):
@@ -86,6 +88,7 @@ class DummyBeamTim(object):
 
 
 extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position', 'enable_kick_x', 'enable_kick_y'}
+
 
 class Ecloud(object):
 

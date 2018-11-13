@@ -52,6 +52,7 @@
 
 from numpy import sum, sqrt, arctan2, sin, cos, isnan, pi
 
+
 class ellip_cham_geom_object:
     def __init__(self, x_aper, y_aper, flag_verbose_file=True):
 

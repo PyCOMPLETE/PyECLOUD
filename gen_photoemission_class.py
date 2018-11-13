@@ -58,8 +58,10 @@ from scipy.constants import c
 
 import electron_emission
 
+
 class PyECLOUD_PhotoemissionException(ValueError):
     pass
+
 
 class photoemission_base(object):
 
@@ -88,6 +90,7 @@ class photoemission_base(object):
         vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass)
 
         MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen)
+
 
 class photoemission(photoemission_base):
 
@@ -176,6 +179,7 @@ class photoemission(photoemission_base):
 
         return MP_e
 
+
 class photoemission_from_file(photoemission_base):
 
     def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
@@ -228,6 +232,7 @@ class photoemission_from_file(photoemission_base):
             self.gen_energy_and_set_MPs(Nint_new_MP, x_in, y_in, x_out, y_out, MP_e)
 
         return MP_e
+
 
 class photoemission_per_segment(photoemission_base):
 

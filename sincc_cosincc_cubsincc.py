@@ -51,6 +51,7 @@
 
 from numpy import *
 
+
 def sincc(x):
     th = 1e-4
 
@@ -61,6 +62,7 @@ def sincc(x):
 
     return val
 
+
 def cosincc(x):
     th = 1e-4
     if abs(x) < th:
@@ -69,6 +71,7 @@ def cosincc(x):
         val = (1 - cos(x)) / (x * x)
 
     return val
+
 
 def cubsincc(x):
     th = 1e-4

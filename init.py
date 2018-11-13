@@ -86,6 +86,7 @@ import parse_cloud_file as pcf
 import input_parameters_format_specification as inp_spec
 import cloud_manager as cman
 
+
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
 
@@ -118,6 +119,7 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
         inp_spec.assert_module_has_parameters(beam_beam, 'beam_beam')
 
     return config_dict
+
 
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
                                          skip_pyeclsaver=False, skip_spacech_ele=False,

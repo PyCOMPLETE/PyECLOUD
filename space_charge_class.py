@@ -53,6 +53,7 @@ import numpy as np
 
 na = lambda x: np.array([x])
 
+
 class space_charge:
     #@profile
 

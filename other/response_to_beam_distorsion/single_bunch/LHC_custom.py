@@ -2,6 +2,7 @@ from PyHEADTAIL.machines.synchrotron import BasicSynchrotron
 import numpy as np
 from scipy.constants import c, e, m_p
 
+
 class LHC(BasicSynchrotron):
 
     def __init__(self, n_segments, machine_configuration, **kwargs):
