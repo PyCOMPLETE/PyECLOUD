@@ -54,7 +54,7 @@ elif optics_mode == 'non-smooth':
     with open('CLIC_DR_n260_optics.pkl') as fid:
         optics = pickle.load(fid)
     optics.pop('circumference')
-    machine = CLIC_DR(machine_configuration=machine_configuration, optics_mode='non-smooth',  **optics)
+    machine = CLIC_DR(machine_configuration=machine_configuration, optics_mode='non-smooth', **optics)
 
 
 # define bunch

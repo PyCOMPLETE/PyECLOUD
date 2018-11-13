@@ -105,7 +105,7 @@ for ii, k in enumerate(out_var_curr):
         else:
             print '%s not  in reference'%k
 
-        pl.legend(prop={'size': myfontsz}, bbox_to_anchor=(1, 1),  loc='best')
+        pl.legend(prop={'size': myfontsz}, bbox_to_anchor=(1, 1), loc='best')
         ms.sciy()
         pl.suptitle(sim_folder)
         pl.savefig(folder_plot + '/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
@@ -138,7 +138,7 @@ for ii, k in enumerate(out_var_curr):
             #Plot number of e- for the reference passage
             sp3 = fig.add_subplot(gs2[0])
             sp3.plot(dict_curr[k][ind_in_mat], 'b', label='curr_sim')
-            sp3.legend(prop={'size': myfontsz},  loc='best')
+            sp3.legend(prop={'size': myfontsz}, loc='best')
             sp3.set_title('index equal to [%d]'%ind_in_mat, fontsize=myfontsz)
             sp3.tick_params(labelsize=10)
             ms.sciy()
@@ -146,7 +146,7 @@ for ii, k in enumerate(out_var_curr):
             #Plot number of e- for each slice
             sp4 = fig.add_subplot(gs2[1])
             sp4.plot(np.sum(dict_curr[k], axis=0), 'b', label='curr_sim')
-            sp4.legend(prop={'size': myfontsz},  loc='best')
+            sp4.legend(prop={'size': myfontsz}, loc='best')
             #~ sp4.set_title('e- per slice')
             sp4.tick_params(labelsize=10)
             ms.sciy()
@@ -154,7 +154,7 @@ for ii, k in enumerate(out_var_curr):
             #Plot number of e- for each passage
             sp5 = fig.add_subplot(gs2[2])
             sp5.plot(np.sum(dict_curr[k], axis=1), 'b', label='curr_sim')
-            sp5.legend(prop={'size': myfontsz},  loc='best')
+            sp5.legend(prop={'size': myfontsz}, loc='best')
             #~ sp5.set_title('e- per passage')
             sp5.tick_params(labelsize=10)
             ms.sciy()
@@ -162,9 +162,9 @@ for ii, k in enumerate(out_var_curr):
             gs2.tight_layout(fig, rect=[0.45, 0, 1, 1], pad=1.08, h_pad=0.5)
 
         except IOError as goterror:
-                    print 'Skipped. Got:',  goterror
+                    print 'Skipped. Got:', goterror
         except IndexError as goterror:
-            print 'Skipped. Got:',  goterror
+            print 'Skipped. Got:', goterror
 
         if (k in out_var_ref) and (dict_ref[k].shape != ()):
 
@@ -187,23 +187,23 @@ for ii, k in enumerate(out_var_curr):
 
                 #Plot number of e- for the reference passage
                 sp3.plot(dict_ref[k][ind_in_mat], '--r', label='ref_sim')
-                sp3.legend(prop={'size': myfontsz},  loc='best')
+                sp3.legend(prop={'size': myfontsz}, loc='best')
                 ms.sciy()
 
                 #Plot number of e- for each slice
                 sp4.plot(np.sum(dict_ref[k], axis=0), '--r', label='ref_sim')
-                sp4.legend(prop={'size': myfontsz},  loc='best')
+                sp4.legend(prop={'size': myfontsz}, loc='best')
                 ms.sciy()
 
                 #Plot number of e- for each passage
                 sp5.plot(np.sum(dict_ref[k], axis=1), '--r', label='ref_sim')
-                sp5.legend(prop={'size': myfontsz},  loc='best')
+                sp5.legend(prop={'size': myfontsz}, loc='best')
                 ms.sciy()
 
                 gs2.tight_layout(fig, rect=[0.45, 0, 1, 1], pad=1.08, h_pad=1.5)
 
             except IOError as goterror:
-                    print 'Skipped. Got:',  goterror
+                    print 'Skipped. Got:', goterror
 
         else:
             print '%s not  in reference'%k

@@ -303,9 +303,9 @@ class beam_and_timing:
         if save_beam_field_file_as is not None:
             if flag_PyPIC_state_mode:
                 raise ValueError('You cannot save the field maps in multigrid mode! Sorry...')
-            sio.savemat(save_beam_field_file_as,  {'xx': xx_beam, 'yy': yy_beam, 'Ex': Ex_beam, 'Ey': Ey_beam,\
-                                                   'sigmax': sigmax, 'sigmay': sigmay,\
-                                                   'x_aper': chamb.x_aper, 'y_aper': chamb.y_aper}, oned_as='row')
+            sio.savemat(save_beam_field_file_as, {'xx': xx_beam, 'yy': yy_beam, 'Ex': Ex_beam, 'Ey': Ey_beam,\
+                                                  'sigmax': sigmax, 'sigmay': sigmay,\
+                                                  'x_aper': chamb.x_aper, 'y_aper': chamb.y_aper}, oned_as='row')
 
         if not flag_PyPIC_state_mode:
 

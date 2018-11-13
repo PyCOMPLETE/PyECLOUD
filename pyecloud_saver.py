@@ -155,7 +155,7 @@ class pyecloud_saver:
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
-                                     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det)
+                                     x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det)
 
         # Init energy and cos angle histogram saving
         self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
@@ -265,7 +265,7 @@ class pyecloud_saver:
         return impact_man
 
     def _pass_by_pass_data_init(self, impact_man,
-                                x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det,  Dx_hist_det):
+                                x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det):
 
         #pass by pass data
         self.t_hist = []
@@ -354,39 +354,39 @@ class pyecloud_saver:
 
     def build_outp_dict(self):
         saved_dict = {
-                    't_hist':               self.t_hist,
-                    'nel_hist':             self.nel_hist,
-                    'xg_hist':              self.xg_hist,
-                    'nel_impact_hist_tot':  self.nel_impact_hist_tot,
+                    't_hist': self.t_hist,
+                    'nel_hist': self.nel_hist,
+                    'xg_hist': self.xg_hist,
+                    'nel_impact_hist_tot': self.nel_impact_hist_tot,
                     'nel_impact_hist_scrub': self.nel_impact_hist_scrub,
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
-                    'En_g_hist':            self.En_g_hist,
-                    'En_hist':              self.En_hist,
-                    't_En_hist':            self.t_En_hist,
-                    'b_spac':               self.b_spac,
-                    't_sc_video':           np.array(self.t_sc_video),
-                    'U_sc_eV':              np.array(self.U_sc_eV),
-                    'N_mp_impact_pass':     self.N_mp_impact_pass,
-                    'N_mp_corrected_pass':  self.N_mp_corrected_pass,
-                    'N_mp_pass':            self.N_mp_pass,
-                    'N_mp_ref_pass':        self.N_mp_ref_pass,
-                    'nel_hist_impact_seg':  self.nel_hist_impact_seg,
-                    'energ_eV_impact_seg':  self.energ_eV_impact_seg,
-                    't_sec_beams':          self.t_sec_beams,
-                    'sec_beam_profiles':    self.sec_beam_profiles,
-                    'x_el_dens_probes':     self.x_el_dens_probes,
-                    'y_el_dens_probes':     self.y_el_dens_probes,
-                    'r_el_dens_probes':     self.r_el_dens_probes,
-                    'nel_hist_det':         self.nel_hist_det,
-                    'xg_hist_det':          self.xg_hist_det,
-                    'dec_fact_out':         self.dec_fact_out,
+                    'En_g_hist': self.En_g_hist,
+                    'En_hist': self.En_hist,
+                    't_En_hist': self.t_En_hist,
+                    'b_spac': self.b_spac,
+                    't_sc_video': np.array(self.t_sc_video),
+                    'U_sc_eV': np.array(self.U_sc_eV),
+                    'N_mp_impact_pass': self.N_mp_impact_pass,
+                    'N_mp_corrected_pass': self.N_mp_corrected_pass,
+                    'N_mp_pass': self.N_mp_pass,
+                    'N_mp_ref_pass': self.N_mp_ref_pass,
+                    'nel_hist_impact_seg': self.nel_hist_impact_seg,
+                    'energ_eV_impact_seg': self.energ_eV_impact_seg,
+                    't_sec_beams': self.t_sec_beams,
+                    'sec_beam_profiles': self.sec_beam_profiles,
+                    'x_el_dens_probes': self.x_el_dens_probes,
+                    'y_el_dens_probes': self.y_el_dens_probes,
+                    'r_el_dens_probes': self.r_el_dens_probes,
+                    'nel_hist_det': self.nel_hist_det,
+                    'xg_hist_det': self.xg_hist_det,
+                    'dec_fact_out': self.dec_fact_out,
                     'sey_test_E_impact_eV': self.sey_test_E_impact_eV,
-                    'sey_test_cos_theta':   self.sey_test_cos_theta,
+                    'sey_test_cos_theta': self.sey_test_cos_theta,
                     'sey_test_del_true_mat': self.sey_test_del_true_mat,
                     'sey_test_del_elast_mat': self.sey_test_del_elast_mat,
-                    'chamber_area':         self.area,
-                    'cos_angle_hist':       self.cos_angle_hist,
-                    'xg_hist_cos_angle':    self.xg_hist_cos_angle
+                    'chamber_area': self.area,
+                    'cos_angle_hist': self.cos_angle_hist,
+                    'xg_hist_cos_angle': self.xg_hist_cos_angle
                 }
 
         saved_dict.update(self._stepbystep_get_dict())
