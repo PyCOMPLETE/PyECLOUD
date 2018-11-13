@@ -31,6 +31,7 @@ begin =    '''#-----------------------------------------------------------------
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
