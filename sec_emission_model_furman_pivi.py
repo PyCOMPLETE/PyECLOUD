@@ -50,25 +50,13 @@
 
 import numpy as np
 import numpy.random as random
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 
-def energy_rediffused(self, E0):
-    randn = random.rand(len(E0))
-    return randn**(1 / (self.q + 1)) * E0
-
-
-def energy_trueSecondary(self, E0):
-    u = random.rand(len(E0))
-    E_out = self.eHat0
-    return E_out
-
-
-class SEY_model_furman_pivi(SEY_model_ECLOUD):
-    def __init__(self, Emax, del_max, R0,
+class SEY_model_furman_pivi():
+    def __init__(self, #eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                 E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
+                 s=1.35
                  ):
 
         self.E_th = E_th
@@ -84,15 +72,11 @@ class SEY_model_furman_pivi(SEY_model_ECLOUD):
         else:
             self.angle_dist_func = None
 
-        self.Emax = Emax
-        self.del_max = del_max
-        self.R0 = R0
-        self.E0 = E0
+        # self.eHat0 = eHat0
+        # self.deltaTSHat = deltaTSHat
         self.s = s
-        self.flag_costheta_delta_scale = flag_costheta_delta_scale
-        self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
-        print 'Secondary emission model: Furman-Pivi E0=%.4f s=%.4f' % (self.E0, self.s)
+        print 'Secondary emission model: Furman-Pivi s=%.4f' % (self.s)
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
         # Furman-Pivi algorithm
@@ -185,3 +169,52 @@ class SEY_model_furman_pivi(SEY_model_ECLOUD):
         angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
 
         return delta_ts0 * angular_factor
+
+    def energy_rediffused(self, E0):
+        randn = random.rand(len(E0))
+        return randn**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
+
+    def energy_trueSecondary(self, E0):
+        u = random.rand(len(E0))
+        E_out = self.eHat0
+        return E_out
+
+
+class SEY_model_FP_Cu(SEY_model_furman_pivi):
+
+    # Parameters for backscattered (elastically scattered) electrons
+    # (25) in FP paper
+    p1EInf = 0.02      # Minimum probability of elastic scattering (at infinite energy)
+    p1Ehat = 0.496     # Peak probability
+    eEHat = 0.        # Peak energy
+    w = 60.86     # Exponential factor 1
+    p = 1.        # Exponential factor 2
+    # (47a)                 # Angular factors
+    e1 = 0.26
+    e2 = 2.
+    # (26)
+    sigmaE = 2.
+
+    # Parameters for rediffused electrons
+    # (28)
+    p1RInf = 0.2       # Minimum probability of rediffused scattering (at infinite energy)
+    eR = 0.041     # Peak energy
+    r = 0.104     # Exponential factor
+    # (29)
+    q = 0.5
+    # (47b)                 # Angular factors
+    r1 = 0.26
+    r2 = 2.
+
+    # Parameters for true secondaries
+    # (31)
+    deltaTSHat = 1.8848    # Maximum probability of secondaries
+    eHat0 = 276.8     # Peak enery
+    # (32)
+    s = 1.54      # Form factor of fitting curve
+    # (48a)                 # Angular factors
+    t1 = 0.66
+    t2 = 0.8
+    # (48b)
+    t3 = 0.7
+    t4 = 1.
