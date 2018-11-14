@@ -48,25 +48,28 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from numpy import sqrt, exp
-from numpy.random import rand
+import numpy as np
+import numpy.random as random
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 
-def yield_fun_furman_pivi(E,costheta,Emax,del_max,R0,E0):
-    del_true_sec = None
-    del_reflected = None
-    del_rediffused = None
-    return del_true_sec+del_reflected+del_rediffused, del_reflected, del_rediffused
+def energy_rediffused(self, E0):
+    randn = random.rand(len(E0))
+    return randn**(1 / (self.q + 1)) * E0
+
+
+def energy_trueSecondary(self, E0):
+    u = random.rand(len(E0))
+    E_out = self.eHat0
+    return E_out
 
 
 class SEY_model_furman_pivi(SEY_model_ECLOUD):
-    def __init__(
-                    self, Emax, del_max, R0,
-                    E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                    E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
-                ):
+    def __init__(self, Emax, del_max, R0,
+                 E_th=None, sigmafit=None, mufit=None,
+                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
+                 E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
+                 ):
 
         self.E_th = E_th
         self.sigmafit = sigmafit
@@ -91,13 +94,94 @@ class SEY_model_furman_pivi(SEY_model_ECLOUD):
 
         print 'Secondary emission model: Furman-Pivi E0=%.4f s=%.4f' % (self.E0, self.s)
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
+        # Furman-Pivi algorithm
+        # (1): Compute emission angles and energy
 
-        yiel, ref_frac, del_rediffused = yield_fun_furman_pivi(
-            E_impact_eV, costheta_impact,self.Emax, self.del_max, self.R0, E0=self.E0, s=self.s,
-            flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
-        flag_elast = None
-        flag_truesec = None
-        nel_emit = None
+        # Already implemented in the impact_man class.
 
-        return nel_emit, flag_elast, flag_truesec
+        # (2): Compute delta_e, delta_r, delta_ts
+        delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(self, E_impact_eV, costheta_impact)
+
+        # (3): Generate probability of number electrons created
+
+        # Emission probability per penetrated electron
+
+        # Decide on type
+        rand = random.rand(E_impact_eV.size)
+        flag_rediffused = rand < delta_r
+        flag_backscattered = np.logical_and(~flag_rediffused, rand < delta_r + delta_e)
+        flag_truesec = np.logical_and(~flag_rediffused, ~flag_backscattered)
+
+        # Reflected or backscattered electrons have yield 1 by definition.
+        delta = np.ones_like(E_impact_eV, dtype=float)
+        # True secondary part has to be adjusted accordingly.
+        delta[flag_truesec] = delta_ts[flag_truesec] / (1. - delta_r[flag_truesec] - delta_e[flag_truesec])  # Eq. (39) in FP paper
+
+        # (4): Generate number of secondaries for every impact
+        # In impacts_on_surface
+
+        # (5): Delete if n = 0
+        # Done automatically by the MP system.
+
+        # (6): Generate energy:
+        # In impacts_on_surface
+
+        nel_emit = delta * nel_impact
+
+        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
+
+    # def _yield_fun_furman_pivi(self, E_impact_eV, costheta_impact):
+    #
+    #     # elastic
+    #     delta_e = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(-(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p) * (1. + self.e1 * (1. - costheta_impact**self.e2))
+    #     delta_r = self.p1RInf * (1. - np.exp(-(E_impact_eV / self.eR)**self.r)) * (1. + self.r1 * (1. - costheta_impact**self.r2))
+    #     delta_ts = self.deltaTSHat * self._D(E_impact_eV / (self.eHat0 * (1. + self.t3 * (1. - np.cos(costheta_impact)**self.t4)))) * (1. + self.t1 * (1. - costheta_impact**self.t2))
+    #
+    #     return delta_e, delta_r, delta_ts
+
+    def _D(self, x):
+        s = self.s
+        return s * x / (s - 1 + x**s)
+
+    def _yield_fun_furman_pivi(self, E, costheta):
+        delta_e = self._delta_e
+        delta_r = self._delta_r
+        delta_ts = self._delta_ts
+        return delta_e, delta_r, delta_ts
+
+    def _delta_e(self, E_impact_eV, costheta_impact):
+        """
+        Backscattered electrons (elastically scattered).
+        (25) in FP paper.
+        """
+
+        exp_factor = -(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p
+        delta_e0 = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(exp_factor)
+        angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
+
+        return delta_e0 * angular_factor
+
+    def _delta_r(self, E_impact_eV, costheta_impact):
+        """
+        Rediffused electrons (not in ECLOUD model).
+        (28) in FP paper.
+        """
+
+        exp_factor = -(E_impact_eV / self.eR)**self.r
+        delta_r0 = self.p1RInf * (1. - np.exp(exp_factor))
+        angular_factor = 1. + self.r1 * (1. - costheta_impact**self.r2)
+
+        return delta_r0 * angular_factor
+
+    def _delta_ts(self, E_impact_eV, costheta_impact):
+        """
+        True secondaries.
+        (31) in FP paper.
+        """
+
+        eHat = self.eHat0 * (1. + self.t3 * (1. - np.cos(costheta_impact)**self.t4))
+        delta_ts0 = self.deltaTSHat * self._D(E_impact_eV / eHat)
+        angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
+
+        return delta_ts0 * angular_factor

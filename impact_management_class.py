@@ -165,7 +165,7 @@ class impact_management(object):
             DEn_hist = self.DEn_hist
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
-            
+
             ## impact management
 
             flag_impact = np.zeros_like(x_mp, dtype=bool)
@@ -229,7 +229,7 @@ class impact_management(object):
                     nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
                     nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
                     self.sey_mod.impacts_on_surface(
-                                MP_e.mass, nel_impact, x_impact, y_impact, z_impact, 
+                                MP_e.mass, nel_impact, x_impact, y_impact, z_impact,
                                 vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                                 v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg
                                                    )
@@ -295,16 +295,16 @@ class impact_management(object):
                     nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
                     nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
                     self.sey_mod.impacts_on_surface(
-                                mass = mass, nel_impact=nel_impact, x_impact=nel_impact*0, y_impact=nel_impact*0, z_impact=nel_impact*0, 
-                                vx_impact=vx*np.ones_like(nel_impact), 
-                                vy_impact=vy*np.ones_like(nel_impact), 
-                                vz_impact=nel_impact*0, 
-                                Norm_x=np.ones_like(nel_impact), Norm_y=np.zeros_like(nel_impact), 
+                                mass = mass, nel_impact=nel_impact, x_impact=nel_impact*0, y_impact=nel_impact*0, z_impact=nel_impact*0,
+                                vx_impact=vx*np.ones_like(nel_impact),
+                                vy_impact=vy*np.ones_like(nel_impact),
+                                vz_impact=nel_impact*0,
+                                Norm_x=np.ones_like(nel_impact), Norm_y=np.zeros_like(nel_impact),
                                 i_found=np.int_(np.ones_like(nel_impact)),
-                                v_impact_n = vx*np.ones_like(nel_impact), 
-                                E_impact_eV = Ene*np.ones_like(nel_impact), 
-                                costheta_impact = ct*np.ones_like(nel_impact), 
-                                nel_mp_th=1, 
+                                v_impact_n = vx*np.ones_like(nel_impact),
+                                E_impact_eV = Ene*np.ones_like(nel_impact),
+                                costheta_impact = ct*np.ones_like(nel_impact),
+                                nel_mp_th=1,
                                 flag_seg = True)
                 del_tot = (np.sum(nel_replace) + np.sum(nel_new_MPs))/n_rep
                 del_true_mat[i_ct, i_ene] = del_tot*float(np.sum(event_type))/float(n_rep)
@@ -312,4 +312,3 @@ class impact_management(object):
         print('Done extracting SEY curves.')
 
         return del_true_mat, del_elast_mat
-
