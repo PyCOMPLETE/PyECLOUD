@@ -3,7 +3,7 @@ import sys
 import os
 import time
 import argparse
-BIN = os.path.expanduser("../../../") #folder containing PyECLOUD, PyPIC, PyKLU
+BIN = os.path.expanduser("../../../")  # folder containing PyECLOUD, PyPIC, PyKLU
 if BIN not in sys.path:
     sys.path.append(BIN)
 
@@ -16,15 +16,15 @@ sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multispecies'
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation_folder')
 parser.add_argument('--angle-dist-func',
-            help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.',
-            choices=('2D', '3D'), default='3D')
+                    help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.',
+                    choices=('2D', '3D'), default='3D')
 
 args = parser.parse_args()
 if args.folder:
     sim_folder = args.folder
 
 angle_distribution = 'cosine_%s' % args.angle_dist_func
-filen_main_outp = sim_folder+'/Pyecltest_angle%s.mat' % args.angle_dist_func
+filen_main_outp = sim_folder + '/Pyecltest_angle%s.mat' % args.angle_dist_func
 
 
 time_0 = time.time()

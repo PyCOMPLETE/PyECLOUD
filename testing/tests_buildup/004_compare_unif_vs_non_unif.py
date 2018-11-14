@@ -1,6 +1,6 @@
 import os, sys
 
-BIN = os.path.expanduser("../../../") #folder containing PyECLOUD, PyPIC, PyKLU
+BIN = os.path.expanduser("../../../")  # folder containing PyECLOUD, PyPIC, PyKLU
 if BIN not in sys.path:
     sys.path.append(BIN)
 

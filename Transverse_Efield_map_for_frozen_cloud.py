@@ -7,8 +7,8 @@ from PyPIC.PyPIC_Scatter_Gather import PyPIC_Scatter_Gather
 
 class Transverse_Efield_map(object):
     def __init__(self, xg, yg, Ex, Ey, L_interaction, slicer,
-            flag_clean_slices=False, wrt_slice_centroid=False,
-            x_beam_offset=0., y_beam_offset=0., slice_by_slice_mode=False):
+                 flag_clean_slices=False, wrt_slice_centroid=False,
+                 x_beam_offset=0., y_beam_offset=0., slice_by_slice_mode=False):
 
         self.slicer = slicer
         self.L_interaction = L_interaction
@@ -45,7 +45,7 @@ class Transverse_Efield_map(object):
         sid = 0
         for _ in xrange(slices.n_slices):
 
-            sid-=1
+            sid -= 1
 
             # select particles in the slice
             pid = slices.particle_indices_of_slice(sid)
@@ -59,8 +59,8 @@ class Transverse_Efield_map(object):
         x = self.get_beam_x(beam)[pid]
         y = self.get_beam_y(beam)[pid]
 
-        self.pic.efx = np.squeeze(self.Ex[sid,:,:])
-        self.pic.efy = np.squeeze(self.Ey[sid,:,:])
+        self.pic.efx = np.squeeze(self.Ex[sid, :, :])
+        self.pic.efy = np.squeeze(self.Ey[sid, :, :])
 
         centroid_x = 0
         centroid_y = 0
@@ -73,7 +73,7 @@ class Transverse_Efield_map(object):
             y - centroid_y + self.y_beam_offset)
 
         # kick beam particles
-        fact_kick = beam.charge / (beam.p0*beam.beta*c) * self.L_interaction
+        fact_kick = beam.charge / (beam.p0 * beam.beta * c) * self.L_interaction
         beam.xp[pid] += fact_kick * Ex_sc_p
         beam.yp[pid] += fact_kick * Ey_sc_p
 
