@@ -22,6 +22,7 @@
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -52,31 +53,32 @@ from numpy import sqrt, exp
 from numpy.random import rand
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
-def yield_fun3(E,costheta,Emax,del_max,R0,E0):
 
-    s=1.35;
+def yield_fun3(E, costheta, Emax, del_max, R0, E0):
 
-    del_max_tilde=del_max*exp(0.5*(1-costheta));
-    E_max_tilde=Emax*(1+0.7*(1-costheta));
+    s = 1.35
 
-    x=E/E_max_tilde;
+    del_max_tilde = del_max * exp(0.5 * (1 - costheta))
+    E_max_tilde = Emax * (1 + 0.7 * (1 - costheta))
 
-    del_true_sec=del_max_tilde*(s*x)/(s-1+x**s);
-    del_reflected=R0*((sqrt(E)-sqrt(E+E0))/(sqrt(E)+sqrt(E+E0)))**2;
+    x = E / E_max_tilde
 
-    delta=del_true_sec+del_reflected;
+    del_true_sec = del_max_tilde * (s * x) / (s - 1 + x**s)
+    del_reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0)))**2
 
-    ref_frac=del_reflected/delta;
+    delta = del_true_sec + del_reflected
+
+    ref_frac = del_reflected / delta
 
     return del_true_sec, del_reflected, ref_frac
 
 
 class SEY_model_acc_low_ene(SEY_model_ECLOUD):
-    def __init__(self, Emax,del_max,R0,E0=150,
-                    E_th=None, sigmafit=None, mufit=None, 
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+    def __init__(self, Emax, del_max, R0, E0=150,
+                 E_th=None, sigmafit=None, mufit=None,
+                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
-            
+
             self.E_th = E_th
             self.sigmafit = sigmafit
             self.mufit = mufit
@@ -95,17 +97,17 @@ class SEY_model_acc_low_ene(SEY_model_ECLOUD):
             self.R0 = R0
             self.E0 = E0
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
-            del_true_sec, del_reflected, ref_frac = yield_fun3(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0, E0=self.E0);
-            ref_prob=del_reflected;
-            beta_ts=del_true_sec/(1.-del_reflected);
+            del_true_sec, del_reflected, ref_frac = yield_fun3(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0)
+            ref_prob = del_reflected
+            beta_ts = del_true_sec / (1. - del_reflected)
 
-            flag_elast=(rand(len(ref_prob))<ref_prob);
-            flag_truesec=~(flag_elast);
+            flag_elast = (rand(len(ref_prob)) < ref_prob)
+            flag_truesec = ~(flag_elast)
 
-            nel_emit=nel_impact;
-            nel_emit[flag_truesec]=nel_impact[flag_truesec]*beta_ts[flag_truesec];
+            nel_emit = nel_impact
+            nel_emit[flag_truesec] = nel_impact[flag_truesec] * beta_ts[flag_truesec]
 
-            return  nel_emit, flag_elast, flag_truesec
+            return nel_emit, flag_elast, flag_truesec
 

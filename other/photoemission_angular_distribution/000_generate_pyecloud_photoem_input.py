@@ -17,7 +17,7 @@ distr_unif = np.interp(theta_unif, theta_data, distr_data)
 
 # Build CDF
 integ = cumtrapz(distr_unif, theta_unif)
-cdf = np.concatenate((np.array([0.]), integ))/np.max(integ)
+cdf = np.concatenate((np.array([0.]), integ)) / np.max(integ)
 
 # Invert
 N_u_sam = 10000
@@ -27,8 +27,8 @@ angles = np.interp(u_sam, cdf, theta_unif)
 # Save
 pyecl_phem_filename = 'inv_cdf_phem_ang_distrib'
 sio.savemat(pyecl_phem_filename, {
-    'u_sam':u_sam,
-    'angles':angles}, oned_as='row')
+    'u_sam': u_sam,
+    'angles': angles}, oned_as='row')
 
 
 pl.close('all')

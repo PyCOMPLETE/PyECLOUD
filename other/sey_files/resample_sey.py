@@ -22,7 +22,7 @@ def resample_sey_data(energy_eV_samples, sey_true_samples, sey_elast_samples, un
     sey_elast_0 = np.array(sey_elast_samples, dtype=float)
 
     # Build equally spaced arrays that are used by the interp function
-    energy_eV = np.arange(energy_eV_0.min(), energy_eV_0.max()+uniform_dE*.5, uniform_dE)
+    energy_eV = np.arange(energy_eV_0.min(), energy_eV_0.max() + uniform_dE * .5, uniform_dE)
 
     sey_true = np.interp(energy_eV, energy_eV_0, sey_true_0)
     extrapolate_grad_true, extrapolate_const_true = get_linear_extrapolation_parameters(energy_eV, sey_true, range_extrapolate_right)
@@ -38,7 +38,7 @@ def resample_sey_data(energy_eV_samples, sey_true_samples, sey_elast_samples, un
         'extrapolate_const_true': extrapolate_const_true,
         'extrapolate_grad_elast': extrapolate_grad_elast,
         'extrapolate_const_elast': extrapolate_const_elast,
-        }
+    }
 
     return resampled
 

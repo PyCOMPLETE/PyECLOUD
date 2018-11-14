@@ -22,6 +22,7 @@
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -85,6 +86,7 @@ import parse_cloud_file as pcf
 import input_parameters_format_specification as inp_spec
 import cloud_manager as cman
 
+
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
 
@@ -118,10 +120,11 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
 
     return config_dict
 
+
 def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=False,
-            skip_pyeclsaver=False, skip_spacech_ele=False,
-            spacech_ele=None,
-            ignore_kwargs=(), **kwargs):
+                                         skip_pyeclsaver=False, skip_spacech_ele=False,
+                                         spacech_ele=None,
+                                         ignore_kwargs=(), **kwargs):
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
 
@@ -140,10 +143,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Init beam and possibly second beams
     if not skip_beam:
-        flag_presence_sec_beams = len(cc.secondary_beams_file_list)>0
+        flag_presence_sec_beams = len(cc.secondary_beams_file_list) > 0
         b_par = pbf.beam_descr_from_fil(os.path.join(pyecl_input_folder, cc.beam_parameters_file), cc.betafx, cc.Dx, cc.betafy, cc.Dy)
 
-        sec_b_par_list=[]
+        sec_b_par_list = []
         if flag_presence_sec_beams:
             for sec_b_file in cc.secondary_beams_file_list:
                 sec_b_par_list.append(pbf.beam_descr_from_fil(os.path.join(pyecl_input_folder, sec_b_file), cc.betafx, cc.Dx, cc.betafy, cc.Dy))
@@ -153,7 +156,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Init of saver (first print to stdout)
     if not skip_pyeclsaver:
-        pyeclsaver=pysav.pyecloud_saver(cc.logfile_path)
+        pyeclsaver = pysav.pyecloud_saver(cc.logfile_path)
     else:
         pyeclsaver = None
 
@@ -183,10 +186,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     if cc.chamb_type == 'ellip':
         chamb = ellip_cham_geom_object(cc.x_aper, cc.y_aper, flag_verbose_file=cc.flag_verbose_file)
     elif cc.chamb_type in ('polyg', 'polyg_cython'):
-        if os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm):
-            filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm
-        elif os.path.isfile(pyecl_input_folder+'/'+cc.filename_chm+'.mat'):
-            filename_chm_path = pyecl_input_folder+'/'+cc.filename_chm+'.mat'
+        if os.path.isfile(pyecl_input_folder + '/' + cc.filename_chm):
+            filename_chm_path = pyecl_input_folder + '/' + cc.filename_chm
+        elif os.path.isfile(pyecl_input_folder + '/' + cc.filename_chm + '.mat'):
+            filename_chm_path = pyecl_input_folder + '/' + cc.filename_chm + '.mat'
         else:
             filename_chm_path = cc.filename_chm
         chamb = gipfi.polyg_cham_geom_object(filename_chm_path, flag_non_unif_sey, **chamber_kwargs)
@@ -199,35 +202,35 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     if not skip_beam:
 
         try:
-            if os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file):
-                beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file
-            elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
-                beam_long_prof_file_path = pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'
+            if os.path.isfile(pyecl_input_folder + '/' + b_par.beam_long_prof_file):
+                beam_long_prof_file_path = pyecl_input_folder + '/' + b_par.beam_long_prof_file
+            elif os.path.isfile(pyecl_input_folder + '/' + b_par.beam_long_prof_file + '.mat'):
+                beam_long_prof_file_path = pyecl_input_folder + '/' + b_par.beam_long_prof_file + '.mat'
             else:
                 beam_long_prof_file_path = b_par.beam_long_prof_file
         except:
             beam_long_prof_file_path = b_par.beam_long_prof_file
 
-        beamtim=beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.q_part, b_par.beam_field_file,cc.lam_th,
-                     b_spac=b_par.b_spac, sigmaz=b_par.sigmaz,t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
-                     beam_long_prof_file=beam_long_prof_file_path, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam=b_par.f_telescope_beam,
-                     target_grid_beam=b_par.target_grid_beam, N_nodes_discard_beam=b_par.N_nodes_discard_beam, N_min_Dh_main_beam=b_par.N_min_Dh_main_beam,
-                     chamb=chamb,  sigmax=b_par.sigmax, sigmay=b_par.sigmay,
-                     x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
-                     Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=(cc.progress_path+'_mapgen'))
+        beamtim = beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.q_part, b_par.beam_field_file, cc.lam_th,
+                                         b_spac=b_par.b_spac, sigmaz=b_par.sigmaz, t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
+                                         beam_long_prof_file=beam_long_prof_file_path, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam=b_par.f_telescope_beam,
+                                         target_grid_beam=b_par.target_grid_beam, N_nodes_discard_beam=b_par.N_nodes_discard_beam, N_min_Dh_main_beam=b_par.N_min_Dh_main_beam,
+                                         chamb=chamb, sigmax=b_par.sigmax, sigmay=b_par.sigmay,
+                                         x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
+                                         Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=(cc.progress_path + '_mapgen'))
 
-        sec_beams_list=[]
+        sec_beams_list = []
         if flag_presence_sec_beams:
             N_sec_beams = len(sec_b_par_list)
             for ii in xrange(N_sec_beams):
-                print('Initialize secondary beam %d/%d' % (ii+1, N_sec_beams))
+                print('Initialize secondary beam %d/%d' % (ii + 1, N_sec_beams))
                 sb_par = sec_b_par_list[ii]
 
                 try:
-                    if os.path.isfile(pyecl_input_folder+'/'+sb_par.beam_long_prof_file):
-                        sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file
-                    elif os.path.isfile(pyecl_input_folder+'/'+b_par.beam_long_prof_file+'.mat'):
-                        sbeam_long_prof_file_path = pyecl_input_folder+'/'+sb_par.beam_long_prof_file+'.mat'
+                    if os.path.isfile(pyecl_input_folder + '/' + sb_par.beam_long_prof_file):
+                        sbeam_long_prof_file_path = pyecl_input_folder + '/' + sb_par.beam_long_prof_file
+                    elif os.path.isfile(pyecl_input_folder + '/' + b_par.beam_long_prof_file + '.mat'):
+                        sbeam_long_prof_file_path = pyecl_input_folder + '/' + sb_par.beam_long_prof_file + '.mat'
                     else:
                         sbeam_long_prof_file_path = sb_par.beam_long_prof_file
                 except TypeError:
@@ -235,13 +238,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                     sbeam_long_prof_file_path = sb_par.beam_long_prof_file
 
                 sec_beams_list.append(beatim.beam_and_timing(sb_par.flag_bunched_beam, sb_par.fact_beam, sb_par.coast_dens, sb_par.q_part, sb_par.beam_field_file, cc.lam_th,
-                     b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz,t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
-                     beam_long_prof_file=sbeam_long_prof_file_path, Dh_beam_field=sb_par.Dh_beam_field, f_telescope_beam=sb_par.f_telescope_beam,
-                     target_grid_beam=sb_par.target_grid_beam, N_nodes_discard_beam=sb_par.N_nodes_discard_beam, N_min_Dh_main_beam=sb_par.N_min_Dh_main_beam,
-                     chamb=chamb, sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
-                     x_beam_pos=sb_par.x_beam_pos, y_beam_pos=sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
-                     flag_secodary_beam=True, t_primary_beam=beamtim.t,
-                     Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file=(cc.progress_path+('_mapgen_sec_%d' % ii))))
+                                                             b_spac=sb_par.b_spac, sigmaz=sb_par.sigmaz, t_offs=sb_par.t_offs, filling_pattern_file=sb_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
+                                                             beam_long_prof_file=sbeam_long_prof_file_path, Dh_beam_field=sb_par.Dh_beam_field, f_telescope_beam=sb_par.f_telescope_beam,
+                                                             target_grid_beam=sb_par.target_grid_beam, N_nodes_discard_beam=sb_par.N_nodes_discard_beam, N_min_Dh_main_beam=sb_par.N_min_Dh_main_beam,
+                                                             chamb=chamb, sigmax=sb_par.sigmax, sigmay=sb_par.sigmay,
+                                                             x_beam_pos=sb_par.x_beam_pos, y_beam_pos=sb_par.y_beam_pos, save_beam_field_file_as=sb_par.save_beam_field_file_as,
+                                                             flag_secodary_beam=True, t_primary_beam=beamtim.t,
+                                                             Nx=sb_par.Nx, Ny=sb_par.Ny, nimag=sb_par.nimag, progress_mapgen_file=(cc.progress_path + ('_mapgen_sec_%d' % ii))))
     else:
         beamtim = None
         sec_beams_list = []
@@ -252,11 +255,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     elif spacech_ele is not None:
         spacech_ele_sim = spacech_ele
     else:
-        if cc.sparse_solver=='klu':
+        if cc.sparse_solver == 'klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
-            cc.sparse_solver='PyKLU'
+            cc.sparse_solver = 'PyKLU'
         spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
-                            f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
+                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -268,7 +271,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         # Init saver for all but default cloud (which is already initialized)
         if cloud_par is not cloud_par_list[0]:
             if not skip_pyeclsaver:
-                pyeclsaver=pysav.pyecloud_saver(thiscloud.logfile_path)
+                pyeclsaver = pysav.pyecloud_saver(thiscloud.logfile_path)
             else:
                 pyeclsaver = None
 
@@ -287,48 +290,48 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
             kwargs_secem = {}
             if thiscloud.E0 is not None:
-                kwargs_secem.update({'E0':thiscloud.E0})
+                kwargs_secem.update({'E0': thiscloud.E0})
                 #If E0 is not provided use default value for each object
             if thiscloud.s_param is not None:
-                if thiscloud.switch_model==0 or thiscloud.switch_model=='ECLOUD':
-                    kwargs_secem.update({'s':thiscloud.s_param})
+                if thiscloud.switch_model == 0 or thiscloud.switch_model == 'ECLOUD':
+                    kwargs_secem.update({'s': thiscloud.s_param})
                 else:
                     raise inp_spec.PyECLOUD_ConfigException('s parameter can be changed only in the ECLOUD sec. emission model!')
 
             if thiscloud.switch_model in (0, 'ECLOUD'):
                 kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
                 kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
-                sey_mod=SEY_model_ECLOUD(
-                                            thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
-                                            switch_no_increase_energy=thiscloud.switch_no_increase_energy,
-                                            thresh_low_energy=thiscloud.thresh_low_energy,
-                                            secondary_angle_distribution=thiscloud.secondary_angle_distribution,
-                                            **kwargs_secem)
+                sey_mod = SEY_model_ECLOUD(
+                    thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                    E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                    switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                    thresh_low_energy=thiscloud.thresh_low_energy,
+                    secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                    **kwargs_secem)
             elif thiscloud.switch_model in (1, 'ACC_LOW'):
-                sey_mod=SEY_model_acc_low_ene(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
-                                            switch_no_increase_energy=thiscloud.switch_no_increase_energy,
-                                            thresh_low_energy=thiscloud.thresh_low_energy,
-                                            secondary_angle_distribution=thiscloud.secondary_angle_distribution,
-                                            **kwargs_secem)
+                sey_mod = SEY_model_acc_low_ene(thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                                                E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                thresh_low_energy=thiscloud.thresh_low_energy,
+                                                secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                **kwargs_secem)
             elif thiscloud.switch_model == 'ECLOUD_nunif':
-                sey_mod=SEY_model_ECLOUD_non_unif(chamb, thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
-                                            switch_no_increase_energy=thiscloud.switch_no_increase_energy,
-                                            thresh_low_energy=thiscloud.thresh_low_energy,
-                                            secondary_angle_distribution=thiscloud.secondary_angle_distribution,
-                                            **kwargs_secem)
+                sey_mod = SEY_model_ECLOUD_non_unif(chamb, thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                                                    E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                    switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                    thresh_low_energy=thiscloud.thresh_low_energy,
+                                                    secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                    **kwargs_secem)
             elif thiscloud.switch_model == 'cos_low_ene':
-                sey_mod=SEY_model_cos_le(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
-                                            switch_no_increase_energy=thiscloud.switch_no_increase_energy,
-                                            thresh_low_energy=thiscloud.thresh_low_energy,
-                                            secondary_angle_distribution=thiscloud.secondary_angle_distribution,
-                                            **kwargs_secem)
+                sey_mod = SEY_model_cos_le(thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                                           E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                           switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                           thresh_low_energy=thiscloud.thresh_low_energy,
+                                           secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                           **kwargs_secem)
             elif thiscloud.switch_model == 'flat_low_ene':
-                sey_mod=SEY_model_flat_le(thiscloud.Emax,thiscloud.del_max,thiscloud.R0,
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
+                sey_mod = SEY_model_flat_le(thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                             switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                             thresh_low_energy=thiscloud.thresh_low_energy,
                                             secondary_angle_distribution=thiscloud.secondary_angle_distribution,
@@ -336,54 +339,54 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             elif thiscloud.switch_model == 'from_file':
                 kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
                 kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
-                if os.path.isfile(pyecl_input_folder+'/'+thiscloud.sey_file):
-                    sey_file_path = pyecl_input_folder+'/'+thiscloud.sey_file
-                elif os.path.isfile(pyecl_input_folder+'/'+thiscloud.sey_file+'.mat'):
-                    sey_file_path = pyecl_input_folder+'/'+thiscloud.sey_file+'.mat'
+                if os.path.isfile(pyecl_input_folder + '/' + thiscloud.sey_file):
+                    sey_file_path = pyecl_input_folder + '/' + thiscloud.sey_file
+                elif os.path.isfile(pyecl_input_folder + '/' + thiscloud.sey_file + '.mat'):
+                    sey_file_path = pyecl_input_folder + '/' + thiscloud.sey_file + '.mat'
                 else:
                     sey_file_path = thiscloud.sey_file
-                sey_mod = SEY_model_from_file(sey_file_path, 
-                                            E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit, 
-                                            switch_no_increase_energy=thiscloud.switch_no_increase_energy,
-                                            thresh_low_energy=thiscloud.thresh_low_energy,
-                                            secondary_angle_distribution=thiscloud.secondary_angle_distribution,
-                                            **kwargs_secem)
+                sey_mod = SEY_model_from_file(sey_file_path,
+                                              E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                              switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                              thresh_low_energy=thiscloud.thresh_low_energy,
+                                              secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                              **kwargs_secem)
             else:
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
         # Init impact management
-        flag_seg = (thiscloud.flag_hist_impact_seg==1)
-        if thiscloud.switch_model=='perfect_absorber':
+        flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+        if thiscloud.switch_model == 'perfect_absorber':
             impact_man_class = pac.impact_management_perfect_absorber
         else:
-            impact_man_class=imc.impact_management
+            impact_man_class = imc.impact_management
 
-        impact_man = impact_man_class(chamb, sey_mod, 
+        impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
                                       flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
                                       )
 
         # Init gas ionization and photoemission
-        if thiscloud.gas_ion_flag==1:
-            resgasion=gic.residual_gas_ionization(thiscloud.unif_frac, thiscloud.P_nTorr, thiscloud.sigma_ion_MBarn,
-                                                  thiscloud.Temp_K,chamb,thiscloud.E_init_ion)
+        if thiscloud.gas_ion_flag == 1:
+            resgasion = gic.residual_gas_ionization(thiscloud.unif_frac, thiscloud.P_nTorr, thiscloud.sigma_ion_MBarn,
+                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion)
         else:
-            resgasion=None
+            resgasion = None
 
         if thiscloud.photoem_flag == 1:
-            phemiss=gpc.photoemission(thiscloud.inv_CDF_refl_photoem_file, thiscloud.k_pe_st, thiscloud.refl_frac, thiscloud.e_pe_sigma, thiscloud.e_pe_max,
-                                      thiscloud.alimit, thiscloud.x0_refl, thiscloud.y0_refl, thiscloud.out_radius, chamb, thiscloud.phem_resc_fac,
-                                      thiscloud.energy_distribution, thiscloud.photoelectron_angle_distribution, beamtim, thiscloud.flag_continuous_emission)
+            phemiss = gpc.photoemission(thiscloud.inv_CDF_refl_photoem_file, thiscloud.k_pe_st, thiscloud.refl_frac, thiscloud.e_pe_sigma, thiscloud.e_pe_max,
+                                        thiscloud.alimit, thiscloud.x0_refl, thiscloud.y0_refl, thiscloud.out_radius, chamb, thiscloud.phem_resc_fac,
+                                        thiscloud.energy_distribution, thiscloud.photoelectron_angle_distribution, beamtim, thiscloud.flag_continuous_emission)
         elif thiscloud.photoem_flag in (2, 'from_file'):
             phemiss = gpc.photoemission_from_file(thiscloud.inv_CDF_all_photoem_file, chamb, thiscloud.phem_resc_fac, thiscloud.energy_distribution,
                                                   thiscloud.e_pe_sigma, thiscloud.e_pe_max, thiscloud.k_pe_st, thiscloud.out_radius,
                                                   thiscloud.photoelectron_angle_distribution, beamtim, thiscloud.flag_continuous_emission)
         elif thiscloud.photoem_flag in (3, 'per_segment'):
 
-            if os.path.isfile(pyecl_input_folder+'/'+thiscloud.filename_chm_photoem):
-                filename_chm_photoem_path = pyecl_input_folder+'/'+thiscloud.filename_chm_photoem
-            elif os.path.isfile(pyecl_input_folder+'/'+thiscloud.filename_chm_photoem+'.mat'):
-                filename_chm_photoem_path = pyecl_input_folder+'/'+thiscloud.filename_chm_photoem+'.mat'
+            if os.path.isfile(pyecl_input_folder + '/' + thiscloud.filename_chm_photoem):
+                filename_chm_photoem_path = pyecl_input_folder + '/' + thiscloud.filename_chm_photoem
+            elif os.path.isfile(pyecl_input_folder + '/' + thiscloud.filename_chm_photoem + '.mat'):
+                filename_chm_photoem_path = pyecl_input_folder + '/' + thiscloud.filename_chm_photoem + '.mat'
             else:
                 filename_chm_photoem_path = thiscloud.filename_chm_photoem
 
@@ -415,54 +418,53 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init electron tracker
         if cc.track_method == 'Boris':
-            dynamics=dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
-                     cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
+            dynamics = dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
+                                         cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
             #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
-            if not(np.abs(thiscloud.cloud_charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.cloud_mass - m_e)/m_e<1e-3):
+            if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBdip tracking method is implemented only for electrons!')
-            if cc.B==-1:
-                B = 2*np.pi*b_par.beta_rel*b_par.energy_J/(c*qe*cc.bm_totlen)
+            if cc.B == -1:
+                B = 2 * np.pi * b_par.beta_rel * b_par.energy_J / (c * qe * cc.bm_totlen)
             else:
                 B = cc.B
-            dynamics=dyndip.pusher_dipole_magnet(cc.Dt, B)
+            dynamics = dyndip.pusher_dipole_magnet(cc.Dt, B)
         elif cc.track_method == 'StrongBgen':
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
-            if not(np.abs(thiscloud.cloud_charge - (-qe))/np.abs(qe)<1e-3 and np.abs(thiscloud.cloud_mass - m_e)/m_e<1e-3):
+            if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
-            dynamics=dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
-                        cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
+            dynamics = dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
+                                                          cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
         elif cc.track_method == 'BorisMultipole':
-            dynamics=dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
+            dynamics = dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
 
-
         # Initial electron density
-        if thiscloud.init_unif_flag==1:
+        if thiscloud.init_unif_flag == 1:
             print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
             MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif,
                                         thiscloud.x_max_init_unif, thiscloud.x_min_init_unif,
                                         thiscloud.y_max_init_unif, thiscloud.y_min_init_unif)
 
-        if thiscloud.init_unif_edens_flag==1:
+        if thiscloud.init_unif_edens_flag == 1:
             print("Adding inital %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
             MP_e.add_uniform_ele_density(n_ele=thiscloud.init_unif_edens, E_init=thiscloud.E_init_unif_edens,
                                          x_max=thiscloud.x_max_init_unif_edens, x_min=thiscloud.x_min_init_unif_edens,
                                          y_max=thiscloud.y_max_init_unif_edens, y_min=thiscloud.y_min_init_unif_edens)
 
-        if thiscloud.filename_init_MP_state!=-1 and thiscloud.filename_init_MP_state is not None:
+        if thiscloud.filename_init_MP_state != -1 and thiscloud.filename_init_MP_state is not None:
             print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud
         if hasattr(spacech_ele_sim, 'rho'):
-            rho = spacech_ele_sim.rho*0.
+            rho = spacech_ele_sim.rho * 0.
         else:
             rho = None
 
         cloud = cman.Cloud(thiscloud.cloud_name, thiscloud, MP_e, impact_man, dynamics, pyeclsaver, thiscloud.gas_ion_flag,
-                                   resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
+                           resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
 
         cloud_list.append(cloud)
 

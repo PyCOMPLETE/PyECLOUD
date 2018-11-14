@@ -5,12 +5,12 @@ files = os.listdir('.')
 for filename in files:
     if filename[-3:] == '.py':
         print filename
-        os.system('cp %s %s'%(filename, filename+'old'))
+        os.system('cp %s %s'%(filename, filename + 'old'))
         with open(filename) as fid:
-            content=fid.read()
+            content = fid.read()
         if 'giovanni.iadarola@cern.ch' in content:
-            content=content.replace('PyECLOUD Version 7.6.0', 'PyECLOUD Version 7.6.0')
-            with open(filename,'w') as fid:
+            content = content.replace('PyECLOUD Version 7.6.0', 'PyECLOUD Version 7.6.0')
+            with open(filename, 'w') as fid:
                 fid.write(content)
 
 os.system('rm *.pyold')

@@ -2,6 +2,7 @@ from PyHEADTAIL.machines.synchrotron import Synchrotron
 import numpy as np
 from scipy.constants import c, e, m_p
 
+
 class SPS(Synchrotron):
 
 	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
@@ -11,8 +12,8 @@ class SPS(Synchrotron):
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Q26-injection':
-			p0 		= 26e9 * e /c
+		if machine_configuration == 'Q26-injection':
+			p0 		= 26e9 * e / c
 			p_increment 	= 0.
 			accQ_x		= 26.13
 			accQ_y		= 26.18
@@ -23,8 +24,8 @@ class SPS(Synchrotron):
 			D_x 		= 0
 			beta_y 		= 42.
 			D_y 		= 0
-		elif machine_configuration=='Q20-injection':
-			p0 		= 26e9 * e /c
+		elif machine_configuration == 'Q20-injection':
+			p0 		= 26e9 * e / c
 			p_increment 	= 0.
 			accQ_x		= 20.13
 			accQ_y		= 20.18
@@ -38,11 +39,12 @@ class SPS(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
-			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+		if optics_mode == 'smooth':
+			if 's' in kwargs.keys():
+				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
-			circumference = 1100*2*np.pi
+			circumference = 1100 * 2 * np.pi
 
 			name = None
 
@@ -51,8 +53,9 @@ class SPS(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
-			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+		elif optics_mode == 'non-smooth':
+			if 'n_segments' in kwargs.keys():
+				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
 
@@ -64,11 +67,11 @@ class SPS(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']
@@ -97,34 +100,35 @@ class SPS(Synchrotron):
 				else:
 					str2print = repr(kwargs[attr])
 				self.prints('Synchrotron init. From kwargs: %s = %s'
-							% (attr, str2print))
-				temp =  kwargs[attr]
+                                    % (attr, str2print))
+				temp = kwargs[attr]
 				exec('%s = temp'%attr)
 
 		super(SPS, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-             alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-             accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-             alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-             h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-             charge=charge, mass=mass)
+                            alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
+                            accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
+                            alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
+                            h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
+                            charge=charge, mass=mass)
+
 
 class shortSPS(Synchrotron):
 
 	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
 
 		longitudinal_mode = 'linear'
-		h_RF       	= 4620/6
+		h_RF       	= 4620 / 6
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Q20-injection-like':
-			p0 		= 26e9 * e /c
+		if machine_configuration == 'Q20-injection-like':
+			p0 		= 26e9 * e / c
 			p_increment 	= 0.
 			accQ_x		= 5.13
 			accQ_y		= 5.18
 			V_RF		= 5.75e6
 			dphi_RF		= 0.
-			alpha		= 6*0.00308642
+			alpha		= 6 * 0.00308642
 			beta_x 		= 54.6
 			D_x 		= 0
 			beta_y 		= 54.6
@@ -132,11 +136,12 @@ class shortSPS(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
-			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+		if optics_mode == 'smooth':
+			if 's' in kwargs.keys():
+				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
-			circumference = 1100*2*np.pi/6.
+			circumference = 1100 * 2 * np.pi / 6.
 
 			name = None
 
@@ -145,8 +150,9 @@ class shortSPS(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
-			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+		elif optics_mode == 'non-smooth':
+			if 'n_segments' in kwargs.keys():
+				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
 
@@ -158,11 +164,11 @@ class shortSPS(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']
@@ -191,16 +197,17 @@ class shortSPS(Synchrotron):
 				else:
 					str2print = repr(kwargs[attr])
 				self.prints('Synchrotron init. From kwargs: %s = %s'
-							% (attr, str2print))
-				temp =  kwargs[attr]
+                                    % (attr, str2print))
+				temp = kwargs[attr]
 				exec('%s = temp'%attr)
 
 		super(shortSPS, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-             alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-             accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-             alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-             h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-             charge=charge, mass=mass)
+                                 alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
+                                 accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
+                                 alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
+                                 h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
+                                 charge=charge, mass=mass)
+
 
 class LHC(Synchrotron):
 
@@ -212,15 +219,15 @@ class LHC(Synchrotron):
 		mass 		= m_p
 		charge		= e
 
-		if machine_configuration=='Injection':
-			p0 			= 450e9 * e /c
+		if machine_configuration == 'Injection':
+			p0 			= 450e9 * e / c
 			p_increment = 0.
 			accQ_x		= 64.28
 			accQ_y		= 59.31
 			V_RF		= 6e6
 			dphi_RF		= 0.
-		elif machine_configuration=='6.5_TeV_collision_tunes':
-			p0 			= 6500e9 * e /c
+		elif machine_configuration == '6.5_TeV_collision_tunes':
+			p0 			= 6500e9 * e / c
 			p_increment = 0.
 			accQ_x		= 64.31
 			accQ_y		= 59.32
@@ -229,8 +236,9 @@ class LHC(Synchrotron):
 		else:
 			raise ValueError('machine_configuration not recognized!')
 
-		if optics_mode=='smooth':
-			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+		if optics_mode == 'smooth':
+			if 's' in kwargs.keys():
+				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
 			circumference = 26658.8832
@@ -247,8 +255,9 @@ class LHC(Synchrotron):
 
 			s = None
 
-		elif optics_mode=='non-smooth':
-			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+		elif optics_mode == 'non-smooth':
+			if 'n_segments' in kwargs.keys():
+				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
 
@@ -260,11 +269,11 @@ class LHC(Synchrotron):
 			try:
 				D_x 		= kwargs['D_x']
 			except KeyError:
-				D_x 		= 0*np.array(kwargs['s'])
+				D_x 		= 0 * np.array(kwargs['s'])
 			try:
 				D_y 		= kwargs['D_y']
 			except KeyError:
-				D_y 		= 0*np.array(kwargs['s'])
+				D_y 		= 0 * np.array(kwargs['s'])
 
 			alpha_x 	= kwargs['alpha_x']
 			alpha_y 	= kwargs['alpha_y']
@@ -293,8 +302,8 @@ class LHC(Synchrotron):
 				else:
 					str2print = repr(kwargs[attr])
 				self.prints('Synchrotron init. From kwargs: %s = %s'
-							% (attr, str2print))
-				temp =  kwargs[attr]
+                                    % (attr, str2print))
+				temp = kwargs[attr]
 				exec('%s = temp'%attr)
 
 		if i_octupole_focusing is not None or i_octupole_defocusing is not None:
@@ -307,17 +316,17 @@ class LHC(Synchrotron):
 		if octupole_knob is not None:
 			if i_octupole_focusing is not None or i_octupole_defocusing is not None:
 				raise ValueError('octupole_knobs and octupole currents cannot be used at the same time!')
-			i_octupole_focusing, i_octupole_defocusing =  self._octupole_currents_from_octupole_knobs(octupole_knob, p0)
+			i_octupole_focusing, i_octupole_defocusing = self._octupole_currents_from_octupole_knobs(octupole_knob, p0)
 			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)
 			self.i_octupole_focusing = i_octupole_focusing
 			self.i_octupole_defocusing = i_octupole_defocusing
 
 		super(LHC, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-             alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-             accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-             alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-             h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-             charge=charge, mass=mass)
+                            alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
+                            accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
+                            alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
+                            h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
+                            charge=charge, mass=mass)
 
 	def _anharmonicities_from_octupole_current_settings(self, i_octupole_focusing, i_octupole_defocusing):
 			"""Calculate the constants of proportionality app_x, app_y and
@@ -345,12 +354,12 @@ class LHC(Synchrotron):
 			i_max = 550.  # [A]
 			E_max = 7000. # [GeV]
 
-			app_x  = E_max * (267065. * i_octupole_focusing / i_max -
-				7856. * i_octupole_defocusing / i_max)
-			app_y  = E_max * (9789. * i_octupole_focusing / i_max -
-				277203. * i_octupole_defocusing / i_max)
+			app_x = E_max * (267065. * i_octupole_focusing / i_max -
+                            7856. * i_octupole_defocusing / i_max)
+			app_y = E_max * (9789. * i_octupole_focusing / i_max -
+                            277203. * i_octupole_defocusing / i_max)
 			app_xy = E_max * (-102261. * i_octupole_focusing / i_max +
-				93331. * i_octupole_defocusing / i_max)
+                            93331. * i_octupole_defocusing / i_max)
 
 			# Convert to SI units.
 			convert_to_SI = e / (1.e-9 * c)

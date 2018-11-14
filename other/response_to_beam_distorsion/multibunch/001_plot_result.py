@@ -21,5 +21,5 @@ ob = mlm.myloadmat_to_obj('./test_saving__iter0.mat')   # load dictionary of the
 N_pass = ob.nel_hist.shape[0]
 
 plt.figure(1)
-plt.pcolormesh(ob.xg_hist, ob.t_hist*1e9, ob.nel_hist, shading='Gouraud')
+plt.pcolormesh(ob.xg_hist, ob.t_hist * 1e9, ob.nel_hist, shading='Gouraud')
 plt.show()
