@@ -16,17 +16,17 @@ ob = mlo.myloadmat_to_obj(pyecl_output_file)
 pl.close('all')
 ms.mystyle_arial()
 
-fig1 = pl.figure(1, figsize=(2*8,6))
+fig1 = pl.figure(1, figsize=(2 * 8, 6))
 fig1.set_facecolor('w')
-sp1 = fig1.add_subplot(1,2,1)
-sp2 = fig1.add_subplot(1,2,2, sharex=sp1)
+sp1 = fig1.add_subplot(1, 2, 1)
+sp2 = fig1.add_subplot(1, 2, 2, sharex=sp1)
 for i_ct, ct in enumerate(ob.sey_test_cos_theta):
     thiscol = ms.colorprog(i_ct, len(ob.sey_test_cos_theta))
     label = 'costheta=%.2f'%ct
     sp1.plot(ob.sey_test_E_impact_eV, ob.sey_test_del_true_mat[i_ct, :], color=thiscol, label=label)
     sp2.plot(ob.sey_test_E_impact_eV, ob.sey_test_del_elast_mat[i_ct, :], color=thiscol, label=label)
 
-sp2.legend(loc='best', prop={'size':14})
+sp2.legend(loc='best', prop={'size': 14})
 sp1.set_ylabel('Delta true')
 sp2.set_ylabel('Delta elast')
 

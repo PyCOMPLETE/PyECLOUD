@@ -55,6 +55,7 @@ from numpy.random import randn
 from numpy import *
 from scipy.constants import c, k, e
 
+
 class residual_gas_ionization:
 
     def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion):
@@ -102,14 +103,14 @@ class residual_gas_ionization:
             x_temp = gauss_flag * (sigmax * randn(Nint_new_MP) + x_beam_pos) + self.chamb.x_aper * unif_flag * (2. * (rand(Nint_new_MP) - 0.5))
             y_temp = gauss_flag * (sigmay * randn(Nint_new_MP) + y_beam_pos) + self.chamb.y_aper * unif_flag * (2. * (rand(Nint_new_MP) - 0.5))
 
-            flag_np = self.chamb.is_outside(x_temp,y_temp) # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
+            flag_np = self.chamb.is_outside(x_temp, y_temp) # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
             Nout = int(sum(flag_np))
             while(Nout > 0):
                 unif_flag1 = unif_flag[flag_np]
                 gauss_flag1 = ~(unif_flag1)
                 x_temp[flag_np] = gauss_flag1 * (sigmax * randn(Nout) + x_beam_pos) + self.chamb.x_aper * unif_flag1 * (2 * (rand(Nout) - 0.5))
                 y_temp[flag_np] = gauss_flag1 * (sigmay * randn(Nout) + y_beam_pos) + self.chamb.y_aper * unif_flag1 * (2 * (rand(Nout) - 0.5))
-                flag_np = self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
+                flag_np = self.chamb.is_outside(x_temp, y_temp)  # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
                 Nout = int(sum(flag_np))
 
             MP_e.x_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = x_temp # Be careful to the indexing when translating to python

@@ -4,6 +4,7 @@ from scipy.constants import c, e as qe
 from . import input_parameters_format_specification as inp_spec
 from . import myloadmat_to_obj as mlm
 
+
 class beam_descr_from_fil:
     def __init__(self, beamfilename, betafx_from_mach_parms_file, Dx_from_mach_parms_file,
                  betafy_from_mach_parms_file, Dy_from_mach_parms_file):
@@ -33,25 +34,25 @@ class beam_descr_from_fil:
             cc.betafy = betafy_from_mach_parms_file
 
         energy_J = cc.energy_eV * qe
-        gamma_rel= energy_J/(cc.m0_part*c**2)
-        beta_rel = np.sqrt(1-1/(gamma_rel*gamma_rel))
+        gamma_rel = energy_J / (cc.m0_part * c**2)
+        beta_rel = np.sqrt(1 - 1 / (gamma_rel * gamma_rel))
         beta_rel = beta_rel.real
 
-        if (cc.sigmax==-1) and ((cc.betafx is None) or (cc.nemittx is None)):
+        if (cc.sigmax == -1) and ((cc.betafx is None) or (cc.nemittx is None)):
             raise ValueError('If sigmax =-1 valid betafx and nemittx MUST be provided!')
 
         if cc.sigmax == -1:
-            gemittx  = cc.nemittx/(beta_rel*gamma_rel)
-            cc.sigmax   = np.sqrt(cc.betafx*gemittx+cc.Dx**2*cc.Dp_p**2)
-            cc.sigmax   = cc.sigmax.real
+            gemittx = cc.nemittx / (beta_rel * gamma_rel)
+            cc.sigmax = np.sqrt(cc.betafx * gemittx + cc.Dx**2 * cc.Dp_p**2)
+            cc.sigmax = cc.sigmax.real
 
-        if (cc.sigmay==-1) and ((cc.betafy is None) or (cc.nemitty is None)):
+        if (cc.sigmay == -1) and ((cc.betafy is None) or (cc.nemitty is None)):
             raise ValueError('If sigmay =-1 valid betafy and nemitty MUST be provided!')
 
         if cc.sigmay == -1:
-            gemitty  = cc.nemitty/(beta_rel*gamma_rel)
-            cc.sigmay   = np.sqrt(cc.betafy*gemitty+cc.Dy**2*cc.Dp_p**2)
-            cc.sigmay   = cc.sigmay.real
+            gemitty = cc.nemitty / (beta_rel * gamma_rel)
+            cc.sigmay = np.sqrt(cc.betafy * gemitty + cc.Dy**2 * cc.Dp_p**2)
+            cc.sigmay = cc.sigmay.real
 
         self.sigmax = cc.sigmax
         self.sigmay = cc.sigmay

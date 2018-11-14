@@ -60,18 +60,18 @@ import os
 
 class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
-                    skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
+                 skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
         print 'PyECLOUD Version 7.6.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
-        config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
-                                                    pyecl_input_folder=pyecl_input_folder,
-                                                    skip_beam=skip_beam,
-                                                    skip_pyeclsaver=skip_pyeclsaver,
-                                                    skip_spacech_ele=skip_spacech_ele,
-                                                    spacech_ele=spacech_ele,
-                                                    ignore_kwargs=ignore_kwargs,
-                                                    **kwargs)
+            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
+                pyecl_input_folder=pyecl_input_folder,
+                skip_beam=skip_beam,
+                skip_pyeclsaver=skip_pyeclsaver,
+                skip_spacech_ele=skip_spacech_ele,
+                spacech_ele=spacech_ele,
+                ignore_kwargs=ignore_kwargs,
+                **kwargs)
 
         self.config_dict = config_dict
         self.beamtim = beamtim
@@ -97,8 +97,7 @@ class BuildupSimulation(object):
                 else:
                     raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
-
-    def run(self, t_end_sim = None):
+    def run(self, t_end_sim=None):
 
         beamtim = self.beamtim
 
@@ -119,11 +118,11 @@ class BuildupSimulation(object):
             self.sim_time_step()
 
             if beamtim.flag_new_bunch_pass:
-                print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb,beamtim.N_pass_tot)
+                print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
 
             ## every bunch passage
             if t_end_sim is not None:
-                if beamtim.tt_curr>    t_end_sim:
+                if beamtim.tt_curr > t_end_sim:
                     print 'Reached user defined t_end_sim --> Ending simulation'
                     break
 
@@ -161,8 +160,8 @@ class BuildupSimulation(object):
             if flag_presence_sec_beams:
                 for sec_beam in sec_beams_list:
                     Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(MP_e)
-                    Ex_n_beam+=Ex_n_secbeam
-                    Ey_n_beam+=Ey_n_secbeam
+                    Ex_n_beam += Ex_n_secbeam
+                    Ey_n_beam += Ey_n_secbeam
 
             ## Compute electron space charge electric field
             Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
@@ -181,7 +180,7 @@ class BuildupSimulation(object):
                 Ey_n = Ey_sc_n + Ey_n_beam
 
             ## Save position before motion step
-            old_pos=MP_e.get_positions()
+            old_pos = MP_e.get_positions()
 
             ## Motion
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
@@ -191,9 +190,9 @@ class BuildupSimulation(object):
                 # Dt from non-uniform beam profile
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
                     raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
-                Dt_substep_target = cloud.dynamics.Dt/cloud.dynamics.N_sub_steps
-                N_substeps_curr = np.round(beamtim.Dt_curr/Dt_substep_target)
-                Dt_substep_curr = beamtim.Dt_curr/N_substeps_curr
+                Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
+                N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
+                Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
                 MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
             else:
                 # Custom steps and substeps provided as arguments of sim_time_step
@@ -205,13 +204,13 @@ class BuildupSimulation(object):
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 
             ## Gas ionization (main and secondary beams)
-            if(beamtim.tt_curr<t_ion and gas_ion_flag==1):
+            if(beamtim.tt_curr < t_ion and gas_ion_flag == 1):
                 MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt_curr, beamtim.sigmax, beamtim.sigmay,
-                                          x_beam_pos = beamtim.x_beam_pos, y_beam_pos = beamtim.y_beam_pos)
+                                          x_beam_pos=beamtim.x_beam_pos, y_beam_pos=beamtim.y_beam_pos)
                 if flag_presence_sec_beams:
                     for sec_beam in sec_beams_list:
                         MP_e = resgasion.generate(MP_e, sec_beam.lam_t_curr, sec_beam.Dt_curr, sec_beam.sigmax, sec_beam.sigmay,
-                                                  x_beam_pos = sec_beam.x_beam_pos, y_beam_pos = sec_beam.y_beam_pos)
+                                                  x_beam_pos=sec_beam.x_beam_pos, y_beam_pos=sec_beam.y_beam_pos)
 
             ## Photoemission (main and secondary beams)
             if (photoem_flag != 0):
@@ -222,7 +221,7 @@ class BuildupSimulation(object):
                 phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
             # Compute space charge field
-            if ((beamtim.tt_curr>t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
+            if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
                 spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
@@ -240,7 +239,7 @@ class BuildupSimulation(object):
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, cloud_list, rho_cloud = cloud.rho)
+                                                            sec_beams_list, cloud_list, rho_cloud=cloud.rho)
 
             ## Every bunch passage
             if beamtim.flag_new_bunch_pass:
@@ -256,9 +255,9 @@ class BuildupSimulation(object):
                     ## Soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
 
-    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'): #, reset_pyeclsaver = True):
+    def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
 
-        print 'Reloading state from file: %s...'% filename_simulation_state
+        print 'Reloading state from file: %s...' % filename_simulation_state
 
         with open(load_from_folder + filename_simulation_state, 'rb') as fid:
             dict_state = cPickle.load(fid)
@@ -293,7 +292,7 @@ class BuildupSimulation(object):
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):
-        print 'Realoading from checkpoint: %s...'% (load_from_folder+filename_simulation_checkpoint)
+        print 'Realoading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint)
 
         i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)

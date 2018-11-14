@@ -58,8 +58,10 @@ import numpy.random as random
 
 import geom_impact_poly_cython as gipc
 
+
 class PyECLOUD_ChamberException(ValueError):
     pass
+
 
 class polyg_cham_geom_object(object):
 
@@ -70,7 +72,7 @@ class polyg_cham_geom_object(object):
 
         print('Polygonal chamber - cython implementation')
 
-        if type(filename_chm)==str:
+        if type(filename_chm) == str:
             dict_chm = sio.loadmat(filename_chm)
         else:
             dict_chm = filename_chm
@@ -86,7 +88,7 @@ class polyg_cham_geom_object(object):
             self.R0_segments = np.squeeze(dict_chm['R0_segments'])
             self.Emax_segments = np.squeeze(dict_chm['Emax_segments'])
 
-        if np.any(np.sqrt(np.diff(Vx)**2 + np.diff(Vy)**2)<1e-9):
+        if np.any(np.sqrt(np.diff(Vx)**2 + np.diff(Vy)**2) < 1e-9):
             raise PyECLOUD_ChamberException('There is a zero length segment!')
 
         self.N_vert = len(Vx)
@@ -102,19 +104,19 @@ class polyg_cham_geom_object(object):
         Vx = np.array(Vx, float)
         Vy = np.array(Vy, float)
 
-        self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
+        self.area = -0.5 * np.sum((Vy[1:] + Vy[:-1]) * (Vx[1:] - Vx[:-1]))
 
         print("The area of the chamber is %.3e m^2"%self.area)
 
         if self.area < 0:
             raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
 
-        Nx = -np.diff(Vy,1)
-        Ny = np.diff(Vx,1)
+        Nx = -np.diff(Vy, 1)
+        Ny = np.diff(Vx, 1)
 
-        norm_N = np.sqrt(Nx**2+Ny**2)
-        Nx = Nx/norm_N
-        Ny = Ny/norm_N
+        norm_N = np.sqrt(Nx**2 + Ny**2)
+        Nx = Nx / norm_N
+        Ny = Ny / norm_N
 
         self.x_aper = np.max(np.abs(Vx))
         self.y_aper = np.max(np.abs(Vy))
@@ -135,7 +137,7 @@ class polyg_cham_geom_object(object):
         self.flag_assume_convex = flag_assume_convex
 
         if self.flag_verbose_file:
-            fbckt=open('bcktr_errors.txt','w')
+            fbckt = open('bcktr_errors.txt', 'w')
             fbckt.write('kind,x_in,y_in,x_out, y_out\n')
             fbckt.close()
 
@@ -155,36 +157,36 @@ class polyg_cham_geom_object(object):
     #@profile
     def impact_point_and_normal(self, x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=0.99, flag_robust=True):
 
-        N_impacts=len(x_in)
-        self.N_mp_impact=self.N_mp_impact+N_impacts
+        N_impacts = len(x_in)
+        self.N_mp_impact = self.N_mp_impact + N_impacts
 
-        x_int,y_int,z_int,Nx_int,Ny_int, i_found = gipc.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out,
-                              self.Vx,  self.Vy,self.Nx,  self.Ny,  self.N_edg, resc_fac)
+        x_int, y_int, z_int, Nx_int, Ny_int, i_found = gipc.impact_point_and_normal(x_in, y_in, z_in, x_out, y_out, z_out,
+                                                                                    self.Vx, self.Vy, self.Nx, self.Ny, self.N_edg, resc_fac)
 
-        mask_found = i_found>=0
+        mask_found = i_found >= 0
 
-        if sum(mask_found)<N_impacts:
+        if sum(mask_found) < N_impacts:
             mask_not_found = ~mask_found
 
             x_int[mask_not_found] = x_in[mask_not_found]
             y_int[mask_not_found] = y_in[mask_not_found]
 
             #compute some kind of normal ....
-            par_cross = arctan2(self.cx*y_in[mask_not_found],self.cy*x_int[mask_not_found])
+            par_cross = arctan2(self.cx * y_in[mask_not_found], self.cy * x_int[mask_not_found])
 
-            Dx=-self.cx*sin(par_cross)
-            Dy=self.cy*cos(par_cross)
+            Dx = -self.cx * sin(par_cross)
+            Dy = self.cy * cos(par_cross)
 
-            Nx_corr=-Dy
-            Ny_corr=Dx
+            Nx_corr = -Dy
+            Ny_corr = Dx
 
-            neg_flag=((Nx_corr*x_int[mask_not_found]+Ny_corr*y_int[mask_not_found])>0)
+            neg_flag = ((Nx_corr * x_int[mask_not_found] + Ny_corr * y_int[mask_not_found]) > 0)
 
-            Nx_corr[neg_flag]=-Nx_corr[neg_flag]
-            Ny_corr[neg_flag]=-Ny_corr[neg_flag]
+            Nx_corr[neg_flag] = -Nx_corr[neg_flag]
+            Ny_corr[neg_flag] = -Ny_corr[neg_flag]
 
-            Nx_int[mask_not_found]=Nx_corr
-            Ny_int[mask_not_found]=Ny_corr
+            Nx_int[mask_not_found] = Nx_corr
+            Ny_int[mask_not_found] = Ny_corr
 
             x_in_error = x_in[mask_not_found]
             y_in_error = y_in[mask_not_found]
@@ -202,13 +204,13 @@ class polyg_cham_geom_object(object):
                 print('End reporting backtrack error of kind 1')
 
             if self.flag_verbose_file:
-                with open('bcktr_errors.txt','a') as fbckt:
+                with open('bcktr_errors.txt', 'a') as fbckt:
                     for i_err in xrange(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-                        fbckt.write('1,'+lcurr+'\n')
+                        fbckt.write('1,' + lcurr + '\n')
 
         if flag_robust:
-            flag_impact=self.is_outside(x_int, y_int)
+            flag_impact = self.is_outside(x_int, y_int)
             if flag_impact.any():
                 self.N_mp_corrected = self.N_mp_corrected + sum(flag_impact)
                 x_int[flag_impact] = x_in[flag_impact]
@@ -228,13 +230,13 @@ class polyg_cham_geom_object(object):
                     print('End reporting backtrack error of kind 2')
 
                 if self.flag_verbose_file:
-                    with open('bcktr_errors.txt','a') as fbckt:
+                    with open('bcktr_errors.txt', 'a') as fbckt:
                         for i_err in xrange(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-                            fbckt.write('2,'+lcurr+'\n')
+                            fbckt.write('2,' + lcurr + '\n')
 
-            flag_impact=self.is_outside(x_int, y_int)
-            if sum(flag_impact)>0:
+            flag_impact = self.is_outside(x_int, y_int)
+            if sum(flag_impact) > 0:
                 #~ import pylab as pl
                 #~ pl.close('all')
                 #~ pl.plot(self.Vx, self.Vy)
@@ -261,10 +263,10 @@ class polyg_cham_geom_object(object):
                     print('End reporting backtrack error of kind 3')
 
                 if self.flag_verbose_file:
-                    with open('bcktr_errors.txt','a') as fbckt:
+                    with open('bcktr_errors.txt', 'a') as fbckt:
                         for i_err in xrange(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
-                            fbckt.write('3,'+lcurr+'\n')
+                            fbckt.write('3,' + lcurr + '\n')
 
                 raise PyECLOUD_ChamberException('Outside after backtracking!!!!')
 
@@ -285,7 +287,7 @@ class polyg_cham_geom_object(object):
             num_points = self.N_edg
             for A in xrange(num_points):
 
-                B = np.mod((A + 1),num_points)
+                B = np.mod((A + 1), num_points)
                 C = np.mod((B + 1), num_points)
 
                 BAx = self.Vx[A] - self.Vx[B]
@@ -313,17 +315,17 @@ class polyg_cham_geom_object(object):
 
             if x == vx and y == vy:
                 return True
-            elif diff_x !=0 and diff_y != 0:
-                a = (x-vx)/diff_x
-                b = (y-vy)/diff_y
+            elif diff_x != 0 and diff_y != 0:
+                a = (x - vx) / diff_x
+                b = (y - vy) / diff_y
                 if a == b and 0 <= a <= 1:
                     return True
             elif diff_x == 0 and x == vx:
-                b = (y-vy)/diff_y
+                b = (y - vy) / diff_y
                 if 0 <= b <= 1:
                     return True
             elif diff_y == 0 and y == vy:
-                a = (x-vx)/diff_x
+                a = (x - vx) / diff_x
                 if 0 <= a <= 1:
                     return True
 
@@ -382,7 +384,7 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         self.Vx = Vx = np.append(orig_Vx, orig_Vx[0])
         self.Vy = Vy = np.append(orig_Vy, orig_Vy[0])
 
-        self.area = -0.5*np.sum((Vy[1:]+Vy[:-1])*(Vx[1:]-Vx[:-1]))
+        self.area = -0.5 * np.sum((Vy[1:] + Vy[:-1]) * (Vx[1:] - Vx[:-1]))
         print("The area of the chamber is %.3e m^2"%self.area)
         if self.area < 0:
             raise PyECLOUD_ChamberException("The area of the chamber is negative!\nVerteces must be provided with counter-clockwise order!")
@@ -399,8 +401,8 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         self.normal_vect_x = -seg_diff_y / len_segments
         self.normal_vect_y = seg_diff_x / len_segments
 
-        self.phem_x0 = orig_Vx + self.distance_new_phem*self.normal_vect_x
-        self.phem_y0 = orig_Vy + self.distance_new_phem*self.normal_vect_y
+        self.phem_x0 = orig_Vx + self.distance_new_phem * self.normal_vect_x
+        self.phem_y0 = orig_Vy + self.distance_new_phem * self.normal_vect_y
 
         if self.is_convex():
             self.cythonisoutside = gipc.is_outside_convex
@@ -448,8 +450,8 @@ class polyg_cham_photoemission(polyg_cham_geom_object):
         But that would be due to unsuitable chamber designs.
         """
         rr = random.rand(N_mp)
-        x_new_mp[:] = self.phem_x0[i_seg] + rr*self.seg_diff_x[i_seg]
-        y_new_mp[:] = self.phem_y0[i_seg] + rr*self.seg_diff_y[i_seg]
+        x_new_mp[:] = self.phem_x0[i_seg] + rr * self.seg_diff_x[i_seg]
+        y_new_mp[:] = self.phem_y0[i_seg] + rr * self.seg_diff_y[i_seg]
 
         flag_outside = self.is_outside(x_new_mp, y_new_mp)
         n_mp_outside = sum(flag_outside)

@@ -49,38 +49,38 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from numpy import sqrt, exp, cos,pi, logical_and
+from numpy import sqrt, exp, cos, pi, logical_and
 from numpy.random import rand
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
-def yield_fun2(E,costheta,Emax,del_max,R0):
 
-    s=1.35;
+def yield_fun2(E, costheta, Emax, del_max, R0):
 
-    del_max_tilde=del_max*exp(0.5*(1.-costheta));
-    E_max_tilde=Emax*(1.+0.7*(1.-costheta));
+    s = 1.35
 
-    x=E/E_max_tilde;
+    del_max_tilde = del_max * exp(0.5 * (1. - costheta))
+    E_max_tilde = Emax * (1. + 0.7 * (1. - costheta))
 
-    true_sec=del_max_tilde*(s*x)/(s-1.+x**s);
+    x = E / E_max_tilde
 
-    delta=true_sec;
+    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s)
 
-    mask_change=logical_and(delta<R0,E<Emax)
-    delta[mask_change]=R0
+    delta = true_sec
+
+    mask_change = logical_and(delta < R0, E < Emax)
+    delta[mask_change] = R0
     reflected = delta - true_sec
 
-    ref_frac=reflected/delta;
+    ref_frac = reflected / delta
 
     return delta, ref_frac
 
 
 class SEY_model_flat_le(SEY_model_ECLOUD):
-    def __init__(self, Emax,del_max,R0,
-                    E_th=None, sigmafit=None, mufit=None, 
-                    switch_no_increase_energy=0, thresh_low_energy=None,secondary_angle_distribution=None, 
+    def __init__(self, Emax, del_max, R0,
+                 E_th=None, sigmafit=None, mufit=None,
+                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                     ):
-            
 
             self.E_th = E_th
             self.sigmafit = sigmafit
@@ -100,11 +100,11 @@ class SEY_model_flat_le(SEY_model_ECLOUD):
             self.R0 = R0
             print 'Secondary emission model: Flat Low Energy '
 
-    def SEY_process(self,nel_impact,E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac=yield_fun2(E_impact_eV,costheta_impact,self.Emax,self.del_max,self.R0);
-            flag_elast=(rand(len(ref_frac))<ref_frac);
-            flag_truesec=~(flag_elast);
-            nel_emit=nel_impact*yiel;
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
+            yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0)
+            flag_elast = (rand(len(ref_frac)) < ref_frac)
+            flag_truesec = ~(flag_elast)
+            nel_emit = nel_impact * yiel
 
-            return  nel_emit, flag_elast, flag_truesec
+            return nel_emit, flag_elast, flag_truesec
 
