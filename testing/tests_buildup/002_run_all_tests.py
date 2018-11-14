@@ -31,7 +31,8 @@ all_sim_folders = [
     'LHC_TDIS_non_unif_sey',
     'LHC_Solenoid_sey1.10_100.00mT',
     'FCC_Dipole_25ns_50.00TeV_sey1.9_segment_photoemission',
-    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime'
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime',
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint'
 ]
 
 if args.all:
@@ -48,4 +49,3 @@ for ctr, sim_folder in enumerate(all_sim_folders):
             status = os.system(cmd)
             if status != 0:
                 raise SystemError('%s finished with status %i' % (cmd, status))
-

@@ -16,7 +16,6 @@ class cloud_descr_from_file:
                 cloud_name = 'default'
                 cloud_output_name = default_param_obj.filen_main_outp
 
-
             config_dict = {}
             inp_spec.copy_to_config_dict(config_dict, 'additional_cloud_parameters', default_param_obj)
 
@@ -25,7 +24,7 @@ class cloud_descr_from_file:
 
             # Parse cloud input file
             cloud_params = inp_spec.import_module_from_file('additional_cloud_parameters', cloudfilename)
-        
+
             # Verify validity of provided module w.r.t. parameters_dict
             inp_spec.assert_module_has_parameters(cloud_params, 'additional_cloud_parameters')
 

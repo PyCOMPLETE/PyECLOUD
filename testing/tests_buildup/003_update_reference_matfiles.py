@@ -5,7 +5,7 @@ import os
 if sys.version_info.major != 2:
     raw_input = input
 
-if raw_input('Continue replace all reference files? y/n ') not in ('y','yes'):
+if raw_input('Continue replace all reference files? y/n ') not in ('y', 'yes'):
     sys.exit()
 
 all_sim_folders = [

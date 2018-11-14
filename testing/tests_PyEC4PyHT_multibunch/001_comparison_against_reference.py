@@ -16,11 +16,10 @@ pl.close('all')
 sim_folder = './'
 
 
-
 myfontsz = 10
 ms.mystyle_arial(fontsz=myfontsz)
 
-dict_ref = mlm.myloadmat('../tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multigrid/'+'/Pyecltest_angle3D_ref.mat') # load dictionary of the reference simulation
+dict_ref = mlm.myloadmat('../tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multigrid/' + '/Pyecltest_angle3D_ref.mat') # load dictionary of the reference simulation
 dict_curr = mlm.myloadmat('./test_saving__iter1.mat')   # load dictionary of the current simulation
 #~ dict_ref = dict_curr
 
@@ -35,7 +34,7 @@ pl.close('all')
 
 pl.figure(1000)
 pl.plot(dict_ref['t'], dict_ref['Nel_timep'], '.-')
-pl.plot(dict_curr['t']-10e-9-dict_curr['t'][0], dict_curr['Nel_timep'], '.r-')
+pl.plot(dict_curr['t'] - 10e-9 - dict_curr['t'][0], dict_curr['Nel_timep'], '.r-')
 
 #~ pl.figure(1001)
 #~ pl.semilogy(dict_ref['t'], dict_ref['En_kin_eV_time'], '.-')
@@ -83,7 +82,6 @@ pl.plot(dict_curr['N_mp_ref_pass'], '.r-')
 pl.figure(1011)
 pl.plot(np.sum(dict_ref['En_hist'], axis=1), '.-')
 pl.plot(np.sum(dict_curr['En_hist'], axis=1), '.r-')
-
 
 
 pl.show()

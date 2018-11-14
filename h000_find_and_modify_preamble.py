@@ -1,6 +1,6 @@
 import os
 
-begin =    '''#----------------------------------------------------------------------
+begin = '''#----------------------------------------------------------------------
 #
 #                           CERN
 #
@@ -16,7 +16,7 @@ begin =    '''#-----------------------------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.5.0
+#                   PyECLOUD Version 7.6.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -31,6 +31,7 @@ begin =    '''#-----------------------------------------------------------------
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -69,24 +70,24 @@ for dirpath, _, filenames in os.walk('.'):
 
         with open(path, 'r') as f:
             content = f.read()
-            
+
         if begin in content:
             print(path)
             content = content.replace(begin, newbegin)
-            
+
             with open(path, 'w') as f:
                 f.write(content)
-                
+
         if end in content:
             print 'End to be changed:'
             print(path)
             content = content.replace(end, newend)
-            
+
             with open(path, 'w') as f:
                 f.write(content)
-                
+
         if '#--------------' in content:
             print 'Test'
             print(path)
-            
+
 

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.5.0
+#                   PyECLOUD Version 7.6.0
 #
 #
 #     Author and contact:   Giovanni IADAROLA
@@ -49,10 +49,11 @@
 #     all references.
 #----------------------------------------------------------------------
 
+
 class Cloud(object):
     def __init__(self, cloudname, config_dict, MP_e, impact_man, dynamics, pyeclsaver,
                  gas_ion_flag, resgasion, t_ion, photoem_flag, phemiss, rho):
-        
+
         self.name = cloudname
         self.config_dict = config_dict
         self.MP_e = MP_e

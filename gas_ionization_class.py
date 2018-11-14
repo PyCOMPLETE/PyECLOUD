@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.5.0
+#                   PyECLOUD Version 7.6.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -22,6 +22,7 @@
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -53,6 +54,7 @@ from numpy.random import rand
 from numpy.random import randn
 from numpy import *
 from scipy.constants import c, k, e
+
 
 class residual_gas_ionization:
 
@@ -87,7 +89,6 @@ class residual_gas_ionization:
 
         k_ion = n_gas * sigma_ion_mq * c
 
-
         DNel = k_ion * lambda_t * Dt
 
         N_new_MP = DNel / MP_e.nel_mp_ref
@@ -102,14 +103,14 @@ class residual_gas_ionization:
             x_temp = gauss_flag * (sigmax * randn(Nint_new_MP) + x_beam_pos) + self.chamb.x_aper * unif_flag * (2. * (rand(Nint_new_MP) - 0.5))
             y_temp = gauss_flag * (sigmay * randn(Nint_new_MP) + y_beam_pos) + self.chamb.y_aper * unif_flag * (2. * (rand(Nint_new_MP) - 0.5))
 
-            flag_np = self.chamb.is_outside(x_temp,y_temp) # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
+            flag_np = self.chamb.is_outside(x_temp, y_temp) # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
             Nout = int(sum(flag_np))
             while(Nout > 0):
                 unif_flag1 = unif_flag[flag_np]
                 gauss_flag1 = ~(unif_flag1)
                 x_temp[flag_np] = gauss_flag1 * (sigmax * randn(Nout) + x_beam_pos) + self.chamb.x_aper * unif_flag1 * (2 * (rand(Nout) - 0.5))
                 y_temp[flag_np] = gauss_flag1 * (sigmay * randn(Nout) + y_beam_pos) + self.chamb.y_aper * unif_flag1 * (2 * (rand(Nout) - 0.5))
-                flag_np = self.chamb.is_outside(x_temp,y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
+                flag_np = self.chamb.is_outside(x_temp, y_temp)  # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1)
                 Nout = int(sum(flag_np))
 
             MP_e.x_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = x_temp # Be careful to the indexing when translating to python

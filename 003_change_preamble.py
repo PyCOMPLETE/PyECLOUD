@@ -20,7 +20,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.5.0
+#                   PyECLOUD Version 7.6.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -35,6 +35,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -62,7 +63,6 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #-End-preamble---------------------------------------------------------"""
 
 new_preamble_lines = preamble_new.split('\n')
-
 
 
 for dirpath, _, filenames in os.walk('.'):
@@ -99,13 +99,12 @@ for dirpath, _, filenames in os.walk('.'):
             elif status == after_preamble:
                 pass
 
-
             if status != in_preamble:
                 new_lines.append(line)
 
             prev_line = line
 
-        new_lines = [x+'\n' for ctr, x in enumerate(new_lines) if ctr+1 != len(new_lines)]
+        new_lines = [x + '\n' for ctr, x in enumerate(new_lines) if ctr + 1 != len(new_lines)]
 
         with open(path, 'w') as f:
             f.writelines(new_lines)

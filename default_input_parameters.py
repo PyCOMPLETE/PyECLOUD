@@ -4,7 +4,7 @@ from scipy.constants import m_p, m_e, e as qe
 # This most importantly excludes python lists. Tuples may be used in their place.
 
 parameters_dict = {
-    'superparameters':{'pi'}, #are allowed anywhere and can be repeated (for backwards compatibility)
+    'superparameters': {'pi'},  # are allowed anywhere and can be repeated (for backwards compatibility)
     'simulation_parameters': {
         'mandatory': {
 
@@ -48,16 +48,16 @@ parameters_dict = {
             'Nbin_En_hist',
             'En_hist_max',
         },
-        'optional':{
+        'optional': {
             # Secondary beams
             'secondary_beams_file_list': (),
 
             # Additional clouds
-            'additional_clouds_file_list': (), 
+            'additional_clouds_file_list': (),
 
             # Name, mass and charge for default cloud
             'cloud_name': None,
-            'cloud_mass': m_e, 
+            'cloud_mass': m_e,
             'cloud_charge': -qe,
 
             'N_mp_soft_regen': None,
@@ -78,6 +78,10 @@ parameters_dict = {
             'dec_fac_secbeam_prof': 1,
             'el_density_probes': (),
             'save_simulation_state_time_file': -1,
+            'checkpoint_DT': None,
+            'checkpoint_folder': None,
+            'copy_main_outp_DT': None,
+            'copy_main_outp_folder': None,
             'x_min_hist_det': None,
             'y_min_hist_det': None,
             'x_max_hist_det': None,
@@ -112,8 +116,8 @@ parameters_dict = {
 
             # Tracking and magnetic field
             'track_method': 'StrongBdip',
-            'B': 0., #Tesla (if B=-1 computed from energy and bending radius)
-            'bm_totlen': -1, #m
+            'B': 0.,  # Tesla (if B=-1 computed from energy and bending radius)
+            'bm_totlen': -1,  # m
             'B_map_file': None,
             'Bz_map_file': None, # documented?
             'fact_Bmap': 1.,
@@ -268,7 +272,7 @@ parameters_dict = {
             'secondary_angle_distribution': 'undefined',
             'switch_no_increase_energy': 0,
             'thresh_low_energy': -1,
-            
+
             # SEY from file
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
