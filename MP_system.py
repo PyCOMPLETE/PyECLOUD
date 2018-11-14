@@ -520,7 +520,7 @@ class MP_system:
             'z_mp': self.z_mp[:self.N_mp].copy(),
             'vx_mp': self.vx_mp[:self.N_mp].copy(),
             'vy_mp': self.vy_mp[:self.N_mp].copy(),
-            'vy_mp': self.vz_mp[:self.N_mp].copy(),
+            'vz_mp': self.vz_mp[:self.N_mp].copy(),
             'nel_mp': self.nel_mp[:self.N_mp].copy(),
             'N_mp': self.N_mp,
             }
