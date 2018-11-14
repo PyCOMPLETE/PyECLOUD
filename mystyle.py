@@ -21,7 +21,7 @@ def mystyle(fontsz=16):
         plt.rcParams['legend.numpoints'] = 1
         plt.style.use('classic')
 
-    font = {#'family' : 'normal',
+    font = {  # 'family' : 'normal',
             #'weight' : 'bold',
             'size'   : fontsz}
 #   print fontsz

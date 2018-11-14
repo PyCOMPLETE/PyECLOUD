@@ -110,7 +110,7 @@ rms_err_x_list = []
 rms_err_y_list = []
 for ii in xrange(N_turns - 1):
 	# track
-	machine.track(bunch)#, verbose = True)
+	machine.track(bunch)  # , verbose = True)
 	print 'Turn', ii
 
 	# id and momenta after track

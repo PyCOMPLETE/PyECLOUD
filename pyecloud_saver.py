@@ -713,7 +713,7 @@ class pyecloud_saver:
     def _MP_state_init(self, save_mp_state_time_file):
         # MP state saver init
         try:
-            save_mp_state_time_file[0] #check if iterable
+            save_mp_state_time_file[0]  # check if iterable
             self.flag_save_MP_state = True
             if type(save_mp_state_time_file) is str:
                 dict_save_mp_state_time = sio.loadmat(save_mp_state_time_file)

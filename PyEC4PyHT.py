@@ -375,7 +375,7 @@ class Ecloud(object):
             Dt_substep = dt / N_sub_steps
             #print Dt_substep, N_sub_steps, dt
 
-            if len(ix) == 0 or not interact_with_EC: #no particles in the beam
+            if len(ix) == 0 or not interact_with_EC:  # no particles in the beam
 
                 #build dummy beamtim object
                 dummybeamtim = DummyBeamTim(None)
@@ -474,7 +474,7 @@ class Ecloud(object):
                 MP_probes = Empty()
                 MP_probes.x_mp = self.x_probes
                 MP_probes.y_mp = self.y_probes
-                MP_probes.nel_mp = self.x_probes * 0. + 1. #fictitious charge of 1 C
+                MP_probes.nel_mp = self.x_probes * 0. + 1.  # fictitious charge of 1 C
                 MP_probes.N_mp = len(self.x_probes)
                 Ex_sc_probe, Ey_sc_probe = spacech_ele.get_sc_eletric_field(MP_probes)
 

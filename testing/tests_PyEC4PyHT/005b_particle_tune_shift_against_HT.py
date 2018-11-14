@@ -105,7 +105,7 @@ yp_i = np.empty((n_record, n_turns))
 
 # track and store
 for i in range(n_turns):
-    machine.track(bunch)#, verbose=True)
+    machine.track(bunch)  # , verbose=True)
 
     print 'Turn', i
     sys.stdout.flush()

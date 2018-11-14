@@ -20,7 +20,7 @@ sigma_z = 10e-2
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
-sparse_solver = 'PyKLU'#'scipy_slu'
+sparse_solver = 'PyKLU'  # 'scipy_slu'
 
 
 # Define the machine
@@ -166,8 +166,8 @@ sp3.set_xlabel('z [cm]')
 sp3.grid('on')
 ms.sciy()
 
-gs1.tight_layout(fig, rect=[0.25, 0.6, 0.75, 0.98], pad=1.08, h_pad=.9)     #[left, bottom, right, top]
-gs2.tight_layout(fig, rect=[0, 0, 1, 0.65], pad=1.08, h_pad=.9)     #[left, bottom, right, top]
+gs1.tight_layout(fig, rect=[0.25, 0.6, 0.75, 0.98], pad=1.08, h_pad=.9)  # [left, bottom, right, top]
+gs2.tight_layout(fig, rect=[0, 0, 1, 0.65], pad=1.08, h_pad=.9)  # [left, bottom, right, top]
 
 
 ########################
@@ -221,7 +221,7 @@ sp1.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 sp1.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 
-sp2 = pl.subplot(2, 3, 4, sharex=sp1)#, sharey=sp1)
+sp2 = pl.subplot(2, 3, 4, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
               np.log10(np.sqrt(Ex_multigrid_matrix**2 + Ey_multigrid_matrix**2).T), vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
@@ -239,7 +239,7 @@ sp2.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 sp3 = pl.subplot(2, 3, 2)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
-              Ex_singlegrid_matrix.T)#, vmin=vmin, vmax=vmax)
+              Ex_singlegrid_matrix.T)  # , vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
@@ -252,9 +252,9 @@ pl.title('Singlegrid electric field', y=1.08)
 sp3.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 sp3.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
-sp4 = pl.subplot(2, 3, 5, sharex=sp1)#, sharey=sp1)
+sp4 = pl.subplot(2, 3, 5, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
-              Ex_multigrid_matrix.T)#, vmin=vmin, vmax=vmax)
+              Ex_multigrid_matrix.T)  # , vmin=vmin, vmax=vmax)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
@@ -267,7 +267,7 @@ pl.title('Multigrid electric field', y=1.08)
 sp4.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 sp4.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
-sp5 = pl.subplot(2, 3, 3, sharex=sp1)#, sharey=sp1)
+sp5 = pl.subplot(2, 3, 3, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, rho_singlegrid_matrix.T)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
@@ -281,7 +281,7 @@ pl.title('Singlegrid distribution', y=1.08)
 sp5.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 sp5.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
-sp6 = pl.subplot(2, 3, 6, sharex=sp1)#, sharey=sp1)
+sp6 = pl.subplot(2, 3, 6, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, rho_multigrid_matrix.T)
 for ii in xrange(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')

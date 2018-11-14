@@ -4,7 +4,7 @@ from scipy.constants import m_p, m_e, e as qe
 # This most importantly excludes python lists. Tuples may be used in their place.
 
 parameters_dict = {
-    'superparameters': {'pi'}, #are allowed anywhere and can be repeated (for backwards compatibility)
+    'superparameters': {'pi'},  # are allowed anywhere and can be repeated (for backwards compatibility)
     'simulation_parameters': {
         'mandatory': {
 
@@ -116,8 +116,8 @@ parameters_dict = {
 
             # Tracking and magnetic field
             'track_method': 'StrongBdip',
-            'B': 0., #Tesla (if B=-1 computed from energy and bending radius)
-            'bm_totlen': -1, #m
+            'B': 0.,  # Tesla (if B=-1 computed from energy and bending radius)
+            'bm_totlen': -1,  # m
             'B_map_file': None,
             'Bz_map_file': None, # documented?
             'fact_Bmap': 1.,

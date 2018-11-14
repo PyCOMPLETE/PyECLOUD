@@ -77,7 +77,7 @@ for ii in xrange(N_turns):
 	slices_list = bunch.extract_slices(slicer)
 
 	for slice_obj in slices_list[::-1]:
-		machine.track(slice_obj)#, verbose = True)
+		machine.track(slice_obj)  # , verbose = True)
 	print 'Turn', ii
 
 	bunch = sum(slices_list)

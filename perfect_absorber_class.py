@@ -97,7 +97,7 @@ class impact_management_perfect_absorber(impact_management):
             self.flag_impact = np.zeros_like(x_mp, dtype=bool)
 
             # detect impact
-            self.flag_impact[:N_mp] = chamb.is_outside(x_mp[0:N_mp], y_mp[0:N_mp])#(((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
+            self.flag_impact[:N_mp] = chamb.is_outside(x_mp[0:N_mp], y_mp[0:N_mp])  # (((x_mp[0:N_mp]/x_aper)**2 + (y_mp[0:N_mp]/y_aper)**2)>=1);
 
             Nimpact = int(np.sum(self.flag_impact))
 

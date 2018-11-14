@@ -31,9 +31,9 @@ ion_mass = A * m_p
 ion_charge = e
 
 # MPs and MP size (set to match with FASTION code)
-N_MP_ele_init = 501 * 156		#500 ion MPs/bunch
+N_MP_ele_init = 501 * 156  # 500 ion MPs/bunch
 N_mp_max = N_MP_ele_init
-nel_mp_ref_0 = P_nTorr * sigma_ion_MBarn / 37.89	#number of real ions/MP
+nel_mp_ref_0 = P_nTorr * sigma_ion_MBarn / 37.89  # number of real ions/MP
 
 # time step (set to bunch spacing)
 Dt_ref = 1.0e-9

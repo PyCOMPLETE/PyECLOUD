@@ -13,8 +13,8 @@ R0 = 0.7
 
 costheta = 1.
 
-E_max_samples = 10000.#2000
-N_samples = 100000 #500
+E_max_samples = 10000.  # 2000
+N_samples = 100000  # 500
 
 dE_resample_eV = 0.2
 range_for_extrap_eV = 100

@@ -170,7 +170,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #9.
 ifig += 1; pl.figure(ifig)
-pl.plot(np.sum(ob.nel_hist, axis=1), linewidth=2) #axis=1: sum w.r.t. columns
+pl.plot(np.sum(ob.nel_hist, axis=1), linewidth=2)  # axis=1: sum w.r.t. columns
 pl.xlabel('Passage')
 pl.ylabel('Number of $e^-$ per unit length [$m^{-1}$]')
 ms.scix(); pl.grid('on')
@@ -180,7 +180,7 @@ pl.savefig('fig%02d.png'%ifig, dpi=dpiset)
 
 #10.
 ifig += 1; pl.figure(ifig)
-pl.plot(ob.xg_hist, np.sum(ob.nel_hist, axis=0), linewidth=2) #axis=0: sum w.r.t. rows
+pl.plot(ob.xg_hist, np.sum(ob.nel_hist, axis=0), linewidth=2)  # axis=0: sum w.r.t. rows
 pl.xlabel('Chamber bin position [m]')
 pl.ylabel('Number of $e^-$ per bin')
 ms.scix(); pl.grid('on')

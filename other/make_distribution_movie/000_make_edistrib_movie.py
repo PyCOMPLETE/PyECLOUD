@@ -36,8 +36,8 @@ tbeam_win_length = bunch_spacing * num_passage
 
 ########
 
-xfield_cut_lim = 7 #5000.
-yfield_cut_lim = 7 #5000.
+xfield_cut_lim = 7  # 5000.
+yfield_cut_lim = 7  # 5000.
 
 denslim = 1.e11
 
@@ -98,7 +98,7 @@ for pass_ind in passlist:
 
     for ii in xrange(0, nphotog, N_dec):
 
-		fig = pl.figure(1, figsize=(4.5, 6)) #,figsize=(4.5,6)
+		fig = pl.figure(1, figsize=(4.5, 6))  # ,figsize=(4.5,6)
 		t_curr = t_video[ii]
 		cendens_curr = np.interp(t_curr, t, cendens)
 		lam_b1_curr = np.interp(t_curr, t, lam_b1)

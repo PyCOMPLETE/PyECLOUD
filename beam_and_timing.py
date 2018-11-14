@@ -196,7 +196,7 @@ class beam_and_timing:
 
             if chamb.chamb_type != 'ellip':
                 raise ValueError('You can only use Bassetti Erskine formula with an elliptic chamber!')
-            if Nx == None or Ny == None or nimag == None:
+            if Nx is None or Ny is None or nimag is None:
                 raise ValueError('Nx, Ny and nimag MUST be provided for Bassetti Erskine formula!')
             if x_beam_pos != 0. or y_beam_pos != 0.:
                 raise ValueError('x_beam_pos, y_beam_pos and MUST be 0 for Bassetti Erskine formula!')
@@ -393,5 +393,3 @@ class beam_and_timing:
             Ey_n_beam = 0.
 
         return Ex_n_beam, Ey_n_beam
-
-

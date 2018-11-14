@@ -104,7 +104,7 @@ for ii in xrange(N_turns - 1):
 	z_before = z_after.copy()
 	yp_before = yp_after.copy()
 
-	machine.track(bunch)#, verbose = True)
+	machine.track(bunch)  # , verbose = True)
 
 	# id and momenta after track
 	id_after = bunch.id[bunch.id <= n_part_per_turn]

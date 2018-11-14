@@ -102,7 +102,7 @@ class MP_system:
 
         xg_hist_reg = np.arange(0, chamb.x_aper + 2. * Dx_hist_reg, Dx_hist_reg, float)
         xgr_hist_reg = xg_hist_reg[1:]
-        xgr_hist_reg = xgr_hist_reg[::-1]#reverse array
+        xgr_hist_reg = xgr_hist_reg[::-1]  # reverse array
         self.xg_hist_reg = np.concatenate((-xgr_hist_reg, xg_hist_reg), 0)
         self.Nxg_hist_reg = len(self.xg_hist_reg)
         self.bias_x_hist_reg = min(self.xg_hist_reg)
@@ -392,13 +392,13 @@ class MP_system:
 
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
 
-            if x_max == None:
+            if x_max is None:
                 x_max = self.chamb.x_aper
-            if x_min == None:
+            if x_min is None:
                 x_min = -self.chamb.x_aper
-            if y_max == None:
+            if y_max is None:
                 y_max = self.chamb.y_aper
-            if y_min == None:
+            if y_min is None:
                 y_min = -self.chamb.y_aper
 
             v0 = -np.sqrt(2. * (E_init / 3.) * np.abs(self.charge) / self.mass)
@@ -413,12 +413,12 @@ class MP_system:
                 x_temp = (x_max - x_min) * rand(Nint_new_MP) + x_min
                 y_temp = (y_max - y_min) * rand(Nint_new_MP) + y_min
 
-                flag_np = self.chamb.is_outside(x_temp, y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+                flag_np = self.chamb.is_outside(x_temp, y_temp)  # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
                 Nout = np.sum(flag_np)
                 while(Nout > 0):
                     x_temp[flag_np] = (x_max - x_min) * rand(Nout) + x_min
                     y_temp[flag_np] = (y_max - y_min) * rand(Nout) + y_min
-                    flag_np = self.chamb.is_outside(x_temp, y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+                    flag_np = self.chamb.is_outside(x_temp, y_temp)  # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
                     Nout = np.sum(flag_np)
 
                 self.x_mp[self.N_mp:self.N_mp + Nint_new_MP] = x_temp
@@ -460,7 +460,7 @@ class MP_system:
             x_temp = (x_max - x_min) * rand(Nint_new_MP) + x_min
             y_temp = (y_max - y_min) * rand(Nint_new_MP) + y_min
 
-            flag_keep = ~self.chamb.is_outside(x_temp, y_temp)#(((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
+            flag_keep = ~self.chamb.is_outside(x_temp, y_temp)  # (((x_temp/x_aper)**2 + (y_temp/y_aper)**2)>=1);
             x_temp = x_temp[flag_keep]
             y_temp = y_temp[flag_keep]
             Nint_new_MP = len(x_temp)

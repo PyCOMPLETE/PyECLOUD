@@ -77,13 +77,13 @@ class impact_management(object):
 
         xg_hist = np.arange(0, chamb.x_aper + 2. * Dx_hist, Dx_hist, float)
         xgr_hist = xg_hist[1:]
-        xgr_hist = xgr_hist[::-1]#reverse array
+        xgr_hist = xgr_hist[::-1]  # reverse array
         xg_hist = np.concatenate((-xgr_hist, xg_hist), 0)
         Nxg_hist = len(xg_hist)
         bias_x_hist = np.min(xg_hist)
 
-        self.En_g_hist = np.linspace(0., En_hist_max, Nbin_En_hist) #hist. grid
-        self.DEn_hist = self.En_g_hist[1] - self.En_g_hist[0]     #hist. step
+        self.En_g_hist = np.linspace(0., En_hist_max, Nbin_En_hist)  # hist. grid
+        self.DEn_hist = self.En_g_hist[1] - self.En_g_hist[0]  # hist. step
 
         self.flag_cos_angle_hist = flag_cos_angle_hist
         if flag_cos_angle_hist:
@@ -216,7 +216,7 @@ class impact_management(object):
                     histf.compute_hist(costheta_impact, nel_impact, 0., self.cos_angle_width, self.cos_angle_hist)
 
                 if flag_seg:
-                    segi.update_seg_impact(i_found, nel_impact, self.nel_hist_impact_seg)#riga incriminata???
+                    segi.update_seg_impact(i_found, nel_impact, self.nel_hist_impact_seg)  # riga incriminata???
                     segi.update_seg_impact(i_found, nel_impact * E_impact_eV, self.energ_eV_impact_seg)
 
                 En_imp_hist = E_impact_eV.copy()

@@ -20,7 +20,7 @@ sigma_z = 10e-2
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 
-sparse_solver = 'PyKLU'#'scipy_slu'
+sparse_solver = 'PyKLU'  # 'scipy_slu'
 
 
 # Define the machine
@@ -65,7 +65,7 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
         y_beam_offset=y_beam_offset,
         sparse_solver=sparse_solver,
         save_pyecl_outp_as='test_saving',
-        Dt=25e-12,#needed for saving
+        Dt=25e-12,  # needed for saving
         )
 
 print 'Track_bunch'

@@ -1,6 +1,6 @@
 import sys
 import os
-BIN = os.path.expanduser("../../../") #folder containing PyECLOUD, PyPIC, PyKLU, PyHEADTAIL, PyPARIS
+BIN = os.path.expanduser("../../../")  # folder containing PyECLOUD, PyPIC, PyKLU, PyHEADTAIL, PyPARIS
 if BIN not in sys.path:
     sys.path.append(BIN)
 

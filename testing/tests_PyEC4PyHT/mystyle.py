@@ -5,7 +5,7 @@ from colorsys import hsv_to_rgb
 
 def mystyle(fontsz=16):
 
-	font = {#'family' : 'normal',
+	font = {  # 'family' : 'normal',
 			#'weight' : 'bold',
 			'size'   : fontsz}
 	print fontsz

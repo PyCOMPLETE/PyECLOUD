@@ -82,11 +82,11 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
         N_high_ene = np.sum(flag_high_energy)
 
         #generate low energy
-        en_eV_le = random.randn(N_low_ene)   #in eV
+        en_eV_le = random.randn(N_low_ene)  # in eV
         flag_negat = np.logical_or(en_eV_le < 0., en_eV_le > 4.)
         N_neg = np.sum(flag_negat)
         while(N_neg > 0):
-            en_eV_le[flag_negat] = random.randn(N_neg)  #in eV
+            en_eV_le[flag_negat] = random.randn(N_neg)  # in eV
             flag_negat = np.logical_or(en_eV_le < 0., en_eV_le > 4.)
             N_neg = np.sum(flag_negat)
         sigma_le = En_impact_eV[flag_low_energy] / 4.
@@ -213,7 +213,7 @@ class _gaussian(_gen_energy_base):
         flag_negat = (En_gen < 0.)
         N_neg = np.sum(flag_negat)
         while(N_neg > 0):
-            En_gen[flag_negat] = random.randn(N_neg) * self.e_pe_sigma + self.e_pe_max   #in eV
+            En_gen[flag_negat] = random.randn(N_neg) * self.e_pe_sigma + self.e_pe_max  # in eV
             flag_negat = (En_gen < 0.)
             N_neg = np.sum(flag_negat)
         return En_gen
