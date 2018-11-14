@@ -15,8 +15,8 @@ beamtim, MP_e, dynamics, impact_man, pyeclsaver, \
     gas_ion_flag, resgasion, t_ion, \
     spacech_ele, t_sc_ON, photoem_flag, phemiss,\
     flag_presence_sec_beams, sec_beams_list, config_dict = read_input_files_and_init_components(
-            pyecl_input_folder=pyecl_input_folder, skip_beam=True,
-            skip_pyeclsaver=True, skip_spacech_ele=True)
+        pyecl_input_folder=pyecl_input_folder, skip_beam=True,
+        skip_pyeclsaver=True, skip_spacech_ele=True)
 
 
 n_rep = 10000

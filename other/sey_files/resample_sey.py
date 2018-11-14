@@ -38,7 +38,7 @@ def resample_sey_data(energy_eV_samples, sey_true_samples, sey_elast_samples, un
         'extrapolate_const_true': extrapolate_const_true,
         'extrapolate_grad_elast': extrapolate_grad_elast,
         'extrapolate_const_elast': extrapolate_const_elast,
-        }
+    }
 
     return resampled
 

@@ -523,7 +523,7 @@ class MP_system:
             'vz_mp': self.vz_mp[:self.N_mp].copy(),
             'nel_mp': self.nel_mp[:self.N_mp].copy(),
             'N_mp': self.N_mp,
-            }
+        }
         return dict_MP
 
     def init_from_dict(self, dict_MP):

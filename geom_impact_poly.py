@@ -51,7 +51,7 @@
 
 
 from numpy import squeeze, array, diff, max, sum, sqrt,\
-                  logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
+    logical_and, logical_or, ones, zeros, take, arctan2, sin, cos
 import scipy.io as sio
 
 
@@ -154,7 +154,7 @@ class polyg_cham_geom_object:
 
         for ii in xrange(self.N_edg):
             t_curr = (self.Nx[ii] * (self.Vx[ii] - x_in) + self.Ny[ii] * (self.Vy[ii] - y_in)) / \
-                             (self.Nx[ii] * (x_out - x_in) + self.Ny[ii] * (y_out - y_in))
+                (self.Nx[ii] * (x_out - x_in) + self.Ny[ii] * (y_out - y_in))
 
             mask_updatemin = logical_and(t_curr >= 0, t_curr < t_min)
             t_min[mask_updatemin] = t_curr[mask_updatemin]

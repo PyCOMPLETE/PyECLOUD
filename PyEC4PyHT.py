@@ -134,12 +134,12 @@ class Ecloud(object):
         self.kwargs = kwargs
 
         self.cloudsim = bsim.BuildupSimulation(
-                    pyecl_input_folder=pyecl_input_folder, skip_beam=True,
-                    spacech_ele=space_charge_obj,
-                    ignore_kwargs=extra_allowed_kwargs,
-                    skip_pyeclsaver=(save_pyecl_outp_as is None),
-                    filen_main_outp=save_pyecl_outp_as,
-                    **self.kwargs)
+            pyecl_input_folder=pyecl_input_folder, skip_beam=True,
+            spacech_ele=space_charge_obj,
+            ignore_kwargs=extra_allowed_kwargs,
+            skip_pyeclsaver=(save_pyecl_outp_as is None),
+            filen_main_outp=save_pyecl_outp_as,
+            **self.kwargs)
 
         if self.cloudsim.config_dict['track_method'] == 'Boris':
             pass
@@ -389,10 +389,10 @@ class Ecloud(object):
 
                 # beam field
                 self.beam_PyPIC_state.scatter(
-                            x_mp=slic.x[ix] + self.x_beam_offset,
-                            y_mp=slic.y[ix] + self.y_beam_offset,
-                            nel_mp=slic.x[ix] * 0. + slic.particlenumber_per_mp / dz,
-                            charge=slic.charge)
+                    x_mp=slic.x[ix] + self.x_beam_offset,
+                    y_mp=slic.y[ix] + self.y_beam_offset,
+                    nel_mp=slic.x[ix] * 0. + slic.particlenumber_per_mp / dz,
+                    charge=slic.charge)
                 self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
 
                 #build dummy beamtim object
@@ -588,7 +588,7 @@ class Ecloud(object):
 
         if self.flag_clean_slices:
             raise ValueError(
-                    'track cannot clean the slices in slice-by-slice mode! ')
+                'track cannot clean the slices in slice-by-slice mode! ')
 
         if beam.slice_info != 'unsliced':
             dz = beam.slice_info['z_bin_right'] - beam.slice_info['z_bin_left']

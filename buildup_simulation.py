@@ -65,13 +65,13 @@ class BuildupSimulation(object):
         print 'PyECLOUD Version 7.6.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
             config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
-                                                    pyecl_input_folder=pyecl_input_folder,
-                                                    skip_beam=skip_beam,
-                                                    skip_pyeclsaver=skip_pyeclsaver,
-                                                    skip_spacech_ele=skip_spacech_ele,
-                                                    spacech_ele=spacech_ele,
-                                                    ignore_kwargs=ignore_kwargs,
-                                                    **kwargs)
+                pyecl_input_folder=pyecl_input_folder,
+                skip_beam=skip_beam,
+                skip_pyeclsaver=skip_pyeclsaver,
+                skip_spacech_ele=skip_spacech_ele,
+                spacech_ele=spacech_ele,
+                ignore_kwargs=ignore_kwargs,
+                **kwargs)
 
         self.config_dict = config_dict
         self.beamtim = beamtim

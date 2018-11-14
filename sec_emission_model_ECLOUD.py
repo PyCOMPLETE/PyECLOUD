@@ -82,11 +82,11 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 class SEY_model_ECLOUD(object):
     def __init__(
-                    self, Emax, del_max, R0,
-                    E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                    E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
-                ):
+        self, Emax, del_max, R0,
+        E_th=None, sigmafit=None, mufit=None,
+        switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
+        E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
+    ):
 
         self.E_th = E_th
         self.sigmafit = sigmafit
@@ -142,9 +142,9 @@ class SEY_model_ECLOUD(object):
 
         # Handle elastics
         vx_replace[flag_elast], vy_replace[flag_elast] = ee.specular_velocity(
-                                                            vx_impact[flag_elast], vy_impact[flag_elast],
-                                                            Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
-                                                        )
+            vx_impact[flag_elast], vy_impact[flag_elast],
+            Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
+        )
 
         # true secondary
         N_true_sec = np.sum(flag_truesec)

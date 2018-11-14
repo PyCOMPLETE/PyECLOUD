@@ -354,7 +354,7 @@ class pyecloud_saver:
 
     def build_outp_dict(self):
         saved_dict = {
-                    't_hist': self.t_hist,
+            't_hist': self.t_hist,
                     'nel_hist': self.nel_hist,
                     'xg_hist': self.xg_hist,
                     'nel_impact_hist_tot': self.nel_impact_hist_tot,
@@ -387,7 +387,7 @@ class pyecloud_saver:
                     'chamber_area': self.area,
                     'cos_angle_hist': self.cos_angle_hist,
                     'xg_hist_cos_angle': self.xg_hist_cos_angle
-                }
+        }
 
         saved_dict.update(self._stepbystep_get_dict())
 
@@ -575,7 +575,7 @@ class pyecloud_saver:
                 'En_emit_eV_time',
                 'En_kin_eV_time',
                 'cen_density'
-                ]
+            ]
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
 

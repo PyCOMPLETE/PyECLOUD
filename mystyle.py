@@ -22,7 +22,7 @@ def mystyle(fontsz=16):
         plt.style.use('classic')
 
     font = {  # 'family' : 'normal',
-            #'weight' : 'bold',
+        #'weight' : 'bold',
             'size'   : fontsz}
 #   print fontsz
     rc('font', **font)

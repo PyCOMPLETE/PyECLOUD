@@ -6,7 +6,7 @@ from colorsys import hsv_to_rgb
 def mystyle(fontsz=16):
 
 	font = {  # 'family' : 'normal',
-			#'weight' : 'bold',
+            #'weight' : 'bold',
 			'size'   : fontsz}
 	print fontsz
 	rcdefaults()
