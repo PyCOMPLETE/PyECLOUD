@@ -59,7 +59,8 @@ sigma_y = np.sqrt(inj_optics['beta_y'] * epsn_y / machine.betagamma)
 x_aper = 20 * sigma_x
 y_aper = 20 * sigma_y
 Dh_sc = 2 * x_aper / 128 / 2
-if show_movie: Dh_sc *= 2
+if show_movie:
+	Dh_sc *= 2
 
 # ecloud
 import PyECLOUD.PyEC4PyHT as PyEC4PyHT

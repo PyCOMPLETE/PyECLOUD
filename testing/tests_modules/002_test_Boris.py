@@ -1,6 +1,7 @@
 import sys
 from numpy import array
-if '../../' not in sys.path: sys.path.append('../../')
+if '../../' not in sys.path:
+    sys.path.append('../../')
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB

@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-if '../../' not in sys.path: sys.path.append('../../')
+if '../../' not in sys.path:
+    sys.path.append('../../')
 import dynamics_Boris_multipole as dbu
 from geom_impact_ellip import ellip_cham_geom_object
 import MP_system as MPs

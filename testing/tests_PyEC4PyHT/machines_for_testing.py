@@ -40,7 +40,8 @@ class SPS(Synchrotron):
 			raise ValueError('machine_configuration not recognized!')
 
 		if optics_mode == 'smooth':
-			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+			if 's' in kwargs.keys():
+				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
 			circumference = 1100 * 2 * np.pi
@@ -53,7 +54,8 @@ class SPS(Synchrotron):
 			s = None
 
 		elif optics_mode == 'non-smooth':
-			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+			if 'n_segments' in kwargs.keys():
+				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
 
@@ -135,7 +137,8 @@ class shortSPS(Synchrotron):
 			raise ValueError('machine_configuration not recognized!')
 
 		if optics_mode == 'smooth':
-			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+			if 's' in kwargs.keys():
+				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
 			circumference = 1100 * 2 * np.pi / 6.
@@ -148,7 +151,8 @@ class shortSPS(Synchrotron):
 			s = None
 
 		elif optics_mode == 'non-smooth':
-			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+			if 'n_segments' in kwargs.keys():
+				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
 
@@ -233,7 +237,8 @@ class LHC(Synchrotron):
 			raise ValueError('machine_configuration not recognized!')
 
 		if optics_mode == 'smooth':
-			if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+			if 's' in kwargs.keys():
+				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
 			n_segments = kwargs['n_segments']
 			circumference = 26658.8832
@@ -251,7 +256,8 @@ class LHC(Synchrotron):
 			s = None
 
 		elif optics_mode == 'non-smooth':
-			if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+			if 'n_segments' in kwargs.keys():
+				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
 			n_segments = None
 			circumference = None
 

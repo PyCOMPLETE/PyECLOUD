@@ -1,7 +1,8 @@
 import sys
 from numpy import array
 
-if '../../' not in sys.path: sys.path.append('../../')
+if '../../' not in sys.path:
+    sys.path.append('../../')
 import dynamics_Boris_f2py as dynB
 import dynamics_strong_B_generalized as dyngen
 import MP_system as MPs

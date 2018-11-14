@@ -9,7 +9,8 @@ import numpy as np
 import scipy.integrate as integrate
 import scipy.stats as stats
 
-if '../../' not in sys.path: sys.path.append('../../')
+if '../../' not in sys.path:
+    sys.path.append('../../')
 import MP_system
 import geom_impact_ellip
 import geom_impact_rect_fast_impact as girfi

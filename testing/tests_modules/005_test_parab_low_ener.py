@@ -1,5 +1,6 @@
 import sys
-if '../..' not in sys.path: sys.path.append('../..')
+if '../..' not in sys.path:
+    sys.path.append('../..')
 import sec_emission_model_cos_low_ener as sem_cle
 import sec_emission_model_flat_low_ener as sem_fle
 import sec_emission_model_ECLOUD as sem_ECLOUD

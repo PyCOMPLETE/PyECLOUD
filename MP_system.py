@@ -392,10 +392,14 @@ class MP_system:
 
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
 
-            if x_max == None: x_max = self.chamb.x_aper
-            if x_min == None: x_min = -self.chamb.x_aper
-            if y_max == None: y_max = self.chamb.y_aper
-            if y_min == None: y_min = -self.chamb.y_aper
+            if x_max == None:
+                x_max = self.chamb.x_aper
+            if x_min == None:
+                x_min = -self.chamb.x_aper
+            if y_max == None:
+                y_max = self.chamb.y_aper
+            if y_min == None:
+                y_min = -self.chamb.y_aper
 
             v0 = -np.sqrt(2. * (E_init / 3.) * np.abs(self.charge) / self.mass)
 
@@ -525,4 +529,3 @@ class MP_system:
     def init_from_dict(self, dict_MP):
         self.N_mp = 0
         self.add_from_file(dict_MP)
-
