@@ -14,7 +14,7 @@ test_obj = fp.SEY_model_FP_Cu()#276.8, 1.8848)
 nel_impact = int(1e5)
 energies = np.linspace(0, 800, nel_impact)
 
-angles = 0.
+angles = np.cos(0.)
 
 #delta_e, delta_r, delta_ts, delta_mc, loc = test_obj.SEY_process(nel_impact, energies, angles, None)
 

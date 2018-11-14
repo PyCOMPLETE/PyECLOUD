@@ -56,7 +56,7 @@ class SEY_model_furman_pivi():
     def __init__(self, #eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                 s=1.35
+                 s=1.54
                  ):
 
         self.E_th = E_th
@@ -74,7 +74,7 @@ class SEY_model_furman_pivi():
 
         # self.eHat0 = eHat0
         # self.deltaTSHat = deltaTSHat
-        self.s = s
+        # self.s = s
 
         print 'Secondary emission model: Furman-Pivi s=%.4f' % (self.s)
 
@@ -124,14 +124,10 @@ class SEY_model_furman_pivi():
     #
     #     return delta_e, delta_r, delta_ts
 
-    def _D(self, x):
-        s = self.s
-        return s * x / (s - 1 + x**s)
-
     def _yield_fun_furman_pivi(self, E, costheta):
-        delta_e = self._delta_e
-        delta_r = self._delta_r
-        delta_ts = self._delta_ts
+        delta_e = self._delta_e(E, costheta)
+        delta_r = self._delta_r(E, costheta)
+        delta_ts = self._delta_ts(E, costheta)
         return delta_e, delta_r, delta_ts
 
     def _delta_e(self, E_impact_eV, costheta_impact):
@@ -164,11 +160,15 @@ class SEY_model_furman_pivi():
         (31) in FP paper.
         """
 
-        eHat = self.eHat0 * (1. + self.t3 * (1. - np.cos(costheta_impact)**self.t4))
+        eHat = self.eHat0 * (1. + self.t3 * (1. - costheta_impact**self.t4))
         delta_ts0 = self.deltaTSHat * self._D(E_impact_eV / eHat)
         angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
 
         return delta_ts0 * angular_factor
+
+    def _D(self, x):
+        s = self.s
+        return s * x / (s - 1 + x**s)
 
     def energy_rediffused(self, E0):
         randn = random.rand(len(E0))
