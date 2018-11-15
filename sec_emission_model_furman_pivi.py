@@ -22,6 +22,7 @@
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
+#                           Eric Wulff
 #
 #
 #     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
@@ -50,10 +51,17 @@
 
 import numpy as np
 import numpy.random as random
+import electron_emission as ee
+# from scipy.special import gamma
+
+# def inverse_CDF_ts_energy(delta_e, delta_r, delta_ts, n, pn, epsn):
+#     delta_prime_ts = delta_ts / (1. - delta_e - delta_r)
+#     PnTS_prime = delta_prime_ts**n / np.math.factorial(n) * np.exp(-delta_prime_ts)
+#     Fn = PnTS_prime / ()(eps[n-1]**pn[n-1] * gamma(pn[n-1]))**n * )
 
 
 class SEY_model_furman_pivi():
-    def __init__(self, #eHat0, deltaTSHat,
+    def __init__(self,  # eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
                  s=1.54
@@ -85,7 +93,7 @@ class SEY_model_furman_pivi():
         # Already implemented in the impact_man class.
 
         # (2): Compute delta_e, delta_r, delta_ts
-        delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(self, E_impact_eV, costheta_impact)
+        delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV, costheta_impact)
 
         # (3): Generate probability of number electrons created
 
@@ -171,13 +179,104 @@ class SEY_model_furman_pivi():
         return s * x / (s - 1 + x**s)
 
     def energy_rediffused(self, E0):
-        randn = random.rand(len(E0))
-        return randn**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
+        uu = random.rand(len(E0))
+        return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
 
     def energy_trueSecondary(self, E0):
-        u = random.rand(len(E0))
+        uu = random.rand(len(E0))
+
         E_out = self.eHat0
         return E_out
+
+    def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
+                           vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
+                           v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
+
+        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
+
+        nel_replace = nel_emit_tot_events.copy()
+        x_replace = x_impact.copy()
+        y_replace = y_impact.copy()
+        z_replace = z_impact.copy()
+        vx_replace = vx_impact.copy()
+        vy_replace = vy_impact.copy()
+        vz_replace = vz_impact.copy()
+        if i_found is not None:
+            i_seg_replace = i_found.copy()
+        else:
+            i_seg_replace = i_found
+
+        # Handle elastics
+        vx_replace[flag_backscattered], vy_replace[flag_backscattered] = ee.specular_velocity(
+            vx_impact[flag_backscattered], vy_impact[flag_backscattered],
+            Norm_x[flag_backscattered], Norm_y[flag_backscattered], v_impact_n[flag_backscattered]
+        )
+
+        # Rediffused
+        vx_replace[flag_rediffused], vy_replace[flag_rediffused] = ee.specular_velocity(
+            vx_impact[flag_rediffused], vy_impact[flag_rediffused],
+            Norm_x[flag_rediffused], Norm_y[flag_rediffused], v_impact_n[flag_rediffused])
+
+        # True secondary
+        N_true_sec = np.sum(flag_truesec)
+        n_add_total = 0
+        if N_true_sec > 0:
+
+            n_add = np.zeros_like(flag_truesec, dtype=int)
+            n_add[flag_truesec] = np.ceil(nel_replace[flag_truesec] / nel_mp_th) - 1
+            n_add[n_add < 0] = 0.  # in case of underflow
+            nel_replace[flag_truesec] = nel_replace[flag_truesec] / (n_add[flag_truesec] + 1.)
+
+            n_add_total = np.sum(n_add)
+
+            # MPs to be replaced
+            En_truesec_eV = ee.sec_energy_hilleret_model2(
+                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
+                self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+
+            vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
+                N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
+
+            # Add new MPs
+            if n_add_total != 0:
+                # Clone MPs
+                x_new_MPs = np.repeat(x_impact, n_add)
+                y_new_MPs = np.repeat(y_impact, n_add)
+                z_new_MPs = np.repeat(z_impact, n_add)
+                norm_x_add = np.repeat(Norm_x, n_add)
+                norm_y_add = np.repeat(Norm_y, n_add)
+                nel_new_MPs = np.repeat(nel_replace, n_add)
+                E_impact_eV_add = np.repeat(E_impact_eV, n_add)
+
+                # Generate new MP properties, angles and energies
+                En_truesec_eV_add = ee.sec_energy_hilleret_model2(
+                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
+                    self.E_th, E_impact_eV_add, self.thresh_low_energy)
+
+                vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
+                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
+
+                if flag_seg:
+                    i_seg_new_MPs = np.repeat(i_found, n_add)
+                else:
+                    i_seg_new_MPs = None
+
+        if n_add_total == 0:
+            nel_new_MPs = np.array([])
+            x_new_MPs = np.array([])
+            y_new_MPs = np.array([])
+            z_new_MPs = np.array([])
+            vx_new_MPs = np.array([])
+            vy_new_MPs = np.array([])
+            vz_new_MPs = np.array([])
+            i_seg_new_MPs = np.array([])
+
+        event_type = flag_truesec
+        event_info = {}
+
+        return nel_emit_tot_events, event_type, event_info,\
+            nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
+            nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
 
 
 class SEY_model_FP_Cu(SEY_model_furman_pivi):
