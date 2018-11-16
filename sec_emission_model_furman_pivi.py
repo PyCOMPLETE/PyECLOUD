@@ -213,9 +213,10 @@ class SEY_model_furman_pivi():
         )
 
         # Rediffused
-        vx_replace[flag_rediffused], vy_replace[flag_rediffused] = ee.specular_velocity(
-            vx_impact[flag_rediffused], vy_impact[flag_rediffused],
-            Norm_x[flag_rediffused], Norm_y[flag_rediffused], v_impact_n[flag_rediffused])
+        En_rediffused_eV = self.energy_rediffused(E_impact_eV[flag_rediffused])
+        N_rediffused = np.sum(flag_rediffused)
+        vx_replace[flag_rediffused], vy_replace[flag_rediffused], vz_replace[flag_rediffused] = self.angle_dist_func(
+            N_rediffused, En_rediffused_eV, Norm_x[flag_rediffused], Norm_y[flag_rediffused], mass)
 
         # True secondary
         N_true_sec = np.sum(flag_truesec)

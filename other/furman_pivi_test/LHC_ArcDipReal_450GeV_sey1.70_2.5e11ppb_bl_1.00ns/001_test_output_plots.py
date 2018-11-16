@@ -17,6 +17,7 @@ ms.mystyle_arial(fontsz=16)
 dpiset = 200
 
 ob = mlo.myloadmat_to_obj('./Pyecltest.mat')
+ob2 = mlo.myloadmat_to_obj('./Pyecltest.mat.ref')
 
 ifig = 0
 
@@ -27,7 +28,8 @@ ifig = 0
 # 8.
 ifig += 1
 pl.figure(ifig)
-pl.plot(ob.t, ob.lam_t_array, linewidth=2)
+pl.plot(ob.t, ob.lam_t_array, linewidth=2, label='Furman-Pivi model')
+pl.plot(ob2.t, ob2.lam_t_array, '--', linewidth=2, label='ECLOUD model')
 pl.xlabel('Time [s]')
 pl.ylabel('Beam profile [p/m]')
 ms.scix()
@@ -35,11 +37,13 @@ pl.grid('on')
 pl.suptitle('Var. name: lam_t_array\nBeam density at each time step')
 pl.subplots_adjust(top=.82, bottom=.14)
 pl.savefig('fig%02d.png' % ifig, dpi=dpiset)
+pl.legend()
 
 # 6.
 ifig += 1
 pl.figure(ifig)
-pl.plot(ob.t, ob.Nel_timep, linewidth=2)
+pl.plot(ob.t, ob.Nel_timep, linewidth=2, label='Furman-Pivi model')
+pl.plot(ob2.t, ob2.Nel_timep, '--', linewidth=2, label='ECLOUD model')
 pl.xlabel('Time [s]')
 pl.ylabel('Number of $e^-$ per unit length [$m^{-1}$]')
 ms.scix()
@@ -47,6 +51,7 @@ pl.grid('on')
 pl.suptitle('Var. name: Nel_timep\nNumber of electrons in the chamber at each time step')
 pl.subplots_adjust(top=.82, bottom=.14)
 pl.savefig('fig%02d.png' % ifig, dpi=dpiset)
+pl.legend()
 
 '''
 # 5.
