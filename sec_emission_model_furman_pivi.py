@@ -52,7 +52,14 @@
 import numpy as np
 import numpy.random as random
 import electron_emission as ee
-# from scipy.special import gamma
+import scipy
+from scipy.special import gamma
+from scipy.special import gammainc
+from scipy.special import binom
+from scipy.special import erf
+from scipy.special import erfinv
+from scipy.misc import factorial
+from scipy.integrate import cumtrapz
 
 # def inverse_CDF_ts_energy(delta_e, delta_r, delta_ts, n, pn, epsn):
 #     delta_prime_ts = delta_ts / (1. - delta_e - delta_r)
@@ -167,7 +174,6 @@ class SEY_model_furman_pivi():
         True secondaries.
         (31) in FP paper.
         """
-
         eHat = self.eHat0 * (1. + self.t3 * (1. - costheta_impact**self.t4))
         delta_ts0 = self.deltaTSHat * self._D(E_impact_eV / eHat)
         angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
@@ -178,15 +184,80 @@ class SEY_model_furman_pivi():
         s = self.s
         return s * x / (s - 1 + x**s)
 
-    def energy_rediffused(self, E0):
+    def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
+        ene = energy - E_0
+        a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
+        c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))
+        return a / c
+
+    def backscattered_energy_CDF(self, energy, E_0, sigma_e=2.):
+        sqrt2 = np.sqrt(2)
+        return 1 - erf((E_0 - energy) / (sqrt2 * sigma_e)) / erf(E_0 / (sqrt2 * sigma_e))
+
+    def get_energy_backscattered(self, E_0):
+        sqrt2 = np.sqrt(2)
+        uu = np.random.rand(len(E_0))
+        return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))  # Inverse transform sampling of (26) in FP paper
+
+    def rediffused_energy_PDF(self, energy, E_0, qq=0.5):
+        for ene in E_0:
+            if ene < 0:
+                raise ValueError('Impacting energy E_0 cannot be negative')
+        prob_density = (qq + 1) * energy**qq / E_0**(qq + 1)
+        return prob_density
+
+    def rediffused_energy_CDF(self, energy, E_0, qq=0.5):
+        return energy**(qq + 1) / E_0**(qq + 1)
+
+    def get_energy_rediffused(self, E0):
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
 
-    def energy_trueSecondary(self, E0):
-        uu = random.rand(len(E0))
+    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='binomial', M=10):
+        """
+        A simplified version of the energy distribution for secondary electrons in
+        the Furman-Pivi model. The choice parameter decides wheter to use a binomial
+        or a Poisson distribution for the probabilities P_n_ts.
+        """
+        p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
+        eps_n = np.array([1.5, 1.75, 1, 3.75, 8.5, 11.5, 2.5, 3, 2.5, 3])
+        if choice == 'poisson':
+            P_n_ts = delta_ts / factorial(nn) * np.exp(-delta_ts)
+        elif choice == 'binomial':
+            p = delta_ts / M
+            P_n_ts = binom(M, nn) * (p)**nn * (1 - p)**(M - nn)
+        else:
+            raise ValueError('choice must be either \'binomial\' or \'poisson\'')
 
-        E_out = self.eHat0
-        return E_out
+        eps_curr = eps_n[int(nn - 1)]
+        p_n_curr = p_n[int(nn - 1)]
+
+        F_n = P_n_ts / ((eps_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr))
+
+        f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
+
+        return f_n_ts, P_n_ts
+
+    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='binomial'):
+        nns = np.arange(1, 11, 1)
+        average_f_n_ts = np.zeros_like(energy)
+        for ii in nns:
+            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts, nn=ii, E_0=E_0, choice=choice)
+            average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts
+        area = scipy.integrate.simps(average_f_n_ts, energy)
+        normalization_constant = 1. / area
+        return normalization_constant * average_f_n_ts
+
+    def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='binomial', energy=np.linspace(0.001, 300, num=int(1e5))):
+        pdf = self.average_true_sec_energy_PDF(delta_ts, E_0, choice=choice)
+        CDF = cumtrapz(pdf, energy)
+        return np.append([0], CDF)
+
+    # numpy.interp(x, xp, fp, left=None, right=None, period=None)
+    def get_energy_true_sec(self, delta_ts, E_0, choice='binomial', energy=np.linspace(0.001, 300, num=int(1e5))):
+        uu = np.random.rand(len(energy))
+        CDF = self.average_true_sec_energy_CDF(delta_ts, E_0, choice)
+        return np.interp(uu, CDF, energy)
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
@@ -207,13 +278,17 @@ class SEY_model_furman_pivi():
             i_seg_replace = i_found
 
         # Handle elastics
-        vx_replace[flag_backscattered], vy_replace[flag_backscattered] = ee.specular_velocity(
-            vx_impact[flag_backscattered], vy_impact[flag_backscattered],
-            Norm_x[flag_backscattered], Norm_y[flag_backscattered], v_impact_n[flag_backscattered]
-        )
+        # vx_replace[flag_backscattered], vy_replace[flag_backscattered] = ee.specular_velocity(
+        #     vx_impact[flag_backscattered], vy_impact[flag_backscattered],
+        #     Norm_x[flag_backscattered], Norm_y[flag_backscattered], v_impact_n[flag_backscattered]
+        # )
+        En_backscattered_eV = self.get_energy_backscattered(E_impact_eV[flag_backscattered])
+        N_rediffused = np.sum(flag_backscattered)
+        vx_replace[flag_backscattered], vy_replace[flag_backscattered], vz_replace[flag_backscattered] = self.angle_dist_func(
+            N_rediffused, En_backscattered_eV, Norm_x[flag_backscattered], Norm_y[flag_backscattered], mass)
 
         # Rediffused
-        En_rediffused_eV = self.energy_rediffused(E_impact_eV[flag_rediffused])
+        En_rediffused_eV = self.get_energy_rediffused(E_impact_eV[flag_rediffused])
         N_rediffused = np.sum(flag_rediffused)
         vx_replace[flag_rediffused], vy_replace[flag_rediffused], vz_replace[flag_rediffused] = self.angle_dist_func(
             N_rediffused, En_rediffused_eV, Norm_x[flag_rediffused], Norm_y[flag_rediffused], mass)
