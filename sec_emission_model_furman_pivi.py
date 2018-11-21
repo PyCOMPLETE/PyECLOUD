@@ -71,9 +71,11 @@ class SEY_model_furman_pivi():
     def __init__(self,  # eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                 s=1.54
+                 s=1.54,
+                 M=10
                  ):
 
+        self.M = M
         self.E_th = E_th
         self.sigmafit = sigmafit
         self.mufit = mufit
@@ -196,7 +198,7 @@ class SEY_model_furman_pivi():
 
     def get_energy_backscattered(self, E_0):
         sqrt2 = np.sqrt(2)
-        uu = np.random.rand(len(E_0))
+        uu = random.rand(len(E_0))
         return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))  # Inverse transform sampling of (26) in FP paper
 
     def rediffused_energy_PDF(self, energy, E_0, qq=0.5):
@@ -213,10 +215,10 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
 
-    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='binomial', M=10):
+    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         """
         A simplified version of the energy distribution for secondary electrons in
-        the Furman-Pivi model. The choice parameter decides wheter to use a binomial
+        the Furman-Pivi model. The 'choice' parameter decides wheter to use a poisson
         or a Poisson distribution for the probabilities P_n_ts.
         """
         p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
@@ -227,36 +229,59 @@ class SEY_model_furman_pivi():
             p = delta_ts / M
             P_n_ts = binom(M, nn) * (p)**nn * (1 - p)**(M - nn)
         else:
-            raise ValueError('choice must be either \'binomial\' or \'poisson\'')
+            raise ValueError('choice must be either \'poisson\' or \'binomial\'')
 
         eps_curr = eps_n[int(nn - 1)]
         p_n_curr = p_n[int(nn - 1)]
 
         F_n = P_n_ts / ((eps_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr))
-
+        F_n[(E_0 == 0.)] = 0.
+        import pdb; pdb.set_trace()
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
+        area = scipy.integrate.simps(f_n_ts, energy)
+        f_n_ts = f_n_ts / area  # Normalization
 
         return f_n_ts, P_n_ts
 
-    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='binomial'):
+    def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
+        pdf, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
+        CDF = cumtrapz(pdf, energy, initial=0)
+        return CDF
+
+    def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
+        energy = np.linspace(0.001, 300, num=int(len(E_0)))
+        out_array = np.empty(1)
+        if type(nn) is int:
+            uu = random.rand(len(energy))
+            CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=nn, E_0=E_0, choice=choice, energy=energy, M=M)
+            return np.interp(uu, CDF, energy)
+        else:
+            for ii, kk in enumerate(nn):
+                uu = random.rand(len(energy))
+                CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=kk, E_0=E_0[ii], choice=choice, energy=energy, M=M)
+                out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
+            out_array = np.delete(out_array, 0)
+            return out_array
+
+    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
         nns = np.arange(1, 11, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
-            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts, nn=ii, E_0=E_0, choice=choice)
+            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
             average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts
         area = scipy.integrate.simps(average_f_n_ts, energy)
         normalization_constant = 1. / area
         return normalization_constant * average_f_n_ts
 
-    def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='binomial', energy=np.linspace(0.001, 300, num=int(1e5))):
-        pdf = self.average_true_sec_energy_PDF(delta_ts, E_0, choice=choice)
-        CDF = cumtrapz(pdf, energy)
-        return np.append([0], CDF)
+    def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
+        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
+        CDF = cumtrapz(pdf, energy, initial=0)
+        return CDF
 
     # numpy.interp(x, xp, fp, left=None, right=None, period=None)
-    def get_energy_true_sec(self, delta_ts, E_0, choice='binomial', energy=np.linspace(0.001, 300, num=int(1e5))):
-        uu = np.random.rand(len(energy))
-        CDF = self.average_true_sec_energy_CDF(delta_ts, E_0, choice)
+    def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
+        uu = random.rand(len(energy))
+        CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
         return np.interp(uu, CDF, energy)
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
@@ -277,11 +302,7 @@ class SEY_model_furman_pivi():
         else:
             i_seg_replace = i_found
 
-        # Handle elastics
-        # vx_replace[flag_backscattered], vy_replace[flag_backscattered] = ee.specular_velocity(
-        #     vx_impact[flag_backscattered], vy_impact[flag_backscattered],
-        #     Norm_x[flag_backscattered], Norm_y[flag_backscattered], v_impact_n[flag_backscattered]
-        # )
+        # Backscattered
         En_backscattered_eV = self.get_energy_backscattered(E_impact_eV[flag_backscattered])
         N_rediffused = np.sum(flag_backscattered)
         vx_replace[flag_backscattered], vy_replace[flag_backscattered], vz_replace[flag_backscattered] = self.angle_dist_func(
@@ -297,18 +318,33 @@ class SEY_model_furman_pivi():
         N_true_sec = np.sum(flag_truesec)
         n_add_total = 0
         if N_true_sec > 0:
-
+            delta_ts = self._delta_ts(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
             n_add = np.zeros_like(flag_truesec, dtype=int)
-            n_add[flag_truesec] = np.ceil(nel_replace[flag_truesec] / nel_mp_th) - 1
-            n_add[n_add < 0] = 0.  # in case of underflow
-            nel_replace[flag_truesec] = nel_replace[flag_truesec] / (n_add[flag_truesec] + 1.)
+            uu = random.poisson(lam=delta_ts)
 
-            n_add_total = np.sum(n_add)
+            # Cut zeros
+            # flag_zeros = (uu == 0)
+            # N_zeros = np.sum(flag_zeros)
+            # while N_zeros > 0:
+            #     uu[flag_zeros] = random.posson(lam=delta_ts[flag_zeros])
+            #     flag_zeros = (uu == 0)
+            #     N_zeros = np.sum(flag_zeros)
+
+            n_add[flag_truesec] = uu
+
+            # Cut above M
+            flag_above_th = (n_add > self.M)
+            Nabove_th = np.sum(flag_above_th)
+            while Nabove_th > 0:
+                n_add[flag_above_th] = random.poisson(delta_ts[flag_above_th])
+
+                flag_above_th = (n_add > self.M)
+                Nabove_th = np.sum(flag_above_th)
+
+            n_add_total = np.sum(n_add[flag_truesec])
 
             # MPs to be replaced
-            En_truesec_eV = ee.sec_energy_hilleret_model2(
-                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
-                self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=1, E_0=E_impact_eV[flag_truesec], M=self.M)
 
             vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
                 N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
@@ -325,10 +361,14 @@ class SEY_model_furman_pivi():
                 E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
                 # Generate new MP properties, angles and energies
-                En_truesec_eV_add = ee.sec_energy_hilleret_model2(
-                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
-                    self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                flag_above_zero = (n_add[flag_truesec] > 0)
+                n_add_extended = np.repeat(n_add[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
+                En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts[flag_above_zero], nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
 
+                # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
+                #     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
+                #     self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                # import pdb; pdb.set_trace()
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
@@ -347,7 +387,7 @@ class SEY_model_furman_pivi():
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-        event_type = flag_truesec
+        event_type = flag_truesec.astype(int) + flag_rediffused.astype(int) * 2
         event_info = {}
 
         return nel_emit_tot_events, event_type, event_info,\

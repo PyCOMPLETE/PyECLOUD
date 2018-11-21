@@ -279,6 +279,7 @@ class impact_management(object):
 
         del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        del_rediff_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         print('Extracting SEY curves...')
         for i_ct, ct in enumerate(cos_theta_test):
             print('%d/%d'%(i_ct + 1, len(cos_theta_test)))
@@ -308,8 +309,9 @@ class impact_management(object):
                         nel_mp_th=1,
                         flag_seg=True)
                 del_tot = (np.sum(nel_replace) + np.sum(nel_new_MPs)) / n_rep
-                del_true_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type)) / float(n_rep)
-                del_elast_mat[i_ct, i_ene] = del_tot * float(np.sum(~event_type)) / float(n_rep)
+                del_true_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 1)) / float(n_rep)
+                del_elast_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 0)) / float(n_rep)
+                del_rediff_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 2)) / float(n_rep)
         print('Done extracting SEY curves.')
 
-        return del_true_mat, del_elast_mat
+        return del_true_mat, del_elast_mat, del_rediff_mat
