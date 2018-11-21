@@ -224,41 +224,52 @@ class SEY_model_furman_pivi():
         p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
         eps_n = np.array([1.5, 1.75, 1, 3.75, 8.5, 11.5, 2.5, 3, 2.5, 3])
         if choice == 'poisson':
-            P_n_ts = delta_ts / factorial(nn) * np.exp(-delta_ts)
+            P_n_ts = np.squeeze(delta_ts / factorial(nn) * np.exp(-delta_ts))
         elif choice == 'binomial':
             p = delta_ts / M
-            P_n_ts = binom(M, nn) * (p)**nn * (1 - p)**(M - nn)
+            P_n_ts = np.squeeze(binom(M, nn) * (p)**nn * (1 - p)**(M - nn))
         else:
             raise ValueError('choice must be either \'poisson\' or \'binomial\'')
 
         eps_curr = eps_n[int(nn - 1)]
         p_n_curr = p_n[int(nn - 1)]
 
-        F_n = P_n_ts / ((eps_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr))
-        F_n[(E_0 == 0.)] = 0.
-        import pdb; pdb.set_trace()
+        # eps_curr = []
+        # p_n_curr = []
+        # if type(nn) == int or nn.shape == np.empty(None).shape:
+        #     eps_curr = eps_n[int(nn - 1)]
+        #     p_n_curr = p_n[int(nn - 1)]
+        # else:
+        #     for kk in nn:
+        #         eps_curr.append(eps_n[int(kk - 1)])
+        #         p_n_curr.append(p_n[int(kk - 1)])
+        #     eps_curr = np.array(eps_curr)
+        #     p_n_curr = np.array(p_n_curr)
+
+        # import pdb; pdb.set_trace()
+        F_n = np.squeeze(P_n_ts / ((eps_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
-        f_n_ts = f_n_ts / area  # Normalization
+        if area != 0:
+            f_n_ts = f_n_ts / area  # Normalization
 
         return f_n_ts, P_n_ts
 
     def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
-        pdf, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
-        CDF = cumtrapz(pdf, energy, initial=0)
+        f_n_ts, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
+        CDF = cumtrapz(f_n_ts, energy, initial=0)
         return CDF
 
     def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
-        energy = np.linspace(0.001, 300, num=int(len(E_0)))
+        energy = np.linspace(1e-10, 300, num=int(len(E_0)))
+        uu = random.rand(len(energy))
         out_array = np.empty(1)
         if type(nn) is int:
-            uu = random.rand(len(energy))
             CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=nn, E_0=E_0, choice=choice, energy=energy, M=M)
             return np.interp(uu, CDF, energy)
         else:
             for ii, kk in enumerate(nn):
-                uu = random.rand(len(energy))
-                CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=kk, E_0=E_0[ii], choice=choice, energy=energy, M=M)
+                CDF = self.true_sec_energy_CDF(delta_ts=delta_ts[ii], nn=kk, E_0=E_0[ii], choice=choice, energy=energy, M=M)
                 out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
             out_array = np.delete(out_array, 0)
             return out_array
@@ -280,6 +291,7 @@ class SEY_model_furman_pivi():
 
     # numpy.interp(x, xp, fp, left=None, right=None, period=None)
     def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
+        energy = np.linspace(0.001, 300, num=int(len(E_0)))
         uu = random.rand(len(energy))
         CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
         return np.interp(uu, CDF, energy)
@@ -333,18 +345,19 @@ class SEY_model_furman_pivi():
             n_add[flag_truesec] = uu
 
             # Cut above M
-            flag_above_th = (n_add > self.M)
+            flag_above_th = (n_add[flag_truesec] > self.M)
             Nabove_th = np.sum(flag_above_th)
             while Nabove_th > 0:
-                n_add[flag_above_th] = random.poisson(delta_ts[flag_above_th])
+                n_add[flag_truesec][flag_above_th] = random.poisson(delta_ts[flag_above_th])
 
-                flag_above_th = (n_add > self.M)
+                flag_above_th = (n_add[flag_truesec] > self.M)
                 Nabove_th = np.sum(flag_above_th)
 
             n_add_total = np.sum(n_add[flag_truesec])
 
             # MPs to be replaced
-            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=1, E_0=E_impact_eV[flag_truesec], M=self.M)
+            # En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=1, E_0=E_impact_eV[flag_truesec], M=self.M)
+            En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts, E_0=E_impact_eV[flag_truesec])
 
             vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
                 N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
@@ -363,8 +376,9 @@ class SEY_model_furman_pivi():
                 # Generate new MP properties, angles and energies
                 flag_above_zero = (n_add[flag_truesec] > 0)
                 n_add_extended = np.repeat(n_add[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
-                En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts[flag_above_zero], nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
-
+                delta_ts_extended = np.repeat(delta_ts[flag_above_zero], n_add[flag_truesec][flag_above_zero])
+                # En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
+                En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_extended, E_0=E_impact_eV_add)
                 # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
                 #     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
                 #     self.E_th, E_impact_eV_add, self.thresh_low_energy)
