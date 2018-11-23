@@ -51,7 +51,6 @@
 
 import numpy as np
 import numpy.random as random
-import electron_emission as ee
 import scipy
 from scipy.special import gamma
 from scipy.special import gammainc
@@ -348,8 +347,9 @@ class SEY_model_furman_pivi():
             flag_above_th = (n_add[flag_truesec] > self.M)
             Nabove_th = np.sum(flag_above_th)
             while Nabove_th > 0:
-                n_add[flag_truesec][flag_above_th] = random.poisson(delta_ts[flag_above_th])
-
+                n_add_flag_true_sec = n_add[flag_truesec]
+                n_add_flag_true_sec[flag_above_th] = random.poisson(delta_ts[flag_above_th])
+                n_add[flag_truesec] = n_add_flag_true_sec
                 flag_above_th = (n_add[flag_truesec] > self.M)
                 Nabove_th = np.sum(flag_above_th)
 
