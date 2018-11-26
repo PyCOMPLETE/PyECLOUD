@@ -247,7 +247,7 @@ class SEY_model_furman_pivi():
         #         p_n_curr.append(p_n[int(kk - 1)])
         #     eps_curr = np.array(eps_curr)
         #     p_n_curr = np.array(p_n_curr)
-
+        P_n_ts = 1.
         # import pdb; pdb.set_trace()
         if E_0 == 0:
             F_n = 0
@@ -255,8 +255,8 @@ class SEY_model_furman_pivi():
             F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
-        if area != 0:
-            f_n_ts = f_n_ts / area  # Normalization
+        # if area != 0:
+        #     f_n_ts = f_n_ts / area  # Normalization
 
         return f_n_ts, P_n_ts
 
@@ -264,7 +264,7 @@ class SEY_model_furman_pivi():
         p_n = self.p_n
         eps_n = self.eps_n
 
-        P_n_ts = 1
+        P_n_ts = 1.
         eps_curr = eps_n[int(nn - 1)]
         p_n_curr = p_n[int(nn - 1)]
 
@@ -283,7 +283,7 @@ class SEY_model_furman_pivi():
         p_n = self.p_n
         eps_n = self.eps_n
 
-        P_n_ts = 1
+        P_n_ts = 1.
         eps_vec = np.array([eps_n[ii] for ii in nn])
         p_n_vec = np.array([p_n[ii] for ii in nn])
         F_n_vec = np.squeeze((P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn))
