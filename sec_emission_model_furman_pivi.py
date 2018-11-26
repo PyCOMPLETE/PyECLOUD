@@ -54,6 +54,7 @@ import numpy.random as random
 import scipy
 from scipy.special import gamma
 from scipy.special import gammainc
+from scipy.special import gammaincinv
 from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
@@ -214,14 +215,16 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
 
+
     def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         """
         A simplified version of the energy distribution for secondary electrons in
         the Furman-Pivi model. The 'choice' parameter decides wheter to use a poisson
         or a Poisson distribution for the probabilities P_n_ts.
         """
-        p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
-        eps_n = np.array([1.5, 1.75, 1, 3.75, 8.5, 11.5, 2.5, 3, 2.5, 3])
+        p_n = self.p_n
+        eps_n = self.eps_n
+
         if choice == 'poisson':
             P_n_ts = np.squeeze(delta_ts / factorial(nn) * np.exp(-delta_ts))
         elif choice == 'binomial':
@@ -246,7 +249,10 @@ class SEY_model_furman_pivi():
         #     p_n_curr = np.array(p_n_curr)
 
         # import pdb; pdb.set_trace()
-        F_n = np.squeeze(P_n_ts / ((eps_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))
+        if E_0 == 0:
+            F_n = 0
+        else:
+            F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
         if area != 0:
@@ -255,23 +261,52 @@ class SEY_model_furman_pivi():
         return f_n_ts, P_n_ts
 
     def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
-        f_n_ts, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
-        CDF = cumtrapz(f_n_ts, energy, initial=0)
-        return CDF
+        p_n = self.p_n
+        eps_n = self.eps_n
+
+        P_n_ts = 1
+        eps_curr = eps_n[int(nn - 1)]
+        p_n_curr = p_n[int(nn - 1)]
+
+        if E_0 == 0:
+            F_n = 0
+        else:
+            F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+        return eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
+
+    # def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
+    #     f_n_ts, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
+    #     CDF = cumtrapz(f_n_ts, energy, initial=0)
+    #     return CDF
 
     def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
-        energy = np.linspace(1e-10, 300, num=int(len(E_0)))
-        uu = random.rand(len(energy))
-        out_array = np.empty(1)
-        if type(nn) is int:
-            CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=nn, E_0=E_0, choice=choice, energy=energy, M=M)
-            return np.interp(uu, CDF, energy)
-        else:
-            for ii, kk in enumerate(nn):
-                CDF = self.true_sec_energy_CDF(delta_ts=delta_ts[ii], nn=kk, E_0=E_0[ii], choice=choice, energy=energy, M=M)
-                out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
-            out_array = np.delete(out_array, 0)
-            return out_array
+        p_n = self.p_n
+        eps_n = self.eps_n
+
+        P_n_ts = 1
+        eps_vec = np.array([eps_n[ii] for ii in nn])
+        p_n_vec = np.array([p_n[ii] for ii in nn])
+        F_n_vec = np.squeeze((P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn))
+        F_n_vec[E_0 == 0] = 0
+        uu = random.rand(len(E_0))
+        xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
+
+        return eps_vec * gammaincinv(p_n_vec, xx)
+
+
+    # def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
+    #     energy = np.linspace(1e-10, 300, num=int(len(E_0)))
+    #     uu = random.rand(len(energy))
+    #     out_array = np.empty(1)
+    #     if type(nn) is int:
+    #         CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=nn, E_0=E_0, choice=choice, energy=energy, M=M)
+    #         return np.interp(uu, CDF, energy)
+    #     else:
+    #         for ii, kk in enumerate(nn):
+    #             CDF = self.true_sec_energy_CDF(delta_ts=delta_ts[ii], nn=kk, E_0=E_0[ii], choice=choice, energy=energy, M=M)
+    #             out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
+    #         out_array = np.delete(out_array, 0)
+    #         return out_array
 
     def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
         nns = np.arange(1, 11, 1)
@@ -290,10 +325,17 @@ class SEY_model_furman_pivi():
 
     # numpy.interp(x, xp, fp, left=None, right=None, period=None)
     def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
-        energy = np.linspace(0.001, 300, num=int(len(E_0)))
-        uu = random.rand(len(energy))
-        CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
+        uu = random.rand(len(delta_ts))
+        out_array = np.empty(1)
+        if type(delta_ts) is int:
+            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
+            return np.interp(uu, CDF, energy)
+        else:
+            for ii, kk in enumerate(delta_ts):
+                CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_0[ii], choice=choice, energy=energy)
+                out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
         return np.interp(uu, CDF, energy)
+
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
@@ -410,6 +452,9 @@ class SEY_model_furman_pivi():
 
 
 class SEY_model_FP_Cu(SEY_model_furman_pivi):
+
+    p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
+    eps_n = np.array([1.5, 1.75, 1, 3.75, 8.5, 11.5, 2.5, 3, 2.5, 3])
 
     # Parameters for backscattered (elastically scattered) electrons
     # (25) in FP paper
