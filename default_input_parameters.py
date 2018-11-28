@@ -101,6 +101,8 @@ parameters_dict = {
 
             # Where to put this?
             't_ion': -1
+
+            'extract_sey': True
         },
     },
     'machine_parameters': {
