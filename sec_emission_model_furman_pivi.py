@@ -215,7 +215,6 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
 
-
     def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         """
         A simplified version of the energy distribution for secondary electrons in
@@ -248,13 +247,12 @@ class SEY_model_furman_pivi():
         #     eps_curr = np.array(eps_curr)
         #     p_n_curr = np.array(p_n_curr)
         P_n_ts = 1.
-        # import pdb; pdb.set_trace()
         if E_0 == 0:
             F_n = 0
         else:
             F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
-        area = scipy.integrate.simps(f_n_ts, energy)
+        # area = scipy.integrate.simps(f_n_ts, energy)
         # if area != 0:
         #     f_n_ts = f_n_ts / area  # Normalization
 
@@ -284,10 +282,10 @@ class SEY_model_furman_pivi():
         eps_n = self.eps_n
 
         P_n_ts = 1.
-        eps_vec = np.array([eps_n[ii] for ii in nn])
-        p_n_vec = np.array([p_n[ii] for ii in nn])
-        F_n_vec = np.squeeze((P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn))
-        F_n_vec[E_0 == 0] = 0
+        eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
+        p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
+        F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
+        # F_n_vec[E_0 == 0] = 0
         uu = random.rand(len(E_0))
         xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
 
@@ -398,8 +396,8 @@ class SEY_model_furman_pivi():
             n_add_total = np.sum(n_add[flag_truesec])
 
             # MPs to be replaced
-            # En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=1, E_0=E_impact_eV[flag_truesec], M=self.M)
-            En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts, E_0=E_impact_eV[flag_truesec])
+            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(1, len(E_impact_eV[flag_truesec])), E_0=E_impact_eV[flag_truesec], M=self.M)
+            # En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts, E_0=E_impact_eV[flag_truesec])
 
             vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
                 N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
@@ -419,12 +417,11 @@ class SEY_model_furman_pivi():
                 flag_above_zero = (n_add[flag_truesec] > 0)
                 n_add_extended = np.repeat(n_add[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
                 delta_ts_extended = np.repeat(delta_ts[flag_above_zero], n_add[flag_truesec][flag_above_zero])
-                # En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
-                En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_extended, E_0=E_impact_eV_add)
+                En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
+                # En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_extended, E_0=E_impact_eV_add)
                 # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
                 #     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
                 #     self.E_th, E_impact_eV_add, self.thresh_low_energy)
-                # import pdb; pdb.set_trace()
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 

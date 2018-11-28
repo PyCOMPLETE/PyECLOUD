@@ -188,12 +188,12 @@ class pyecloud_saver:
             n_rep = 10000
             self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
             self.sey_test_cos_theta = np.linspace(0, 1., 10)
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = \
+            self.sey_test_del_true_mat, self.sey_test_del_elast_mat, self.del_rediff_mat = \
                 impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta, MP_e.charge, MP_e.mass)
         else:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = 0., 0.
+            self.sey_test_del_true_mat, self.sey_test_del_elast_mat, self.del_rediff_mat = 0., 0., 0.
 
         # Log
         print('Done init pyecloud_saver.')
@@ -208,7 +208,7 @@ class pyecloud_saver:
                 cloud_list, rho_cloud=None):
 
         ####################################################
-        # Quantites saved at custom times provided by user #
+        # Quantities saved at custom times provided by user #
         ####################################################
 
         # Check for MP save state
@@ -238,7 +238,7 @@ class pyecloud_saver:
         self._stepbystep_data_save(impact_man, MP_e, beamtim)
 
         ##########################################################
-        # Quantites saved at each bunch passage and dump to file #
+        # Quantities saved at each bunch passage and dump to file #
         ##########################################################
 
         if beamtim.flag_new_bunch_pass:
@@ -384,6 +384,7 @@ class pyecloud_saver:
                     'sey_test_cos_theta': self.sey_test_cos_theta,
                     'sey_test_del_true_mat': self.sey_test_del_true_mat,
                     'sey_test_del_elast_mat': self.sey_test_del_elast_mat,
+                    'del_rediff_mat': self.del_rediff_mat,
                     'chamber_area': self.area,
                     'cos_angle_hist': self.cos_angle_hist,
                     'xg_hist_cos_angle': self.xg_hist_cos_angle
@@ -519,6 +520,7 @@ class pyecloud_saver:
                                    'sey_test_del_true_mat',
                                    'sey_test_E_impact_eV',
                                    'sey_test_del_elast_mat',
+                                   'del_rediff_mat',
                                    'sey_test_cos_theta',
                                    'U_sc_eV'
                                    ]
