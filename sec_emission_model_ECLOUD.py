@@ -109,7 +109,7 @@ class SEY_model_ECLOUD(object):
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
-        print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
+        print('Secondary emission model: ECLOUD E0=%.4f s=%.4f') % (self.E0, self.s)
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 

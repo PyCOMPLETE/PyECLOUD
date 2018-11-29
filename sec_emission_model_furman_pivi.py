@@ -285,12 +285,10 @@ class SEY_model_furman_pivi():
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
         F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
-        # F_n_vec[E_0 == 0] = 0
         uu = random.rand(len(E_0))
         xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
-
+        xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small
         return eps_vec * gammaincinv(p_n_vec, xx)
-
 
     # def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
     #     energy = np.linspace(1e-10, 300, num=int(len(E_0)))
@@ -333,7 +331,6 @@ class SEY_model_furman_pivi():
                 CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_0[ii], choice=choice, energy=energy)
                 out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
         return np.interp(uu, CDF, energy)
-
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
