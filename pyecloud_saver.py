@@ -407,6 +407,8 @@ class pyecloud_saver:
             self.checkpoint_DT = checkpoint_DT
             self.t_last_checkp = 0
             self.i_checkp = 0
+            if checkpoint_folder is None:
+                raise ValueError('checkpoint_folder not specified in simulation_parameters.input')
             self.checkpoint_folder = checkpoint_folder
             if not os.path.isdir(self.checkpoint_folder):
                 os.makedirs(self.checkpoint_folder)
