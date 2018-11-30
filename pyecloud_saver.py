@@ -112,10 +112,13 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None):
+                        copy_main_outp_DT=None, extract_sey=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        if extract_sey is not None:
+            self.extract_sey = extract_sey
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
