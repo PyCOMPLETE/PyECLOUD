@@ -87,12 +87,15 @@ class BuildupSimulation(object):
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
             if os.path.isdir(self.checkpoint_folder):
-                saved_states_list = [f for f in os.listdir(self.checkpoint_folder) if (f.find('simulation_checkpoint_') != -1)]
-                if len(saved_states_list) != 0:
-                    saved_states_list.sort()
+                if len(os.listdir(self.checkpoint_folder)) == 1:
+                    print('Loading from checkpoint...')
                     # Selecting latest checkpoint
-                    checkpoint = saved_states_list[-1]
+                    checkpoint = os.listdir(self.checkpoint_folder)[0]
                     self.load_checkpoint(filename_simulation_checkpoint=checkpoint, load_from_folder=self.checkpoint_folder)
+                elif len(os.listdir(self.checkpoint_folder)) == 0:
+                    print('No checkpoint found, starting new simulation...')
+                else:
+                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder
 
     def run(self, t_end_sim=None):
 
