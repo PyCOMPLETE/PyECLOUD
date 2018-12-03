@@ -368,14 +368,6 @@ class SEY_model_furman_pivi():
             n_add = np.zeros_like(flag_truesec, dtype=int)
             uu = random.poisson(lam=delta_ts)
 
-            # Cut zeros
-            # flag_zeros = (uu == 0)
-            # N_zeros = np.sum(flag_zeros)
-            # while N_zeros > 0:
-            #     uu[flag_zeros] = random.posson(lam=delta_ts[flag_zeros])
-            #     flag_zeros = (uu == 0)
-            #     N_zeros = np.sum(flag_zeros)
-
             n_add[flag_truesec] = uu
 
             # Cut above M
@@ -388,20 +380,24 @@ class SEY_model_furman_pivi():
                 flag_above_th = (n_add[flag_truesec] > self.M)
                 Nabove_th = np.sum(flag_above_th)
 
-            n_add_total = np.sum(n_add[flag_truesec])
-
             # MPs to be replaced
-            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(1, len(E_impact_eV[flag_truesec])), E_0=E_impact_eV[flag_truesec], M=self.M)
+            flag_equals_one = (n_add[flag_truesec] == 1)
+            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(1, len(E_impact_eV[flag_truesec][flag_equals_one])), E_0=E_impact_eV[flag_truesec][flag_equals_one], M=self.M)
             # En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts, E_0=E_impact_eV[flag_truesec])
 
-            vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
-                N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
+            N_true_sec = np.sum(flag_equals_one)
+            vx_replace[flag_truesec][flag_equals_one], vy_replace[flag_truesec][flag_equals_one], vz_replace[flag_truesec][flag_equals_one] = self.angle_dist_func(
+                N_true_sec, En_truesec_eV, Norm_x[flag_truesec][flag_equals_one], Norm_y[flag_truesec][flag_equals_one], mass)
+
+            flag_zero = (n_add[flag_truesec] == 0)
+            nel_replace[flag_truesec][flag_zero] = 0.0
 
             # Add new MPs
+            clone_idxs = n_add - 1
+            clone_idxs[clone_idxs < 0] = 0
+            n_add_total = np.sum(clone_idxs)
             if n_add_total != 0:
                 # Clone MPs
-                clone_idxs = n_add - 1
-                clone_idxs[clone_idxs < 0] = 0
                 x_new_MPs = np.repeat(x_impact, clone_idxs)
                 y_new_MPs = np.repeat(y_impact, clone_idxs)
                 z_new_MPs = np.repeat(z_impact, clone_idxs)
@@ -411,9 +407,9 @@ class SEY_model_furman_pivi():
                 E_impact_eV_add = np.repeat(E_impact_eV, clone_idxs)
 
                 # Generate new MP properties, angles and energies
-                flag_above_zero = (n_add[flag_truesec] > 1)
-                n_add_extended = np.repeat(n_add[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
-                delta_ts_extended = np.repeat(delta_ts[flag_above_zero], n_add[flag_truesec][flag_above_zero])
+                flag_above_one = (n_add[flag_truesec] > 1)
+                n_add_extended = np.repeat(n_add[flag_truesec][flag_above_one], clone_idxs[flag_truesec][flag_above_one])
+                delta_ts_extended = np.repeat(delta_ts[flag_above_one], clone_idxs[flag_truesec][flag_above_one])
                 En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
                 # En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_extended, E_0=E_impact_eV_add)
                 # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
