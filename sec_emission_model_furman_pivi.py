@@ -152,7 +152,6 @@ class SEY_model_furman_pivi():
         Backscattered electrons (elastically scattered).
         (25) in FP paper.
         """
-
         exp_factor = -(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p
         delta_e0 = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(exp_factor)
         angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
@@ -164,7 +163,6 @@ class SEY_model_furman_pivi():
         Rediffused electrons (not in ECLOUD model).
         (28) in FP paper.
         """
-
         exp_factor = -(E_impact_eV / self.eR)**self.r
         delta_r0 = self.p1RInf * (1. - np.exp(exp_factor))
         angular_factor = 1. + self.r1 * (1. - costheta_impact**self.r2)
@@ -402,16 +400,18 @@ class SEY_model_furman_pivi():
             # Add new MPs
             if n_add_total != 0:
                 # Clone MPs
-                x_new_MPs = np.repeat(x_impact, n_add)
-                y_new_MPs = np.repeat(y_impact, n_add)
-                z_new_MPs = np.repeat(z_impact, n_add)
-                norm_x_add = np.repeat(Norm_x, n_add)
-                norm_y_add = np.repeat(Norm_y, n_add)
-                nel_new_MPs = np.repeat(nel_replace, n_add)
-                E_impact_eV_add = np.repeat(E_impact_eV, n_add)
+                clone_idxs = n_add - 1
+                clone_idxs[clone_idxs < 0] = 0
+                x_new_MPs = np.repeat(x_impact, clone_idxs)
+                y_new_MPs = np.repeat(y_impact, clone_idxs)
+                z_new_MPs = np.repeat(z_impact, clone_idxs)
+                norm_x_add = np.repeat(Norm_x, clone_idxs)
+                norm_y_add = np.repeat(Norm_y, clone_idxs)
+                nel_new_MPs = np.repeat(nel_replace, clone_idxs)
+                E_impact_eV_add = np.repeat(E_impact_eV, clone_idxs)
 
                 # Generate new MP properties, angles and energies
-                flag_above_zero = (n_add[flag_truesec] > 0)
+                flag_above_zero = (n_add[flag_truesec] > 1)
                 n_add_extended = np.repeat(n_add[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
                 delta_ts_extended = np.repeat(delta_ts[flag_above_zero], n_add[flag_truesec][flag_above_zero])
                 En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
