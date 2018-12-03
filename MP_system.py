@@ -508,7 +508,7 @@ class MP_system:
         self.z_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['z_mp'])
         self.vx_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vx_mp'])
         self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
-        self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
+        self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vz_mp'])
         self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['nel_mp'])
 
         self.N_mp = int(self.N_mp + Nint_new_MP)

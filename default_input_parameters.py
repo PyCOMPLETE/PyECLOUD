@@ -100,7 +100,9 @@ parameters_dict = {
             'dec_fact_out': 1,
 
             # Where to put this?
-            't_ion': -1
+            't_ion': -1,
+
+            'extract_sey': True,
         },
     },
     'machine_parameters': {

@@ -87,15 +87,12 @@ class BuildupSimulation(object):
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
             if os.path.isdir(self.checkpoint_folder):
-                if len(os.listdir(self.checkpoint_folder)) == 1:
-                    print('Loading from checkpoint...')
+                saved_states_list = [f for f in os.listdir(self.checkpoint_folder) if (f.find('simulation_checkpoint_') != -1)]
+                if len(saved_states_list) != 0:
+                    saved_states_list.sort()
                     # Selecting latest checkpoint
-                    checkpoint = os.listdir(self.checkpoint_folder)[0]
+                    checkpoint = saved_states_list[-1]
                     self.load_checkpoint(filename_simulation_checkpoint=checkpoint, load_from_folder=self.checkpoint_folder)
-                elif len(os.listdir(self.checkpoint_folder)) == 0:
-                    print('No checkpoint found, starting new simulation...')
-                else:
-                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
     def run(self, t_end_sim=None):
 
@@ -257,8 +254,6 @@ class BuildupSimulation(object):
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
 
-        print 'Reloading state from file: %s...' % filename_simulation_state
-
         with open(load_from_folder + filename_simulation_state, 'rb') as fid:
             dict_state = cPickle.load(fid)
 
@@ -292,7 +287,7 @@ class BuildupSimulation(object):
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):
-        print 'Realoading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint)
+        print('Reloading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint))
 
         i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)
