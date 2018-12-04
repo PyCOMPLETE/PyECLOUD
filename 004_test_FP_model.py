@@ -12,8 +12,9 @@ test_obj = fp.SEY_model_FP_Cu()  # 276.8, 1.8848)
 
 qq = 0.5  # From FP paper
 sigma_e = 2.
-E_0 = np.array([300] * int(1e5))
-energy = np.linspace(0.001, 300, num=int(1e5))
+E_0_single = 10
+E_0 = np.array([E_0_single] * int(1e5))
+energy = np.linspace(0.001, E_0_single, num=int(1e5))
 
 alpha = 0.3
 round_to_digits = 4
@@ -53,27 +54,34 @@ ax2.legend()
 ax6.legend()
 
 # True secondary
-delta_ts = np.repeat(1.8, len(E_0))
-# prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=1.8, E_0=300, energy=energy)
+delta_ts = test_obj._delta_ts(E_0, 1)
+# prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=1.8, E_0=E_0_single, energy=energy)
 # ax3.plot(energy, prob_density_ts, label='PDF of true secondary electrons', linewidth=linewid)
 # ax3.set_title('Average true secondary energy distribution')
 # area = scipy.integrate.simps(prob_density_ts, energy)
 # area = round(area, round_to_digits)
 # ax3.text(150, ax3.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
-# CDF = test_obj.average_true_sec_energy_CDF(delta_ts=1.8, E_0=300, energy=energy)
+# CDF = test_obj.average_true_sec_energy_CDF(delta_ts=1.8, E_0=E_0_single, energy=energy)
 # ax7.plot(energy, CDF, label='CDF', linewidth=linewid)
 # # ax7.plot(CDF, energy, label='Inverse CDF')
 # ax3.hist(test_obj.get_energy_average_true_sec(delta_ts=delta_ts, E_0=E_0, energy=energy), density=True, bins=60)
 # ax7.legend()
 
-nn = 4
-prob_density_ts, _ = test_obj.true_sec_energy_PDF(delta_ts=1.8, nn=nn, E_0=300, energy=energy)
+# nn = 2
+# dddE = test_obj._delta_ts(E_0_single,1) * test_obj.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(nn, len(E_0)), E_0=E_0) + \
+#        test_obj._delta_r(E_0_single,1) * test_obj.get_energy_rediffused(E_0) + \
+#        test_obj._delta_e(E_0_single,1) * test_obj.get_energy_backscattered(E_0)
+# ax3.hist(dddE, density=True, bins=60)
+
+
+nn = 1
+prob_density_ts, _ = test_obj.true_sec_energy_PDF(delta_ts=delta_ts[0], nn=nn, E_0=E_0_single, energy=energy)
 ax4.plot(energy, prob_density_ts, label='PDF of true secondary electrons', linewidth=linewid)
 ax4.set_title(r'True secondary energy distribution, $f_{%i,ts}$' % nn)
 area = scipy.integrate.simps(prob_density_ts, energy)
 area = round(area, round_to_digits)
 ax4.text(150, ax4.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
-CDF = test_obj.true_sec_energy_CDF(delta_ts=1.8, nn=nn, E_0=300, energy=energy)
+CDF = test_obj.true_sec_energy_CDF(delta_ts=delta_ts[0], nn=nn, E_0=E_0_single, energy=energy)
 ax8.plot(energy, CDF, label='CDF', linewidth=linewid)
 ax4.hist(test_obj.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(nn, len(E_0)), E_0=E_0), density=True, bins=30)
 ax8.legend()
@@ -86,28 +94,29 @@ energy = np.linspace(0., 1000, num=int(1e3))
 plt.plot(energy, test_obj._delta_e(energy, 1), label=r'$\delta_e$', color='r', linewidth=linewid)
 plt.plot(energy, test_obj._delta_r(energy, 1), label=r'$\delta_r$', color='g', linewidth=linewid)
 plt.plot(energy, test_obj._delta_ts(energy, 1), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
-plt.plot(energy, test_obj._delta_ts(energy, 1) + test_obj._delta_r(energy, 0) + test_obj._delta_e(energy, 0), label=r'$\delta_{tot}$', color='k', linewidth=linewid)
+plt.plot(energy, test_obj._delta_ts(energy, 1) + test_obj._delta_r(energy, 1) + test_obj._delta_e(energy, 1), label=r'$\delta_{tot}$', color='k', linewidth=linewid)
 plt.legend()
 plt.grid(alpha=alpha)
 plt.title('SEY components', fontsize=25)
 
 # Tests for multiple nn
-delta_ts = np.repeat(1.8, 1e5)
-energy = np.linspace(0.001, 300, num=int(1e5))
-E_0 = np.array([300] * int(1e5))
+energy = np.linspace(0.001, E_0_single, num=int(1e5))
+E_0 = np.array([E_0_single] * int(1e5))
 fig, axarr = plt.subplots(2, 10, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
 plt.suptitle('Furman-Pivi tests', fontsize=25)
 for kk in np.arange(1, 10.1, 1):
     nn = np.repeat(kk, 1e5)
-    prob_density_ts, _ = test_obj.true_sec_energy_PDF(delta_ts=delta_ts[0], nn=kk, E_0=E_0[0])
+    prob_density_ts, _ = test_obj.true_sec_energy_PDF(delta_ts=delta_ts[0], nn=kk, E_0=E_0[0], energy=energy)
     axarr[0, int(kk - 1)].plot(energy, prob_density_ts, label='PDF of true secondary electrons', linewidth=linewid)
     axarr[0, int(kk - 1)].set_title(r'$f_{%i,ts}$' % kk)
-    axarr[0, int(kk - 1)].hist(test_obj.get_energy_true_sec(delta_ts=delta_ts, nn=nn, E_0=E_0), density=True, bins=np.arange(0, 301, 3))
+    draws = test_obj.get_energy_true_sec(delta_ts=delta_ts, nn=nn, E_0=E_0)
+    axarr[0, int(kk - 1)].hist(draws, density=True, bins=np.arange(0, E_0_single + 1, E_0_single / 100.))
+    axarr[0, int(kk - 1)].text(E_0_single / 4., ax4.get_ylim()[1] * 0.3, 'Average: ' + str(np.mean(draws)))
 # # Tests for multiple nn
 # delta_ts = np.repeat(1.8, 1e3)
-# energy = np.linspace(0.001, 300, num=int(1e3))
-# energyBig = np.linspace(0.001, 300, num=int(1e5))
-# E_0 = np.array([300] * int(1e3))
+# energy = np.linspace(0.001, E_0_single, num=int(1e3))
+# energyBig = np.linspace(0.001, E_0_single, num=int(1e5))
+# E_0 = np.array([E_0_single] * int(1e3))
 # fig, axarr = plt.subplots(2, 10, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
 # nn = np.arange(1, 10.1, 1)
 # nn = np.repeat(nn, 10)
@@ -125,6 +134,6 @@ for kk in np.arange(1, 10.1, 1):
 # for kk in np.arange(1, 10.1, 1):
 #     nn = np.repeat(kk, 1e3)
 #     draw = test_obj.get_energy_true_sec(delta_ts, nn, E_0, choice='poisson', M=10)
-#     axarr[0, int(kk - 1)].hist(draw, density=True, bins=np.arange(0, 301, 5))
+#     axarr[0, int(kk - 1)].hist(draw, density=True, bins=np.arange(0, E_0_single + 1, 5))
 # fig.subplots_adjust(left=0.05, right=0.95)
 plt.show()
