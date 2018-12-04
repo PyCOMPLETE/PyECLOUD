@@ -372,21 +372,22 @@ class SEY_model_furman_pivi():
             flag_above_th = (n_add[flag_truesec] > self.M)
             Nabove_th = np.sum(flag_above_th)
             while Nabove_th > 0:
-                n_add_flag_true_sec = n_add[flag_truesec]
                 n_add_flag_true_sec[flag_above_th] = random.poisson(delta_ts[flag_above_th])
-                n_add[flag_truesec] = n_add_flag_true_sec
-                flag_above_th = (n_add[flag_truesec] > self.M)
+                flag_above_th = (n_add_flag_true_sec > self.M)
                 Nabove_th = np.sum(flag_above_th)
+            n_add[flag_truesec] = n_add_flag_true_sec
 
             # MPs to be replaced
             flag_above_zero = (n_add_flag_true_sec > 0)
-            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts[flag_above_zero], nn=n_add_flag_true_sec[flag_above_zero], E_0=E_impact_eV[flag_truesec][flag_above_zero], M=self.M)
+            flag_truesec_and_above_zero = flag_truesec & (n_add > 0)
+            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts[flag_above_zero], nn=n_add_flag_true_sec[flag_above_zero], E_0=E_impact_eV[flag_truesec_and_above_zero], M=self.M)
 
             N_true_sec = np.sum(flag_above_zero)
-            vx_replace[flag_truesec][flag_above_zero], vy_replace[flag_truesec][flag_above_zero], vz_replace[flag_truesec][flag_above_zero] = self.angle_dist_func(
-                N_true_sec, En_truesec_eV, Norm_x[flag_truesec][flag_above_zero], Norm_y[flag_truesec][flag_above_zero], mass)
+            vx_replace[flag_truesec_and_above_zero], vy_replace[flag_truesec_and_above_zero], vz_replace[flag_truesec_and_above_zero] = self.angle_dist_func(
+                N_true_sec, En_truesec_eV, Norm_x[flag_truesec_and_above_zero], Norm_y[flag_truesec_and_above_zero], mass)
 
-            nel_replace[flag_truesec][~flag_above_zero] = 0.0
+            flag_truesec_and_zero = flag_truesec & (n_add == 0)
+            nel_replace[flag_truesec_and_zero] = 0.0
 
             # Add new MPs
             clone_idxs = n_add - 1
@@ -428,7 +429,12 @@ class SEY_model_furman_pivi():
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-        event_type = flag_truesec.astype(int) + flag_rediffused.astype(int) * 2
+        events = flag_truesec.astype(int)
+        if N_true_sec > 0:
+            events[n_add == 0] = 3  # Absorbed MPs
+            event_type = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
+
+        event_type = events + flag_rediffused.astype(int) * 2
         event_info = {}
 
         return nel_emit_tot_events, event_type, event_info,\

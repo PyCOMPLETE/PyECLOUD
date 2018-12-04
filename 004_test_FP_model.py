@@ -89,14 +89,26 @@ ax8.legend()
 fig.subplots_adjust(left=0.05, right=0.95)
 
 # SEY components
-plt.figure(2, figsize=(9 * 1.2, 9), facecolor='w')
-energy = np.linspace(0., 1000, num=int(1e3))
-plt.plot(energy, test_obj._delta_e(energy, 1), label=r'$\delta_e$', color='r', linewidth=linewid)
-plt.plot(energy, test_obj._delta_r(energy, 1), label=r'$\delta_r$', color='g', linewidth=linewid)
-plt.plot(energy, test_obj._delta_ts(energy, 1), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
-plt.plot(energy, test_obj._delta_ts(energy, 1) + test_obj._delta_r(energy, 1) + test_obj._delta_e(energy, 1), label=r'$\delta_{tot}$', color='k', linewidth=linewid)
-plt.legend()
-plt.grid(alpha=alpha)
+sp1 = plt.subplot(1, 4, 1)
+sp2 = plt.subplot(1, 4, 2, sharex=sp1, sharey=sp1)
+sp3 = plt.subplot(1, 4, 3, sharex=sp1, sharey=sp1)
+sp4 = plt.subplot(1, 4, 4, sharex=sp1, sharey=sp1)
+
+energy = np.linspace(0., 2000, num=int(1e3))
+sp1.plot(energy, test_obj._delta_e(energy, 1), label=r'$\delta_e$', color='r', linewidth=linewid)
+sp1.plot(energy, test_obj._delta_r(energy, 1), label=r'$\delta_r$', color='g', linewidth=linewid)
+sp1.plot(energy, test_obj._delta_ts(energy, 1), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
+sp1.plot(energy, test_obj._delta_ts(energy, 1) + test_obj._delta_r(energy, 1) + test_obj._delta_e(energy, 1), label=r'$\delta_{tot}$', color='k', linewidth=linewid)
+sp1.legend()
+
+for costheta in np.linspace(0, 1, 10):
+    sp2.plot(energy, test_obj._delta_e(energy, costheta), label=r'$\delta_e$', color='r', linewidth=linewid)
+    sp3.plot(energy, test_obj._delta_r(energy, costheta), label=r'$\delta_r$', color='g', linewidth=linewid)
+    sp4.plot(energy, test_obj._delta_ts(energy, costheta), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
+
+
+for sp in [sp1, sp2, sp3, sp4]:
+    sp.grid(alpha=alpha)
 plt.title('SEY components', fontsize=25)
 
 # Tests for multiple nn
