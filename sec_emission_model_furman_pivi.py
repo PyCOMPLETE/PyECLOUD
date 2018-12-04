@@ -66,7 +66,6 @@ from scipy.integrate import cumtrapz
 #     PnTS_prime = delta_prime_ts**n / np.math.factorial(n) * np.exp(-delta_prime_ts)
 #     Fn = PnTS_prime / ()(eps[n-1]**pn[n-1] * gamma(pn[n-1]))**n * )
 
-
 class SEY_model_furman_pivi():
     def __init__(self,  # eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
@@ -285,7 +284,8 @@ class SEY_model_furman_pivi():
         F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
         uu = random.rand(len(E_0))
         xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
-        xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small
+        xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
+
         return eps_vec * gammaincinv(p_n_vec, xx)
 
     # def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
@@ -366,10 +366,8 @@ class SEY_model_furman_pivi():
         if N_true_sec > 0:
             delta_ts = self._delta_ts(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
             n_add = np.zeros_like(flag_truesec, dtype=int)
-            uu = random.poisson(lam=delta_ts)
-
-            n_add[flag_truesec] = uu
-
+            n_add[flag_truesec] = random.poisson(lam=delta_ts)
+            n_add_flag_true_sec = n_add[flag_truesec]
             # Cut above M
             flag_above_th = (n_add[flag_truesec] > self.M)
             Nabove_th = np.sum(flag_above_th)
@@ -381,16 +379,14 @@ class SEY_model_furman_pivi():
                 Nabove_th = np.sum(flag_above_th)
 
             # MPs to be replaced
-            flag_equals_one = (n_add[flag_truesec] == 1)
-            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(1, len(E_impact_eV[flag_truesec][flag_equals_one])), E_0=E_impact_eV[flag_truesec][flag_equals_one], M=self.M)
-            # En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts, E_0=E_impact_eV[flag_truesec])
+            flag_above_zero = (n_add_flag_true_sec > 0)
+            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts[flag_above_zero], nn=n_add_flag_true_sec[flag_above_zero], E_0=E_impact_eV[flag_truesec][flag_above_zero], M=self.M)
 
-            N_true_sec = np.sum(flag_equals_one)
-            vx_replace[flag_truesec][flag_equals_one], vy_replace[flag_truesec][flag_equals_one], vz_replace[flag_truesec][flag_equals_one] = self.angle_dist_func(
-                N_true_sec, En_truesec_eV, Norm_x[flag_truesec][flag_equals_one], Norm_y[flag_truesec][flag_equals_one], mass)
+            N_true_sec = np.sum(flag_above_zero)
+            vx_replace[flag_truesec][flag_above_zero], vy_replace[flag_truesec][flag_above_zero], vz_replace[flag_truesec][flag_above_zero] = self.angle_dist_func(
+                N_true_sec, En_truesec_eV, Norm_x[flag_truesec][flag_above_zero], Norm_y[flag_truesec][flag_above_zero], mass)
 
-            flag_zero = (n_add[flag_truesec] == 0)
-            nel_replace[flag_truesec][flag_zero] = 0.0
+            nel_replace[flag_truesec][~flag_above_zero] = 0.0
 
             # Add new MPs
             clone_idxs = n_add - 1
@@ -408,13 +404,12 @@ class SEY_model_furman_pivi():
 
                 # Generate new MP properties, angles and energies
                 flag_above_one = (n_add[flag_truesec] > 1)
-                n_add_extended = np.repeat(n_add[flag_truesec][flag_above_one], clone_idxs[flag_truesec][flag_above_one])
-                delta_ts_extended = np.repeat(delta_ts[flag_above_one], clone_idxs[flag_truesec][flag_above_one])
+                clone_above_one = clone_idxs[flag_truesec][flag_above_one]
+                n_add_extended = np.repeat(n_add_flag_true_sec[flag_above_one], clone_above_one)
+                delta_ts_extended = np.repeat(delta_ts[flag_above_one], clone_above_one)
+
                 En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
-                # En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_extended, E_0=E_impact_eV_add)
-                # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
-                #     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
-                #     self.E_th, E_impact_eV_add, self.thresh_low_energy)
+
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
