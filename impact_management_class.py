@@ -229,7 +229,7 @@ class impact_management(object):
                 nel_emit_tot_events, event_type, event_info,\
                     nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
                     nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
-                    self.sey_mod.impacts_on_surface(
+                    sey_mod.impacts_on_surface(
                         MP_e.mass, nel_impact, x_impact, y_impact, z_impact,
                         vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                         v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg

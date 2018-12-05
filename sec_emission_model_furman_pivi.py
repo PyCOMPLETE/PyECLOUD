@@ -66,6 +66,7 @@ from scipy.integrate import cumtrapz
 #     PnTS_prime = delta_prime_ts**n / np.math.factorial(n) * np.exp(-delta_prime_ts)
 #     Fn = PnTS_prime / ()(eps[n-1]**pn[n-1] * gamma(pn[n-1]))**n * )
 
+
 class SEY_model_furman_pivi():
     def __init__(self,  # eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
@@ -113,6 +114,10 @@ class SEY_model_furman_pivi():
         flag_backscattered = np.logical_and(~flag_rediffused, rand < delta_r + delta_e)
         flag_truesec = np.logical_and(~flag_rediffused, ~flag_backscattered)
 
+        flag_truesec = rand > delta_e + delta_r
+        flag_backscattered = np.logical_and(~flag_truesec, rand < delta_e)
+        flag_rediffused = np.logical_and(~flag_truesec, ~flag_backscattered)
+
         # Reflected or backscattered electrons have yield 1 by definition.
         delta = np.ones_like(E_impact_eV, dtype=float)
         # True secondary part has to be adjusted accordingly.
@@ -127,7 +132,7 @@ class SEY_model_furman_pivi():
         # (6): Generate energy:
         # In impacts_on_surface
 
-        nel_emit = delta * nel_impact
+        nel_emit = nel_impact * delta
 
         return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
 
@@ -430,11 +435,10 @@ class SEY_model_furman_pivi():
             i_seg_new_MPs = np.array([])
 
         events = flag_truesec.astype(int)
-        if N_true_sec > 0:
-            events[n_add == 0] = 3  # Absorbed MPs
-            event_type = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
+        events[n_add == 0] = 3  # Absorbed MPs
+        event_type = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
 
-        event_type = events + flag_rediffused.astype(int) * 2
+        # event_type = events + flag_rediffused.astype(int) * 2
         event_info = {}
 
         return nel_emit_tot_events, event_type, event_info,\
