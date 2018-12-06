@@ -308,8 +308,8 @@ class impact_management(object):
                         costheta_impact=ct * np.ones_like(nel_impact),
                         nel_mp_th=1,
                         flag_seg=True)
-                del_tot = (np.sum(nel_replace) + np.sum(nel_new_MPs)) / n_rep
-                del_true_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 1)) / float(n_rep)
+                
+                del_true_mat[i_ct, i_ene] = nel_emit_tot_events[event_type == 1]/np.sum(nel_impact)
                 del_elast_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 0)) / float(n_rep)
                 del_rediff_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 2)) / float(n_rep)
         print('Done extracting SEY curves.')
