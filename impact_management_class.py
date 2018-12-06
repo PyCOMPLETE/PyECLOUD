@@ -277,12 +277,13 @@ class impact_management(object):
 
     def extract_sey_curves(self, n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
-        del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-        del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-        del_rediff_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        deltas = {}
+        for etype in self.sey_mod.event_types.keys():
+            etype_name = self.sey_mod.event_types[etype]
+            deltas[etype_name] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         print('Extracting SEY curves...')
         for i_ct, ct in enumerate(cos_theta_test):
-            print('%d/%d'%(i_ct + 1, len(cos_theta_test)))
+            print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
             for i_ene, Ene in enumerate(E_impact_eV_test):
 
                 # nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
@@ -308,12 +309,13 @@ class impact_management(object):
                         costheta_impact=ct * np.ones_like(nel_impact),
                         nel_mp_th=1,
                         flag_seg=True)
-                
-                deltas = {}
+
                 for etype in self.sey_mod.event_types.keys():
                     etype_name = self.sey_mod.event_types[etype]
-                    deltas[etype_name] = nel_emit_tot_events[event_type==etype]/np.sum(nel_impact)
+                    thisdelta = deltas[etype_name]
+                    thisdelta[i_ct, i_ene] = np.sum(nel_emit_tot_events[event_type == etype]) / np.sum(nel_impact)
+                    deltas[etype_name] = thisdelta
 
-                print('Done extracting SEY curves.')
+        print('Done extracting SEY curves.')
 
-        return deltas 
+        return deltas

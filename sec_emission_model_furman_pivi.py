@@ -68,6 +68,14 @@ from scipy.integrate import cumtrapz
 
 
 class SEY_model_furman_pivi():
+
+    event_types = {
+        0: 'elast',
+        1: 'true',
+        2: 'rediff',
+        3: 'absorb',
+    }
+
     def __init__(self,  # eHat0, deltaTSHat,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
@@ -93,7 +101,7 @@ class SEY_model_furman_pivi():
         # self.deltaTSHat = deltaTSHat
         # self.s = s
 
-        print 'Secondary emission model: Furman-Pivi s=%.4f' % (self.s)
+        print('Secondary emission model: Furman-Pivi s=%.4f' % (self.s))
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
         # Furman-Pivi algorithm
@@ -132,7 +140,7 @@ class SEY_model_furman_pivi():
         # (6): Generate energy:
         # In impacts_on_surface
 
-        nel_emit = nel_impact * 1 # * delta
+        nel_emit = nel_impact # * delta
 
         return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
 
@@ -434,12 +442,19 @@ class SEY_model_furman_pivi():
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
+        # Add new MPs to nel_emit_tot_events
+        nel_emit_tot_events = np.concatenate([nel_emit_tot_events, nel_new_MPs])
+
         events = flag_truesec.astype(int)
         if N_true_sec > 0:
             events[n_add == 0] = 3  # Absorbed MPs
-        event_type = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
 
-        # event_type = events + flag_rediffused.astype(int) * 2
+        events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
+        if n_add_total != 0:
+            events_add = np.repeat(events, clone_idxs)
+            events = np.concatenate([events, events_add])
+        event_type = events
+
         event_info = {}
 
         return nel_emit_tot_events, event_type, event_info,\
