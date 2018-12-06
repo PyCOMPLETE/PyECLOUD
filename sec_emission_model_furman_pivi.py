@@ -132,7 +132,7 @@ class SEY_model_furman_pivi():
         # (6): Generate energy:
         # In impacts_on_surface
 
-        nel_emit = nel_impact * delta
+        nel_emit = nel_impact * 1 # * delta
 
         return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
 
@@ -435,7 +435,8 @@ class SEY_model_furman_pivi():
             i_seg_new_MPs = np.array([])
 
         events = flag_truesec.astype(int)
-        events[n_add == 0] = 3  # Absorbed MPs
+        if N_true_sec > 0:
+            events[n_add == 0] = 3  # Absorbed MPs
         event_type = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
 
         # event_type = events + flag_rediffused.astype(int) * 2
