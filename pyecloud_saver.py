@@ -392,8 +392,8 @@ class pyecloud_saver:
         saved_dict['sey_test_E_impact_eV'] = self.sey_test_E_impact_eV,
         saved_dict['sey_test_cos_theta'] = self.sey_test_cos_theta
         for etypn in self.sey_test_deltas.keys():
-            saved_dict['sey_test_del_%s_mat'%etypn] = self.sey_test_deltas[etypn]
-        
+            saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
+
         saved_dict.update(self._stepbystep_get_dict())
 
         for kk in saved_dict.keys():
@@ -534,8 +534,6 @@ class pyecloud_saver:
                                'y_el_dens_probes',
                                'r_el_dens_probes'
                                ]
-
-        treated_separately_list = ['t_sc_video'] # This list is not used
 
         dict_restored = {}
         for var in saved_every_timestep_list:

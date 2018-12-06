@@ -67,7 +67,6 @@ from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
-from sec_emission_model_furman_pivi import SEY_model_furman_pivi
 from sec_emission_model_furman_pivi import SEY_model_FP_Cu
 
 
