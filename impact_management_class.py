@@ -309,9 +309,11 @@ class impact_management(object):
                         nel_mp_th=1,
                         flag_seg=True)
                 
-                del_true_mat[i_ct, i_ene] = nel_emit_tot_events[event_type == 1]/np.sum(nel_impact)
-                del_elast_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 0)) / float(n_rep)
-                del_rediff_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 2)) / float(n_rep)
-        print('Done extracting SEY curves.')
+                deltas = {}
+                for etype in self.sey_mod.event_types.keys():
+                    etype_name = self.sey_mod.event_types[etype]
+                    deltas[etype_name] = nel_emit_tot_events[event_type==etype]/np.sum(nel_impact)
 
-        return del_true_mat, del_elast_mat, del_rediff_mat
+                print('Done extracting SEY curves.')
+
+        return deltas 

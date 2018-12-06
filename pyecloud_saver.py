@@ -191,12 +191,12 @@ class pyecloud_saver:
             n_rep = 10000
             self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
             self.sey_test_cos_theta = np.linspace(0, 1., 10)
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat, self.del_rediff_mat = \
+            self.sey_test_deltas = \
                 impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta, MP_e.charge, MP_e.mass)
         else:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat, self.del_rediff_mat = 0., 0., 0.
+            self.sey_test_deltas = {}
 
         # Log
         print('Done init pyecloud_saver.')
@@ -383,16 +383,17 @@ class pyecloud_saver:
                     'nel_hist_det': self.nel_hist_det,
                     'xg_hist_det': self.xg_hist_det,
                     'dec_fact_out': self.dec_fact_out,
-                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV,
-                    'sey_test_cos_theta': self.sey_test_cos_theta,
-                    'sey_test_del_true_mat': self.sey_test_del_true_mat,
-                    'sey_test_del_elast_mat': self.sey_test_del_elast_mat,
-                    'del_rediff_mat': self.del_rediff_mat,
                     'chamber_area': self.area,
                     'cos_angle_hist': self.cos_angle_hist,
                     'xg_hist_cos_angle': self.xg_hist_cos_angle
         }
 
+        # Extracted sey
+        saved_dict['sey_test_E_impact_eV'] = self.sey_test_E_impact_eV,
+        saved_dict['sey_test_cos_theta'] = self.sey_test_cos_theta
+        for etypn in self.sey_test_deltas.keys():
+            saved_dict['sey_test_del_%s_mat'%etypn] = self.sey_test_deltas[etypn]
+        
         saved_dict.update(self._stepbystep_get_dict())
 
         for kk in saved_dict.keys():

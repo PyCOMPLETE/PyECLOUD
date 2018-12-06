@@ -81,6 +81,12 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 
 class SEY_model_ECLOUD(object):
+    
+    event_types = {
+            0: 'elast',
+            1: 'true',
+            } 
+
     def __init__(
         self, Emax, del_max, R0,
         E_th=None, sigmafit=None, mufit=None,
