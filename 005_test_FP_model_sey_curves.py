@@ -77,7 +77,7 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
 
 cos_theta_test = np.linspace(0, 1., 10)
-E_impact_eV_test = np.array(list(np.arange(0, 499., 5.)) + list(np.arange(500., 2000, 25)))
+E_impact_eV_test = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5.)))
 n_rep = 10000
 
 deltas = extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
@@ -89,13 +89,14 @@ del_absorb_mat = deltas['absorb']
 plt.close('all')
 ms.mystyle_arial()
 
-fig1 = plt.figure(1, figsize=(4 * 8, 8))
+fig1 = plt.figure(1, figsize=(3 * 8, 2 * 8))
 fig1.set_facecolor('w')
-sp1 = fig1.add_subplot(1, 5, 1)
-sp2 = fig1.add_subplot(1, 5, 2, sharex=sp1)
-sp3 = fig1.add_subplot(1, 5, 3, sharex=sp1)
-sp4 = fig1.add_subplot(1, 5, 4, sharex=sp1)
-sp5 = fig1.add_subplot(1, 5, 5, sharex=sp1)
+sp1 = fig1.add_subplot(2, 3, 1)
+sp2 = fig1.add_subplot(2, 3, 2, sharex=sp1)
+sp3 = fig1.add_subplot(2, 3, 3, sharex=sp1)
+sp4 = fig1.add_subplot(2, 3, 4, sharex=sp1)
+sp5 = fig1.add_subplot(2, 3, 5, sharex=sp1)
+sp6 = fig1.add_subplot(2, 3, 6, sharex=sp1)
 
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
@@ -105,18 +106,39 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label)
     sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label)
     sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
+    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
 
+sp3.plot(0, 0, 'white', label='Model')
 sp3.legend(loc='best', prop={'size': 14})
 sp1.set_ylabel('Delta true')
 sp2.set_ylabel('Delta elast')
 sp3.set_ylabel('Delta rediff')
 sp4.set_ylabel('Delta absorb')
 sp5.set_ylabel('Delta total')
+sp6.set_ylabel(r'$\delta_{ts} + \delta_{e}$')
 
-for sp in [sp1, sp2, sp3, sp4, sp5]:
+for sp in [sp1, sp2, sp3, sp4, sp5, sp6]:
     sp.grid('on')
     sp.set_xlabel('Electron energy [eV]')
 
 plt.subplots_adjust(right=0.99, left=.05)
+
+
+test_obj = fp.SEY_model_FP_Cu()  # 276.8, 1.8848)
+
+energy = np.linspace(0., 2000, num=int(1e3))
+
+for costheta in np.linspace(0, 1, 10):
+    delta_ts_vec = test_obj._delta_ts(energy, costheta)
+    delta_e_vec = test_obj._delta_e(energy, costheta)
+    delta_r_vec = test_obj._delta_r(energy, costheta)
+
+    sp2.plot(energy, delta_e_vec, color='k', linewidth=linewid)
+    sp3.plot(energy, delta_r_vec, color='k', linewidth=linewid)
+    sp1.plot(energy, delta_ts_vec, color='k', linewidth=linewid)
+    sp5.plot(energy, delta_r_vec + delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
+    sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
+
+plt.suptitle('SEY extraction tests: Furman-Pivi model', fontsize=30)
 
 plt.show()

@@ -377,7 +377,9 @@ class SEY_model_furman_pivi():
         N_true_sec = np.sum(flag_truesec)
         n_add_total = 0
         if N_true_sec > 0:
-            delta_ts = self._delta_ts(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
+            # delta_ts = self._delta_ts(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
+            delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
+            delta_ts = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
             n_add = np.zeros_like(flag_truesec, dtype=int)
             n_add[flag_truesec] = random.poisson(lam=delta_ts)
             n_add_flag_true_sec = n_add[flag_truesec]

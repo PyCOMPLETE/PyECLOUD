@@ -21,10 +21,10 @@ round_to_digits = 4
 
 plt.close('all')
 # Subplots
-fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8)) = plt.subplots(2, 4, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
-plt.suptitle('Furman-Pivi tests', fontsize=25)
+fig, ((ax1, ax2, ax4), (ax5, ax6, ax8)) = plt.subplots(2, 3, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
+plt.suptitle('Furman-Pivi tests: Energy distributions', fontsize=30)
 
-axlist = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
+axlist = [ax1, ax2, ax4, ax5, ax6, ax8]
 for ax in axlist:
     ax.grid(alpha=alpha)
     ax.set_xlabel('Energy [eV]')
@@ -89,10 +89,11 @@ ax8.legend()
 fig.subplots_adjust(left=0.05, right=0.95)
 
 # SEY components
-sp1 = plt.subplot(1, 4, 1)
-sp2 = plt.subplot(1, 4, 2, sharex=sp1, sharey=sp1)
-sp3 = plt.subplot(1, 4, 3, sharex=sp1, sharey=sp1)
-sp4 = plt.subplot(1, 4, 4, sharex=sp1, sharey=sp1)
+plt.figure(2, figsize=(16, 12), facecolor='w')
+sp1 = plt.subplot(2, 2, 1)
+sp2 = plt.subplot(2, 2, 2, sharex=sp1, sharey=sp1)
+sp3 = plt.subplot(2, 2, 3, sharex=sp1, sharey=sp1)
+sp4 = plt.subplot(2, 2, 4, sharex=sp1, sharey=sp1)
 
 energy = np.linspace(0., 2000, num=int(1e3))
 sp1.plot(energy, test_obj._delta_e(energy, 1), label=r'$\delta_e$', color='r', linewidth=linewid)
@@ -109,13 +110,13 @@ for costheta in np.linspace(0, 1, 10):
 
 for sp in [sp1, sp2, sp3, sp4]:
     sp.grid(alpha=alpha)
-plt.title('SEY components', fontsize=25)
+plt.suptitle('Furman Pivi test: SEY components', fontsize=30)
 
 # Tests for multiple nn
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
 E_0 = np.array([E_0_single] * int(1e5))
-fig, axarr = plt.subplots(2, 10, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
-plt.suptitle('Furman-Pivi tests', fontsize=25)
+fig2, axarr = plt.subplots(2, 10, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
+plt.suptitle('Furman-Pivi tests: True secondary energy distributions', fontsize=30)
 for kk in np.arange(1, 10.1, 1):
     nn = np.repeat(kk, 1e5)
     prob_density_ts, _ = test_obj.true_sec_energy_PDF(delta_ts=delta_ts[0], nn=kk, E_0=E_0[0], energy=energy)
