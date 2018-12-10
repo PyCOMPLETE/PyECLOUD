@@ -62,7 +62,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 7.6.0'
+        print('PyECLOUD Version 7.6.0')
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
             config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
@@ -95,7 +95,7 @@ class BuildupSimulation(object):
                 elif len(os.listdir(self.checkpoint_folder)) == 0:
                     print('No checkpoint found, starting new simulation...')
                 else:
-                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder
+                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
     def run(self, t_end_sim=None):
 
