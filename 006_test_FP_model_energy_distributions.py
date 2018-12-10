@@ -66,8 +66,8 @@ def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge
 
 cos_theta_test = np.linspace(0, 1., 10) # np.array([1.]) #
 E_0_single = 300
-E_impact_eV_test = np.array([E_0_single] * int(5e5))
-n_rep = 500000
+E_impact_eV_test = np.array([E_0_single] * int(1e5))
+n_rep = 100000
 alpha = 0.9
 
 dists = extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)

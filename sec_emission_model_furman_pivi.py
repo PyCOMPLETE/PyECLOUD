@@ -241,6 +241,7 @@ class SEY_model_furman_pivi():
             P_n_ts = np.squeeze(binom(M, nn) * (p)**nn * (1 - p)**(M - nn))
         else:
             raise ValueError('choice must be either \'poisson\' or \'binomial\'')
+        P_n_ts_return = P_n_ts
 
         eps_curr = eps_n[int(nn - 1)]
         p_n_curr = p_n[int(nn - 1)]
@@ -266,7 +267,7 @@ class SEY_model_furman_pivi():
         # if area != 0:
         #     f_n_ts = f_n_ts / area  # Normalization
 
-        return f_n_ts, P_n_ts
+        return f_n_ts, P_n_ts_return
 
     def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         p_n = self.p_n

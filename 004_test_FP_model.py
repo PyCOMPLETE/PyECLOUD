@@ -12,7 +12,7 @@ test_obj = fp.SEY_model_FP_Cu()  # 276.8, 1.8848)
 
 qq = 0.5  # From FP paper
 sigma_e = 2.
-E_0_single = 10
+E_0_single = 300
 E_0 = np.array([E_0_single] * int(1e5))
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
 
@@ -36,7 +36,7 @@ ax5.plot(energy, test_obj.backscattered_energy_CDF(energy, E_0), label='CDF', li
 ax1.set_title('Backscattered energy distribution')
 area = scipy.integrate.simps(prob_density_e, energy)
 area = round(area, round_to_digits)
-ax1.text(150, ax1.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
+ax1.text(E_0_single / 2., ax1.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
 ax1.legend()
 ax5.legend()
 ax1.hist(test_obj.get_energy_backscattered(E_0), density=True, bins=20)
@@ -48,7 +48,7 @@ ax6.plot(energy, test_obj.rediffused_energy_CDF(energy=energy, E_0=E_0), label='
 ax2.set_title('Rediffused energy distribution')
 area = scipy.integrate.simps(prob_density_r, energy)
 area = round(area, round_to_digits)
-ax2.text(150, ax2.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
+ax2.text(E_0_single / 2., ax2.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
 ax2.hist(test_obj.get_energy_rediffused(E_0), density=True, bins=20)
 ax2.legend()
 ax6.legend()
@@ -74,13 +74,13 @@ delta_ts = test_obj._delta_ts(E_0, 1)
 # ax3.hist(dddE, density=True, bins=60)
 
 
-nn = 1
+nn = 5
 prob_density_ts, _ = test_obj.true_sec_energy_PDF(delta_ts=delta_ts[0], nn=nn, E_0=E_0_single, energy=energy)
 ax4.plot(energy, prob_density_ts, label='PDF of true secondary electrons', linewidth=linewid)
 ax4.set_title(r'True secondary energy distribution, $f_{%i,ts}$' % nn)
 area = scipy.integrate.simps(prob_density_ts, energy)
 area = round(area, round_to_digits)
-ax4.text(150, ax4.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
+ax4.text(E_0_single / 2., ax4.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
 CDF = test_obj.true_sec_energy_CDF(delta_ts=delta_ts[0], nn=nn, E_0=E_0_single, energy=energy)
 ax8.plot(energy, CDF, label='CDF', linewidth=linewid)
 ax4.hist(test_obj.get_energy_true_sec(delta_ts=delta_ts, nn=np.repeat(nn, len(E_0)), E_0=E_0), density=True, bins=30)
