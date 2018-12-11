@@ -95,7 +95,7 @@ class BuildupSimulation(object):
                 elif len(os.listdir(self.checkpoint_folder)) == 0:
                     print('No checkpoint found, starting new simulation...')
                 else:
-                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder
+                    raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
     def run(self, t_end_sim=None):
 
