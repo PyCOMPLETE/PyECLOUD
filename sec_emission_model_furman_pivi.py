@@ -287,8 +287,8 @@ class SEY_model_furman_pivi():
         F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
         cdf = eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
         if len(cdf) != 0:
-            area = cdf[-1]
-            cdf = cdf / area
+            area = cdf
+            cdf = cdf / area[-1]
             return cdf, area
         return cdf, 1
 
@@ -305,7 +305,7 @@ class SEY_model_furman_pivi():
 
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        _, area = self.true_sec_energy_CDF(delta_ts, nn, E_0, energy=E_0, choice=choice, M=10)
+        cdf, area = self.true_sec_energy_CDF(delta_ts, nn, E_0, energy=E_0, choice=choice, M=10)
         F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
         F_n_vec = F_n_vec / (area)
         uu = random.rand(len(E_0))
