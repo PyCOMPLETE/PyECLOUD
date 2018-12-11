@@ -64,8 +64,8 @@ def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge
     return dists
 
 
-cos_theta_test = np.linspace(0, 1., 10) # np.array([1.]) #
-E_0_single = 300
+cos_theta_test = np.linspace(0, 1., 10)
+E_0_single = 100
 E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
 alpha = 0.9
@@ -93,6 +93,7 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     # sp5.hist(dists['true'][i_ct] + dists['elast'][i_ct] + dists['rediff'][i_ct], color=thiscol, label=label)
     # sp6.hist(dists['true'][i_ct] + dists['elast'][i_ct], color=thiscol, label=label)
+
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
