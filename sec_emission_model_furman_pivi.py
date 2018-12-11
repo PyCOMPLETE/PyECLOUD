@@ -313,11 +313,11 @@ class SEY_model_furman_pivi():
         flag_xx_above_one = xx > 1
         N_above_one = np.sum(flag_xx_above_one)
         # Redraw if xx is above 1; Temporary solution, this is not the right way to do it
-        while N_above_one > 0:
-            uu = random.rand(N_above_one)
-            xx[flag_xx_above_one] = uu / (F_n_vec[flag_xx_above_one] * eps_vec[flag_xx_above_one]**p_n_vec[flag_xx_above_one] * gamma(p_n_vec[flag_xx_above_one]))
-            flag_xx_above_one = xx > 1
-            N_above_one = np.sum(flag_xx_above_one)
+        # while N_above_one > 0:
+        #     uu = random.rand(N_above_one)
+        #     xx[flag_xx_above_one] = uu / (F_n_vec[flag_xx_above_one] * eps_vec[flag_xx_above_one]**p_n_vec[flag_xx_above_one] * gamma(p_n_vec[flag_xx_above_one]))
+        #     flag_xx_above_one = xx > 1
+        #     N_above_one = np.sum(flag_xx_above_one)
         xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
 
         return eps_vec * gammaincinv(p_n_vec, xx)
