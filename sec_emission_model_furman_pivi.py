@@ -157,6 +157,8 @@ class SEY_model_furman_pivi():
         delta_e = self._delta_e(E, costheta)
         delta_r = self._delta_r(E, costheta)
         delta_ts = self._delta_ts(E, costheta)
+        if (delta_e + delta_r >= 1).any():
+            raise ValueError('delta_e + delta_r is greater than 1')
         return delta_e, delta_r, delta_ts
 
     def _delta_e(self, E_impact_eV, costheta_impact):
@@ -257,15 +259,15 @@ class SEY_model_furman_pivi():
         #         p_n_curr.append(p_n[int(kk - 1)])
         #     eps_curr = np.array(eps_curr)
         #     p_n_curr = np.array(p_n_curr)
-        P_n_ts = 1.
+        # P_n_ts = 1.
         if E_0 == 0:
             F_n = 0
         else:
             F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
-        # area = scipy.integrate.simps(f_n_ts, energy)
-        # if area != 0:
-        #     f_n_ts = f_n_ts / area  # Normalization
+        area = scipy.integrate.simps(f_n_ts, energy)
+        if area != 0:
+            f_n_ts = f_n_ts / area  # Normalization
 
         return f_n_ts, P_n_ts_return
 
@@ -274,14 +276,21 @@ class SEY_model_furman_pivi():
         eps_n = self.eps_n
 
         P_n_ts = 1.
-        eps_curr = eps_n[int(nn - 1)]
-        p_n_curr = p_n[int(nn - 1)]
 
-        if E_0 == 0:
-            F_n = 0
+        if isinstance(nn, int) or isinstance(nn, np.float64):
+            eps_curr = eps_n[int(nn - 1)]
+            p_n_curr = p_n[int(nn - 1)]
         else:
-            F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
-        return eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
+            eps_curr = np.array([eps_n[int(ii - 1)] for ii in nn])
+            p_n_curr = np.array([p_n[int(ii - 1)] for ii in nn])
+
+        F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+        cdf = eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
+        if len(cdf) != 0:
+            area = cdf[-1]
+            cdf = cdf / area
+            return cdf, area
+        return cdf, 1
 
     # def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
     #     f_n_ts, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
@@ -293,11 +302,22 @@ class SEY_model_furman_pivi():
         eps_n = self.eps_n
 
         P_n_ts = 1.
+
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
+        _, area = self.true_sec_energy_CDF(delta_ts, nn, E_0, energy=E_0, choice=choice, M=10)
         F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
+        F_n_vec = F_n_vec / (area)
         uu = random.rand(len(E_0))
         xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
+        flag_xx_above_one = xx > 1
+        N_above_one = np.sum(flag_xx_above_one)
+        # Redraw if xx is above 1; Temporary solution, this is not the right way to do it
+        while N_above_one > 0:
+            uu = random.rand(N_above_one)
+            xx[flag_xx_above_one] = uu / (F_n_vec[flag_xx_above_one] * eps_vec[flag_xx_above_one]**p_n_vec[flag_xx_above_one] * gamma(p_n_vec[flag_xx_above_one]))
+            flag_xx_above_one = xx > 1
+            N_above_one = np.sum(flag_xx_above_one)
         xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
 
         return eps_vec * gammaincinv(p_n_vec, xx)
@@ -468,7 +488,7 @@ class SEY_model_furman_pivi():
 class SEY_model_FP_Cu(SEY_model_furman_pivi):
 
     p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
-    eps_n = np.array([1.5, 1.75, 1, 3.75, 8.5, 11.5, 2.5, 3, 2.5, 3])
+    eps_n = np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.])
 
     # Parameters for backscattered (elastically scattered) electrons
     # (25) in FP paper
