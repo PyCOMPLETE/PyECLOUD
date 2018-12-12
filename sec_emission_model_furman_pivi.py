@@ -310,9 +310,9 @@ class SEY_model_furman_pivi():
         F_n_vec = F_n_vec / (area)
         uu = random.rand(len(E_0))
         xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
-        flag_xx_above_one = xx > 1
-        N_above_one = np.sum(flag_xx_above_one)
         # Redraw if xx is above 1; Temporary solution, this is not the right way to do it
+        # flag_xx_above_one = xx > 1
+        # N_above_one = np.sum(flag_xx_above_one)
         # while N_above_one > 0:
         #     uu = random.rand(N_above_one)
         #     xx[flag_xx_above_one] = uu / (F_n_vec[flag_xx_above_one] * eps_vec[flag_xx_above_one]**p_n_vec[flag_xx_above_one] * gamma(p_n_vec[flag_xx_above_one]))
@@ -400,15 +400,15 @@ class SEY_model_furman_pivi():
         if N_true_sec > 0:
             # delta_ts = self._delta_ts(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
             delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
-            delta_ts = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
+            delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
             n_add = np.zeros_like(flag_truesec, dtype=int)
-            n_add[flag_truesec] = random.poisson(lam=delta_ts)
+            n_add[flag_truesec] = random.poisson(lam=delta_ts_prime)
             n_add_flag_true_sec = n_add[flag_truesec]
             # Cut above M
             flag_above_th = (n_add[flag_truesec] > self.M)
             Nabove_th = np.sum(flag_above_th)
             while Nabove_th > 0:
-                n_add_flag_true_sec[flag_above_th] = random.poisson(delta_ts[flag_above_th])
+                n_add_flag_true_sec[flag_above_th] = random.poisson(delta_ts_prime[flag_above_th])
                 flag_above_th = (n_add_flag_true_sec > self.M)
                 Nabove_th = np.sum(flag_above_th)
             n_add[flag_truesec] = n_add_flag_true_sec
