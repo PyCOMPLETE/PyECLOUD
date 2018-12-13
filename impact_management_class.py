@@ -229,7 +229,7 @@ class impact_management(object):
                 nel_emit_tot_events, event_type, event_info,\
                     nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
                     nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
-                    self.sey_mod.impacts_on_surface(
+                    sey_mod.impacts_on_surface(
                         MP_e.mass, nel_impact, x_impact, y_impact, z_impact,
                         vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                         v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg
@@ -277,11 +277,13 @@ class impact_management(object):
 
     def extract_sey_curves(self, n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
-        del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-        del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        deltas = {}
+        for etype in self.sey_mod.event_types.keys():
+            etype_name = self.sey_mod.event_types[etype]
+            deltas[etype_name] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         print('Extracting SEY curves...')
         for i_ct, ct in enumerate(cos_theta_test):
-            print('%d/%d'%(i_ct + 1, len(cos_theta_test)))
+            print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
             for i_ene, Ene in enumerate(E_impact_eV_test):
 
                 # nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
@@ -307,10 +309,13 @@ class impact_management(object):
                         costheta_impact=ct * np.ones_like(nel_impact),
                         nel_mp_th=1,
                         flag_seg=True)
-                del_tot = (np.sum(nel_replace) + np.sum(nel_new_MPs)) / n_rep
-                del_true_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type)) / float(n_rep)
-                del_elast_mat[i_ct, i_ene] = del_tot * float(np.sum(~event_type)) / float(n_rep)
+
+                for etype in self.sey_mod.event_types.keys():
+                    etype_name = self.sey_mod.event_types[etype]
+                    thisdelta = deltas[etype_name]
+                    thisdelta[i_ct, i_ene] = np.sum(nel_emit_tot_events[event_type == etype]) / np.sum(nel_impact)
+                    deltas[etype_name] = thisdelta
+
         print('Done extracting SEY curves.')
 
-        return del_true_mat, del_elast_mat
-
+        return deltas
