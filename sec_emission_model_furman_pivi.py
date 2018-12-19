@@ -144,15 +144,6 @@ class SEY_model_furman_pivi():
 
         return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
 
-    # def _yield_fun_furman_pivi(self, E_impact_eV, costheta_impact):
-    #
-    #     # elastic
-    #     delta_e = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(-(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p) * (1. + self.e1 * (1. - costheta_impact**self.e2))
-    #     delta_r = self.p1RInf * (1. - np.exp(-(E_impact_eV / self.eR)**self.r)) * (1. + self.r1 * (1. - costheta_impact**self.r2))
-    #     delta_ts = self.deltaTSHat * self._D(E_impact_eV / (self.eHat0 * (1. + self.t3 * (1. - np.cos(costheta_impact)**self.t4)))) * (1. + self.t1 * (1. - costheta_impact**self.t2))
-    #
-    #     return delta_e, delta_r, delta_ts
-
     def _yield_fun_furman_pivi(self, E, costheta):
         delta_e = self._delta_e(E, costheta)
         delta_r = self._delta_r(E, costheta)
