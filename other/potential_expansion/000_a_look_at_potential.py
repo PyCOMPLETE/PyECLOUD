@@ -12,8 +12,8 @@ n_segments = 1
 machine_configuration = '6.5_TeV_collision_tunes'
 p0_GeV = 2000
 
-z_cut = 2.5e-9 * c
-n_slices = 150
+z_cut = 2.0e-9 * c
+n_slices = 350
 L_ecloud = 1000.
 
 sigma_z = 10e-2
@@ -52,7 +52,7 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
     f_telescope=0.3,
     target_grid={'x_min_target': -5 * bunch.sigma_x(), 'x_max_target': 5 * bunch.sigma_x(),
                  'y_min_target': -5 * bunch.sigma_y(), 'y_max_target': 5 * bunch.sigma_y(),
-                 'Dh_target': .2 * bunch.sigma_x()},
+                 'Dh_target': .1 * bunch.sigma_x()},
     N_nodes_discard=10.,
     N_min_Dh_main=10,
     sparse_solver=sparse_solver,
@@ -81,6 +81,9 @@ sio.savemat('pinch_pic_data.mat', {
     'phi': ecloud_multigrid.phi_ele_last_track,
     'Ex': ecloud_multigrid.Ex_ele_last_track,
     'Ey': ecloud_multigrid.Ey_ele_last_track,
+    'sigma_x_beam': bunch.sigma_x(),
+    'sigma_y_beam': bunch.sigma_y(),
+    'sigma_z_beam': bunch.sigma_z(),
     }, oned_as = 'row')
     
 
