@@ -5,7 +5,7 @@ sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 from scipy.constants import c, e, m_p
 import numpy as np
 import pylab as plt
-import PyECLOUD.myloadmat_to_obj as mlm
+import PyECLOUD.myfilemanager as mfm
 import PyECLOUD.mystyle as ms
 
 n_segments = 1
@@ -70,6 +70,19 @@ slices = bunch.get_slices(ecloud_multigrid.slicer)
 xg = ecloud_multigrid.spacech_ele.xg
 yg = ecloud_multigrid.spacech_ele.yg
 
+import scipy.io as sio
+
+sio.savemat('pinch_pic_data.mat', {
+    'xg': xg,
+    'yg': yg,
+    'zg': slices.z_centers,
+    'rho': ecloud_multigrid.rho_ele_last_track,
+    'phi': ecloud_multigrid.phi_ele_last_track,
+    'Ex': ecloud_multigrid.Ex_ele_last_track,
+    'Ey': ecloud_multigrid.Ey_ele_last_track,
+    }, oned_as = 'row')
+    
+
 x_obs = 0. 
 ix_obs = np.argmin(np.abs(xg - x_obs))
 
@@ -87,6 +100,7 @@ ax2.pcolormesh(slices.z_centers, yg,
         ecloud_multigrid.Ey_ele_last_track[:,ix_obs,:].T)
 ax3.pcolormesh(slices.z_centers, yg, 
         ecloud_multigrid.phi_ele_last_track[:,ix_obs,:].T)
+
 
 
 plt.show()
