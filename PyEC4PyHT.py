@@ -247,6 +247,8 @@ class Ecloud(object):
         slices = beam.get_slices(self.slicer)
 
         for i in xrange(slices.n_slices - 1, -1, -1):
+            if self.verbose:
+                print('Slice %d/%d'%(i, slices.n_slices))
 
             # select particles in the slice
             ix = slices.particle_indices_of_slice(i)

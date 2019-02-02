@@ -55,7 +55,8 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
                  'Dh_target': .2 * bunch.sigma_x()},
     N_nodes_discard=10.,
     N_min_Dh_main=10,
-    sparse_solver=sparse_solver)
+    sparse_solver=sparse_solver,
+    verbose=True)
 
 
 
