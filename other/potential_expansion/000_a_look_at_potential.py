@@ -27,6 +27,7 @@ sparse_solver = 'PyKLU'  # 'scipy_slu'
 #============================
 from machines_for_testing import LHC
 machine = LHC(machine_configuration=machine_configuration,
+              beta_x = 100., beta_y = 100.,
               optics_mode='smooth', n_segments=n_segments, p0=p0_GeV * 1e9 * e / c)
 
 bunch = machine.generate_6D_Gaussian_bunch(
@@ -41,8 +42,9 @@ import PyECLOUD.PyEC4PyHT as PyEC4PyHT
 ecloud_multigrid = PyEC4PyHT.Ecloud(
     L_ecloud=L_ecloud, slicer=slicer,
     Dt_ref=20e-12, pyecl_input_folder='./pyecloud_config_LHC',
-    chamb_type='polyg' ,
-    filename_chm='LHC_chm_ver.mat', Dh_sc=1e-3,
+    #chamb_type='polyg', filename_chm='LHC_chm_ver.mat', 
+    chamb_type='ellip', x_aper=2e-2, y_aper=2e-2,
+    Dh_sc=1e-3,
     init_unif_edens_flag=1,
     init_unif_edens=1e7,
     N_mp_max=3000000,
