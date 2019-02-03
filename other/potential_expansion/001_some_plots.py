@@ -12,8 +12,8 @@ from scipy.constants import e as qe
 
 N_discard = 10
 
-gen_movie = True
-z_single_frame_interactive = 0.
+gen_movie = False
+z_single_frame_interactive = -21e-2
 
 ob = mfm.myloadmat_to_obj('pinch_pic_data.mat')
 
@@ -101,6 +101,15 @@ for i_frame, z_obs in enumerate(list(z_movie) + [z_single_frame_interactive]):
     axd1.xaxis.set_major_locator(MaxNLocator(5))
     axd1.set_title('log10(rho)')
     
+    axd3 = plt.subplot2grid(shape=(3, 3), loc=(2,2), colspan=1, fig=fig2,
+            sharex=axd1)
+    mbl = axd3.pcolormesh(ob.xg*1e3, ob.yg*1e3, 
+            ob.phi[iz_obs, :, :].T)
+    axd3.axis('equal')
+    plt.colorbar(mappable=mbl, ax=axd3, aspect=20)
+    # axd3.yaxis.set_major_locator(MaxNLocator(5))
+    # axd3.xaxis.set_major_locator(MaxNLocator(5))
+    
     for ax in [axc1, axc2, axc3, ax1, ax2, ax3, axd1]:
         ax.ticklabel_format(style='sci', scilimits=(0,0),axis='y')
         ax.ticklabel_format(style='sci', scilimits=(0,0),axis='x')
@@ -112,6 +121,18 @@ for i_frame, z_obs in enumerate(list(z_movie) + [z_single_frame_interactive]):
     
     if gen_movie and i_frame < len(z_movie):
         fig2.savefig('temp/frame_%03d.png'%i_frame, dpi=150)
+
+    # # Look vs theta (work in progress)
+    # if i_frame >= len(z_movie):
+    #     fig3 = plt.figure(3)
+    #     r_obs = 0.5e-3
+    #     N_theta = 1000
+    #     theta = np.linspace(0, 2.*np.pi, N_theta+1)[:-1]
+    #     
+    #     from scipy.interpolate import interp2d
+    #     phi_obs = interp2d(ob.xg, ob.yg, ob.phi)(
+    #             r_obs*np.cos(theta), r_obs*np.sin(theta))
+
 
 
 if gen_movie:
