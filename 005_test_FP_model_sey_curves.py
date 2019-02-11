@@ -10,7 +10,7 @@ ms.mystyle(12)
 linewid = 2
 
 me = 9.10938356e-31
-sey_mod = fp.SEY_model_FP_Cu(E_th=35., secondary_angle_distribution='cosine_3D',
+sey_mod = fp.SEY_model_FP_Cu(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                              switch_no_increase_energy=0, thresh_low_energy=-1)  # 276.8, 1.8848)
 # sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
 #                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
@@ -78,7 +78,7 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
 cos_theta_test = np.linspace(0, 1., 10)
 E_impact_eV_test = np.array(list(np.arange(0, 499., 5.)) + list(np.arange(500., 2000, 25.)))
-n_rep = 10000
+n_rep = 1000
 
 deltas = extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
 del_true_mat = deltas['true']
