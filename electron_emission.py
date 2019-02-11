@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -73,6 +73,8 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
             Nabove_th = np.sum(flag_above_th)
 
     elif switch_no_increase_energy == 1:
+
+        raise ValueError('This part of the code is not supported anymore!')
 
         en_eV = np.zeros_like(En_impact_eV, dtype=float)
 
@@ -167,7 +169,7 @@ setting in the machine parameter input file:
 "photoelectron_angle_distribution = 'cosine_3D'"
 and in the secondary emission input file:
 "secondary_angle_distribution = 'cosine_3D'"
-For more info, see presentation by P. Dijkstal on the angle of emission 
+For more info, see presentation by P. Dijkstal on the angle of emission
 of generated electrons (https://indico.cern.ch/event/673160/).
 """)
         time.sleep(3)
@@ -259,5 +261,3 @@ def get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max):
         raise ValueError('Energy distribution %s is invalid!' % energy_distribution)
 
     return get_energy(e_pe_sigma, e_pe_max)
-
-

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -106,8 +106,7 @@ class SEY_model_acc_low_ene(SEY_model_ECLOUD):
             flag_elast = (rand(len(ref_prob)) < ref_prob)
             flag_truesec = ~(flag_elast)
 
-            nel_emit = nel_impact
+            nel_emit = nel_impact.copy()
             nel_emit[flag_truesec] = nel_impact[flag_truesec] * beta_ts[flag_truesec]
 
             return nel_emit, flag_elast, flag_truesec
-

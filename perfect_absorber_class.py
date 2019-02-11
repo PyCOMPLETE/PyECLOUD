@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -158,10 +158,11 @@ class impact_management_perfect_absorber(impact_management):
 
     def extract_sey_curves(self, n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
-        del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-        del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        deltas = {}
+        deltas['elast'] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
+        deltas['true'] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         print('Extracting SEY curves...')
         print(':-P')
         print('Done extracting SEY curves.')
 
-        return del_true_mat, del_elast_mat
+        return deltas

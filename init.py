@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -413,7 +413,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
                                        flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud,
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
-                                       copy_main_outp_DT=cc.copy_main_outp_DT)
+                                       copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey)
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -94,7 +94,7 @@ class pyecloud_saver:
         print(git_branch)
 
         with open(self.logfile_path, 'w') as flog:
-            flog.write('PyECLOUD Version 7.6.0\n')
+            flog.write('PyECLOUD Version 7.6.1\n')
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
@@ -112,10 +112,13 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None):
+                        copy_main_outp_DT=None, extract_sey=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        if extract_sey is not None:
+            self.extract_sey = extract_sey
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
@@ -188,12 +191,12 @@ class pyecloud_saver:
             n_rep = 10000
             self.sey_test_E_impact_eV = np.array(list(np.arange(0, 499., 1.)) + list(np.arange(500., 2000, 5)))
             self.sey_test_cos_theta = np.linspace(0, 1., 10)
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = \
+            self.sey_test_deltas = \
                 impact_man.extract_sey_curves(n_rep, self.sey_test_E_impact_eV, self.sey_test_cos_theta, MP_e.charge, MP_e.mass)
         else:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
-            self.sey_test_del_true_mat, self.sey_test_del_elast_mat = 0., 0.
+            self.sey_test_deltas = {}
 
         # Log
         print('Done init pyecloud_saver.')
@@ -208,7 +211,7 @@ class pyecloud_saver:
                 cloud_list, rho_cloud=None):
 
         ####################################################
-        # Quantites saved at custom times provided by user #
+        # Quantities saved at custom times provided by user #
         ####################################################
 
         # Check for MP save state
@@ -238,7 +241,7 @@ class pyecloud_saver:
         self._stepbystep_data_save(impact_man, MP_e, beamtim)
 
         ##########################################################
-        # Quantites saved at each bunch passage and dump to file #
+        # Quantities saved at each bunch passage and dump to file #
         ##########################################################
 
         if beamtim.flag_new_bunch_pass:
@@ -380,14 +383,16 @@ class pyecloud_saver:
                     'nel_hist_det': self.nel_hist_det,
                     'xg_hist_det': self.xg_hist_det,
                     'dec_fact_out': self.dec_fact_out,
-                    'sey_test_E_impact_eV': self.sey_test_E_impact_eV,
-                    'sey_test_cos_theta': self.sey_test_cos_theta,
-                    'sey_test_del_true_mat': self.sey_test_del_true_mat,
-                    'sey_test_del_elast_mat': self.sey_test_del_elast_mat,
                     'chamber_area': self.area,
                     'cos_angle_hist': self.cos_angle_hist,
                     'xg_hist_cos_angle': self.xg_hist_cos_angle
         }
+
+        # Extracted sey
+        saved_dict['sey_test_E_impact_eV'] = self.sey_test_E_impact_eV,
+        saved_dict['sey_test_cos_theta'] = self.sey_test_cos_theta
+        for etypn in self.sey_test_deltas.keys():
+            saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
 
@@ -407,6 +412,8 @@ class pyecloud_saver:
             self.checkpoint_DT = checkpoint_DT
             self.t_last_checkp = 0
             self.i_checkp = 0
+            if checkpoint_folder is None:
+                raise ValueError('checkpoint_folder not specified in simulation_parameters.input')
             self.checkpoint_folder = checkpoint_folder
             if not os.path.isdir(self.checkpoint_folder):
                 os.makedirs(self.checkpoint_folder)
@@ -519,6 +526,7 @@ class pyecloud_saver:
                                    'sey_test_del_true_mat',
                                    'sey_test_E_impact_eV',
                                    'sey_test_del_elast_mat',
+                                   'del_rediff_mat',
                                    'sey_test_cos_theta',
                                    'U_sc_eV'
                                    ]
@@ -528,8 +536,6 @@ class pyecloud_saver:
                                'y_el_dens_probes',
                                'r_el_dens_probes'
                                ]
-
-        treated_separately_list = ['t_sc_video'] # This list is not used
 
         dict_restored = {}
         for var in saved_every_timestep_list:

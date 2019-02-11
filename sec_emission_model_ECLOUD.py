@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -81,6 +81,12 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 
 class SEY_model_ECLOUD(object):
+
+    event_types = {
+            0: 'elast',
+            1: 'true',
+            }
+
     def __init__(
         self, Emax, del_max, R0,
         E_th=None, sigmafit=None, mufit=None,
@@ -109,7 +115,7 @@ class SEY_model_ECLOUD(object):
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
-        print 'Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)
+        print('Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s))
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 

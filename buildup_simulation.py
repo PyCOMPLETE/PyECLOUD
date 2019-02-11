@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -62,7 +62,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 7.6.0'
+        print 'PyECLOUD Version 7.6.1'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
             config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
@@ -257,8 +257,6 @@ class BuildupSimulation(object):
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
 
-        print 'Reloading state from file: %s...' % filename_simulation_state
-
         with open(load_from_folder + filename_simulation_state, 'rb') as fid:
             dict_state = cPickle.load(fid)
 
@@ -292,7 +290,7 @@ class BuildupSimulation(object):
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):
-        print 'Realoading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint)
+        print('Reloading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint))
 
         i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)
