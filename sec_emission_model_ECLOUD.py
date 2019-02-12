@@ -207,7 +207,13 @@ class SEY_model_ECLOUD(object):
             i_seg_new_MPs = np.array([])
 
         event_type = flag_truesec
+        if n_add_total != 0:
+            events_add = np.repeat(event_type, n_add)
+            event_type = np.concatenate([event_type, events_add])
+
         event_info = {}
+
+        nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
