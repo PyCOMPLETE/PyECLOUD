@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sec_emission_model_ECLOUD as ECL
-import sec_emission_model_furman_pivi as fp
+import sec_emission_model_furman_pivi_variable_MP as fp
 import mystyle as ms
 from scipy.constants import e as qe
 
@@ -10,7 +10,7 @@ ms.mystyle(12)
 linewid = 2
 
 me = 9.10938356e-31
-sey_mod = fp.SEY_model_FP_Cu(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
+sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                              switch_no_increase_energy=0, thresh_low_energy=-1)  # 276.8, 1.8848)
 # sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
 #                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
@@ -90,7 +90,7 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp1.hist(dists['true'][i_ct], bins=60, color=thiscol, label=label, alpha=alpha, density=True)
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
+    # sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     # sp5.hist(dists['true'][i_ct] + dists['elast'][i_ct] + dists['rediff'][i_ct], color=thiscol, label=label)
     # sp6.hist(dists['true'][i_ct] + dists['elast'][i_ct], color=thiscol, label=label)
 
@@ -107,7 +107,7 @@ sp4.set_ylabel('Absorbed', fontsize=sz)
 # sp6.set_ylabel('true + elast')
 
 # Compare with model
-test_obj = fp.SEY_model_FP_Cu()
+test_obj = fp.SEY_model_furman_pivi()
 E_0 = np.array([E_0_single] * int(1e5))
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
 # Rediffused
@@ -126,9 +126,6 @@ for sp in [sp1, sp2, sp3, sp4]:
     sp.set_xlabel('Electron energy [eV]')
 
 plt.subplots_adjust(right=0.99, left=.06)
-
-
-# test_obj = fp.SEY_model_FP_Cu()  # 276.8, 1.8848)
 
 plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
 
