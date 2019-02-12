@@ -1,4 +1,5 @@
 from scipy.constants import m_p, m_e, e as qe
+import numpy as np
 
 # To be safe, only use immutable python types as default values in the parameters_dict.
 # This most importantly excludes python lists. Tuples may be used in their place.
@@ -279,6 +280,47 @@ parameters_dict = {
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
             'flag_costheta_delta_scale': True,
+
+            # Furman-Pivi Model
+            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+
+            # Parameters for backscattered (elastically scattered) electrons
+            # (25) in FP paper
+            'p1EInf': 0.02,      # Minimum probability of elastic scattering (at infinite energy)
+            'p1Ehat': 0.496,     # Peak probability
+            'eEHat': 0.,        # Peak energy
+            'w': 60.86,     # Exponential factor 1
+            'p': 1.,        # Exponential factor 2
+            # (47a)                 # Angular factors
+            'e1': 0.26,
+            'e2': 2.,
+            # (26)
+            'sigmaE': 2.,
+
+            # Parameters for rediffused electrons
+            # (28)
+            'p1RInf': 0.2,       # Minimum probability of rediffused scattering (at infinite energy)
+            'eR': 0.041,     # Peak energy
+            'r': 0.104,     # Exponential factor
+            # (29)
+            'q': 0.5,
+            # (47b)                 # Angular factors
+            'r1': 0.26,
+            'r2': 2.,
+
+            # Parameters for true secondaries
+            # (31)
+            'deltaTSHat': 1.8848,    # Maximum probability of secondaries
+            'eHat0': 276.8,     # Peak enery
+            # (32)
+            's': 1.54,      # Form factor of fitting curve
+            # (48a)                 # Angular factors
+            't1': 0.66,
+            't2': 0.8,
+            # (48b)
+            't3': 0.7,
+            't4': 1.,
         },
     },
     'combined_simulations_secondaryEmission_machine_parameters': {

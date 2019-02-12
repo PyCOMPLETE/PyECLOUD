@@ -61,18 +61,47 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
         0: 'elast',
         1: 'true',
         2: 'rediff',
-        3: 'absorb',
     }
 
-    def __init__(self,  # eHat0, deltaTSHat,
+    def __init__(self,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                 s=1.54,
                  M=10,
-                 variable_MP_size=True,
+                 p_n=np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+                 eps_n=np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+
+                 # Parameters for backscattered (elastically scattered) electrons
+                 p1EInf=0.02,      # Minimum probability of elastic scattering (at infinite energy)
+                 p1Ehat=0.496,     # Peak probability
+                 eEHat=0.,        # Peak energy
+                 w=60.86,     # Exponential factor 1
+                 p=1.,        # Exponential factor 2
+                 # Angular factors
+                 e1=0.26,
+                 e2=2.,
+                 sigmaE=2.,
+
+                 # Parameters for rediffused electrons
+                 p1RInf=0.2,       # Minimum probability of rediffused scattering (at infinite energy)
+                 eR=0.041,     # Peak energy
+                 r=0.104,     # Exponential factor
+                 q=0.5,
+                 # Angular factors
+                 r1=0.26,
+                 r2=2.,
+
+                 # Parameters for true secondaries
+                 deltaTSHat=1.8848,    # Maximum probability of secondaries
+                 eHat0=276.8,     # Peak enery
+                 s=1.54,      # Form factor of fitting curve
+                 # Angular factors
+                 t1=0.66,
+                 t2=0.8,
+                 t3=0.7,
+                 t4=1.,
                  ):
 
-        self.variable_MP_size = variable_MP_size
+        self.variable_MP_size = True
         self.M = M
         self.E_th = E_th
         self.sigmafit = sigmafit
@@ -87,7 +116,35 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
         else:
             self.angle_dist_func = None
 
-        print('Secondary emission model: Furman-Pivi, varaible MP size s=%.4f' % (self.s))
+        # Parameters for backscattered (elastically scattered) electrons
+        self.p1EInf = p1EInf
+        self.p1Ehat = p1Ehat
+        self.eEHat = eEHat
+        self.w = w
+        self.p = p
+        self.e1 = e1
+        self.e2 = e2
+        self.sigmaE = sigmaE
+
+        # Parameters for rediffused electrons
+        self.p1RInf = p1RInf
+        self.eR = eR
+        self.r = r
+        self.q = q
+        self.r1 = r1
+        self.r2 = r2
+
+        # Parameters for true secondaries
+        self.deltaTSHat = deltaTSHat
+        self.eHat0 = eHat0
+        self.s = s
+
+        self.t1 = t1
+        self.t2 = t2
+        self.t3 = t3
+        self.t4 = t4
+
+        print('Secondary emission model: Furman-Pivi, varaible MP size, s=%.4f' % (self.s))
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
         # Furman-Pivi algorithm
@@ -215,59 +272,16 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
             i_seg_new_MPs = np.array([])
 
         events = flag_truesec.astype(int)
-        if N_true_sec > 0:
-            events[n_add == 0] = 3  # Absorbed MPs
 
-        events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
-        events_add = np.repeat(events, n_add)
-        events = np.concatenate([events, events_add])
+        events = events + 2 * flag_rediffused.astype(int)
+        if n_add_total != 0:
+            events_add = np.repeat(events, n_add)
+            events = np.concatenate([events, events_add])
         event_type = events
         nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
         event_info = {}
+
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
-
-
-class SEY_model_FP_Cu(SEY_model_furman_pivi_variable_MP):
-
-    p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
-    eps_n = np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.])
-
-    # Parameters for backscattered (elastically scattered) electrons
-    # (25) in FP paper
-    p1EInf = 0.02      # Minimum probability of elastic scattering (at infinite energy)
-    p1Ehat = 0.496     # Peak probability
-    eEHat = 0.        # Peak energy
-    w = 60.86     # Exponential factor 1
-    p = 1.        # Exponential factor 2
-    # (47a)                 # Angular factors
-    e1 = 0.26
-    e2 = 2.
-    # (26)
-    sigmaE = 2.
-
-    # Parameters for rediffused electrons
-    # (28)
-    p1RInf = 0.2       # Minimum probability of rediffused scattering (at infinite energy)
-    eR = 0.041     # Peak energy
-    r = 0.104     # Exponential factor
-    # (29)
-    q = 0.5
-    # (47b)                 # Angular factors
-    r1 = 0.26
-    r2 = 2.
-
-    # Parameters for true secondaries
-    # (31)
-    deltaTSHat = 1.8848    # Maximum probability of secondaries
-    eHat0 = 276.8     # Peak enery
-    # (32)
-    s = 1.54      # Form factor of fitting curve
-    # (48a)                 # Angular factors
-    t1 = 0.66
-    t2 = 0.8
-    # (48b)
-    t3 = 0.7
-    t4 = 1.
