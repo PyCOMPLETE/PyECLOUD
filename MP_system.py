@@ -426,10 +426,10 @@ class MP_system:
                 self.y_mp[self.N_mp:self.N_mp + Nint_new_MP] = y_temp
                 self.z_mp[self.N_mp:self.N_mp + Nint_new_MP] = 0.
                 #randn(Nint_new_MP,1)
-                self.vx_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
+                self.vx_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand(Nint_new_MP) - 0.5)
                 #if you note a towards down polarization look here
-                self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
-                self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
+                self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand(Nint_new_MP) - 0.5)
+                self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand(Nint_new_MP) - 0.5)
                 self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
                 self.N_mp = int(self.N_mp + Nint_new_MP)
@@ -470,10 +470,10 @@ class MP_system:
             self.y_mp[self.N_mp:self.N_mp + Nint_new_MP] = y_temp
             self.z_mp[self.N_mp:self.N_mp + Nint_new_MP] = 0.
             #randn(Nint_new_MP,1)
-            self.vx_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
+            self.vx_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand(Nint_new_MP) - 0.5)
             #if you note a towards down polarization look here
-            self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
-            self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
+            self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand(Nint_new_MP) - 0.5)
+            self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand(Nint_new_MP) - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
             self.N_mp = int(self.N_mp + Nint_new_MP)
