@@ -130,13 +130,14 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,   
                  ):
-        
+
         super(SEY_model_ECLOUD_non_unif_charging, self).__init__(chamb, Emax, del_max, R0, E0=150.,
                     E_th=None, sigmafit=None, mufit=None,
                     switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,   
                     )
-        self.chamb = chamb
+        print 'Secondary emission model: ECLOUD non uniform E0=%f, with charging'%self.E0
         
+        self.chamb = chamb
         self.Q_segments = 0. * self.del_max_segments
         self.flag_charging =  np.int_(chamb.flag_charging)>0
         self.Q_max_segments = np.float_(chamb.Q_max_segments)
@@ -156,9 +157,10 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
         mask_charging = np.take(self.flag_charging, i_impact)
         Q_charging = np.take(self.Q_segments, i_impact[mask_charging])
         Q_max = np.take(self.Q_max_segments, i_impact[mask_charging])
-        EQ = np.take(self.Q_max_segments, i_impact[mask_cherging])
+        EQ = np.take(self.EQ_segments, i_impact[mask_charging])
         
         Q_charging[Q_charging<0.] = 0.
+        Q_charging[Q_charging>Q_max] = Q_max[Q_charging>Q_max]
   
         yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV/EQ))*(Q_charging/Q_max)
 
@@ -172,6 +174,8 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
                 n_emit_here = np.sum(nel_emit[mask_impact_here])
 
                 self.Q_segments[i_edg] += (n_impact_here - n_emit_here)*(-qe)/self.chamb.L_edg[i_edg]
+
+        return nel_emit, flag_elast, flag_truesec
 
          
 
