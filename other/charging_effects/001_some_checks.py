@@ -15,13 +15,13 @@ semod = se.SEY_model_ECLOUD_non_unif_charging(chamb,
 
 Q_Qmax_test_vect = np.linspace(0, 1.1, 5)
 
+E_test = np.linspace(0, 5000, 10000)
+
 plt.close('all')
 
 for Q_Qmax in Q_Qmax_test_vect:
    
     semod.Q_segments[:] = Q_Qmax*semod.Q_max_segments
-    
-    E_test = np.linspace(0, 5000, 10000)
     
     yiel, flag_elast, flag_truesec = semod.SEY_process(nel_impact=E_test*0+1.,
             E_impact_eV=E_test, 
@@ -33,10 +33,22 @@ for Q_Qmax in Q_Qmax_test_vect:
 # Check charge accumulation
 semod.Q_segments[:] = 0.
 
-yiel, flag_elast, flag_truesec = semod.SEY_process(nel_impact=1e9*no.ones(1000)/1000.,
-        E_impact_eV=300*np.ones(1000),
-        costheta_impact=1.*np.ones(1000),
-        i_impact=ones(1000))
+plt.figure(2)
+
+for ii in range(20):
+
+    yiel, flag_elast, flag_truesec = semod.SEY_process(nel_impact=E_test*0+1.,
+            E_impact_eV=E_test, 
+            costheta_impact=E_test*0+1.,
+            i_impact=np.int_(E_test*0+1))
+    
+    _, _, _ = semod.SEY_process(nel_impact=5e9*np.ones(1000)/1000.,
+            E_impact_eV=300*np.ones(1000),
+            costheta_impact=1.*np.ones(1000),
+            i_impact=np.int_(np.ones(1000)))
+    
+    plt.plot(E_test, yiel)
+
 
 plt.show()
 
