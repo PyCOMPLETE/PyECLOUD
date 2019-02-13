@@ -53,7 +53,7 @@ from numpy import sqrt, exp, take
 from numpy.random import rand
 import numpy as np
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
-
+from scipy.constants import e as qe
 
 def yield_fun2(E, costheta, Emax, del_max, R0, E0):
 
@@ -160,12 +160,19 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
         
         Q_charging[Q_charging<0.] = 0.
   
-
         yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV/EQ))*(Q_charging/Q_max)
 
         nel_emit = nel_impact * yiel
 
-        for i_edg, flag_Q in enumerate( 
+        for i_edg, flag_Q in enumerate(self.flag_charging):
+
+            if flag_Q:
+                mask_impact_here = (i_impact == i_edg)
+                n_impact_here = np.sum(nel_impact[mask_impact_here])
+                n_emit_here = np.sum(nel_emit[mask_impact_here])
+
+                self.Q_segments[i_edg] += (n_impact_here - n_emit_here)*(-qe)/self.chamb.L_edg[i_edg]
+
          
 
 
