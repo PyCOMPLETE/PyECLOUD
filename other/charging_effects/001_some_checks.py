@@ -1,0 +1,34 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from PyECLOUD import geom_impact_poly_fast_impact as gipfi
+import PyECLOUD.sec_emission_model_ECLOUD_nunif as se
+
+chamb = gipfi.polyg_cham_geom_object('chamber.mat', flag_non_unif_sey=True)
+
+semod = se.SEY_model_ECLOUD_non_unif_charging(chamb, 
+        Emax=-1., del_max=-1., R0=-1, E0=150.,
+        E_th=35., sigmafit=1.0828, mufit=1.6636,
+        switch_no_increase_energy=0, 
+        thresh_low_energy=-1, 
+        secondary_angle_distribution='cosine_3D')
+
+Q_Qmax_test_vect = np.linspace(0, 1.1, 5)
+
+plt.close('all')
+
+for Q_Qmax in Q_Qmax_test_vect:
+   
+    semod.Q_segments[:] = Q_Qmax*semod.Q_max_segments
+    
+    E_test = np.linspace(0, 5000, 10000)
+    
+    yiel, flag_elast, flag_truesec = semod.SEY_process(nel_impact=E_test*0+1.,
+            E_impact_eV=E_test, 
+            costheta_impact=E_test*0+1.,
+            i_impact=np.int_(E_test*0+1))
+    
+    plt.plot(E_test, yiel)
+
+plt.show()
+
