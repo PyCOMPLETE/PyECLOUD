@@ -66,8 +66,8 @@ furman_pivi_surface = {'M': 10,
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
                                    furman_pivi_surface=furman_pivi_surface_LHC)
-sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
-                               sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
+# sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
+#                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
 
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
@@ -138,8 +138,8 @@ n_rep = 1000
 deltas = extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
 del_true_mat = deltas['true']
 del_elast_mat = deltas['elast']
-# del_rediff_mat = deltas['rediff']
-# del_absorb_mat = deltas['absorb']
+del_rediff_mat = deltas['rediff']
+del_absorb_mat = deltas['absorb']
 
 plt.close('all')
 ms.mystyle_arial()
@@ -158,8 +158,8 @@ for i_ct, ct in enumerate(cos_theta_test):
     label = 'costheta=%.2f' % ct
     sp1.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label)
     sp2.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label)
-    # sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label)
-    # sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label)
+    sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label)
+    sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label)
     # sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
     sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] +
              del_elast_mat[i_ct, :], color=thiscol, label=label)

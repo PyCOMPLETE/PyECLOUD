@@ -143,7 +143,7 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp1.hist(dists['true'][i_ct], bins=60, color=thiscol, label=label, alpha=alpha, density=True)
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    # sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
+    sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     # sp5.hist(dists['true'][i_ct] + dists['elast'][i_ct] + dists['rediff'][i_ct], color=thiscol, label=label)
     # sp6.hist(dists['true'][i_ct] + dists['elast'][i_ct], color=thiscol, label=label)
 
@@ -170,7 +170,8 @@ sp3.plot(energy, prob_density_r, 'k', label='PDF', linewidth=linewid)
 prob_density_e = test_obj.backscattered_energy_PDF(energy, E_0)
 sp2.plot(energy, prob_density_e, 'k', label='PDF', linewidth=linewid)
 # True secondaries
-delta_ts = test_obj._delta_ts(E_0_single, 1)
+delta_e, delta_r, delta_ts = test_obj._yield_fun_furman_pivi(E=E_0_single, costheta=1.)
+delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0_single, energy=energy)
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
 
