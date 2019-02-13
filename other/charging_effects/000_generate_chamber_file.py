@@ -40,7 +40,7 @@ sio.savemat('chamber.mat',{\
 'Emax_segments': Vx_unif*0. + 300.,
 
 'flag_charging':  Vx_unif*0. + 1,
-'Q_max_segments': Vx_unif*0. + 1e-12*1e-6, #1e-12 C/mm^2
+'Q_max_segments': Vx_unif*0. + 1e-12*1e6, #1e-12 C/mm^2
 'EQ_segments': 10,
 
 }, oned_as='row')
