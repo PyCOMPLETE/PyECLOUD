@@ -135,10 +135,12 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
                     E_th=None, sigmafit=None, mufit=None,
                     switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,   
                     )
-
+        self.chamb = chamb
+        
         self.Q_segments = 0. * self.del_max_segments
         self.flag_charging =  np.int_(chamb.flag_charging)>0
         self.Q_max_segments = np.float_(chamb.Q_max_segments)
+        self.EQ_segments = np.float_(chamb.EQ_segments)
 
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
@@ -152,14 +154,18 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
         flag_truesec = ~(flag_elast)
          
         mask_charging = np.take(self.flag_charging, i_impact)
-        Q_charging = np.take(self.Q_segments, i_impact)
-        Q_max = np.take(self.Q_max_segments, i_impact)
+        Q_charging = np.take(self.Q_segments, i_impact[mask_charging])
+        Q_max = np.take(self.Q_max_segments, i_impact[mask_charging])
+        EQ = np.take(self.Q_max_segments, i_impact[mask_cherging])
+        
+        Q_charging[Q_charging<0.] = 0.
+  
 
-        yiel[mask_charging] = yiel[mask_charging] * 
-    
+        yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV/EQ))*(Q_charging/Q_max)
+
         nel_emit = nel_impact * yiel
 
-        CHARGE NEEDS TO DEPEND ON SEGMENT LENGTH
+        for i_edg, flag_Q in enumerate( 
          
 
 

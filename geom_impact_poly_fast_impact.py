@@ -128,6 +128,8 @@ class polyg_cham_geom_object(object):
         self.cx = cx
         self.cy = cy
 
+        self.L_edg = norm_N
+
         self.N_mp_impact = 0
         self.N_mp_corrected = 0
 
