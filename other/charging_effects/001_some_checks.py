@@ -30,5 +30,13 @@ for Q_Qmax in Q_Qmax_test_vect:
     
     plt.plot(E_test, yiel)
 
+# Check charge accumulation
+semod.Q_segments[:] = 0.
+
+yiel, flag_elast, flag_truesec = semod.SEY_process(nel_impact=1e9*no.ones(1000)/1000.,
+        E_impact_eV=300*np.ones(1000),
+        costheta_impact=1.*np.ones(1000),
+        i_impact=ones(1000))
+
 plt.show()
 
