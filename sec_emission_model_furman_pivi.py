@@ -351,7 +351,7 @@ class SEY_model_furman_pivi():
     #         return out_array
 
     def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        nns = np.arange(1, self.M, 1)
+        nns = np.arange(1, self.M  + 1, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
