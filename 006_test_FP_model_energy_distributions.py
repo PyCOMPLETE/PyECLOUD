@@ -185,8 +185,8 @@ plt.subplots_adjust(right=0.99, left=.06)
 plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
 
 plt.figure(2)
-for M in np.arange(1, 11, 1):
-    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy, M=sey_mod.M)
+for M in np.arange(1, sey_mod.M + 1, 1):
+    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy)
     # import pdb; pdb.set_trace()
     plt.plot(energy, prob_density_ts[0], label='n: %i'%M, linewidth=linewid)
 plt.legend()
