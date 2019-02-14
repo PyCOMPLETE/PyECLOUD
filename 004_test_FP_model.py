@@ -171,10 +171,12 @@ for kk in np.arange(1, 10.1, 1):
     axarr[1, int(kk - 1)].plot(energy, cdf, label='CDF', linewidth=linewid)
     axarr[1, int(kk - 1)].grid(alpha=alpha)
 
-plt.figure(10000)
+plt.figure(4, figsize=(1.8 * 12, 12))
 plt.hist(all_draws, density=True, bins=np.arange(0, E_0_single + 1, E_0_single / 100.), weights=weights_P_n_ts)
 prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0_single, energy=energy)
 plt.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
+plt.legend()
+plt.title('Total energy distribution of secondary electrons')
 # # Tests for multiple nn
 # delta_ts = np.repeat(1.8, 1e3)
 # energy = np.linspace(0.001, E_0_single, num=int(1e3))

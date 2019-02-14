@@ -160,7 +160,7 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp2.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label)
     sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label)
     sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label)
-    # sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
+    sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
     sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] +
              del_elast_mat[i_ct, :], color=thiscol, label=label)
 

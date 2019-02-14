@@ -351,7 +351,7 @@ class SEY_model_furman_pivi():
     #         return out_array
 
     def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        nns = np.arange(1, 11, 1)
+        nns = np.arange(1, self.M, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
@@ -454,10 +454,8 @@ class SEY_model_furman_pivi():
                 E_impact_eV_add = np.repeat(E_impact_eV, clone_idxs)
 
                 # Generate new MP properties, angles and energies
-                flag_above_one = (n_add[flag_truesec] > 1)
-                clone_above_one = clone_idxs[flag_truesec][flag_above_one]
-                n_add_extended = np.repeat(n_add_flag_true_sec[flag_above_one], clone_above_one)
-                delta_ts_extended = np.repeat(delta_ts[flag_above_one], clone_above_one)
+                n_add_extended = np.repeat(n_add_flag_true_sec, clone_idxs[flag_truesec])
+                delta_ts_extended = np.repeat(delta_ts, clone_idxs[flag_truesec])
 
                 En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
 
@@ -480,7 +478,7 @@ class SEY_model_furman_pivi():
             i_seg_new_MPs = np.array([])
 
         # Add new MPs to nel_emit_tot_events
-        nel_emit_tot_events = np.concatenate([nel_emit_tot_events, nel_new_MPs])
+        nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
         events = flag_truesec.astype(int)
         if N_true_sec > 0:

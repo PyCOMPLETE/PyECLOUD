@@ -107,6 +107,7 @@ def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge
         E_new_MPs_eV = 0.5 * mass / qe * v_new_MPs_mod * v_new_MPs_mod
 
         E_all_MPs_eV = np.concatenate([E_replace_eV, E_new_MPs_eV])
+        E_all_MPs_eV = E_all_MPs_eV * nel_emit_tot_events
 
         for etype in sey_mod.event_types.keys():
             etype_name = sey_mod.event_types[etype]
@@ -182,5 +183,13 @@ for sp in [sp1, sp2, sp3, sp4]:
 plt.subplots_adjust(right=0.99, left=.06)
 
 plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
+
+plt.figure(2)
+for M in np.arange(1, 11, 1):
+    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy, M=10)
+    # import pdb; pdb.set_trace()
+    plt.plot(energy, prob_density_ts[0], label='n: %i'%M, linewidth=linewid)
+plt.legend()
+plt.title('Energy distribution PDFs for secondary electron energies')
 
 plt.show()
