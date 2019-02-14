@@ -297,13 +297,13 @@ class SEY_model_furman_pivi():
         # F_n = 1
         # cdf = eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
         cdf = gammainc(p_n_curr, energy / eps_curr)
-        if len(cdf) != 0:
-            area = cdf
-            cdf = cdf / area[-1]
-            return cdf, area
-        return cdf, 1
+        # if len(cdf) != 0:
+        area = cdf
+        cdf = cdf / area[-1]
+        return cdf, area
+        # return cdf, 1
 
-    def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
+    def get_energy_true_sec(self, nn, E_0, choice='poisson', M=10):
         p_n = self.p_n
         eps_n = self.eps_n
 
@@ -403,7 +403,6 @@ class SEY_model_furman_pivi():
             flag_above_zero = (n_add_flag_true_sec > 0)  # I exclude the absorbed
             flag_truesec_and_above_zero = flag_truesec & (n_add > 0)
             En_truesec_eV = self.get_energy_true_sec(
-                delta_ts=delta_ts[flag_above_zero],
                 nn=n_add_flag_true_sec[flag_above_zero],
                 E_0=E_impact_eV[flag_truesec_and_above_zero], M=self.M)  # First generated MPs
 
@@ -430,9 +429,9 @@ class SEY_model_furman_pivi():
 
                 # Generate new MP properties, angles and energies
                 n_add_extended = np.repeat(n_add_flag_true_sec, clone_idxs[flag_truesec])
-                delta_ts_extended = np.repeat(delta_ts, clone_idxs[flag_truesec])
+                # delta_ts_extended = np.repeat(delta_ts, clone_idxs[flag_truesec])
 
-                En_truesec_eV_add = self.get_energy_true_sec(delta_ts=delta_ts_extended, nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
+                En_truesec_eV_add = self.get_energy_true_sec(nn=n_add_extended, E_0=E_impact_eV_add, M=self.M)
 
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
