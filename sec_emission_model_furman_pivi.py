@@ -165,7 +165,7 @@ class SEY_model_furman_pivi():
 
         nel_emit = nel_impact # * delta
 
-        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
+        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
     def _yield_fun_furman_pivi(self, E, costheta):
         delta_e = self._delta_e(E, costheta)
@@ -296,11 +296,11 @@ class SEY_model_furman_pivi():
         # F_n = 1
         # cdf = eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
         cdf = gammainc(p_n_curr, energy / eps_curr)
-        # if len(cdf) != 0:
-        area = cdf
-        cdf = cdf / area[-1]
-        return cdf, area
-        # return cdf, 1
+        if len(cdf) != 0:
+            area = cdf
+            cdf = cdf / area[-1]
+            return cdf, area
+        return cdf, 1
 
     def get_energy_true_sec(self, nn, E_0, choice='poisson'):
         p_n = self.p_n
@@ -353,7 +353,8 @@ class SEY_model_furman_pivi():
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                            v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
-        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
+        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec, \
+            delta_e, delta_r, delta_ts = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
 
         nel_replace = nel_emit_tot_events.copy()
         x_replace = x_impact.copy()
@@ -383,9 +384,7 @@ class SEY_model_furman_pivi():
         N_true_sec = np.sum(flag_truesec)
         n_emit_total = 0
         if N_true_sec > 0:
-            # delta_ts = self._delta_ts(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
-            delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
-            delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
+            delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec] - delta_r[flag_truesec])  # delta_ts^prime in FP paper, eq. (39)
             n_emit = np.zeros_like(flag_truesec, dtype=int)
             n_emit[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
             n_emit_flag_true_sec = n_emit[flag_truesec]
