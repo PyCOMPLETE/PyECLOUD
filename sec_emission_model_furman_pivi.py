@@ -250,7 +250,7 @@ class SEY_model_furman_pivi():
         p_n = self.p_n
         eps_n = self.eps_n
 
-        nn_all = np.arange(1, M + 1, 1)
+        nn_all = np.arange(0, M + 1, 1)
 
         if choice == 'poisson':
             P_n_ts = np.squeeze(delta_ts / factorial(nn_all) * np.exp(-delta_ts))

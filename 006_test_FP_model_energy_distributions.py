@@ -11,7 +11,7 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'M': 10,
+furman_pivi_surface_LHC = {'M': 2,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -118,7 +118,7 @@ def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge
     return dists
 
 
-cos_theta_test = np.linspace(0, 1., 10)
+cos_theta_test = np.linspace(1., 1., 1)
 E_0_single = 100
 E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
@@ -173,7 +173,7 @@ sp2.plot(energy, prob_density_e, 'k', label='PDF', linewidth=linewid)
 # True secondaries
 delta_e, delta_r, delta_ts = test_obj._yield_fun_furman_pivi(E=E_0_single, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
-prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0_single, energy=energy)
+prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_single, energy=energy)
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
 
 for sp in [sp1, sp2, sp3, sp4]:
@@ -186,7 +186,7 @@ plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize
 
 plt.figure(2)
 for M in np.arange(1, 11, 1):
-    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy, M=10)
+    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy, M=sey_mod.M)
     # import pdb; pdb.set_trace()
     plt.plot(energy, prob_density_ts[0], label='n: %i'%M, linewidth=linewid)
 plt.legend()
