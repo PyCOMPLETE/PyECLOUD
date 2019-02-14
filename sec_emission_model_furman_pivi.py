@@ -351,7 +351,7 @@ class SEY_model_furman_pivi():
     #         return out_array
 
     def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        nns = np.arange(1, self.M  + 1, 1)
+        nns = np.arange(1, self.M + 1, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
@@ -416,7 +416,7 @@ class SEY_model_furman_pivi():
             delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
             delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
             n_add = np.zeros_like(flag_truesec, dtype=int)
-            n_add[flag_truesec] = random.poisson(lam=delta_ts_prime)
+            n_add[flag_truesec] = random.poisson(lam=delta_ts_prime) # Using (45)
             n_add_flag_true_sec = n_add[flag_truesec]
             # Cut above M
             flag_above_th = (n_add[flag_truesec] > self.M)
@@ -428,9 +428,12 @@ class SEY_model_furman_pivi():
             n_add[flag_truesec] = n_add_flag_true_sec
 
             # MPs to be replaced
-            flag_above_zero = (n_add_flag_true_sec > 0)
+            flag_above_zero = (n_add_flag_true_sec > 0)  # I exclude the absorbed
             flag_truesec_and_above_zero = flag_truesec & (n_add > 0)
-            En_truesec_eV = self.get_energy_true_sec(delta_ts=delta_ts[flag_above_zero], nn=n_add_flag_true_sec[flag_above_zero], E_0=E_impact_eV[flag_truesec_and_above_zero], M=self.M)
+            En_truesec_eV = self.get_energy_true_sec(
+                    delta_ts=delta_ts[flag_above_zero],
+                    nn=n_add_flag_true_sec[flag_above_zero],
+                    E_0=E_impact_eV[flag_truesec_and_above_zero], M=self.M)  # First generated MPs
 
             N_true_sec = np.sum(flag_above_zero)
             vx_replace[flag_truesec_and_above_zero], vy_replace[flag_truesec_and_above_zero], vz_replace[flag_truesec_and_above_zero] = self.angle_dist_func(
