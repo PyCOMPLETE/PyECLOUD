@@ -131,9 +131,9 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,   
                  ):
 
-        super(SEY_model_ECLOUD_non_unif_charging, self).__init__(chamb, Emax, del_max, R0, E0=150.,
-                    E_th=None, sigmafit=None, mufit=None,
-                    switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,   
+        super(SEY_model_ECLOUD_non_unif_charging, self).__init__(chamb, Emax, del_max, R0, E0,
+                    E_th, sigmafit, mufit,
+                    switch_no_increase_energy, thresh_low_energy, secondary_angle_distribution,   
                     )
         print 'Secondary emission model: ECLOUD non uniform E0=%f, with charging'%self.E0
         
@@ -151,19 +151,23 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
         R0_mp = take(self.R0_segments, i_impact)
 
         yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, Emax_mp, del_max_mp, R0_mp, E0=self.E0)
+                 
+        mask_charging = np.take(self.flag_charging, i_impact) 
+        if np.any(mask_charging):
+            Q_charging = np.take(self.Q_segments, i_impact[mask_charging])
+            Q_max = np.take(self.Q_max_segments, i_impact[mask_charging])
+            EQ = np.take(self.EQ_segments, i_impact[mask_charging])
+            
+            Q_charging[Q_charging<0.] = 0.
+            Q_charging[Q_charging>Q_max] = Q_max[Q_charging>Q_max]
+  
+            yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV[mask_charging]/EQ))*(Q_charging/Q_max)
+            
+            ref_frac[mask_charging] = ref_frac[mask_charging] * (1. - Q_charging/Q_max) + Q_charging/Q_max
+        
         flag_elast = (rand(len(ref_frac)) < ref_frac)
         flag_truesec = ~(flag_elast)
-         
-        mask_charging = np.take(self.flag_charging, i_impact)
-        Q_charging = np.take(self.Q_segments, i_impact[mask_charging])
-        Q_max = np.take(self.Q_max_segments, i_impact[mask_charging])
-        EQ = np.take(self.EQ_segments, i_impact[mask_charging])
-        
-        Q_charging[Q_charging<0.] = 0.
-        Q_charging[Q_charging>Q_max] = Q_max[Q_charging>Q_max]
-  
-        yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV/EQ))*(Q_charging/Q_max)
-
+   
         nel_emit = nel_impact * yiel
 
         for i_edg, flag_Q in enumerate(self.flag_charging):

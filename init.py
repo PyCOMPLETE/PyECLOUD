@@ -64,6 +64,7 @@ import geom_impact_rect_fast_impact as girfi
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
+from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
@@ -174,7 +175,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     # Init chamber
     flag_non_unif_sey = False
     for cloud_par in cloud_par_list:
-        if cloud_par.cc.switch_model == "ECLOUD_nunif":
+        if "ECLOUD_nunif" in cloud_par.cc.switch_model:
             flag_non_unif_sey = True
 
     chamber_kwargs = {
@@ -317,6 +318,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                                 **kwargs_secem)
             elif thiscloud.switch_model == 'ECLOUD_nunif':
                 sey_mod = SEY_model_ECLOUD_non_unif(chamb, thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                                                    E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                    switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                    thresh_low_energy=thiscloud.thresh_low_energy,
+                                                    secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                    **kwargs_secem)
+            elif thiscloud.switch_model == 'ECLOUD_nunif_charging':
+                sey_mod = SEY_model_ECLOUD_non_unif_charging(chamb, thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
                                                     E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                                     switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                                     thresh_low_energy=thiscloud.thresh_low_energy,

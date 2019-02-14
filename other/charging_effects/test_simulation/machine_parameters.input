@@ -5,7 +5,7 @@ chamb_type = 'polyg_cython'
 x_aper = 2.300000e-02
 y_aper = 1.800000e-02
 
-filename_chm = 'LHC_chm_ver.mat'
+filename_chm = 'chamber.mat'
 
 
 
@@ -24,7 +24,7 @@ betafy = 90.00
 
 # uniform initial distrib
 init_unif_flag=1
-Nel_init_unif=2e8
+Nel_init_unif=1e7
 E_init_unif=0.01;   #in eV
 x_max_init_unif =x_aper
 x_min_init_unif =-x_aper

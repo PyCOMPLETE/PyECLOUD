@@ -1,5 +1,7 @@
 # SIMULATION PARAMETERS
 
+extract_sey = False
+
 machine_param_file='machine_parameters.input'
 secondary_emission_parameters_file='secondary_emission_parameters.input'
 beam_parameters_file='beam.beam' 
