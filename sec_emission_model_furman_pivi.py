@@ -250,41 +250,35 @@ class SEY_model_furman_pivi():
         p_n = self.p_n
         eps_n = self.eps_n
 
+        nn_all = np.arange(1, M + 1, 1)
+
         if choice == 'poisson':
-            P_n_ts = np.squeeze(delta_ts / factorial(nn) * np.exp(-delta_ts))
+            P_n_ts = np.squeeze(delta_ts / factorial(nn_all) * np.exp(-delta_ts))
         elif choice == 'binomial':
             p = delta_ts / M
-            P_n_ts = np.squeeze(binom(M, nn) * (p)**nn * (1 - p)**(M - nn))
+            P_n_ts = np.squeeze(binom(M, nn) * (p)**nn_all * (1 - p)**(M - nn_all))
         else:
             raise ValueError('choice must be either \'poisson\' or \'binomial\'')
-        P_n_ts_return = P_n_ts
+
+        P_n_ts = P_n_ts / np.sum(P_n_ts)
+        P_n_ts_return = P_n_ts[int(nn - 1)]
 
         eps_curr = eps_n[int(nn - 1)]
         p_n_curr = p_n[int(nn - 1)]
 
-        # eps_curr = []
-        # p_n_curr = []
-        # if type(nn) == int or nn.shape == np.empty(None).shape:
-        #     eps_curr = eps_n[int(nn - 1)]
-        #     p_n_curr = p_n[int(nn - 1)]
-        # else:
-        #     for kk in nn:
-        #         eps_curr.append(eps_n[int(kk - 1)])
-        #         p_n_curr.append(p_n[int(kk - 1)])
-        #     eps_curr = np.array(eps_curr)
-        #     p_n_curr = np.array(p_n_curr)
         # P_n_ts = 1.
+
         if E_0 == 0:
             F_n = 0
         else:
-            F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+            # F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
             F_n = 1
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
         if area != 0:
             f_n_ts = f_n_ts / area  # Normalization
 
-        return f_n_ts, P_n_ts_return / area
+        return f_n_ts, P_n_ts_return
 
     def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         p_n = self.p_n
