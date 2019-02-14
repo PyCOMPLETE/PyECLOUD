@@ -278,18 +278,19 @@ class SEY_model_furman_pivi():
             F_n = 0
         else:
             F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+            F_n = 1
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
         if area != 0:
             f_n_ts = f_n_ts / area  # Normalization
 
-        return f_n_ts, P_n_ts_return
+        return f_n_ts, P_n_ts_return / area
 
     def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         p_n = self.p_n
         eps_n = self.eps_n
 
-        P_n_ts = 1.
+        # P_n_ts = 1.
 
         if isinstance(nn, int) or isinstance(nn, np.float64):
             eps_curr = eps_n[int(nn - 1)]
@@ -298,7 +299,8 @@ class SEY_model_furman_pivi():
             eps_curr = np.array([eps_n[int(ii - 1)] for ii in nn])
             p_n_curr = np.array([p_n[int(ii - 1)] for ii in nn])
 
-        F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+        # F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+        F_n = 1
         cdf = eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
         if len(cdf) != 0:
             area = cdf
@@ -306,49 +308,24 @@ class SEY_model_furman_pivi():
             return cdf, area
         return cdf, 1
 
-    # def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
-    #     f_n_ts, _ = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0, energy=energy, choice=choice, M=M)
-    #     CDF = cumtrapz(f_n_ts, energy, initial=0)
-    #     return CDF
-
     def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
         p_n = self.p_n
         eps_n = self.eps_n
 
-        P_n_ts = 1.
+        # P_n_ts = 1.
 
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        cdf, area = self.true_sec_energy_CDF(delta_ts, nn, E_0, energy=E_0, choice=choice, M=10)
-        F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
-        F_n_vec = F_n_vec / (area)
+        _, area = self.true_sec_energy_CDF(delta_ts, nn, E_0, energy=E_0, choice=choice, M=10)  # Putting energy=E_0 gives area under the PDF
+        # F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
+        # F_n_vec = F_n_vec / (area)
+        F_n_vec = 1. / area
         uu = random.rand(len(E_0))
         xx = uu / (F_n_vec * eps_vec**p_n_vec * gamma(p_n_vec))
-        # Redraw if xx is above 1; Temporary solution, this is not the right way to do it
-        # flag_xx_above_one = xx > 1
-        # N_above_one = np.sum(flag_xx_above_one)
-        # while N_above_one > 0:
-        #     uu = random.rand(N_above_one)
-        #     xx[flag_xx_above_one] = uu / (F_n_vec[flag_xx_above_one] * eps_vec[flag_xx_above_one]**p_n_vec[flag_xx_above_one] * gamma(p_n_vec[flag_xx_above_one]))
-        #     flag_xx_above_one = xx > 1
-        #     N_above_one = np.sum(flag_xx_above_one)
+
         xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
 
         return eps_vec * gammaincinv(p_n_vec, xx)
-
-    # def get_energy_true_sec(self, delta_ts, nn, E_0, choice='poisson', M=10):
-    #     energy = np.linspace(1e-10, 300, num=int(len(E_0)))
-    #     uu = random.rand(len(energy))
-    #     out_array = np.empty(1)
-    #     if type(nn) is int:
-    #         CDF = self.true_sec_energy_CDF(delta_ts=delta_ts, nn=nn, E_0=E_0, choice=choice, energy=energy, M=M)
-    #         return np.interp(uu, CDF, energy)
-    #     else:
-    #         for ii, kk in enumerate(nn):
-    #             CDF = self.true_sec_energy_CDF(delta_ts=delta_ts[ii], nn=kk, E_0=E_0[ii], choice=choice, energy=energy, M=M)
-    #             out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
-    #         out_array = np.delete(out_array, 0)
-    #         return out_array
 
     def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
         nns = np.arange(1, self.M + 1, 1)
