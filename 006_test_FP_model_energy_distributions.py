@@ -11,7 +11,7 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'M': 1,
+furman_pivi_surface_LHC = {'M': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,

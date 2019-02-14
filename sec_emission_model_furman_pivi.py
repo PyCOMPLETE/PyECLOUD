@@ -280,7 +280,7 @@ class SEY_model_furman_pivi():
 
         return f_n_ts, P_n_ts_return
 
-    def true_sec_energy_CDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
+    def true_sec_energy_CDF(self, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson', M=10):
         p_n = self.p_n
         eps_n = self.eps_n
 
@@ -311,7 +311,7 @@ class SEY_model_furman_pivi():
 
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        _, area = self.true_sec_energy_CDF(delta_ts, nn, E_0, energy=E_0, choice=choice, M=10)  # Putting energy=E_0 gives area under the PDF
+        _, area = self.true_sec_energy_CDF(nn, E_0, energy=E_0, choice=choice, M=10)  # Putting energy=E_0 gives area under the PDF
         # F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
         # F_n_vec = F_n_vec / (area)
         F_n_vec = 1. / area
@@ -388,7 +388,7 @@ class SEY_model_furman_pivi():
             delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV[flag_truesec], costheta_impact[flag_truesec])
             delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
             n_add = np.zeros_like(flag_truesec, dtype=int)
-            n_add[flag_truesec] = random.poisson(lam=delta_ts_prime) # Using (45)
+            n_add[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
             n_add_flag_true_sec = n_add[flag_truesec]
             # Cut above M
             flag_above_th = (n_add[flag_truesec] > self.M)
@@ -403,9 +403,9 @@ class SEY_model_furman_pivi():
             flag_above_zero = (n_add_flag_true_sec > 0)  # I exclude the absorbed
             flag_truesec_and_above_zero = flag_truesec & (n_add > 0)
             En_truesec_eV = self.get_energy_true_sec(
-                    delta_ts=delta_ts[flag_above_zero],
-                    nn=n_add_flag_true_sec[flag_above_zero],
-                    E_0=E_impact_eV[flag_truesec_and_above_zero], M=self.M)  # First generated MPs
+                delta_ts=delta_ts[flag_above_zero],
+                nn=n_add_flag_true_sec[flag_above_zero],
+                E_0=E_impact_eV[flag_truesec_and_above_zero], M=self.M)  # First generated MPs
 
             N_true_sec = np.sum(flag_above_zero)
             vx_replace[flag_truesec_and_above_zero], vy_replace[flag_truesec_and_above_zero], vz_replace[flag_truesec_and_above_zero] = self.angle_dist_func(
