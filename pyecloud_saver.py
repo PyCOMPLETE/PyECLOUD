@@ -472,6 +472,9 @@ class pyecloud_saver:
 
     def load_from_output(self, last_t=None):
 
+        if self.step_by_step_custom_observables is not None:
+            raise ValueError('Not implemented! Sorry!')
+
         if self.copy_main_outp_folder is not None:
             load_output_folder = self.copy_main_outp_folder
         else:
@@ -587,6 +590,10 @@ class pyecloud_saver:
             ]
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
+
+            for kk in self.sbs_custom_data.keys():
+                vv = self.sbs_custom_data[kk]
+                self.sbs_custom_data[kk] = np.concatenate((vv, 0 * vv))
 
             for mm in list_members:
                 vv = getattr(self, mm)
@@ -726,6 +733,9 @@ class pyecloud_saver:
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
 
+        for kk in self.sbs_custom_data.keys():
+            dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
+        
         return dict_sbs_data
 
     def _MP_state_init(self, save_mp_state_time_file):
