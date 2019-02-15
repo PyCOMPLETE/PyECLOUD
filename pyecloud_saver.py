@@ -112,10 +112,12 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None, extract_sey=None):
+                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        self.step_by_step_custom_observables = step_by_step_custom_observables
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
@@ -154,7 +156,8 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                   initial_size_t_vect=1000)
+                                   initial_size_t_vect=1000, 
+                                   step_by_step_custom_observables = self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
@@ -208,7 +211,7 @@ class pyecloud_saver:
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
                 t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams, sec_beams_list,
-                cloud_list, rho_cloud=None):
+                cloud_list, buildup_sim, rho_cloud=None):
 
         ####################################################
         # Quantities saved at custom times provided by user #
@@ -238,7 +241,7 @@ class pyecloud_saver:
         #########################
         # Step-by-step saveings #
         #########################
-        self._stepbystep_data_save(impact_man, MP_e, beamtim)
+        self._stepbystep_data_save(impact_man, MP_e, beamtim, buildup_sim)
 
         ##########################################################
         # Quantities saved at each bunch passage and dump to file #
@@ -469,6 +472,9 @@ class pyecloud_saver:
 
     def load_from_output(self, last_t=None):
 
+        if self.step_by_step_custom_observables is not None:
+            raise ValueError('Not implemented! Sorry!')
+
         if self.copy_main_outp_folder is not None:
             load_output_folder = self.copy_main_outp_folder
         else:
@@ -585,6 +591,10 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
 
+            for kk in self.sbs_custom_data.keys():
+                vv = self.sbs_custom_data[kk]
+                self.sbs_custom_data[kk] = np.concatenate((vv, 0 * vv))
+
             for mm in list_members:
                 vv = getattr(self, mm)
                 setattr(self, mm, np.concatenate((vv, 0 * vv)))
@@ -594,7 +604,8 @@ class pyecloud_saver:
                     (self.el_dens_at_probes, 0 * self.el_dens_at_probes), axis=1)
             print('Done resizing')
 
-    def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect):
+    def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect,
+            step_by_step_custom_observables):
 
         #step by step data
 
@@ -650,7 +661,12 @@ class pyecloud_saver:
             self.y_el_dens_probes = np.array(self.y_el_dens_probes)
             self.r_el_dens_probes = np.array(self.r_el_dens_probes)
 
-    def _stepbystep_data_save(self, impact_man, MP_e, beamtim):
+        self.sbs_custom_data = {}
+        if step_by_step_custom_observables is not None:
+            for kk in step_by_step_custom_observables.keys():
+                self.sbs_custom_data[kk] = 0 * self.t
+
+    def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim):
         #save step by step data
         # Vars to be accumulated
         self.Nel_impact_last_step_group += impact_man.Nel_impact_last_step
@@ -695,6 +711,9 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
 
+            for kk in self.step_by_step_custom_observables.keys():
+                self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
+
     def _stepbystep_get_dict(self):
         dict_sbs_data = {
             't': self.t[:self.i_last_save + 1],
@@ -714,6 +733,9 @@ class pyecloud_saver:
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
 
+        for kk in self.sbs_custom_data.keys():
+            dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
+        
         return dict_sbs_data
 
     def _MP_state_init(self, save_mp_state_time_file):

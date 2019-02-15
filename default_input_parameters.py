@@ -72,7 +72,7 @@ parameters_dict = {
             'cos_angle_width' : 0.05,
             'save_mp_state_time_file': -1,
             'flag_detailed_MP_info': 0,
-            'flag_hist_impact_seg': 0,
+            'flag_hist_impact_seg': 1,
             'flag_verbose_file': False,
             'flag_verbose_stdout': False,
             'dec_fac_secbeam_prof': 1,
@@ -103,6 +103,8 @@ parameters_dict = {
             't_ion': -1,
 
             'extract_sey': True,
+
+            'step_by_step_custom_observables': None,
         },
     },
     'machine_parameters': {
