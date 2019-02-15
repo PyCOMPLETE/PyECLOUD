@@ -1,12 +1,27 @@
+import numpy as np
+
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 
 t_stop_list = [5e-9, 25e-9, 123e-9, 25e-9, 250e-9, 500e-9, None]
 
+
+def observe_Nel(sim):
+    N_mp = sim.cloud_list[0].MP_e.N_mp
+    Nel = np.sum(sim.cloud_list[0].MP_e.nel_mp[:N_mp])
+    return Nel
+
+step_by_step_custom_observables = {
+        'Nelectrons': observe_Nel,
+        }
+
 sim = BuildupSimulation(pyecl_input_folder=sim_input_folder, 
         filen_main_outp='./Pyecltest.mat',
-        extract_sey=False)
+        extract_sey=False, 
+        step_by_step_custom_observables = step_by_step_custom_observables)
+
+ec = sim.cloud_list[0]
 
 for ii, t_stop in enumerate(t_stop_list):
     print('\n\n==============================')

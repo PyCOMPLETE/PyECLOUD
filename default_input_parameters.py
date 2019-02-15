@@ -103,6 +103,8 @@ parameters_dict = {
             't_ion': -1,
 
             'extract_sey': True,
+
+            'step_by_step_custom_observables': None,
         },
     },
     'machine_parameters': {
