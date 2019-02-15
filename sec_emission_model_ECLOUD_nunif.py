@@ -163,7 +163,8 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
   
             yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV[mask_charging]/EQ))*(Q_charging/Q_max)
             
-            ref_frac[mask_charging] = ref_frac[mask_charging] * (1. - Q_charging/Q_max) + Q_charging/Q_max
+            # This would preserve also the ener
+            # ref_frac[mask_charging] = ref_frac[mask_charging] * (1. - Q_charging/Q_max) + Q_charging/Q_max
         
         flag_elast = (rand(len(ref_frac)) < ref_frac)
         flag_truesec = ~(flag_elast)
