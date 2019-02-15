@@ -39,7 +39,7 @@ Q_max_segments = Vx_unif*0.
 EQ_segments = Vx_unif*0. 
 
 # Charging patch
-del_max_segments[mask_patch] = 2.2 
+del_max_segments[mask_patch] = 1.9 
 flag_charging[mask_patch] = 1. 
 Q_max_segments[mask_patch] = 1e-12*1e6 # 1e-12 C/mm^2 
 EQ_segments[mask_patch] = 20. 

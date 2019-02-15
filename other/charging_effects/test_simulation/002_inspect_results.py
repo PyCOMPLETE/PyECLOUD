@@ -15,4 +15,12 @@ sp2 = plt.subplot(3,1,2, sharex=sp1)
 sp2.plot(ob.t, ob.Qpatch_ave)
 sp3 = plt.subplot(3,1,3, sharex=sp1)
 sp3.plot(ob.t, ob.lam_t_array)
+
+hl_left = np.sum(ob.energ_eV_impact_hist[:, ob.xg_hist<0], axis=1)
+hl_right = np.sum(ob.energ_eV_impact_hist[:, ob.xg_hist>0], axis=1)
+
+fig3 = plt.figure(3)
+plt.plot(hl_left, 'b.-')
+plt.plot(hl_right, 'r.-')
+
 plt.show()
