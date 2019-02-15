@@ -1,12 +1,13 @@
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
+import numpy as np
 
-sim = BuildupSimulation()
+step_by_step_custom_observables = {
+        'Qpatch_ave': lambda sim: np.mean(sim.cloud_list[0].impact_man.sey_mod.Q_segments)
+        }
 
-t_end = 5e-9
-sim.run(t_end_sim = t_end)
+sim = BuildupSimulation(
+        step_by_step_custom_observables=step_by_step_custom_observables)
 
-'''
-ec = sim.cloud_list[0]
-plot(ec.MP_e.x_mp[:ec.MP_e.N_mp], ec.MP_e.y_mp[:ec.MP_e.N_mp], '.')
-'''
+sim.run(t_end_sim = None) 
+

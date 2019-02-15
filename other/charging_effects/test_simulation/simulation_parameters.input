@@ -32,17 +32,17 @@ N_mp_max=250000;   #size of allocated vectors
 #Regen parameters
 
 N_mp_regen=200000;
-N_mp_regen_low=5000;
+N_mp_regen_low=0.;
 N_mp_after_regen=10000;
 t_ON_regen_low=10.
 fact_split=1.5;
 fact_clean=1e-6;
 regen_hist_cut = 1.e-4
 
-N_mp_soft_regen = 60000
-N_mp_after_soft_regen = 20000
+N_mp_soft_regen = 6000
+N_mp_after_soft_regen = 2000
 
-nel_mp_ref_0= 2e8/(0.7*N_mp_soft_regen)   #e-/m
+nel_mp_ref_0= 1e8/(0.7*N_mp_soft_regen)   #e-/m
 
 
 # Number of bins

@@ -711,8 +711,9 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
 
-            for kk in self.step_by_step_custom_observables.keys():
-                self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
+            if self.step_by_step_custom_observables is not None:
+                for kk in self.step_by_step_custom_observables.keys():
+                    self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
 
     def _stepbystep_get_dict(self):
         dict_sbs_data = {
