@@ -175,7 +175,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     # Init chamber
     flag_non_unif_sey = False
     for cloud_par in cloud_par_list:
-        if "ECLOUD_nunif" in cloud_par.cc.switch_model:
+        if cloud_par.cc.switch_model=="ECLOUD_nunif" or cloud_par.cc.switch_model=="ECLOUD_nunif_charging":
             flag_non_unif_sey = True
 
     chamber_kwargs = {

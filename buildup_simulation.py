@@ -59,6 +59,7 @@ import os
 
 
 class BuildupSimulation(object):
+
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
@@ -97,6 +98,7 @@ class BuildupSimulation(object):
                 else:
                     raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
+
     def run(self, t_end_sim=None):
 
         beamtim = self.beamtim
@@ -108,6 +110,11 @@ class BuildupSimulation(object):
 
         ## simulation
         while not beamtim.end_simulation():
+            
+            if t_end_sim is not None and beamtim.tt_curr is not None:
+                if beamtim.tt_curr >= t_end_sim:
+                    print 'Reached user defined t_end_sim --> Ending simulation'
+                    break
 
             beamtim.next_time_step()
 
@@ -119,12 +126,7 @@ class BuildupSimulation(object):
 
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
-
-            ## every bunch passage
-            if t_end_sim is not None:
-                if beamtim.tt_curr > t_end_sim:
-                    print 'Reached user defined t_end_sim --> Ending simulation'
-                    break
+            
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
                       force_recompute_space_charge=False, skip_MP_cleaning=False, skip_MP_regen=False):

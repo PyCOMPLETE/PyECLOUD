@@ -112,7 +112,7 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None, extract_sey=None):
+                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observable=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -208,7 +208,7 @@ class pyecloud_saver:
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
                 t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams, sec_beams_list,
-                cloud_list, rho_cloud=None):
+                cloud_list, buildup_sim, rho_cloud=None):
 
         ####################################################
         # Quantities saved at custom times provided by user #
