@@ -42,7 +42,7 @@ EQ_segments = Vx_unif*0.
 del_max_segments[mask_patch] = 1.9 
 flag_charging[mask_patch] = 1. 
 Q_max_segments[mask_patch] = 0.1*1e-12*1e6 # 1e-12 C/mm^2 
-EQ_segments[mask_patch] = 20. 
+EQ_segments[mask_patch] = 0.0000000001#20. 
 
 
 sio.savemat('chamber.mat',{\
