@@ -41,8 +41,8 @@ EQ_segments = Vx_unif*0.
 # Charging patch
 del_max_segments[mask_patch] = 1.9 
 flag_charging[mask_patch] = 1. 
-Q_max_segments[mask_patch] = 0.1*1e-12*1e6 # 1e-12 C/mm^2 
-EQ_segments[mask_patch] = 0.0000000001#20. 
+Q_max_segments[mask_patch] = 1e-12*1e6 # 1e-12 C/mm^2 
+EQ_segments[mask_patch] = 20. 
 
 
 sio.savemat('chamber.mat',{\
@@ -68,7 +68,8 @@ pl.close('all')
 
 pl.figure(2)
 pl.plot(Vx_unif, Vy_unif, 'b.-')
-pl.plot(Vx_unif[mask_patch], Vy_unif[mask_patch], 'r.-')
+for ii in np.where(mask_patch)[0]:
+    pl.plot(Vx_unif[ii:ii+2], Vy_unif[ii:ii+2], 'r.-')
 
 pl.plot(x_sem_ellip_insc*np.cos(theta_unif), y_sem_ellip_insc*np.sin(theta_unif), 'g')
 pl.axis('equal')
