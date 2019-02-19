@@ -105,6 +105,8 @@ parameters_dict = {
             'extract_sey': True,
 
             'step_by_step_custom_observables': None,
+            'pass_by_pass_custom_observables': None,
+
         },
     },
     'machine_parameters': {

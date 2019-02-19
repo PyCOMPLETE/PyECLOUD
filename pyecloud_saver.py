@@ -112,12 +112,14 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None):
+                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None
+                        pass_by_pass_custom_observables=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
+        self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
@@ -312,6 +314,13 @@ class pyecloud_saver:
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
+        
+        # Custom data
+        self.pbp_custom_data = {}
+        if self.pass_by_pass_custom_observables is not None:
+            for kk in self.pass_by_pass_custom_observables.keys():
+                self.pbp_custom_data[kk] = []
+
 
     def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim):
         #update histograms
@@ -358,6 +367,11 @@ class pyecloud_saver:
         if self.flag_hist_det:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
+        if seld.pass_by_pass_custom_observables is not None:
+            for kk in self.pass_by_pass_custom_observables.keys():
+               self.pbp_custom_data[kk].append(
+                       self.pass_by_pass_custom_observables[kk](sim))
+
     def build_outp_dict(self):
         saved_dict = {
             't_hist': self.t_hist,
@@ -398,6 +412,9 @@ class pyecloud_saver:
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
+
+        #custom step-by-step
+        saved_dict.update(self.pbp_custom_data)
 
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
