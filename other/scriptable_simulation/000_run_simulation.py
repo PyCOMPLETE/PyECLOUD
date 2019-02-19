@@ -19,10 +19,16 @@ step_by_step_custom_observables = {
         'ref_size': lambda sim: ec.MP_e.nel_mp_ref
         }
 
+pass_by_pass_custom_observables = {
+        'sum_rho': lambda sim: np.sum(sim.cloud_list[0].rho, axis=1)
+        }
+
+
 sim = BuildupSimulation(pyecl_input_folder=sim_input_folder, 
         filen_main_outp='./Pyecltest.mat',
         extract_sey=False, 
-        step_by_step_custom_observables = step_by_step_custom_observables)
+        step_by_step_custom_observables = step_by_step_custom_observables,
+        pass_by_pass_custom_observables = pass_by_pass_custom_observables)
 
 ec = sim.cloud_list[0]
 

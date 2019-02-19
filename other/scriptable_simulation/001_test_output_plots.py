@@ -47,4 +47,9 @@ sp4.set_ylabel('Ref MP size')
 sp2 = pl.subplot(4,1,4, sharex=sp1)
 sp2.plot(ob.t, ob.lam_t_array, '.-')
 sp2.set_ylabel('Beam profile')
+
+fig = pl.figure()
+pl.plot(-ob.sum_rho.T)
+
+
 pl.show()

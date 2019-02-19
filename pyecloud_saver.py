@@ -112,7 +112,7 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None
+                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
                         pass_by_pass_custom_observables=None):
         print('Start pyecloud_saver observation')
 
@@ -251,7 +251,7 @@ class pyecloud_saver:
 
         if beamtim.flag_new_bunch_pass:
 
-            self._pass_by_pass_data_save(MP_e, impact_man, beamtim)
+            self._pass_by_pass_data_save(MP_e, impact_man, beamtim, buildup_sim)
 
             # I want all elements that go to the output file to be members of this object
             self.xg_hist = impact_man.xg_hist
@@ -322,7 +322,7 @@ class pyecloud_saver:
                 self.pbp_custom_data[kk] = []
 
 
-    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim):
+    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim, buildup_sim):
         #update histograms
         self.nel_hist_line = 0.0 * self.nel_hist_line
         if MP_e.N_mp > 0:
@@ -367,10 +367,10 @@ class pyecloud_saver:
         if self.flag_hist_det:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
-        if seld.pass_by_pass_custom_observables is not None:
+        if self.pass_by_pass_custom_observables is not None:
             for kk in self.pass_by_pass_custom_observables.keys():
                self.pbp_custom_data[kk].append(
-                       self.pass_by_pass_custom_observables[kk](sim))
+                       self.pass_by_pass_custom_observables[kk](buildup_sim))
 
     def build_outp_dict(self):
         saved_dict = {
