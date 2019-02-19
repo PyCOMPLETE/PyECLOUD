@@ -73,16 +73,17 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
             Nabove_th = np.sum(flag_above_th)
 
     elif switch_no_increase_energy == 2:
-            en_eV = random.lognormal(mufit, sigmafit, Ngen)
+        #En_impact_eV[En_impact_eV < 1.] = 0.
+        en_eV = random.lognormal(mufit, sigmafit, Ngen)
+        flag_above_th = ((en_eV > En_impact_eV) & (En_impact_eV != 0))
+        Nabove_th = np.sum(flag_above_th)
+
+        while Nabove_th > 0:
+            en_eV[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
+
             flag_above_th = ((en_eV > En_impact_eV) & (En_impact_eV != 0))
             Nabove_th = np.sum(flag_above_th)
-
-            while Nabove_th > 0:
-                en_eV[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
-
-                flag_above_th = (en_eV > En_impact_eV)
-                Nabove_th = np.sum(flag_above_th)
-            en_eV[En_impact_eV == 0] = 0
+        en_eV[En_impact_eV == 0] = 0.
 
     elif switch_no_increase_energy == 1:
 
