@@ -423,7 +423,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
-                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables)
+                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables, 
+                                       save_once_custom_observables=cc.save_once_custom_observables)
 
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 

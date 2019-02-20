@@ -23,12 +23,16 @@ pass_by_pass_custom_observables = {
         'sum_rho': lambda sim: np.sum(sim.cloud_list[0].rho, axis=1)
         }
 
+save_once_custom_observables = {
+        'Vx': lambda sim: sim.cloud_list[0].impact_man.chamb.Vx
+        }
 
 sim = BuildupSimulation(pyecl_input_folder=sim_input_folder, 
         filen_main_outp='./Pyecltest.mat',
         extract_sey=False, 
         step_by_step_custom_observables = step_by_step_custom_observables,
-        pass_by_pass_custom_observables = pass_by_pass_custom_observables)
+        pass_by_pass_custom_observables = pass_by_pass_custom_observables, 
+        save_once_custom_observables = save_once_custom_observables)
 
 ec = sim.cloud_list[0]
 

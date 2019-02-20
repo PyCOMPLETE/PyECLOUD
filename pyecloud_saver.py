@@ -113,13 +113,15 @@ class pyecloud_saver:
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
-                        pass_by_pass_custom_observables=None):
+                        pass_by_pass_custom_observables=None,
+                        save_once_custom_observables=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
+        self.save_once_custom_observables = save_once_custom_observables
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
@@ -259,7 +261,7 @@ class pyecloud_saver:
             self.b_spac = beamtim.b_spac
             self.area = impact_man.chamb.area
 
-            sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
+            sio.savemat(self.filen_main_outp, self.build_outp_dict(buildup_sim), oned_as='row')
 
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
@@ -372,7 +374,7 @@ class pyecloud_saver:
                self.pbp_custom_data[kk].append(
                        self.pass_by_pass_custom_observables[kk](buildup_sim))
 
-    def build_outp_dict(self):
+    def build_outp_dict(self, buildup_sim):
         saved_dict = {
             't_hist': self.t_hist,
                     'nel_hist': self.nel_hist,
@@ -415,6 +417,11 @@ class pyecloud_saver:
 
         #custom step-by-step
         saved_dict.update(self.pbp_custom_data)
+
+        # custom once
+        if self.save_once_custom_observables is not None:
+            for kk in self.save_once_custom_observables.keys():
+                saved_dict[kk] = self.save_once_custom_observables[kk](buildup_sim)
 
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
