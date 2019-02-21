@@ -2,6 +2,8 @@ from PyECLOUD.buildup_simulation import BuildupSimulation
 
 import numpy as np
 
+seed_only_patch = True#False
+
 def sey_at_emax_patch(sim):
     ec = ec = sim.cloud_list[0]
     flag_patch = ec.impact_man.sey_mod.flag_charging
@@ -35,10 +37,19 @@ save_once_custom_observables = {
         'EQ_segments': lambda sim: sim.cloud_list[0].impact_man.sey_mod.EQ_segments
         }
 
+additional_kwargs = {}
+
+if seed_only_patch:
+    additional_kwargs.update({
+        'x_min_init_unif':6.5e-3, 
+        'x_max_init_unif': 9.5e-3
+        })
+
 sim = BuildupSimulation(
         step_by_step_custom_observables=step_by_step_custom_observables,
         pass_by_pass_custom_observables=pass_by_pass_custom_observables,
-        save_once_custom_observables=save_once_custom_observables)
+        save_once_custom_observables=save_once_custom_observables,
+       **additional_kwargs)
 
 sim.run(t_end_sim = None) 
 
