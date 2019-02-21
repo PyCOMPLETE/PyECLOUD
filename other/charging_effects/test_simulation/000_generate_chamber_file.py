@@ -26,7 +26,9 @@ Vy_unif[Vy_unif<-y_rect]=-y_rect;
 x_sem_ellip_insc = 0.98*np.min([x_ellip , x_rect]);
 y_sem_ellip_insc = 0.98*np.min([y_ellip , y_rect]);
 
-mask_patch = np.logical_and(Vx_unif>=5.e-3, Vx_unif <= 1e-2)
+Vx_rep = np.concatenate((Vx_unif, [Vx_unif[0]]))
+Vx_mid = 0.5*(Vx_rep[:-1]+Vx_rep[1:])
+mask_patch = np.logical_and(Vx_mid>=5.e-3, Vx_mid <= 1e-2)
 #mask_patch = np.logical_and(Vy_unif>0, mask_patch)
 
 # Regular chamber surface
