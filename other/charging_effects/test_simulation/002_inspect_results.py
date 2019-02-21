@@ -41,4 +41,10 @@ splr.plot(hl_right, 'r.-')
 splr.set_xlabel('Bunch passage')
 splr.set_ylabel('Heat load [a.u.]')
 
+# crosscheck current on patch
+mask_patch = ob.flag_charging>1
+
+nel_impact_on_patch = np.sum(ob.nel_hist_impact_seg[:, mask_patch], axis=1)
+nel_emit_on_patch = np.sum(ob.nel_hist_emit_seg[:, mask_patch], axis=1)
+
 plt.show()

@@ -16,7 +16,7 @@ step_by_step_custom_observables = {
         'Nelectrons': observe_Nel,
         'y_first_ele': lambda sim: sim.cloud_list[0].MP_e.y_mp[0],
         'relative_charge_first_ele': lambda sim: sim.cloud_list[0].MP_e.nel_mp[0]/sim.cloud_list[0].MP_e.nel_mp_ref,
-        'ref_size': lambda sim: ec.MP_e.nel_mp_ref
+        'ref_size': lambda sim: sim.cloud_list[0].MP_e.nel_mp_ref
         }
 
 pass_by_pass_custom_observables = {
