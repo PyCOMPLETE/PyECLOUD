@@ -29,6 +29,7 @@ pass_by_pass_custom_observables = {
 save_once_custom_observables = {
         'Vx': lambda sim: sim.cloud_list[0].impact_man.chamb.Vx,
         'Vy': lambda sim: sim.cloud_list[0].impact_man.chamb.Vy,
+        'L_edg': lambda sim: sim.cloud_list[0].impact_man.chamb.L_edg,
         'flag_charging': lambda sim: sim.cloud_list[0].impact_man.sey_mod.flag_charging,
         'Q_max_segments': lambda sim: sim.cloud_list[0].impact_man.sey_mod.Q_max_segments,
         'EQ_segments': lambda sim: sim.cloud_list[0].impact_man.sey_mod.EQ_segments
