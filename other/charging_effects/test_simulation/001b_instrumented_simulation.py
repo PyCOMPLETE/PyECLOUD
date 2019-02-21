@@ -26,10 +26,17 @@ step_by_step_custom_observables = {
 pass_by_pass_custom_observables = {
         'Q_segments' : lambda sim: sim.cloud_list[0].impact_man.sey_mod.Q_segments.copy()
         }
+save_once_custom_observables = {
+        'Vx': lambda sim: sim.cloud_list[0].impact_man.chamb.Vx,
+        'Vy': lambda sim: sim.cloud_list[0].impact_man.chamb.Vy,
+        'flag_charging': lambda sim: sim.cloud_list[0].impact_man.sey_mod.flag_charging,
+        'Q_max_segments': lambda sim: sim.cloud_list[0].impact_man.sey_mod.Q_max_segments,
+        }
 
 sim = BuildupSimulation(
         step_by_step_custom_observables=step_by_step_custom_observables,
-        pass_by_pass_custom_observables=pass_by_pass_custom_observables)
+        pass_by_pass_custom_observables=pass_by_pass_custom_observables,
+        save_once_custom_observables=save_once_custom_observables)
 
 sim.run(t_end_sim = None) 
 

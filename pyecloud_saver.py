@@ -289,11 +289,13 @@ class pyecloud_saver:
         self.N_mp_ref_pass = []
 
         if impact_man.flag_seg:
-                self.nel_hist_impact_seg = []
-                self.energ_eV_impact_seg = []
+           self.nel_hist_impact_seg = []
+           self.nel_hist_emit_seg = []
+           self.energ_eV_impact_seg = []
         else:
-                self.nel_hist_impact_seg = -1
-                self.energ_eV_impact_seg = -1
+           self.nel_hist_impact_seg = -1
+           self.nel_emit_impact_seg = -1
+           self.energ_eV_impact_seg = -1
 
         # detailed hist
         self.flag_hist_det = False
@@ -363,6 +365,10 @@ class pyecloud_saver:
             impact_man.reset_hist_impact_seg()
 
         if impact_man.flag_seg:
+            self.nel_hist_emit_seg.append(impact_man.nel_hist_emit_seg.copy())
+            impact_man.reset_hist_emit_seg()
+
+        if impact_man.flag_seg:
             self.energ_eV_impact_seg.append(impact_man.energ_eV_impact_seg.copy())
             impact_man.reset_energ_impact_seg()
 
@@ -393,6 +399,7 @@ class pyecloud_saver:
                     'N_mp_pass': self.N_mp_pass,
                     'N_mp_ref_pass': self.N_mp_ref_pass,
                     'nel_hist_impact_seg': self.nel_hist_impact_seg,
+                    'nel_hist_emit_seg': self.nel_hist_emit_seg,
                     'energ_eV_impact_seg': self.energ_eV_impact_seg,
                     't_sec_beams': self.t_sec_beams,
                     'sec_beam_profiles': self.sec_beam_profiles,
@@ -535,6 +542,7 @@ class pyecloud_saver:
                                     'nel_hist',
                                     'nel_hist_det',
                                     'nel_hist_impact_seg',
+                                    'nel_hist_emit_seg',
                                     'nel_impact_hist_scrub',
                                     'nel_impact_hist_tot',
                                     'cos_angle_hist',
