@@ -2,7 +2,8 @@ import PyECLOUD.myfilemanager as mfm
 import numpy as np
 from scipy.constants import e as qe
 
-ob = mfm.myloadmat_to_obj('Pyecltest.mat')
+fname = 'Pyecltest.mat'
+ob = mfm.myloadmat_to_obj(fname)
 
 import matplotlib.pyplot as plt
 plt.close('all')
@@ -42,6 +43,9 @@ splr.plot(hl_left, 'b.-')
 splr.plot(hl_right, 'r.-')
 splr.set_xlabel('Bunch passage')
 splr.set_ylabel('Heat load [a.u.]')
+
+fig1.suptitle(fname)
+fig2.suptitle(fname)
 
 # crosscheck current on patch
 mask_patch = ob.flag_charging>0

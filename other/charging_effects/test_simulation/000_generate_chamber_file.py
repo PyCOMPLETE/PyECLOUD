@@ -27,7 +27,7 @@ x_sem_ellip_insc = 0.98*np.min([x_ellip , x_rect]);
 y_sem_ellip_insc = 0.98*np.min([y_ellip , y_rect]);
 
 mask_patch = np.logical_and(Vx_unif>=5.e-3, Vx_unif <= 1e-2)
-mask_patch = np.logical_and(Vy_unif>0, mask_patch)
+#mask_patch = np.logical_and(Vy_unif>0, mask_patch)
 
 # Regular chamber surface
 del_max_segments = Vx_unif*0. +1.35
@@ -42,7 +42,7 @@ EQ_segments = Vx_unif*0.
 del_max_segments[mask_patch] = 1.9 
 flag_charging[mask_patch] = 1. 
 Q_max_segments[mask_patch] = 1e-12*1e6 # 1e-12 C/mm^2 
-EQ_segments[mask_patch] = 100. 
+EQ_segments[mask_patch] = 20. 
 
 
 sio.savemat('chamber.mat',{\
