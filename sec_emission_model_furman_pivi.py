@@ -477,7 +477,7 @@ class SEY_model_furman_pivi():
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
         n_emit_MPs[flag_backscattered] = 1.
-        n_emit_MPs[flag_truesec] = 1.
+        n_emit_MPs[flag_rediffused] = 1.
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
 

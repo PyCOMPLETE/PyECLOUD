@@ -110,9 +110,10 @@ def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge
         extended_nel_emit_tot_events = event_info['extended_nel_emit_tot_events']
         E_all_MPs_eV = E_all_MPs_eV * extended_nel_emit_tot_events
 
+        extended_event_type = event_info['extended_event_type']
         for etype in sey_mod.event_types.keys():
             etype_name = sey_mod.event_types[etype]
-            dists[etype_name].append(E_all_MPs_eV[event_type == etype])
+            dists[etype_name].append(E_all_MPs_eV[extended_event_type == etype])
 
     print('Done extracting energy distributions.')
 
@@ -136,8 +137,6 @@ sp1 = fig1.add_subplot(2, 2, 1)
 sp2 = fig1.add_subplot(2, 2, 2)
 sp3 = fig1.add_subplot(2, 2, 3)
 sp4 = fig1.add_subplot(2, 2, 4)
-# sp5 = fig1.add_subplot(2, 3, 5)
-# sp6 = fig1.add_subplot(2, 3, 6)
 
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
@@ -146,9 +145,6 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    # sp5.hist(dists['true'][i_ct] + dists['elast'][i_ct] + dists['rediff'][i_ct], color=thiscol, label=label)
-    # sp6.hist(dists['true'][i_ct] + dists['elast'][i_ct], color=thiscol, label=label)
-
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
@@ -158,8 +154,6 @@ sp1.set_ylabel('True secondaries', fontsize=sz)
 sp2.set_ylabel('Elastic', fontsize=sz)
 sp3.set_ylabel('Rediffused', fontsize=sz)
 sp4.set_ylabel('Absorbed', fontsize=sz)
-# sp5.set_ylabel('total')
-# sp6.set_ylabel('true + elast')
 
 # Compare with model
 test_obj = fp.SEY_model_furman_pivi(furman_pivi_surface=furman_pivi_surface_LHC)
@@ -188,7 +182,6 @@ plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize
 plt.figure(2)
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
     prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy)
-    # import pdb; pdb.set_trace()
     plt.plot(energy, prob_density_ts[0], label='n: %i'%M, linewidth=linewid)
 plt.legend()
 plt.title('Energy distribution PDFs for secondary electron energies')

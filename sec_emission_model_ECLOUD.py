@@ -206,12 +206,19 @@ class SEY_model_ECLOUD(object):
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
+        events = flag_truesec
         event_type = flag_truesec
         if n_add_total != 0:
             events_add = np.repeat(event_type, n_add)
-            event_type = np.concatenate([event_type, events_add])
+            events = np.concatenate([event_type, events_add])
+        extended_event_type = events
 
-        event_info = {}
+        # extended_nel_emit_tot_events used for extraction of energy distributions
+        extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
+
+        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
+                      'extended_event_type': extended_event_type,
+                      }
 
         nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
