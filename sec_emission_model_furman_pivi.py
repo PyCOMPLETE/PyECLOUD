@@ -94,7 +94,7 @@ class SEY_model_furman_pivi():
         else:
             self.angle_dist_func = None
 
-        self.M = furman_pivi_surface['M']
+        self.M_cut = furman_pivi_surface['M']
         self.p_n = furman_pivi_surface['p_n']
         self.eps_n = furman_pivi_surface['eps_n']
         # Parameters for backscattered (elastically scattered) electrons
@@ -126,7 +126,7 @@ class SEY_model_furman_pivi():
 
         print('Secondary emission model: Furman-Pivi s=%.4f' % (self.s))
 
-    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
+    def SEY_process(self, E_impact_eV, costheta_impact, i_impact):
         # Furman-Pivi algorithm
         # (1): Compute emission angles and energy
 
@@ -163,9 +163,9 @@ class SEY_model_furman_pivi():
         # (6): Generate energy:
         # In impacts_on_surface
 
-        nel_emit = nel_impact # * delta
+        # nel_emit = nel_impact # * delta
 
-        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
+        return flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
     def _yield_fun_furman_pivi(self, E, costheta):
         delta_e = self._delta_e(E, costheta)
@@ -250,13 +250,13 @@ class SEY_model_furman_pivi():
         p_n = self.p_n
         eps_n = self.eps_n
 
-        nn_all = np.arange(0, self.M + 1, 1)
+        nn_all = np.arange(0, self.M_cut + 1, 1)
 
         if choice == 'poisson':
             P_n_ts = np.squeeze(delta_ts / factorial(nn_all) * np.exp(-delta_ts))
         elif choice == 'binomial':
-            p = delta_ts / self.M
-            P_n_ts = np.squeeze(binom(self.M, nn) * (p)**nn_all * (1 - p)**(self.M - nn_all))
+            p = delta_ts / self.M_cut
+            P_n_ts = np.squeeze(binom(self.M_cut, nn) * (p)**nn_all * (1 - p)**(self.M_cut - nn_all))
         else:
             raise ValueError('choice must be either \'poisson\' or \'binomial\'')
 
@@ -322,7 +322,7 @@ class SEY_model_furman_pivi():
         return eps_vec * gammaincinv(p_n_vec, xx)
 
     def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        nns = np.arange(1, self.M + 1, 1)
+        nns = np.arange(1, self.M_cut + 1, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
@@ -353,10 +353,10 @@ class SEY_model_furman_pivi():
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                            v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
-        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec, \
-            delta_e, delta_r, delta_ts = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
+        flag_backscattered, flag_rediffused, flag_truesec, \
+            delta_e, delta_r, delta_ts = self.SEY_process(E_impact_eV, costheta_impact, i_found)
 
-        nel_replace = nel_emit_tot_events.copy()
+        nel_replace = nel_impact.copy()
         x_replace = x_impact.copy()
         y_replace = y_impact.copy()
         z_replace = z_impact.copy()
@@ -382,26 +382,26 @@ class SEY_model_furman_pivi():
 
         # True secondary
         N_true_sec = np.sum(flag_truesec)
-        n_emit_total = 0
+        n_emit_truesec_MPs_total = 0
         if N_true_sec > 0:
             delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec] - delta_r[flag_truesec])  # delta_ts^prime in FP paper, eq. (39)
-            n_emit = np.zeros_like(flag_truesec, dtype=int)
-            n_emit[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
-            n_emit_flag_true_sec = n_emit[flag_truesec]
+            n_emit_truesec_MPs = np.zeros_like(flag_truesec, dtype=int)
+            n_emit_truesec_MPs[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
+            n_emit_truesec_MPs_flag_true_sec = n_emit_truesec_MPs[flag_truesec]
             # Cut above M
-            flag_above_th = (n_emit[flag_truesec] > self.M)
+            flag_above_th = (n_emit_truesec_MPs[flag_truesec] > self.M_cut)
             Nabove_th = np.sum(flag_above_th)
             while Nabove_th > 0:
-                n_emit_flag_true_sec[flag_above_th] = random.poisson(delta_ts_prime[flag_above_th])
-                flag_above_th = (n_emit_flag_true_sec > self.M)
+                n_emit_truesec_MPs_flag_true_sec[flag_above_th] = random.poisson(delta_ts_prime[flag_above_th])
+                flag_above_th = (n_emit_truesec_MPs_flag_true_sec > self.M_cut)
                 Nabove_th = np.sum(flag_above_th)
-            n_emit[flag_truesec] = n_emit_flag_true_sec
+            n_emit_truesec_MPs[flag_truesec] = n_emit_truesec_MPs_flag_true_sec
 
             # MPs to be replaced
-            flag_above_zero = (n_emit_flag_true_sec > 0)  # I exclude the absorbed
-            flag_truesec_and_above_zero = flag_truesec & (n_emit > 0)
+            flag_above_zero = (n_emit_truesec_MPs_flag_true_sec > 0)  # I exclude the absorbed
+            flag_truesec_and_above_zero = flag_truesec & (n_emit_truesec_MPs > 0)
             En_truesec_eV = self.get_energy_true_sec(
-                nn=n_emit_flag_true_sec[flag_above_zero],
+                nn=n_emit_truesec_MPs_flag_true_sec[flag_above_zero],
                 E_0=E_impact_eV[flag_truesec_and_above_zero])  # First generated MPs
 
             N_true_sec = np.sum(flag_above_zero)
@@ -409,7 +409,7 @@ class SEY_model_furman_pivi():
                 N_true_sec, En_truesec_eV, Norm_x[flag_truesec_and_above_zero], Norm_y[flag_truesec_and_above_zero], mass)
 
             # Handle absorbed MPs
-            flag_truesec_and_zero = flag_truesec & (n_emit == 0)
+            flag_truesec_and_zero = flag_truesec & (n_emit_truesec_MPs == 0)
             nel_replace[flag_truesec_and_zero] = 0.0
             vx_replace[flag_truesec_and_zero] = 0.0
             vy_replace[flag_truesec_and_zero] = 0.0
@@ -419,10 +419,10 @@ class SEY_model_furman_pivi():
             z_replace[flag_truesec_and_zero] = 0.0
 
             # Add new MPs
-            n_add = n_emit - 1
+            n_add = n_emit_truesec_MPs - 1
             n_add[n_add < 0] = 0
-            n_emit_total = np.sum(n_add)
-            if n_emit_total != 0:
+            n_emit_truesec_MPs_total = np.sum(n_add)
+            if n_emit_truesec_MPs_total != 0:
                 # Clone MPs
                 x_new_MPs = np.repeat(x_impact, n_add)
                 y_new_MPs = np.repeat(y_impact, n_add)
@@ -433,20 +433,20 @@ class SEY_model_furman_pivi():
                 E_impact_eV_add = np.repeat(E_impact_eV, n_add)
 
                 # Generate new MP properties, angles and energies
-                n_emit_extended = np.repeat(n_emit_flag_true_sec, n_add[flag_truesec])
+                n_emit_truesec_MPs_extended = np.repeat(n_emit_truesec_MPs_flag_true_sec, n_add[flag_truesec])
                 # delta_ts_extended = np.repeat(delta_ts, n_add[flag_truesec])
 
-                En_truesec_eV_add = self.get_energy_true_sec(nn=n_emit_extended, E_0=E_impact_eV_add)
+                En_truesec_eV_add = self.get_energy_true_sec(nn=n_emit_truesec_MPs_extended, E_0=E_impact_eV_add)
 
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
-                    n_emit_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
+                    n_emit_truesec_MPs_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
                 if flag_seg:
-                    i_seg_new_MPs = np.repeat(i_found, n_emit)
+                    i_seg_new_MPs = np.repeat(i_found, n_emit_truesec_MPs)
                 else:
                     i_seg_new_MPs = None
 
-        if n_emit_total == 0:
+        if n_emit_truesec_MPs_total == 0:
             nel_new_MPs = np.array([])
             x_new_MPs = np.array([])
             y_new_MPs = np.array([])
@@ -456,20 +456,30 @@ class SEY_model_furman_pivi():
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-        # Add new MPs to nel_emit_tot_events
-        nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
+        # extended_nel_emit_tot_events used for extraction of energy distributions
+        extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
         events = flag_truesec.astype(int)
         if N_true_sec > 0:
-            events[n_emit == 0] = 3  # Absorbed MPs
+            events[n_emit_truesec_MPs == 0] = 3  # Absorbed MPs
 
         events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
-        if n_emit_total != 0:
+        event_type = events
+        if n_emit_truesec_MPs_total != 0:
             events_add = np.repeat(events, n_add)
             events = np.concatenate([events, events_add])
-        event_type = events
+        extended_event_type = events
 
-        event_info = {}
+        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
+                      'extended_event_type': extended_event_type,
+                      }
+
+        # Elastic and rediffused events emit 1 MP
+        n_emit_MPs = n_emit_truesec_MPs
+        n_emit_MPs[flag_backscattered] = 1.
+        n_emit_MPs[flag_truesec] = 1.
+
+        nel_emit_tot_events = nel_impact * n_emit_MPs
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
