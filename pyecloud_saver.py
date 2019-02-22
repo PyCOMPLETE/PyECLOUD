@@ -294,7 +294,7 @@ class pyecloud_saver:
            self.energ_eV_impact_seg = []
         else:
            self.nel_hist_impact_seg = -1
-           self.nel_emit_impact_seg = -1
+           self.nel_hist_emit_seg = -1
            self.energ_eV_impact_seg = -1
 
         # detailed hist
