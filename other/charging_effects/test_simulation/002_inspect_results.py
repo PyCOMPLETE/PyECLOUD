@@ -5,6 +5,8 @@ from scipy.constants import e as qe
 fname = 'Pyecltest.mat'
 ob = mfm.myloadmat_to_obj(fname)
 
+compare_against_charge_in_chamber = False
+
 import matplotlib.pyplot as plt
 plt.close('all')
 
@@ -58,17 +60,19 @@ patch_area = np.sum(ob.L_edg[mask_patch])
 accumulated_charge_m2 = -qe*np.cumsum(nel_impact_on_patch - nel_emit_on_patch)/patch_area
 sp2.plot(accumulated_charge_m2)
 
-set_patch_Vx = set(list(ob.Vx[1:][mask_patch]) + list(ob.Vx[:-1][mask_patch]))
 
-min_x_patch = np.min(list(set_patch_Vx))
-max_x_patch = np.max(list(set_patch_Vx))
-
-mask_xg_patch = np.logical_and(ob.xg_hist>min_x_patch, ob.xg_hist<max_x_patch)
-
-Q_chamb_patch = np.sum(ob.nel_hist[:, mask_xg_patch], axis=1)*qe/patch_area
-
-sp2.plot(Q_chamb_patch-Q_chamb_patch[0])
-
-sp1.plot(ob.t/ob.b_spac, ob.Qpatch_ave*patch_area/qe)
+if compare_against_charge_in_chamber:
+    set_patch_Vx = set(list(ob.Vx[1:][mask_patch]) + list(ob.Vx[:-1][mask_patch]))
+    
+    min_x_patch = np.min(list(set_patch_Vx))
+    max_x_patch = np.max(list(set_patch_Vx))
+    
+    mask_xg_patch = np.logical_and(ob.xg_hist>min_x_patch, ob.xg_hist<max_x_patch)
+    
+    Q_chamb_patch = np.sum(ob.nel_hist[:, mask_xg_patch], axis=1)*qe/patch_area
+    
+    sp2.plot(Q_chamb_patch-Q_chamb_patch[0])
+    
+    sp1.plot(ob.t/ob.b_spac, ob.Qpatch_ave*patch_area/qe)
 
 plt.show()
