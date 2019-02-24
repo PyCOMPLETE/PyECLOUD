@@ -205,6 +205,9 @@ class BuildupSimulation(object):
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 
+            ## Evolve SEY module (e.g. charge decay for insulators
+            impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
+
             ## Gas ionization (main and secondary beams)
             if(beamtim.tt_curr < t_ion and gas_ion_flag == 1):
                 MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt_curr, beamtim.sigmax, beamtim.sigmay,
