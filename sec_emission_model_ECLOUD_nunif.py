@@ -142,6 +142,7 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
         self.flag_charging =  np.int_(chamb.flag_charging)>0
         self.Q_max_segments = np.float_(chamb.Q_max_segments)
         self.EQ_segments = np.float_(chamb.EQ_segments)
+        self.tau_segments = np.float_(chamb.tau_segments)
 
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
@@ -182,8 +183,9 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
 
         return nel_emit, flag_elast, flag_truesec
 
-         
-
+    def SEY_model_evol(self, Dt): 
+        mask_evol = np.logical_and(self.flag_charging, self.tau_segments>0.)
+        self.Q_segments[mask_evol]*=np.exp(-Dt/self.tau_segments[mask_evol])
 
 
 

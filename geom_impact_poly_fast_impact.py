@@ -92,6 +92,7 @@ class polyg_cham_geom_object(object):
                 self.flag_charging = np.squeeze(dict_chm['flag_charging'])
                 self.Q_max_segments = np.squeeze(dict_chm['Q_max_segments'])
                 self.EQ_segments = np.squeeze(dict_chm['EQ_segments'])
+                self.tau_segments = np.squeeze(dict_chm['tau_segments'])
 
 
         if np.any(np.sqrt(np.diff(Vx)**2 + np.diff(Vy)**2) < 1e-9):
