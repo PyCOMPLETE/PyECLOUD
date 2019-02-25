@@ -447,13 +447,15 @@ class SEY_model_furman_pivi():
 
     def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
         """The PDF for true secondary electrons."""
+        if nn == 0:
+            raise ValueError('nn = 0, you cannot emit zero electrons.')
         p_n = self.p_n
         eps_n = self.eps_n
 
         nn_all = np.arange(0, self.M_cut + 1, 1)
 
         if choice == 'poisson':
-            P_n_ts = np.squeeze(delta_ts / factorial(nn_all) * np.exp(-delta_ts))
+            P_n_ts = np.squeeze(delta_ts**nn_all / factorial(nn_all) * np.exp(-delta_ts))
         elif choice == 'binomial':
             p = delta_ts / self.M_cut
             P_n_ts = np.squeeze(binom(self.M_cut, nn) * (p)**nn_all * (1 - p)**(self.M_cut - nn_all))
