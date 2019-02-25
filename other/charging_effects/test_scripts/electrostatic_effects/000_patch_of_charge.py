@@ -17,9 +17,13 @@ y_aper = 0.5e-2
 Dh = .020e-3
 
 y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
-
-x_patch_center = 0.6e-2 #x_aper/2.
+x_patch_center = 0.6e-2
 Dx_patch = 3e-3
+
+y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
+x_patch_center = 0.2e-2 
+Dx_patch = 10e-3
+
 Dy_patch = Dh/2.
 
 Sigma_C_m2 = 1e-5
@@ -122,7 +126,7 @@ axll.set_ylabel('Max. potential [V]')
 axll.legend(loc='upper left', prop={'size':16})
 
 for ff in [f1, fig3, fig10, f100]:
-    ff.suptitle('Charge density: %.1e C/mm^2\nThickness:%.1e m'%(Sigma_C_m2*1e-6, y_patch_distance))
+    ff.suptitle('Charge density: %.1e C/mm^2\nThickness: %.1e m'%(Sigma_C_m2*1e-6, y_patch_distance))
     ff.subplots_adjust(bottom=.16, top=1.-.16)
 
 plt.show()
