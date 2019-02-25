@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sec_emission_model_ECLOUD as ECL
-import sec_emission_model_furman_pivi as fp
 import mystyle as ms
-from scipy.constants import e as qe
 from impact_management_class import impact_management
 from geom_impact_ellip import ellip_cham_geom_object
 
@@ -14,7 +12,7 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'M': 2,
+furman_pivi_surface_LHC = {'M_cut': 2,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -39,7 +37,7 @@ furman_pivi_surface_LHC = {'M': 2,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'M': 10,
+furman_pivi_surface = {'M_cut': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                        'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                        'p1EInf': 0.02,
@@ -65,9 +63,6 @@ furman_pivi_surface = {'M': 10,
                        't4': 1.,
                        }
 
-sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
-                                   switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_LHC)
 sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
 
@@ -135,7 +130,7 @@ E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
 alpha = 0.9
 
-dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
+dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me)
 
 plt.close('all')
 ms.mystyle_arial()

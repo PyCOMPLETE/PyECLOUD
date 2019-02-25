@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sec_emission_model_ECLOUD as ECL
 import sec_emission_model_furman_pivi as fp
 import mystyle as ms
-from scipy.constants import e as qe
 from impact_management_class import impact_management
 from geom_impact_ellip import ellip_cham_geom_object
 
@@ -68,9 +66,6 @@ furman_pivi_surface = {'M_cut': 10,
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
                                    furman_pivi_surface=furman_pivi_surface_LHC)
-# sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
-#                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
-
 
 # def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 #     dists = {}

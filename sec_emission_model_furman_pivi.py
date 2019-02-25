@@ -270,7 +270,6 @@ class SEY_model_furman_pivi():
         CDF = cumtrapz(pdf, energy, initial=0)
         return CDF
 
-    # numpy.interp(x, xp, fp, left=None, right=None, period=None)
     def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
         uu = random.rand(len(delta_ts))
         out_array = np.empty(1)
@@ -417,6 +416,7 @@ class SEY_model_furman_pivi():
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
+
     ############################################################################
     #  The following functions are not used in the simulation code but are
     #  provided here for use in tests and development.
