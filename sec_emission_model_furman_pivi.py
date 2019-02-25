@@ -127,6 +127,12 @@ class SEY_model_furman_pivi():
         print('Secondary emission model: Furman-Pivi s=%.4f' % (self.s))
 
     def SEY_process(self, E_impact_eV, costheta_impact, i_impact):
+        """
+        Decides event type for each MP colliding with energy E_impact_eV and
+        angle costheta_impact.
+        Returns the SEY components as well as flags defining the event type of
+        each MP.
+        """
         # Furman-Pivi algorithm
         # (1): Compute emission angles and energy
 
@@ -254,33 +260,6 @@ class SEY_model_furman_pivi():
         xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
 
         return eps_vec * gammaincinv(p_n_vec, xx)
-
-    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        nns = np.arange(1, self.M_cut + 1, 1)
-        average_f_n_ts = np.zeros_like(energy)
-        for ii in nns:
-            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
-            average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts
-        area = scipy.integrate.simps(average_f_n_ts, energy)
-        normalization_constant = 1. / area
-        return normalization_constant * average_f_n_ts
-
-    def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
-        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
-        CDF = cumtrapz(pdf, energy, initial=0)
-        return CDF
-
-    def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
-        uu = random.rand(len(delta_ts))
-        out_array = np.empty(1)
-        if type(delta_ts) is int:
-            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
-            return np.interp(uu, CDF, energy)
-        else:
-            for ii, kk in enumerate(delta_ts):
-                CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_0[ii], choice=choice, energy=energy)
-                out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
-        return np.interp(uu, CDF, energy)
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
@@ -487,6 +466,33 @@ class SEY_model_furman_pivi():
             f_n_ts = f_n_ts / area  # Normalization
 
         return f_n_ts, P_n_ts_return
+
+    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+        nns = np.arange(1, self.M_cut + 1, 1)
+        average_f_n_ts = np.zeros_like(energy)
+        for ii in nns:
+            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
+            average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts
+        area = scipy.integrate.simps(average_f_n_ts, energy)
+        normalization_constant = 1. / area
+        return normalization_constant * average_f_n_ts
+
+    def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
+        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
+        CDF = cumtrapz(pdf, energy, initial=0)
+        return CDF
+
+    def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
+        uu = random.rand(len(delta_ts))
+        out_array = np.empty(1)
+        if type(delta_ts) is int:
+            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
+            return np.interp(uu, CDF, energy)
+        else:
+            for ii, kk in enumerate(delta_ts):
+                CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_0[ii], choice=choice, energy=energy)
+                out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
+        return np.interp(uu, CDF, energy)
     ############################################################################
     ############################################################################
 
