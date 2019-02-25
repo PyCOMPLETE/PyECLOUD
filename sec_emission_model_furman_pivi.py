@@ -129,9 +129,9 @@ class SEY_model_furman_pivi():
     def SEY_process(self, E_impact_eV, costheta_impact, i_impact):
         """
         Decides event type for each MP colliding with energy E_impact_eV and
-        angle costheta_impact.
+        incident angle costheta_impact.
         Returns the SEY components as well as flags defining the event type of
-        each MP.
+        each MP. Does not rescale the MPs (that is done in impacts_on_surface).
         """
         # Furman-Pivi algorithm
         # (1): Compute emission angles and energy
@@ -218,8 +218,30 @@ class SEY_model_furman_pivi():
         s = self.s
         return s * x / (s - 1 + x**s)
 
-    #  Functions used in the simulation code
-    def true_sec_energy_CDF(self, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+    def get_energy_backscattered(self, E_0):
+        """
+        Inverse transform sampling of (26) in the Furman-Pivi paper.
+        Returns emission energies for backscattered electrons.
+        """
+        sqrt2 = np.sqrt(2)
+        uu = random.rand(len(E_0))
+        return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
+
+    def get_energy_rediffused(self, E0):
+        """
+        Inverse transform sampling of (29) in the Furman-Pivi paper.
+        Returns emission energies for rediffused electrons.
+        """
+        uu = random.rand(len(E0))
+        return uu**(1 / (self.q + 1)) * E0
+
+    def _true_sec_energy_CDF(self, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+        """
+        Gives the value of the CDF corresponding to nn emitted electrons when
+        the surface is impacted on by electrons with E_0 energy.
+        Returns the value of the CDF as well as the area under the PDF before
+        normalisation.
+        """
         p_n = self.p_n
         eps_n = self.eps_n
 
@@ -243,6 +265,7 @@ class SEY_model_furman_pivi():
         return cdf, 1
 
     def get_energy_true_sec(self, nn, E_0, choice='poisson'):
+        """Returns emission energies for true secondary electrons."""
         p_n = self.p_n
         eps_n = self.eps_n
 
@@ -250,7 +273,7 @@ class SEY_model_furman_pivi():
 
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        _, area = self.true_sec_energy_CDF(nn, E_0, energy=E_0, choice=choice)  # Putting energy=E_0 gives area under the PDF
+        _, area = self._true_sec_energy_CDF(nn, E_0, energy=E_0, choice=choice)  # Putting energy=E_0 gives area under the PDF
         # F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
         # F_n_vec = F_n_vec / (area)
         F_n_vec = 1. / area
@@ -401,19 +424,16 @@ class SEY_model_furman_pivi():
     #  provided here for use in tests and development.
     ############################################################################
     def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
+        """The PDF for backscattered electrons."""
         ene = energy - E_0
         a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
         c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))
         return a / c
 
     def backscattered_energy_CDF(self, energy, E_0, sigma_e=2.):
+        """The CDF for backscattered electrons."""
         sqrt2 = np.sqrt(2)
         return 1 - erf((E_0 - energy) / (sqrt2 * sigma_e)) / erf(E_0 / (sqrt2 * sigma_e))
-
-    def get_energy_backscattered(self, E_0):
-        sqrt2 = np.sqrt(2)
-        uu = random.rand(len(E_0))
-        return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))  # Inverse transform sampling of (26) in FP paper
 
     def rediffused_energy_PDF(self, energy, E_0, qq=0.5):
         for ene in E_0:
@@ -425,16 +445,8 @@ class SEY_model_furman_pivi():
     def rediffused_energy_CDF(self, energy, E_0, qq=0.5):
         return energy**(qq + 1) / E_0**(qq + 1)
 
-    def get_energy_rediffused(self, E0):
-        uu = random.rand(len(E0))
-        return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
-
     def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        """
-        A simplified version of the energy distribution for secondary electrons in
-        the Furman-Pivi model. The 'choice' parameter decides wheter to use a poisson
-        or a Poisson distribution for the probabilities P_n_ts.
-        """
+        """The PDF for true secondary electrons."""
         p_n = self.p_n
         eps_n = self.eps_n
 
@@ -463,7 +475,7 @@ class SEY_model_furman_pivi():
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
         if area != 0:
-            f_n_ts = f_n_ts / area  # Normalization
+            f_n_ts = f_n_ts / area  # normalisation
 
         return f_n_ts, P_n_ts_return
 
@@ -474,8 +486,8 @@ class SEY_model_furman_pivi():
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
             average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts
         area = scipy.integrate.simps(average_f_n_ts, energy)
-        normalization_constant = 1. / area
-        return normalization_constant * average_f_n_ts
+        normalisation_constant = 1. / area
+        return normalisation_constant * average_f_n_ts
 
     def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
         pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
