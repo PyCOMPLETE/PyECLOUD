@@ -220,8 +220,6 @@ class SEY_model_ECLOUD(object):
                       'extended_event_type': extended_event_type,
                       }
 
-        nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
-
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
