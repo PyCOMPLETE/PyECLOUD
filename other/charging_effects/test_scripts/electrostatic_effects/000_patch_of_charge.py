@@ -10,7 +10,7 @@ import PyPIC.geom_impact_poly as poly
 import PyECLOUD.mystyle as ms
 
 plt.close('all')
-ms.mystyle_arial(fontsz=14)
+ms.mystyle_arial(fontsz=16)
 
 x_aper = 1.5e-2
 y_aper = 0.5e-2
@@ -22,7 +22,7 @@ x_patch_center = 1e-2 #x_aper/2.
 Dx_patch = 3e-3
 Dy_patch = Dh/2.
 
-Sigma_C_m2 = 1e-6
+Sigma_C_m2 = 1e-5
 
 Q_tot_C_m = Sigma_C_m2*Dx_patch #1.e-12 C/mm^2
 
@@ -57,12 +57,12 @@ for y_patch_distance in y_p_dist_vect:
 f1 = plt.figure(1)
 f1.set_facecolor('w')
 sp0 = plt.subplot(2,1,1)
-plt.pcolormesh(pic.xg, pic.yg, rho_mat.T)
+plt.pcolormesh(pic.xg*1e3, pic.yg*1e3, rho_mat.T)
 plt.axis('equal')
 plt.grid('on')
 plt.colorbar()
 sp01 = plt.subplot(2,1,2, sharex=sp0)
-plt.pcolormesh(pic.xg, pic.yg, pic.phi.T)
+plt.pcolormesh(pic.xg*1e3, pic.yg*1e3, pic.phi.T)
 plt.axis('equal')
 plt.colorbar()
 plt.subplots_adjust(hspace=.3)
@@ -93,9 +93,22 @@ ax1d.plot([-y_aper, y_patch_center, y_aper], [0, phi_i, 0.])
 
 
 fig10 = plt.figure(10)
+fig10.set_facecolor('w')
 axll = fig10.add_subplot(1,1,1)
-axll.loglog(y_p_dist_vect, max_phi_list)
-axll.loglog(y_p_dist_vect, Sigma_C_m2*y_p_dist_vect/epsilon_0)
+axll.loglog(y_p_dist_vect, max_phi_list, '.-',
+        linewidth=2, markersize=10, color='b',
+        label='PIC')
+
+y_dist_theo = np.array([1e-6, 1e-2])
+axll.loglog(y_dist_theo, Sigma_C_m2*y_dist_theo/epsilon_0,
+        linewidth=2, color='g', label='Formula')
+axll.grid(True)
+axll.set_xlabel('d [m]')
+axll.set_ylabel('Max. potential [V]')
+axll.legend(loc='upper left', prop={'size':16})
+
+fig10.suptitle('Charge density: %.1e C/mm^2'%(Sigma_C_m2*1e-6))
+fig10.subplots_adjust(bottom=.16)
 
 plt.show()
 
