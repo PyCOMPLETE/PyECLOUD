@@ -32,7 +32,7 @@ mask_patch = np.logical_and(Vx_mid>=5.e-3, Vx_mid <= 1e-2)
 mask_patch = np.logical_and(Vy_unif>0, mask_patch)
 
 # Regular chamber surface
-del_max_segments = Vx_unif*0. +1.35
+del_max_segments = Vx_unif*0. +1.30
 Emax_segments = Vx_unif*0. + 332.
 R0_segments = Vx_unif*0. + 0.7,
 
@@ -45,9 +45,9 @@ tau_segments = Vx_unif*0.
 # Charging patch
 del_max_segments[mask_patch] = 1.9 
 flag_charging[mask_patch] = 1. 
-Q_max_segments[mask_patch] = 1e-12*1e6 # 1e-12 C/mm^2 
+Q_max_segments[mask_patch] = 100*1e-12*1e6 # 1e-12 C/mm^2 
 EQ_segments[mask_patch] = 20. 
-tau_segments[mask_patch] = 1e-6
+tau_segments[mask_patch] = 100e-6
 
 
 sio.savemat('chamber.mat',{\

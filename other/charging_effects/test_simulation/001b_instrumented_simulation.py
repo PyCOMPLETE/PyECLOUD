@@ -2,7 +2,7 @@ from PyECLOUD.buildup_simulation import BuildupSimulation
 
 import numpy as np
 
-seed_only_patch = True#False
+seed_only_patch = False
 
 def sey_at_emax_patch(sim):
     ec = ec = sim.cloud_list[0]
