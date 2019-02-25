@@ -104,6 +104,7 @@ parameters_dict = {
             't_ion': -1,
 
             'extract_sey': True,
+            'extract_ene_dist': False,
         },
     },
     'machine_parameters': {

@@ -94,7 +94,7 @@ class SEY_model_furman_pivi():
         else:
             self.angle_dist_func = None
 
-        self.M_cut = furman_pivi_surface['M']
+        self.M_cut = furman_pivi_surface['M_cut']
         self.p_n = furman_pivi_surface['p_n']
         self.eps_n = furman_pivi_surface['eps_n']
         # Parameters for backscattered (elastically scattered) electrons
@@ -177,7 +177,7 @@ class SEY_model_furman_pivi():
 
     def _delta_e(self, E_impact_eV, costheta_impact):
         """
-        Backscattered electrons (elastically scattered).
+        SEY component of backscattered electrons (elastically scattered).
         (25) in FP paper.
         """
         exp_factor = -(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p
@@ -188,7 +188,7 @@ class SEY_model_furman_pivi():
 
     def _delta_r(self, E_impact_eV, costheta_impact):
         """
-        Rediffused electrons (not in ECLOUD model).
+        SEY component of rediffused electrons (not in ECLOUD model).
         (28) in FP paper.
         """
         exp_factor = -(E_impact_eV / self.eR)**self.r
@@ -199,7 +199,7 @@ class SEY_model_furman_pivi():
 
     def _delta_ts(self, E_impact_eV, costheta_impact):
         """
-        True secondaries.
+        SEY component of true secondaries.
         (31) in FP paper.
         """
         eHat = self.eHat0 * (1. + self.t3 * (1. - costheta_impact**self.t4))
@@ -212,73 +212,7 @@ class SEY_model_furman_pivi():
         s = self.s
         return s * x / (s - 1 + x**s)
 
-    def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
-        ene = energy - E_0
-        a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
-        c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))
-        return a / c
-
-    def backscattered_energy_CDF(self, energy, E_0, sigma_e=2.):
-        sqrt2 = np.sqrt(2)
-        return 1 - erf((E_0 - energy) / (sqrt2 * sigma_e)) / erf(E_0 / (sqrt2 * sigma_e))
-
-    def get_energy_backscattered(self, E_0):
-        sqrt2 = np.sqrt(2)
-        uu = random.rand(len(E_0))
-        return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))  # Inverse transform sampling of (26) in FP paper
-
-    def rediffused_energy_PDF(self, energy, E_0, qq=0.5):
-        for ene in E_0:
-            if ene < 0:
-                raise ValueError('Impacting energy E_0 cannot be negative')
-        prob_density = (qq + 1) * energy**qq / E_0**(qq + 1)
-        return prob_density
-
-    def rediffused_energy_CDF(self, energy, E_0, qq=0.5):
-        return energy**(qq + 1) / E_0**(qq + 1)
-
-    def get_energy_rediffused(self, E0):
-        uu = random.rand(len(E0))
-        return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
-
-    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
-        """
-        A simplified version of the energy distribution for secondary electrons in
-        the Furman-Pivi model. The 'choice' parameter decides wheter to use a poisson
-        or a Poisson distribution for the probabilities P_n_ts.
-        """
-        p_n = self.p_n
-        eps_n = self.eps_n
-
-        nn_all = np.arange(0, self.M_cut + 1, 1)
-
-        if choice == 'poisson':
-            P_n_ts = np.squeeze(delta_ts / factorial(nn_all) * np.exp(-delta_ts))
-        elif choice == 'binomial':
-            p = delta_ts / self.M_cut
-            P_n_ts = np.squeeze(binom(self.M_cut, nn) * (p)**nn_all * (1 - p)**(self.M_cut - nn_all))
-        else:
-            raise ValueError('choice must be either \'poisson\' or \'binomial\'')
-
-        P_n_ts = P_n_ts / np.sum(P_n_ts)
-        P_n_ts_return = P_n_ts[int(nn)]
-        eps_curr = eps_n[int(nn - 1)]
-        p_n_curr = p_n[int(nn - 1)]
-
-        # P_n_ts = 1.
-
-        if E_0 == 0:
-            F_n = 0
-        else:
-            # F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
-            F_n = 1
-        f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
-        area = scipy.integrate.simps(f_n_ts, energy)
-        if area != 0:
-            f_n_ts = f_n_ts / area  # Normalization
-
-        return f_n_ts, P_n_ts_return
-
+    #  Functions used in the simulation code
     def true_sec_energy_CDF(self, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
         p_n = self.p_n
         eps_n = self.eps_n
@@ -383,9 +317,9 @@ class SEY_model_furman_pivi():
         # True secondary
         N_true_sec = np.sum(flag_truesec)
         n_emit_truesec_MPs_total = 0
+        n_emit_truesec_MPs = np.zeros_like(flag_truesec, dtype=int)
         if N_true_sec > 0:
             delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec] - delta_r[flag_truesec])  # delta_ts^prime in FP paper, eq. (39)
-            n_emit_truesec_MPs = np.zeros_like(flag_truesec, dtype=int)
             n_emit_truesec_MPs[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
             n_emit_truesec_MPs_flag_true_sec = n_emit_truesec_MPs[flag_truesec]
             # Cut above M
@@ -480,10 +414,81 @@ class SEY_model_furman_pivi():
         n_emit_MPs[flag_rediffused] = 1.
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
-
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
+    ############################################################################
+    #  The following functions are not used in the simulation code but are
+    #  provided here for use in tests and development.
+    ############################################################################
+    def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
+        ene = energy - E_0
+        a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
+        c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))
+        return a / c
+
+    def backscattered_energy_CDF(self, energy, E_0, sigma_e=2.):
+        sqrt2 = np.sqrt(2)
+        return 1 - erf((E_0 - energy) / (sqrt2 * sigma_e)) / erf(E_0 / (sqrt2 * sigma_e))
+
+    def get_energy_backscattered(self, E_0):
+        sqrt2 = np.sqrt(2)
+        uu = random.rand(len(E_0))
+        return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))  # Inverse transform sampling of (26) in FP paper
+
+    def rediffused_energy_PDF(self, energy, E_0, qq=0.5):
+        for ene in E_0:
+            if ene < 0:
+                raise ValueError('Impacting energy E_0 cannot be negative')
+        prob_density = (qq + 1) * energy**qq / E_0**(qq + 1)
+        return prob_density
+
+    def rediffused_energy_CDF(self, energy, E_0, qq=0.5):
+        return energy**(qq + 1) / E_0**(qq + 1)
+
+    def get_energy_rediffused(self, E0):
+        uu = random.rand(len(E0))
+        return uu**(1 / (self.q + 1)) * E0  # Inverse transform sampling of (29) in FP paper
+
+    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+        """
+        A simplified version of the energy distribution for secondary electrons in
+        the Furman-Pivi model. The 'choice' parameter decides wheter to use a poisson
+        or a Poisson distribution for the probabilities P_n_ts.
+        """
+        p_n = self.p_n
+        eps_n = self.eps_n
+
+        nn_all = np.arange(0, self.M_cut + 1, 1)
+
+        if choice == 'poisson':
+            P_n_ts = np.squeeze(delta_ts / factorial(nn_all) * np.exp(-delta_ts))
+        elif choice == 'binomial':
+            p = delta_ts / self.M_cut
+            P_n_ts = np.squeeze(binom(self.M_cut, nn) * (p)**nn_all * (1 - p)**(self.M_cut - nn_all))
+        else:
+            raise ValueError('choice must be either \'poisson\' or \'binomial\'')
+
+        P_n_ts = P_n_ts / np.sum(P_n_ts)
+        P_n_ts_return = P_n_ts[int(nn)]
+        eps_curr = eps_n[int(nn - 1)]
+        p_n_curr = p_n[int(nn - 1)]
+
+        # P_n_ts = 1.
+
+        if E_0 == 0:
+            F_n = 0
+        else:
+            # F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
+            F_n = 1
+        f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
+        area = scipy.integrate.simps(f_n_ts, energy)
+        if area != 0:
+            f_n_ts = f_n_ts / area  # Normalization
+
+        return f_n_ts, P_n_ts_return
+    ############################################################################
+    ############################################################################
 
 
 class SEY_model_FP_Cu(SEY_model_furman_pivi):

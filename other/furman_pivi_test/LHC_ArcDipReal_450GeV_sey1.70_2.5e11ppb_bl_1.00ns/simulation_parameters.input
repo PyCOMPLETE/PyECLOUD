@@ -63,6 +63,9 @@ flag_sc_movie = 0          #1/0
 
 save_mp_state_time_file =  -1
 
+extract_ene_dist = False
+extract_sey = False
+
 #save_simulation_state_time_file =  list(25e-9*np.array([0., 15.]) - np.array([0., 2.5e-11]))
 
 #checkpoint_folder = './checkpoints/LHC_blabla/'
