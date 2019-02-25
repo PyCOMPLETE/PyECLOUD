@@ -16,12 +16,14 @@ x_aper = 1.5e-2
 y_aper = 0.5e-2
 Dh = .020e-3
 
-x_patch_center = 0. #x_aper/2.
+x_patch_center = 1e-2 #x_aper/2.
 y_patch_center = y_aper-Dh #0.
-Dx_patch = 5e-3
+Dx_patch = 3e-3
 Dy_patch = Dh/2.
 
-Q_tot_C_m = 1e-6*Dx_patch #1.e-12 C/mm^2
+Sigma_C_m2 = 1e-6
+
+Q_tot_C_m = Sigma_C_m2*Dx_patch #1.e-12 C/mm^2
 
 na = np.array
 
@@ -79,6 +81,11 @@ i_center = np.argmin(np.abs(pic.xg - x_patch_center))
 fig3 = plt.figure()
 ax1d = fig3.add_subplot(111)
 ax1d.plot(pic.yg, pic.phi[i_center, :])
+
+from scipy.constants import epsilon_0
+phi_i = Sigma_C_m2*(y_aper-y_patch_center)/epsilon_0
+
+ax1d.plot([-y_aper, y_patch_center, y_aper], [0, phi_i, 0.])
 
 plt.show()
 

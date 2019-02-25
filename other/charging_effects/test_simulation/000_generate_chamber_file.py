@@ -47,7 +47,7 @@ del_max_segments[mask_patch] = 1.9
 flag_charging[mask_patch] = 1. 
 Q_max_segments[mask_patch] = 100*1e-12*1e6 # 1e-12 C/mm^2 
 EQ_segments[mask_patch] = 20. 
-tau_segments[mask_patch] = 100e-6
+tau_segments[mask_patch] = -1
 
 
 sio.savemat('chamber.mat',{\
