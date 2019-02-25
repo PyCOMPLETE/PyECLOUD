@@ -91,14 +91,20 @@ sp01.grid(True)
 i_center = np.argmin(np.abs(pic.xg - x_patch_center))
 
 fig3 = plt.figure(3)
+fig3.set_facecolor('w')
 ax1d = fig3.add_subplot(111)
-ax1d.plot(pic.yg, pic.phi[i_center, :])
+ax1d.plot(pic.yg*1e3, pic.phi[i_center, :],
+    linewidth=2, label='PIC')
 
 from scipy.constants import epsilon_0
 phi_i = Sigma_C_m2*(y_aper-y_patch_center)/epsilon_0
-
-ax1d.plot([-y_aper, y_patch_center, y_aper], [0, phi_i, 0.])
-
+ax1d.plot(np.array(
+    [-y_aper, y_patch_center, y_aper])*1e3, [0, phi_i, 0.], 
+    linewidth=2, label='Formula')
+ax1d.grid(True)
+ax1d.legend(loc='upper left', prop={'size':16})
+ax1d.set_ylabel('Potential [V]')
+ax1d.set_xlabel('y [mm]')
 
 fig10 = plt.figure(10)
 fig10.set_facecolor('w')
