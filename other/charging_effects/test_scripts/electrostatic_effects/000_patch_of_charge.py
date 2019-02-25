@@ -12,13 +12,13 @@ import PyECLOUD.mystyle as ms
 plt.close('all')
 ms.mystyle_arial(fontsz=16)
 
-x_aper = 1.5e-2
+x_aper = 0.8e-2
 y_aper = 0.5e-2
 Dh = .020e-3
 
 y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
 
-x_patch_center = 1e-2 #x_aper/2.
+x_patch_center = 0.6e-2 #x_aper/2.
 Dx_patch = 3e-3
 Dy_patch = Dh/2.
 
@@ -56,16 +56,24 @@ for y_patch_distance in y_p_dist_vect:
 
 f1 = plt.figure(1)
 f1.set_facecolor('w')
-sp0 = plt.subplot(2,1,1)
+sp0 = plt.subplot(1,1,1)
 plt.pcolormesh(pic.xg*1e3, pic.yg*1e3, rho_mat.T)
 plt.axis('equal')
 plt.grid('on')
 plt.colorbar()
-sp01 = plt.subplot(2,1,2, sharex=sp0)
+
+f100 = plt.figure(100)
+f100.set_facecolor('w')
+sp01 = plt.subplot(1,1,1, sharex=sp0)
 plt.pcolormesh(pic.xg*1e3, pic.yg*1e3, pic.phi.T)
 plt.axis('equal')
-plt.colorbar()
-plt.subplots_adjust(hspace=.3)
+cbar = plt.colorbar()
+plt.subplots_adjust(bottom=.16)
+cbar.set_label('Potential [V]')
+sp01.set_xlim(-x_aper*1.05*1e3, x_aper*1.05*1e3) 
+sp01.set_xlabel('x [mm]')
+sp01.set_ylabel('y [mm]')
+sp01.grid(True)
 
 # plt.figure(2)
 # sp1 = plt.subplot(2,1,1, sharex=sp0)
@@ -82,7 +90,7 @@ plt.subplots_adjust(hspace=.3)
 
 i_center = np.argmin(np.abs(pic.xg - x_patch_center))
 
-fig3 = plt.figure()
+fig3 = plt.figure(3)
 ax1d = fig3.add_subplot(111)
 ax1d.plot(pic.yg, pic.phi[i_center, :])
 
@@ -107,8 +115,9 @@ axll.set_xlabel('d [m]')
 axll.set_ylabel('Max. potential [V]')
 axll.legend(loc='upper left', prop={'size':16})
 
-fig10.suptitle('Charge density: %.1e C/mm^2'%(Sigma_C_m2*1e-6))
-fig10.subplots_adjust(bottom=.16)
+for ff in [f1, fig3, fig10, f100]:
+    ff.suptitle('Charge density: %.1e C/mm^2\nThickness:%.1e m'%(Sigma_C_m2*1e-6, y_patch_distance))
+    ff.subplots_adjust(bottom=.16, top=1.-.16)
 
 plt.show()
 
