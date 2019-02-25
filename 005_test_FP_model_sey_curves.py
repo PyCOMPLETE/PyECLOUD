@@ -12,7 +12,7 @@ linewid = 2
 me = 9.10938356e-31
 
 
-furman_pivi_surface_LHC = {'M': 10,
+furman_pivi_surface_LHC = {'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -37,7 +37,7 @@ furman_pivi_surface_LHC = {'M': 10,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'M': 10,
+furman_pivi_surface = {'M_cut': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                        'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                        'p1EInf': 0.02,
@@ -161,8 +161,7 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label)
     sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label)
     sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
-    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] +
-             del_elast_mat[i_ct, :], color=thiscol, label=label)
+    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
 
 sp3.plot(0, 0, 'white', label='Model')
 sp3.legend(loc='best', prop={'size': 14})

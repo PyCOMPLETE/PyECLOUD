@@ -14,7 +14,7 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'M_cut': 2,
+furman_pivi_surface_LHC = {'M': 2,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -39,7 +39,7 @@ furman_pivi_surface_LHC = {'M_cut': 2,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'M_cut': 10,
+furman_pivi_surface = {'M': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                        'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                        'p1EInf': 0.02,
@@ -68,8 +68,8 @@ furman_pivi_surface = {'M_cut': 10,
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
                                    furman_pivi_surface=furman_pivi_surface_LHC)
-# sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
-#                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
+sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
+                               sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
 
 
 # def extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
@@ -135,25 +135,22 @@ E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
 alpha = 0.9
 
-dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me)
+dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
 
 plt.close('all')
 ms.mystyle_arial()
 
-fig1 = plt.figure(1, figsize=(3 * 8, 2 * 8))
+fig1 = plt.figure(1, figsize=(2 * 8, 8))
 fig1.set_facecolor('w')
-sp1 = fig1.add_subplot(2, 2, 1)
-sp2 = fig1.add_subplot(2, 2, 2)
-sp3 = fig1.add_subplot(2, 2, 3)
-sp4 = fig1.add_subplot(2, 2, 4)
+sp1 = fig1.add_subplot(1, 2, 1)
+sp2 = fig1.add_subplot(1, 2, 2)
+
 
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
     sp1.hist(dists['true'][i_ct], bins=60, color=thiscol, label=label, alpha=alpha, density=True)
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
@@ -161,38 +158,18 @@ sp2.legend(loc='best', prop={'size': 14})
 sz = 24
 sp1.set_ylabel('True secondaries', fontsize=sz)
 sp2.set_ylabel('Elastic', fontsize=sz)
-sp3.set_ylabel('Rediffused', fontsize=sz)
-sp4.set_ylabel('Absorbed', fontsize=sz)
 
 # Compare with model
-test_obj = fp.SEY_model_furman_pivi(furman_pivi_surface=furman_pivi_surface_LHC)
 E_0 = np.array([E_0_single] * int(1e5))
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
-# Rediffused
-prob_density_r = test_obj.rediffused_energy_PDF(energy=energy, E_0=E_0)
-sp3.plot(energy, prob_density_r, 'k', label='PDF', linewidth=linewid)
-# Backscaterred
-prob_density_e = test_obj.backscattered_energy_PDF(energy, E_0)
-sp2.plot(energy, prob_density_e, 'k', label='PDF', linewidth=linewid)
-# True secondaries
-delta_e, delta_r, delta_ts = test_obj._yield_fun_furman_pivi(E=E_0_single, costheta=1.)
-delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
-prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_single, energy=energy)
-sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
 
-for sp in [sp1, sp2, sp3, sp4]:
+
+for sp in [sp1, sp2]:
     sp.grid('on')
     sp.set_xlabel('Electron energy [eV]')
 
 plt.subplots_adjust(right=0.99, left=.06)
 
-plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
-
-plt.figure(2)
-for M in np.arange(1, sey_mod.M_cut + 1, 1):
-    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy)
-    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid)
-plt.legend()
-plt.title('Energy distribution PDFs for secondary electron energies')
+plt.suptitle('Energy distribution extraction tests: ECLOUD model', fontsize=30)
 
 plt.show()
