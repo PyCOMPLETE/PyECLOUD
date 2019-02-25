@@ -16,8 +16,9 @@ x_aper = 1.5e-2
 y_aper = 0.5e-2
 Dh = .020e-3
 
+y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
+
 x_patch_center = 1e-2 #x_aper/2.
-y_patch_center = y_aper-Dh #0.
 Dx_patch = 3e-3
 Dy_patch = Dh/2.
 
@@ -28,27 +29,30 @@ Q_tot_C_m = Sigma_C_m2*Dx_patch #1.e-12 C/mm^2
 na = np.array
 
 chamber = poly.polyg_cham_geom_object({'Vx':na([x_aper, -x_aper, -x_aper, x_aper]),
-									   'Vy':na([y_aper, y_aper, -y_aper, -y_aper]),
-									   'x_sem_ellip_insc':0.99*x_aper,
-									   'y_sem_ellip_insc':0.99*y_aper})
+    'Vy':na([y_aper, y_aper, -y_aper, -y_aper]),
+    'x_sem_ellip_insc':0.99*x_aper,
+    'y_sem_ellip_insc':0.99*y_aper})
 
 pic = PIC_FDSW.FiniteDifferences_ShortleyWeller_SquareGrid(chamb = chamber, Dh = Dh, sparse_solver = 'PyKLU')
 
 
 YY,XX = np.meshgrid(pic.yg, pic.xg)
-rho_mat = 0*XX
-
-mask_charge = np.logical_and(
-				np.abs(XX - x_patch_center)<Dx_patch/2.,
-				np.abs(YY - y_patch_center)<=Dy_patch/2.)
-
-rho_mat[mask_charge] = 1.
-
-rho_mat=rho_mat/(np.sum(rho_mat[:])*Dh*Dh)*Q_tot_C_m
-#rho_mat[mask_charge] = np.cos(2*np.pi*XX[mask_charge]/x_aper/4.)
-
-pic.solve(rho=rho_mat)
-
+max_phi_list = []
+for y_patch_distance in y_p_dist_vect:
+    rho_mat = 0*XX
+    
+    y_patch_center = y_aper - y_patch_distance
+    mask_charge = np.logical_and(
+    				np.abs(XX - x_patch_center)<Dx_patch/2.,
+    				np.abs(YY - y_patch_center)<=Dy_patch/2.)
+    
+    rho_mat[mask_charge] = 1.
+    
+    rho_mat=rho_mat/(np.sum(rho_mat[:])*Dh*Dh)*Q_tot_C_m
+    #rho_mat[mask_charge] = np.cos(2*np.pi*XX[mask_charge]/x_aper/4.)
+    
+    pic.solve(rho=rho_mat)
+    max_phi_list.append(np.max(pic.phi))
 
 f1 = plt.figure(1)
 f1.set_facecolor('w')
@@ -86,6 +90,12 @@ from scipy.constants import epsilon_0
 phi_i = Sigma_C_m2*(y_aper-y_patch_center)/epsilon_0
 
 ax1d.plot([-y_aper, y_patch_center, y_aper], [0, phi_i, 0.])
+
+
+fig10 = plt.figure(10)
+axll = fig10.add_subplot(1,1,1)
+axll.loglog(y_p_dist_vect, max_phi_list)
+axll.loglog(y_p_dist_vect, Sigma_C_m2*y_p_dist_vect/epsilon_0)
 
 plt.show()
 
