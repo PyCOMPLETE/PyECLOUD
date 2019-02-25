@@ -16,13 +16,20 @@ x_aper = 0.8e-2
 y_aper = 0.5e-2
 Dh = .020e-3
 
+# Small patch
 y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
 x_patch_center = 0.6e-2
 Dx_patch = 3e-3
 
-y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
-x_patch_center = 0.2e-2 
-Dx_patch = 10e-3
+# Small patch (distant patch)
+y_p_dist_vect = np.array([1e-3])
+x_patch_center = 0.6e-2
+Dx_patch = 3e-3
+
+# # Large patch
+# y_p_dist_vect = np.array([100, 50, 20, 10, 5, 2, 1 ])*Dh
+# x_patch_center = 0.2e-2 
+# Dx_patch = 10e-3
 
 Dy_patch = Dh/2.
 
