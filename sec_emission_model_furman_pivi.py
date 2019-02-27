@@ -474,8 +474,8 @@ class SEY_model_furman_pivi():
             F_n = 1
         f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
         area = scipy.integrate.simps(f_n_ts, energy)
-        if area != 0:
-            f_n_ts = f_n_ts / area  # normalisation
+        # if area != 0:
+        f_n_ts = f_n_ts / area  # normalisation
 
         return f_n_ts, P_n_ts_return
 
@@ -484,10 +484,9 @@ class SEY_model_furman_pivi():
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
-            average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts
+            average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
         area = scipy.integrate.simps(average_f_n_ts, energy)
-        normalisation_constant = 1. / area
-        return normalisation_constant * average_f_n_ts
+        return average_f_n_ts / area
 
     def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
         pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)

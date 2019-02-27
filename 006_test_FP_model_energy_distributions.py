@@ -12,7 +12,7 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'M_cut': 2,
+furman_pivi_surface_LHC = {'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -126,8 +126,8 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
 
 cos_theta_test = np.linspace(1., 1., 1)
 E_0_single = 100
-E_impact_eV_test = np.array([E_0_single] * int(1e5))
-n_rep = 100000
+n_rep = int(1e5)
+E_impact_eV_test = np.array([E_0_single] * n_rep)
 alpha = 0.9
 
 dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me)
@@ -160,7 +160,7 @@ sp3.set_ylabel('Rediffused', fontsize=sz)
 sp4.set_ylabel('Absorbed', fontsize=sz)
 
 # Compare with model
-test_obj = fp.SEY_model_furman_pivi(furman_pivi_surface=furman_pivi_surface_LHC)
+test_obj = sey_mod
 E_0 = np.array([E_0_single] * int(1e5))
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
 # Rediffused
@@ -183,9 +183,9 @@ plt.subplots_adjust(right=0.99, left=.06)
 
 plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
 
-plt.figure(2)
+plt.figure(2, figsize=(1.5 * 8, 8))
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
-    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=M, E_0=E_0_single, energy=energy)
+    prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts_prime, nn=M, E_0=E_0_single, energy=energy)
     plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid)
 plt.legend()
 plt.title('Energy distribution PDFs for secondary electron energies')

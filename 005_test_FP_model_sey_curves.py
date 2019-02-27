@@ -133,7 +133,7 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
 cos_theta_test = np.linspace(0, 1., 10)
 E_impact_eV_test = np.array(list(np.arange(0, 499., 5.)) + list(np.arange(500., 2000, 25.)))
-n_rep = 1000
+n_rep = int(1e3)
 
 deltas = extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
 del_true_mat = deltas['true']
