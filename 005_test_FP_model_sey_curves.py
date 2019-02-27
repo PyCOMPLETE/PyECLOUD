@@ -72,12 +72,6 @@ sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, seco
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
-    # del_true_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-    # del_elast_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-    # del_rediff_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-    # del_absorb_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-    # del_tot_mat = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
-
     deltas = {}
     for etype in sey_mod.event_types.keys():
         etype_name = sey_mod.event_types[etype]
@@ -87,8 +81,6 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
         print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
         for i_ene, Ene in enumerate(E_impact_eV_test):
 
-            # nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
-            #                 E_impact_eV=Ene*np.ones(n_rep), costheta_impact=np.ones(n_rep)*ct, i_impact=np.array(n_rep*[0]))
             nel_impact = np.ones(n_rep)
             # Assuming normal is along x
             v_mod = np.sqrt(2 * Ene * qe / mass) * np.ones_like(nel_impact)
@@ -110,14 +102,6 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
                     costheta_impact=ct * np.ones_like(nel_impact),
                     nel_mp_th=1,
                     flag_seg=True)
-            # del_tot = (np.sum(nel_replace) + np.sum(nel_new_MPs)) / float(n_rep)
-            # del_tot_mat[i_ct, i_ene] = del_tot
-            # # del_true_mat[i_ct, i_ene] = del_tot * (float(np.sum(event_type == 1)) + float(np.sum(event_type == 3))) / float(n_rep)
-            # del_true_mat[i_ct, i_ene] = (np.sum(nel_replace) + np.sum(nel_new_MPs) - np.sum(event_type == 0) - np.sum(event_type == 2)) / float(n_rep)
-            # del_tot = 1.
-            # del_elast_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 0)) / float(n_rep)
-            # del_rediff_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 2)) / float(n_rep)
-            # del_absorb_mat[i_ct, i_ene] = del_tot * float(np.sum(event_type == 3)) / float(n_rep)
 
             for etype in sey_mod.event_types.keys():
                 etype_name = sey_mod.event_types[etype]
