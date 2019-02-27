@@ -156,9 +156,9 @@ class SEY_model_furman_pivi():
         flag_rediffused = np.logical_and(~flag_truesec, ~flag_backscattered)
 
         # Reflected or backscattered electrons have yield 1 by definition.
-        delta = np.ones_like(E_impact_eV, dtype=float)
+        # delta = np.ones_like(E_impact_eV, dtype=float)
         # True secondary part has to be adjusted accordingly.
-        delta[flag_truesec] = delta_ts[flag_truesec] / (1. - delta_r[flag_truesec] - delta_e[flag_truesec])  # Eq. (39) in FP paper
+        # delta[flag_truesec] = delta_ts[flag_truesec] / (1. - delta_r[flag_truesec] - delta_e[flag_truesec])  # Eq. (39) in FP paper
 
         # (4): Generate number of secondaries for every impact
         # In impacts_on_surface
@@ -235,37 +235,35 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0
 
-    def _true_sec_energy_CDF(self, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+    def _true_sec_energy_CDF(self, nn, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
         """
-        Gives the value of the CDF corresponding to nn emitted electrons when
-        the surface is impacted on by electrons with E_0 energy.
+        Gives the value of the CDF corresponding to nn emitted.
         Returns the value of the CDF as well as the area under the PDF before
         normalisation.
         """
-        p_n = self.p_n
-        eps_n = self.eps_n
-
         # P_n_ts = 1.
 
         if isinstance(nn, int) or isinstance(nn, np.float64):
-            eps_curr = eps_n[int(nn - 1)]
-            p_n_curr = p_n[int(nn - 1)]
+            eps_curr = self.eps_n[int(nn - 1)]
+            p_n_curr = self.p_n[int(nn - 1)]
         else:
-            eps_curr = np.array([eps_n[int(ii - 1)] for ii in nn])
-            p_n_curr = np.array([p_n[int(ii - 1)] for ii in nn])
+            eps_curr = np.array([self.eps_n[int(ii - 1)] for ii in nn])
+            p_n_curr = np.array([self.p_n[int(ii - 1)] for ii in nn])
 
         # F_n = np.squeeze((P_n_ts / ((eps_curr**p_n_curr * gamma(p_n_curr))**nn * gammainc(nn * p_n_curr, E_0 / eps_curr)))**(1. / nn))
         # F_n = 1
         # cdf = eps_curr**p_n_curr * F_n * gamma(p_n_curr) * gammainc(p_n_curr, energy / eps_curr)
         cdf = gammainc(p_n_curr, energy / eps_curr)
-        if len(cdf) != 0:
-            area = cdf
-            cdf = cdf / area[-1]
-            return cdf, area
-        return cdf, 1
+        # if len(cdf) != 0:
+        area = cdf
+        cdf = cdf / area[-1]
+        return cdf, area
+        # return cdf, 1
 
     def get_energy_true_sec(self, nn, E_0, choice='poisson'):
         """Returns emission energies for true secondary electrons."""
+        if len(E_0) == 0:
+            return np.array([])
         p_n = self.p_n
         eps_n = self.eps_n
 
@@ -273,7 +271,7 @@ class SEY_model_furman_pivi():
 
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        _, area = self._true_sec_energy_CDF(nn, E_0, energy=E_0, choice=choice)  # Putting energy=E_0 gives area under the PDF
+        _, area = self._true_sec_energy_CDF(nn, energy=E_0, choice=choice)  # Putting energy=E_0 gives area under the PDF
         # F_n_vec = (P_n_ts / ((eps_vec**p_n_vec * gamma(p_n_vec))**nn * gammainc(nn * p_n_vec, E_0 / eps_vec)))**(1. / nn)
         # F_n_vec = F_n_vec / (area)
         F_n_vec = 1. / area
