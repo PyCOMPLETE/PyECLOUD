@@ -225,7 +225,7 @@ class SEY_model_furman_pivi():
         """
         sqrt2 = np.sqrt(2)
         uu = random.rand(len(E_0))
-        return E_0 - sqrt2 * self.sigmaE * erfinv(-(uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
+        return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
 
     def get_energy_rediffused(self, E0):
         """
