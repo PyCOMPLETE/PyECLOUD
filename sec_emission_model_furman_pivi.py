@@ -88,6 +88,7 @@ class SEY_model_furman_pivi():
         else:
             self.angle_dist_func = None
 
+        self.choice = furman_pivi_surface['choice']
         self.M_cut = furman_pivi_surface['M_cut']
         self.p_n = furman_pivi_surface['p_n']
         self.eps_n = furman_pivi_surface['eps_n']
@@ -222,7 +223,7 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0
 
-    def _true_sec_energy_CDF(self, nn, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+    def _true_sec_energy_CDF(self, nn, energy=np.linspace(0.001, 300, num=int(1e5))):
         """
         Gives the value of the CDF corresponding to nn emitted.
         Returns the value of the CDF as well as the area under the PDF before
@@ -240,7 +241,7 @@ class SEY_model_furman_pivi():
         cdf = cdf / area[-1]
         return cdf, area
 
-    def get_energy_true_sec(self, nn, E_0, choice='poisson'):
+    def get_energy_true_sec(self, nn, E_0):
         """Returns emission energies for true secondary electrons."""
         if len(E_0) == 0:
             return np.array([])
@@ -249,7 +250,7 @@ class SEY_model_furman_pivi():
 
         eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
         p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        _, area = self._true_sec_energy_CDF(nn, energy=E_0, choice=choice)  # Putting energy=E_0 gives area under the PDF
+        _, area = self._true_sec_energy_CDF(nn, energy=E_0)  # Putting energy=E_0 gives area under the PDF
         normalisation = 1. / area
         uu = random.rand(len(E_0))
         xx = uu / (normalisation)
@@ -417,7 +418,7 @@ class SEY_model_furman_pivi():
     def rediffused_energy_CDF(self, energy, E_0, qq=0.5):
         return energy**(qq + 1) / E_0**(qq + 1)
 
-    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5))):
         """The PDF for true secondary electrons."""
         if nn == 0:
             raise ValueError('nn = 0, you cannot emit zero electrons.')
@@ -426,9 +427,9 @@ class SEY_model_furman_pivi():
 
         nn_all = np.arange(0, self.M_cut + 1, 1)
 
-        if choice == 'poisson':
+        if self.choice == 'poisson':
             P_n_ts = np.squeeze(delta_ts**nn_all / factorial(nn_all) * np.exp(-delta_ts))
-        elif choice == 'binomial':
+        elif self.choice == 'binomial':
             p = delta_ts / self.M_cut
             P_n_ts = np.squeeze(binom(self.M_cut, nn) * (p)**nn_all * (1 - p)**(self.M_cut - nn_all))
         else:
@@ -449,31 +450,28 @@ class SEY_model_furman_pivi():
 
         return f_n_ts, P_n_ts_return
 
-    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5)), choice='poisson'):
+    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5))):
         nns = np.arange(1, self.M_cut + 1, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
-            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, choice=choice, energy=energy)
+            f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, energy=energy)
             average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
         area = scipy.integrate.simps(average_f_n_ts, energy)
         return average_f_n_ts / area
 
-    def average_true_sec_energy_CDF(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
-        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
+    def average_true_sec_energy_CDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5))):
+        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, energy=energy)
         CDF = cumtrapz(pdf, energy, initial=0)
         return CDF
 
-    def get_energy_average_true_sec(self, delta_ts, E_0, choice='poisson', energy=np.linspace(0.001, 300, num=int(1e5))):
-        uu = random.rand(len(delta_ts))
-        out_array = np.empty(1)
-        if type(delta_ts) is int:
-            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts, E_0=E_0, choice=choice, energy=energy)
-            return np.interp(uu, CDF, energy)
-        else:
-            for ii, kk in enumerate(delta_ts):
-                CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_0[ii], choice=choice, energy=energy)
-                out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
-        return np.interp(uu, CDF, energy)
+    def get_energy_average_true_sec(self, delta_ts, E_0):
+        uu = random.rand(len(E_0))
+        out_array = np.empty(0)
+        for ii, E_i in enumerate(E_0):
+            energy = np.linspace(0., E_i, 100)
+            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_i, energy=energy)
+            out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
+        return out_array
     ############################################################################
     ############################################################################
 

@@ -68,7 +68,7 @@ from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
 from sec_emission_model_furman_pivi import SEY_model_furman_pivi
-from sec_emission_model_furman_pivi_variable_MP import SEY_model_furman_pivi as SEY_model_FP_variable
+from sec_emission_model_furman_pivi_variable_MP import SEY_model_furman_pivi_variable_MP as SEY_model_FP_variable
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB

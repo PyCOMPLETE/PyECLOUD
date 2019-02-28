@@ -8,7 +8,8 @@ plt.close('all')
 ms.mystyle(12)
 linewid = 2
 
-furman_pivi_surface_LHC = {'M_cut': 10,
+furman_pivi_surface_LHC = {'choice': 'poisson',
+                           'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -33,7 +34,8 @@ furman_pivi_surface_LHC = {'M_cut': 10,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'M': 10,
+furman_pivi_surface = {'choice': 'poisson',
+                       'M': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                        'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                        'p1EInf': 0.02,

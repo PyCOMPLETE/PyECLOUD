@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sec_emission_model_ECLOUD as ECL
 import sec_emission_model_furman_pivi as fp
+import sec_emission_model_furman_pivi_variable_MP as fp_var
 import mystyle as ms
 from scipy.constants import e as qe
 
@@ -12,7 +13,8 @@ linewid = 2
 me = 9.10938356e-31
 
 
-furman_pivi_surface_LHC = {'M_cut': 10,
+furman_pivi_surface_LHC = {'choice': 'poisson',
+                           'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                            'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                            'p1EInf': 0.02,
@@ -37,7 +39,8 @@ furman_pivi_surface_LHC = {'M_cut': 10,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'M_cut': 10,
+furman_pivi_surface = {'choice': 'poisson',
+                       'M_cut': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                        'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                        'p1EInf': 0.02,
@@ -66,6 +69,9 @@ furman_pivi_surface = {'M_cut': 10,
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
                                    furman_pivi_surface=furman_pivi_surface_LHC)
+# sey_mod = fp_var.SEY_model_furman_pivi_variable_MP(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
+#                                                    switch_no_increase_energy=0, thresh_low_energy=-1,
+#                                                    furman_pivi_surface=furman_pivi_surface_LHC)
 # sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
 #                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
 
