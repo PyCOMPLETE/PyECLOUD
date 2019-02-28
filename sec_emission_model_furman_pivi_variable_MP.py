@@ -69,8 +69,10 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
                  ):
 
         SEY_model_furman_pivi.__init__(self, furman_pivi_surface,
-                                       E_th=None, sigmafit=None, mufit=None,
-                                       switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
+                                       E_th=E_th, sigmafit=sigmafit, mufit=mufit,
+                                       switch_no_increase_energy=switch_no_increase_energy,
+                                       thresh_low_energy=thresh_low_energy,
+                                       secondary_angle_distribution=secondary_angle_distribution,
                                        )
         self.variable_MP_size = True
 
@@ -112,18 +114,15 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
 
         # (6): Generate energy:
         # In impacts_on_surface
-        if self.variable_MP_size:
-            nel_emit = nel_impact * delta
-        else:
-            nel_emit = nel_impact # * delta
+        nel_emit = nel_impact * delta
 
-        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec
+        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                            v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
-        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
+        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
 
         nel_replace = nel_emit_tot_events.copy()
         x_replace = x_impact.copy()
@@ -161,9 +160,11 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
             n_add_total = np.sum(n_add)
 
             # MPs to be replaced
-            En_truesec_eV = ee.sec_energy_hilleret_model2(
-                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
-                self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+            # En_truesec_eV = ee.sec_energy_hilleret_model2(
+            #     self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
+            #     self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+            delta_ts_prime = delta_ts / (1. - delta_e - delta_r)
+            En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts_prime[flag_truesec], E_0=E_impact_eV[flag_truesec])
 
             vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
                 N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
@@ -178,11 +179,14 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
                 norm_y_add = np.repeat(Norm_y, n_add)
                 nel_new_MPs = np.repeat(nel_replace, n_add)
                 E_impact_eV_add = np.repeat(E_impact_eV, n_add)
+                delta_ts_prime_add = np.repeat(delta_ts_prime, n_add)
 
                 # Generate new MP properties, angles and energies
-                En_truesec_eV_add = ee.sec_energy_hilleret_model2(
-                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
-                    self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
+                #     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
+                #     self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_prime_add, E_0=E_impact_eV_add)
+
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
@@ -201,16 +205,21 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
+        # extended_nel_emit_tot_events used for extraction of energy distributions
+        extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
+
         events = flag_truesec.astype(int)
 
         events = events + 2 * flag_rediffused.astype(int)
+        event_type = events
         if n_add_total != 0:
             events_add = np.repeat(events, n_add)
             events = np.concatenate([events, events_add])
-        event_type = events
-        nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
+        extended_event_type = events
 
-        event_info = {}
+        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
+                      'extended_event_type': extended_event_type,
+                      }
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\

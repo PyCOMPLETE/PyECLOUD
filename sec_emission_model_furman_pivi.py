@@ -468,7 +468,7 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E_0))
         out_array = np.empty(0)
         for ii, E_i in enumerate(E_0):
-            energy = np.linspace(0., E_i, 100)
+            energy = np.linspace(0., E_i, 1000)
             CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_i, energy=energy)
             out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
         return out_array
