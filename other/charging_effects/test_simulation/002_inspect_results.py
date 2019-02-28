@@ -4,7 +4,7 @@ import PyECLOUD.mystyle as ms
 import numpy as np
 from scipy.constants import e as qe
 
-fname = 'Pyecltest.mat'
+fname = 'Pyecltest_example_20eV_1e-13C_2us.mat'
 ob = mfm.myloadmat_to_obj(fname)
 
 compare_against_charge_in_chamber = False
@@ -18,7 +18,7 @@ fig2 = plt.figure(2, figsize=(8,6*1.5))
 fig2.set_facecolor('w')
 sp1 = plt.subplot(3,1,1)
 sp1.plot(ob.t/ob.b_spac, ob.Nel_timep)
-sp1.set_ylabel('Number of e-\n[m^-1]')
+sp1.set_ylabel('Number of e-\n[1/m]')
 sp2 = plt.subplot(3,1,2, sharex=sp1)
 sp2.plot(ob.t/ob.b_spac, ob.Qpatch_ave)
 sp2.set_ylabel('Q on the patch\n[C/m^2]')
@@ -30,9 +30,16 @@ sp3.set_ylabel('SEY at Emax\n(patch)')
 
 from matplotlib.ticker import MaxNLocator
 for sp in [sp1, sp2, sp3]:
-    sp.yaxis.set_major_locator(MaxNLocator(5))
+    sp.yaxis.set_major_locator(MaxNLocator(4))
     sp.grid(True)
 sp3.set_xlabel('Time/(25 ns)')
+sp3.set_ylim(1.0, 2.0)
+
+mask_patch = ob.flag_charging>0
+Q_max_patch = np.mean(ob.Q_max_segments[mask_patch])
+sp2.axhline(y = Q_max_patch,
+        linestyle='--', color='r', linewidth=2)
+sp2.set_ylim(0., 1.1*Q_max_patch)
 
 fig2.subplots_adjust(
     top=0.95,
@@ -62,7 +69,6 @@ fig1.suptitle(fname)
 fig2.suptitle(fname)
 
 # crosscheck current on patch
-mask_patch = ob.flag_charging>0
 
 nel_impact_on_patch = np.sum(ob.nel_hist_impact_seg[:, mask_patch], axis=1)
 nel_emit_on_patch = np.sum(ob.nel_hist_emit_seg[:, mask_patch], axis=1)
