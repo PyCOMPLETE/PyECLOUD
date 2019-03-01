@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -71,6 +71,20 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
 
             flag_above_th = (en_eV > E_th)
             Nabove_th = np.sum(flag_above_th)
+
+    elif switch_no_increase_energy == 2:  # Cut emitted energy at En_impact_eV
+        flag_low_energy = En_impact_eV < thresh_low_energy
+
+        en_eV = random.lognormal(mufit, sigmafit, Ngen)
+        flag_above_th = ((en_eV > En_impact_eV) & (~flag_low_energy))
+        Nabove_th = np.sum(flag_above_th)
+
+        while Nabove_th > 0:
+            en_eV[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
+
+            flag_above_th = ((en_eV > En_impact_eV) & (~flag_low_energy))
+            Nabove_th = np.sum(flag_above_th)
+        en_eV[flag_low_energy] = random.rand() * En_impact_eV[flag_low_energy]
 
     elif switch_no_increase_energy == 1:
 
