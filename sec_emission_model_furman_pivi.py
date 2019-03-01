@@ -119,7 +119,7 @@ class SEY_model_furman_pivi():
         self.t3 = furman_pivi_surface['t3']
         self.t4 = furman_pivi_surface['t4']
 
-        print('Secondary emission model: Furman-Pivi s=%.4f' % (self.s))
+        print('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s))
 
     def SEY_process(self, E_impact_eV, costheta_impact, i_impact):
         """
@@ -223,7 +223,7 @@ class SEY_model_furman_pivi():
         uu = random.rand(len(E0))
         return uu**(1 / (self.q + 1)) * E0
 
-    def _true_sec_energy_CDF(self, nn, energy=np.linspace(0.001, 300, num=int(1e5))):
+    def _true_sec_energy_CDF(self, nn, energy):
         """
         Gives the value of the CDF corresponding to nn emitted.
         Returns the value of the CDF as well as the area under the PDF before
@@ -418,7 +418,7 @@ class SEY_model_furman_pivi():
     def rediffused_energy_CDF(self, energy, E_0, qq=0.5):
         return energy**(qq + 1) / E_0**(qq + 1)
 
-    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy=np.linspace(0.001, 300, num=int(1e5))):
+    def true_sec_energy_PDF(self, delta_ts, nn, E_0, energy):
         """The PDF for true secondary electrons."""
         if nn == 0:
             raise ValueError('nn = 0, you cannot emit zero electrons.')
@@ -450,7 +450,7 @@ class SEY_model_furman_pivi():
 
         return f_n_ts, P_n_ts_return
 
-    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5))):
+    def average_true_sec_energy_PDF(self, delta_ts, E_0, energy):
         nns = np.arange(1, self.M_cut + 1, 1)
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
@@ -459,7 +459,7 @@ class SEY_model_furman_pivi():
         area = scipy.integrate.simps(average_f_n_ts, energy)
         return average_f_n_ts / area
 
-    def average_true_sec_energy_CDF(self, delta_ts, E_0, energy=np.linspace(0.001, 300, num=int(1e5))):
+    def average_true_sec_energy_CDF(self, delta_ts, E_0, energy):
         pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, energy=energy)
         CDF = cumtrapz(pdf, energy, initial=0)
         return CDF
