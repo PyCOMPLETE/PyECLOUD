@@ -12,57 +12,6 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'M_cut': 2,
-                           'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
-                           'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
-                           'p1EInf': 0.02,
-                           'p1Ehat': 0.496,
-                           'eEHat': 0.,
-                           'w': 60.86,
-                           'p': 1.,
-                           'e1': 0.26,
-                           'e2': 2.,
-                           'sigmaE': 2.,
-                           'p1RInf': 0.2,
-                           'eR': 0.041,
-                           'r': 0.104,
-                           'q': 0.5,
-                           'r1': 0.26,
-                           'r2': 2.,
-                           'deltaTSHat': 1.8848,
-                           'eHat0': 322.,
-                           's': 1.35,
-                           't1': 0.66,
-                           't2': 0.8,
-                           't3': 0.7,
-                           't4': 1.,
-                           }
-furman_pivi_surface = {'M_cut': 10,
-                       'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
-                       'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
-                       'p1EInf': 0.02,
-                       'p1Ehat': 0.496,
-                       'eEHat': 0.,
-                       'w': 60.86,
-                       'p': 1.,
-                       'e1': 0.26,
-                       'e2': 2.,
-                       'sigmaE': 2.,
-                       'p1RInf': 0.2,
-                       'eR': 0.041,
-                       'r': 0.104,
-                       'q': 0.5,
-                       'r1': 0.26,
-                       'r2': 2.,
-                       'deltaTSHat': 1.8848,
-                       'eHat0': 322.,
-                       's': 1.35,
-                       't1': 0.66,
-                       't2': 0.8,
-                       't3': 0.7,
-                       't4': 1.,
-                       }
-
 sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
 
@@ -72,8 +21,8 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
 
-cos_theta_test = np.linspace(1., 1., 1)
-E_0_single = 100
+cos_theta_test = np.linspace(.1, 1., 10)
+E_0_single = 10
 E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
 alpha = 0.9
@@ -96,7 +45,7 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
 
 linewid = 3
-# sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
+sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
 sp2.legend(loc='best', prop={'size': 14})
 sz = 24
 sp1.set_ylabel('True secondaries', fontsize=sz)
@@ -105,7 +54,10 @@ sp2.set_ylabel('Elastic', fontsize=sz)
 # Compare with model
 E_0 = np.array([E_0_single] * int(1e5))
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
-
+sigmafit = 1.0828
+mufit = 1.6636
+hilleret_energy = 1. / (energy * sigmafit * np.sqrt(2 * np.pi)) * np.exp(-(np.log(energy) - mufit)**2 / (2 * sigmafit**2))
+sp1.plot(energy, hilleret_energy, 'k', linewidth=linewid)
 
 for sp in [sp1, sp2]:
     sp.grid('on')

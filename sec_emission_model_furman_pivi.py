@@ -88,10 +88,13 @@ class SEY_model_furman_pivi():
         else:
             self.angle_dist_func = None
 
+        # General model parameters
         self.choice = furman_pivi_surface['choice']
         self.M_cut = furman_pivi_surface['M_cut']
         self.p_n = furman_pivi_surface['p_n']
         self.eps_n = furman_pivi_surface['eps_n']
+        self.exclude_rediffused = furman_pivi_surface['exclude_rediffused']
+
         # Parameters for backscattered (elastically scattered) electrons
         self.p1EInf = furman_pivi_surface['p1EInf']
         self.p1Ehat = furman_pivi_surface['p1Ehat']
@@ -119,7 +122,10 @@ class SEY_model_furman_pivi():
         self.t3 = furman_pivi_surface['t3']
         self.t4 = furman_pivi_surface['t4']
 
-        print('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s))
+        if self.exclude_rediffused:
+            print('Secondary emission model: Furman-Pivi excluding rediffused, s=%.4f' % (self.s))
+        else:
+            print('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s))
 
     def SEY_process(self, E_impact_eV, costheta_impact, i_impact):
         """
@@ -142,13 +148,14 @@ class SEY_model_furman_pivi():
 
         # Decide on type
         rand = random.rand(E_impact_eV.size)
-        flag_rediffused = rand < delta_r
-        flag_backscattered = np.logical_and(~flag_rediffused, rand < delta_r + delta_e)
-        flag_truesec = np.logical_and(~flag_rediffused, ~flag_backscattered)
-
-        flag_truesec = rand > delta_e + delta_r
-        flag_backscattered = np.logical_and(~flag_truesec, rand < delta_e)
-        flag_rediffused = np.logical_and(~flag_truesec, ~flag_backscattered)
+        if self.exclude_rediffused:
+            flag_truesec = rand > delta_e
+            flag_backscattered = (~flag_truesec)
+            return flag_backscattered, None, flag_truesec, delta_e, None, delta_ts
+        else:
+            flag_truesec = rand > delta_e + delta_r
+            flag_backscattered = np.logical_and(~flag_truesec, rand < delta_e)
+            flag_rediffused = np.logical_and(~flag_truesec, ~flag_backscattered)
 
         # (4): Generate number of secondaries for every impact
         # In impacts_on_surface
@@ -284,18 +291,22 @@ class SEY_model_furman_pivi():
         vx_replace[flag_backscattered], vy_replace[flag_backscattered], vz_replace[flag_backscattered] = self.angle_dist_func(
             N_rediffused, En_backscattered_eV, Norm_x[flag_backscattered], Norm_y[flag_backscattered], mass)
 
-        # Rediffused
-        En_rediffused_eV = self.get_energy_rediffused(E_impact_eV[flag_rediffused])
-        N_rediffused = np.sum(flag_rediffused)
-        vx_replace[flag_rediffused], vy_replace[flag_rediffused], vz_replace[flag_rediffused] = self.angle_dist_func(
-            N_rediffused, En_rediffused_eV, Norm_x[flag_rediffused], Norm_y[flag_rediffused], mass)
+        if not self.exclude_rediffused:
+            # Rediffused
+            En_rediffused_eV = self.get_energy_rediffused(E_impact_eV[flag_rediffused])
+            N_rediffused = np.sum(flag_rediffused)
+            vx_replace[flag_rediffused], vy_replace[flag_rediffused], vz_replace[flag_rediffused] = self.angle_dist_func(
+                N_rediffused, En_rediffused_eV, Norm_x[flag_rediffused], Norm_y[flag_rediffused], mass)
 
         # True secondary
         N_true_sec = np.sum(flag_truesec)
         n_emit_truesec_MPs_total = 0
         n_emit_truesec_MPs = np.zeros_like(flag_truesec, dtype=int)
         if N_true_sec > 0:
-            delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec] - delta_r[flag_truesec])  # delta_ts^prime in FP paper, eq. (39)
+            if self.exclude_rediffused:
+                delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec])
+            else:
+                delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec] - delta_r[flag_truesec])  # delta_ts^prime in FP paper, eq. (39)
             n_emit_truesec_MPs[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
             n_emit_truesec_MPs_flag_true_sec = n_emit_truesec_MPs[flag_truesec]
             # Cut above M_cut
@@ -371,7 +382,11 @@ class SEY_model_furman_pivi():
         if N_true_sec > 0:
             events[n_emit_truesec_MPs == 0] = 3  # Absorbed MPs
 
-        events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
+        if self.exclude_rediffused:
+            events = events - flag_backscattered.astype(int) * 3
+
+        else:
+            events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
         event_type = events
         if n_emit_truesec_MPs_total != 0:
             events_add = np.repeat(events, n_add)
@@ -385,7 +400,8 @@ class SEY_model_furman_pivi():
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
         n_emit_MPs[flag_backscattered] = 1.
-        n_emit_MPs[flag_rediffused] = 1.
+        if not self.exclude_rediffused:
+            n_emit_MPs[flag_rediffused] = 1.
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
         return nel_emit_tot_events, event_type, event_info,\

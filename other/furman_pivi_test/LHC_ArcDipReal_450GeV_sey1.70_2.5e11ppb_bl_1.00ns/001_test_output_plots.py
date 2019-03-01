@@ -18,6 +18,7 @@ dpiset = 200
 
 ob = mlo.myloadmat_to_obj('./Pyecltest.mat')
 ob2 = mlo.myloadmat_to_obj('./Pyecltest.mat.ref')
+# ob2 = mlo.myloadmat_to_obj('./Pyecltest_excl.mat')
 
 ifig = 0
 
