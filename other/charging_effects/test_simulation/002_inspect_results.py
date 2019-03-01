@@ -4,8 +4,11 @@ import PyECLOUD.mystyle as ms
 import numpy as np
 from scipy.constants import e as qe
 
-fname = 'Pyecltest_example_20eV_1e-13C_2us.mat'
-n_slots_plot = 700
+fname = 'Pyecltest_example_20eV_1e-13C_2us.mat'; n_slots_plot = 700
+fname = 'Pyecltest_example_20eV_1e-13C.mat'; n_slots_plot = 700
+fname = 'Pyecltest_example_0.01eV_1e-13C.mat'; n_slots_plot = 700
+
+# fname = 'Pyecltest_highQmax_100us_3turns.mat'; n_slots_plot = 10500
 
 Trev = 88.9e-6
 
@@ -24,7 +27,7 @@ sp1 = plt.subplot(3,1,1)
 sp1.plot(ob.t/ob.b_spac, ob.Nel_timep, linewidth=2)
 sp1.set_ylabel('Number of e-\n[1/m]')
 sp2 = plt.subplot(3,1,2, sharex=sp1)
-sp2.plot(ob.t/ob.b_spac, ob.Qpatch_ave, linewidth=2)
+sp2.semilogy(ob.t/ob.b_spac, ob.Qpatch_ave, linewidth=2)
 sp2.set_ylabel('Q on the patch\n[C/m^2]')
 sp3 = plt.subplot(3,1,3, sharex=sp1)
 sp3.plot(ob.t/ob.b_spac, ob.sey_at_emax_patch, linewidth=2)
@@ -34,19 +37,19 @@ sp3.set_ylabel('SEY at Emax\n(patch)')
 
 from matplotlib.ticker import MaxNLocator
 for sp in [sp1, sp2, sp3]:
-    sp.yaxis.set_major_locator(MaxNLocator(4))
+    if sp is not sp2:
+        sp.yaxis.set_major_locator(MaxNLocator(4))
     sp.grid(True)
 sp3.set_xlabel('Time/(25 ns)')
 sp3.set_ylim(1.0, 2.0)
-sp3.set_xlim(0., 700.)
 
 mask_patch = ob.flag_charging>0
 Q_max_patch = np.mean(ob.Q_max_segments[mask_patch])
 sp2.axhline(y = Q_max_patch,
         linestyle='--', color='r', linewidth=2)
-sp2.set_ylim(0., 1.1*Q_max_patch)
+sp2.set_ylim(1e-3*Q_max_patch, 2*Q_max_patch)
 
-sp1.set_ylim(0, 1.3e9)
+sp1.set_ylim(0, 1.4e9)
 fig2.subplots_adjust(
     top=0.95,
     bottom=0.09,
@@ -59,25 +62,26 @@ fig1 = plt.figure(1, figsize=(8*2., 6))
 fig1.set_facecolor('w')
 spprof = plt.subplot(1,2,1)
 spprof.plot(ob.xg_hist*1e3, 
-        (qe/Trev*1000)*np.sum(ob.energ_eV_impact_hist[:n_slots_plot], 
+        (qe/Trev*1000)*np.mean(ob.energ_eV_impact_hist[:n_slots_plot], 
             axis=0),
         linewidth=2)
 spprof.set_ylabel('Heat load [a.u.]')
 spprof.set_xlabel('x [mm]')
 spprof.grid(True)
-spprof.set_ylim(0,50)
+spprof.set_ylim(0,.10)
 
 hl_left = np.sum((qe/Trev*1000)*ob.energ_eV_impact_hist[:n_slots_plot, ob.xg_hist<0],
         axis=1)
 hl_right = np.sum((qe/Trev*1000)*ob.energ_eV_impact_hist[:n_slots_plot, ob.xg_hist>0],
         axis=1)
-splr = plt.subplot(1,2,2) 
-splr.plot(hl_left, 'b-', linewidth=2)
+splr = plt.subplot(1,2,2, sharex=sp1) 
 splr.plot(hl_right, 'r-', linewidth=2)
+splr.plot(hl_left, 'b-', linewidth=2)
 splr.set_xlabel('Bunch passage')
 splr.set_ylabel('Heat load [W/bunch]')
 splr.grid(True)
-splr.set_ylim(0., 0.4)
+splr.set_ylim(0., 0.43)
+sp3.set_xlim(0., n_slots_plot)
 
 fig1.subplots_adjust(
         bottom=.14,
