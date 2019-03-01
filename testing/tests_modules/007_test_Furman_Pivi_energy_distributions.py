@@ -1,3 +1,6 @@
+import sys
+if '../..' not in sys.path:
+    sys.path.append('../..')
 import numpy as np
 import matplotlib.pyplot as plt
 import sec_emission_model_furman_pivi as fp
@@ -13,7 +16,7 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_LHC = {'exclude_rediffused': True,
+furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),

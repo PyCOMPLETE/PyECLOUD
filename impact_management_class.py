@@ -359,8 +359,8 @@ class impact_management(object):
             E_new_MPs_eV = 0.5 * mass / qe * v_new_MPs_mod * v_new_MPs_mod
 
             E_all_MPs_eV = np.concatenate([E_replace_eV, E_new_MPs_eV])
-            extended_nel_emit_tot_events = event_info['extended_nel_emit_tot_events']
-            E_all_MPs_eV = E_all_MPs_eV * extended_nel_emit_tot_events
+            # extended_nel_emit_tot_events = event_info['extended_nel_emit_tot_events']
+            E_all_MPs_eV = E_all_MPs_eV #* extended_nel_emit_tot_events
 
             extended_event_type = event_info['extended_event_type']
             for etype in self.sey_mod.event_types.keys():

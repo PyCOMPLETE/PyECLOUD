@@ -1,3 +1,6 @@
+import sys
+if '../..' not in sys.path:
+    sys.path.append('../..')
 import numpy as np
 import matplotlib.pyplot as plt
 import sec_emission_model_furman_pivi as fp

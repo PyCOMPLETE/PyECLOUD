@@ -1,9 +1,13 @@
+import sys
+if '../..' not in sys.path:
+    sys.path.append('../..')
 import numpy as np
 import matplotlib.pyplot as plt
 import sec_emission_model_ECLOUD as ECL
 import mystyle as ms
 from impact_management_class import impact_management
 from geom_impact_ellip import ellip_cham_geom_object
+import scipy
 
 
 plt.close('all')
@@ -12,8 +16,10 @@ linewid = 2
 
 me = 9.10938356e-31
 
+switch = 2
+
 sey_mod = ECL.SEY_model_ECLOUD(Emax=332., del_max=1.8848, R0=0.7, E_th=35., mufit=1.6636, secondary_angle_distribution='cosine_3D',
-                               sigmafit=1.0828, switch_no_increase_energy=0, thresh_low_energy=-1)
+                               sigmafit=1.0828, switch_no_increase_energy=switch, thresh_low_energy=1.)
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hist=.1, scrub_en_th=25.,
@@ -22,7 +28,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
 
 
 cos_theta_test = np.linspace(.1, 1., 10)
-E_0_single = 10
+E_0_single = 100
 E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
 alpha = 0.9
@@ -32,7 +38,7 @@ dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV
 plt.close('all')
 ms.mystyle_arial()
 
-fig1 = plt.figure(1, figsize=(2 * 8, 8))
+fig1 = plt.figure(1, figsize=(2 * 10, 10))
 fig1.set_facecolor('w')
 sp1 = fig1.add_subplot(1, 2, 1)
 sp2 = fig1.add_subplot(1, 2, 2)
@@ -57,7 +63,9 @@ energy = np.linspace(0.001, E_0_single, num=int(1e5))
 sigmafit = 1.0828
 mufit = 1.6636
 hilleret_energy = 1. / (energy * sigmafit * np.sqrt(2 * np.pi)) * np.exp(-(np.log(energy) - mufit)**2 / (2 * sigmafit**2))
-sp1.plot(energy, hilleret_energy, 'k', linewidth=linewid)
+area = scipy.integrate.simps(hilleret_energy, energy)
+sp1.plot(energy, hilleret_energy / area, 'k', linewidth=linewid)
+sp1.set_title('switch_no_increase_energy=%d' % switch)
 
 for sp in [sp1, sp2]:
     sp.grid('on')
