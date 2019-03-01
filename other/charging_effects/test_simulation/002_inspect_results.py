@@ -117,12 +117,17 @@ for ii in np.where(mask_patch)[0]:
             'r.-', linewidth=2, markersize=10)
 spchm.axis('equal')
 spchm.grid(True)
+spchm.set_xlabel('x [mm]')
+spchm.set_ylabel('y [mm]')
+
 fig200.subplots_adjust(
     bottom=.14,
     top=.85)
 
-for fig in [fig1, fig2, fig200]:
+for tag, fig in zip(['heaload', 'charge', 'chamber'],
+                        [fig1, fig2, fig200]):
     fig.suptitle(fname)
+    fig.savefig(tag+'_'+fname.split('.mat')[0]+'.png', dpi=200)
 
 
 
