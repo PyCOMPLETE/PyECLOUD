@@ -100,6 +100,7 @@ class pyecloud_saver:
             flog.write('Simulation started on %s\n' % timestr)
 
         self.extract_sey = True
+        self.extract_ene_dist = False
 
     def start_observing(self, Dt_ref, MP_e, beamtim, impact_man,
                         r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info=0,
@@ -112,13 +113,15 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None, extract_sey=None):
+                        copy_main_outp_DT=None, extract_sey=None, extract_ene_dist=None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
+        if extract_ene_dist is not None:
+            self.extract_ene_dist = extract_ene_dist
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
@@ -197,6 +200,19 @@ class pyecloud_saver:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
             self.sey_test_deltas = {}
+
+        # extract energy distributions
+        if self.extract_ene_dist:
+            n_rep = 100000
+            ene_impact_single = 300.
+            self.ene_dist_test_E_impact_eV = np.array([ene_impact_single] * int(1e5))
+            self.ene_dist_test_cos_theta = np.linspace(0, 1., 10)
+            self.ene_dist_test_emitted_energies = impact_man.extract_energy_distributions(n_rep, self.ene_dist_test_E_impact_eV,
+                self.ene_dist_test_cos_theta, mass=MP_e.mass)
+        else:
+            self.ene_dist_test_cos_theta = 0.
+            self.ene_dist_test_E_impact_eV = 0.
+            self.ene_dist_test_emitted_energies = {}
 
         # Log
         print('Done init pyecloud_saver.')
@@ -394,6 +410,11 @@ class pyecloud_saver:
         for etypn in self.sey_test_deltas.keys():
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
+        # Extracted energy distributions
+        saved_dict['ene_dist_test_emitted_energies'] = self.ene_dist_test_emitted_energies
+        saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
+        saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
+
         saved_dict.update(self._stepbystep_get_dict())
 
         for kk in saved_dict.keys():
@@ -528,6 +549,9 @@ class pyecloud_saver:
                                    'sey_test_del_elast_mat',
                                    'del_rediff_mat',
                                    'sey_test_cos_theta',
+                                   'ene_dist_test_cos_theta',
+                                   'ene_dist_test_E_impact_eV',
+                                   'ene_dist_test_emitted_energies',
                                    'U_sc_eV'
                                    ]
 

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.6.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -50,89 +50,79 @@
 #-End-preamble---------------------------------------------------------
 
 import numpy as np
-from numpy import sqrt, exp
-from numpy.random import rand
+import numpy.random as random
 import electron_emission as ee
+from sec_emission_model_furman_pivi import SEY_model_furman_pivi
 
 
-def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
-
-    if flag_costheta_delta_scale:
-        del_max_tilde = del_max * exp(0.5 * (1. - costheta))
-    else:
-        del_max_tilde = del_max
-
-    if flag_costheta_Emax_shift:
-        E_max_tilde = Emax * (1. + 0.7 * (1. - costheta))
-    else:
-        E_max_tilde = Emax
-
-    x = E / E_max_tilde
-
-    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s)
-    reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0)))**2.
-
-    delta = true_sec + reflected
-    ref_frac = 0. * delta
-    mask_non_zero = (delta > 0)
-    ref_frac[mask_non_zero] = reflected[mask_non_zero] / delta[mask_non_zero]
-
-    return delta, ref_frac
-
-
-class SEY_model_ECLOUD(object):
+class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
 
     event_types = {
-            0: 'elast',
-            1: 'true',
-            }
+        0: 'elast',
+        1: 'true',
+        2: 'rediff',
+    }
 
-    def __init__(
-        self, Emax, del_max, R0,
-        E_th=None, sigmafit=None, mufit=None,
-        switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-        E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
-    ):
+    def __init__(self, furman_pivi_surface,
+                 E_th=None, sigmafit=None, mufit=None,
+                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
+                 ):
 
-        self.E_th = E_th
-        self.sigmafit = sigmafit
-        self.mufit = mufit
-        self.switch_no_increase_energy = switch_no_increase_energy
-        self.thresh_low_energy = thresh_low_energy
-        self.secondary_angle_distribution = secondary_angle_distribution
+        SEY_model_furman_pivi.__init__(self, furman_pivi_surface,
+                                       E_th=E_th, sigmafit=sigmafit, mufit=mufit,
+                                       switch_no_increase_energy=switch_no_increase_energy,
+                                       thresh_low_energy=thresh_low_energy,
+                                       secondary_angle_distribution=secondary_angle_distribution,
+                                       )
+        self.variable_MP_size = True
 
-        if secondary_angle_distribution is not None:
-            import electron_emission
-            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
-        else:
-            self.angle_dist_func = None
-
-        self.Emax = Emax
-        self.del_max = del_max
-        self.R0 = R0
-        self.E0 = E0
-        self.s = s
-        self.flag_costheta_delta_scale = flag_costheta_delta_scale
-        self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
-
-        print('Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s))
+        print('Secondary emission model: Furman-Pivi, varaible MP size, s=%.4f' % (self.s))
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
+        # Furman-Pivi algorithm
+        # (1): Compute emission angles and energy
 
-        yiel, ref_frac = yield_fun2(
-            E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0, s=self.s,
-            flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
-        flag_elast = (rand(len(ref_frac)) < ref_frac)
-        flag_truesec = ~(flag_elast)
-        nel_emit = nel_impact * yiel
+        # Already implemented in the impact_man class.
 
-        return nel_emit, flag_elast, flag_truesec
+        # (2): Compute delta_e, delta_r, delta_ts
+        delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV, costheta_impact)
+
+        # (3): Generate probability of number electrons created
+
+        # Emission probability per penetrated electron
+
+        # Decide on type
+        rand = random.rand(E_impact_eV.size)
+        flag_rediffused = rand < delta_r
+        flag_backscattered = np.logical_and(~flag_rediffused, rand < delta_r + delta_e)
+        flag_truesec = np.logical_and(~flag_rediffused, ~flag_backscattered)
+
+        flag_truesec = rand > delta_e + delta_r
+        flag_backscattered = np.logical_and(~flag_truesec, rand < delta_e)
+        flag_rediffused = np.logical_and(~flag_truesec, ~flag_backscattered)
+
+        # Reflected or backscattered electrons have yield 1 by definition.
+        delta = np.ones_like(E_impact_eV, dtype=float)
+        # True secondary part has to be adjusted accordingly.
+        delta[flag_truesec] = delta_ts[flag_truesec] / (1. - delta_r[flag_truesec] - delta_e[flag_truesec])  # Eq. (39) in FP paper
+
+        # (4): Generate number of secondaries for every impact
+        # In impacts_on_surface
+
+        # (5): Delete if n = 0
+        # Done automatically by the MP system.
+
+        # (6): Generate energy:
+        # In impacts_on_surface
+        nel_emit = nel_impact * delta
+
+        return nel_emit, flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
     def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
                            vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                            v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
 
-        nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
+        nel_emit_tot_events, flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
 
         nel_replace = nel_emit_tot_events.copy()
         x_replace = x_impact.copy()
@@ -146,17 +136,22 @@ class SEY_model_ECLOUD(object):
         else:
             i_seg_replace = i_found
 
-        # Handle elastics
-        vx_replace[flag_elast], vy_replace[flag_elast] = ee.specular_velocity(
-            vx_impact[flag_elast], vy_impact[flag_elast],
-            Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
-        )
+        # Backscattered
+        En_backscattered_eV = self.get_energy_backscattered(E_impact_eV[flag_backscattered])
+        N_rediffused = np.sum(flag_backscattered)
+        vx_replace[flag_backscattered], vy_replace[flag_backscattered], vz_replace[flag_backscattered] = self.angle_dist_func(
+            N_rediffused, En_backscattered_eV, Norm_x[flag_backscattered], Norm_y[flag_backscattered], mass)
 
-        # true secondary
+        # Rediffused
+        En_rediffused_eV = self.get_energy_rediffused(E_impact_eV[flag_rediffused])
+        N_rediffused = np.sum(flag_rediffused)
+        vx_replace[flag_rediffused], vy_replace[flag_rediffused], vz_replace[flag_rediffused] = self.angle_dist_func(
+            N_rediffused, En_rediffused_eV, Norm_x[flag_rediffused], Norm_y[flag_rediffused], mass)
+
+        # True secondary
         N_true_sec = np.sum(flag_truesec)
         n_add_total = 0
         if N_true_sec > 0:
-
             n_add = np.zeros_like(flag_truesec, dtype=int)
             n_add[flag_truesec] = np.ceil(nel_replace[flag_truesec] / nel_mp_th) - 1
             n_add[n_add < 0] = 0.  # in case of underflow
@@ -165,9 +160,11 @@ class SEY_model_ECLOUD(object):
             n_add_total = np.sum(n_add)
 
             # MPs to be replaced
-            En_truesec_eV = ee.sec_energy_hilleret_model2(
-                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
-                self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+            # En_truesec_eV = ee.sec_energy_hilleret_model2(
+            #     self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
+            #     self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+            delta_ts_prime = delta_ts / (1. - delta_e - delta_r)
+            En_truesec_eV = self.get_energy_average_true_sec(delta_ts=delta_ts_prime[flag_truesec], E_0=E_impact_eV[flag_truesec])
 
             vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
                 N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
@@ -182,11 +179,13 @@ class SEY_model_ECLOUD(object):
                 norm_y_add = np.repeat(Norm_y, n_add)
                 nel_new_MPs = np.repeat(nel_replace, n_add)
                 E_impact_eV_add = np.repeat(E_impact_eV, n_add)
+                delta_ts_prime_add = np.repeat(delta_ts_prime, n_add)
 
                 # Generate new MP properties, angles and energies
-                En_truesec_eV_add = ee.sec_energy_hilleret_model2(
-                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
-                    self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                # En_truesec_eV_add = ee.sec_energy_hilleret_model2(
+                #     self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
+                #     self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                En_truesec_eV_add = self.get_energy_average_true_sec(delta_ts=delta_ts_prime_add, E_0=E_impact_eV_add)
 
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
@@ -206,15 +205,17 @@ class SEY_model_ECLOUD(object):
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-        events = flag_truesec
-        event_type = flag_truesec
-        if n_add_total != 0:
-            events_add = np.repeat(event_type, n_add)
-            events = np.concatenate([event_type, events_add])
-        extended_event_type = events
-
         # extended_nel_emit_tot_events used for extraction of energy distributions
         extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
+
+        events = flag_truesec.astype(int)
+
+        events = events + 2 * flag_rediffused.astype(int)
+        event_type = events
+        if n_add_total != 0:
+            events_add = np.repeat(events, n_add)
+            events = np.concatenate([events, events_add])
+        extended_event_type = events
 
         event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
                       'extended_event_type': extended_event_type,

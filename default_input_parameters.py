@@ -1,4 +1,5 @@
 from scipy.constants import m_p, m_e, e as qe
+import numpy as np
 
 # To be safe, only use immutable python types as default values in the parameters_dict.
 # This most importantly excludes python lists. Tuples may be used in their place.
@@ -103,6 +104,7 @@ parameters_dict = {
             't_ion': -1,
 
             'extract_sey': True,
+            'extract_ene_dist': False,
         },
     },
     'machine_parameters': {
@@ -279,6 +281,10 @@ parameters_dict = {
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
             'flag_costheta_delta_scale': True,
+
+            # Furman-Pivi Model
+            'furman_pivi_surface': None
+
         },
     },
     'combined_simulations_secondaryEmission_machine_parameters': {
@@ -389,6 +395,9 @@ parameters_dict = {
             'sey_file': (),
             'flag_costheta_Emax_shift': (),
             'flag_costheta_delta_scale': (),
+
+            # Furman-Pivi model of SEY
+            'furman_pivi_surface': (),
 
             # Saving settings
             'Dx_hist': (),

@@ -67,6 +67,8 @@ from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
+from sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from sec_emission_model_furman_pivi_variable_MP import SEY_model_furman_pivi_variable_MP as SEY_model_FP_variable
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
@@ -105,7 +107,6 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     # Update input_parameters object with parameters from other files
     inp_spec.update_module(input_parameters, machine_parameters)
     inp_spec.update_module(input_parameters, secondary_emission_parameters)
-
     # Check validity of input files
     inp_spec.assert_module_has_parameters(input_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
 
@@ -127,7 +128,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                          ignore_kwargs=(), **kwargs):
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
-
     # Override config values with kwargs
     for attr, value in kwargs.items():
         if attr in ignore_kwargs:
@@ -351,6 +351,20 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                               thresh_low_energy=thiscloud.thresh_low_energy,
                                               secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                               **kwargs_secem)
+            elif(thiscloud.switch_model == 'furman_pivi'):
+                sey_mod = SEY_model_furman_pivi(E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                thresh_low_energy=thiscloud.thresh_low_energy,
+                                                secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                furman_pivi_surface=thiscloud.furman_pivi_surface,
+                                                **kwargs_secem)
+            elif(thiscloud.switch_model == 'furman_pivi_variable_MP'):
+                sey_mod = SEY_model_FP_variable(E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                thresh_low_energy=thiscloud.thresh_low_energy,
+                                                secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                furman_pivi_surface=thiscloud.furman_pivi_surface,
+                                                **kwargs_secem)
             else:
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
@@ -413,7 +427,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
                                        flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud,
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
-                                       copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey)
+                                       copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey, extract_ene_dist=cc.extract_ene_dist)
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker
