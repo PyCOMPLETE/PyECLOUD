@@ -4,11 +4,15 @@ import PyECLOUD.mystyle as ms
 import numpy as np
 from scipy.constants import e as qe
 
-fname = 'Pyecltest_example_20eV_1e-13C_2us.mat'; n_slots_plot = 700
-fname = 'Pyecltest_example_20eV_1e-13C.mat'; n_slots_plot = 700
-fname = 'Pyecltest_example_0.01eV_1e-13C.mat'; n_slots_plot = 700
-
 # fname = 'Pyecltest_highQmax_100us_3turns.mat'; n_slots_plot = 10500
+
+# fname = 'Pyecltest_example_20eV_1e-13C_0.5us.mat'; n_slots_plot = 700
+# fname = 'Pyecltest_example_20eV_1e-13C_1us.mat'; n_slots_plot = 700
+# fname = 'Pyecltest_example_20eV_1e-13C_2us.mat'; n_slots_plot = 700
+# fname = 'Pyecltest_example_20eV_1e-13C.mat'; n_slots_plot = 700
+# fname = 'Pyecltest_example_0.01eV_1e-13C.mat'; n_slots_plot = 700
+fname = 'Pyecltest.mat'; n_slots_plot = 700
+
 
 Trev = 88.9e-6
 
@@ -24,7 +28,13 @@ ms.mystyle_arial(fontsz=16)
 fig2 = plt.figure(2, figsize=(8,6*1.5))
 fig2.set_facecolor('w')
 sp1 = plt.subplot(3,1,1)
-sp1.plot(ob.t/ob.b_spac, ob.Nel_timep, linewidth=2)
+
+if compare_against_charge_in_chamber:
+    sub = ob.Nel_timep[0]
+else:
+    sub = 0.
+
+sp1.plot(ob.t/ob.b_spac, ob.Nel_timep - sub, linewidth=2)
 sp1.set_ylabel('Number of e-\n[1/m]')
 sp2 = plt.subplot(3,1,2, sharex=sp1)
 sp2.semilogy(ob.t/ob.b_spac, ob.Qpatch_ave, linewidth=2)
@@ -95,7 +105,7 @@ patch_area = np.sum(ob.L_edg[mask_patch])
 
 accumulated_charge_m2 = -qe*np.cumsum(nel_impact_on_patch - nel_emit_on_patch)/patch_area
 if plot_charge_from_post_processing:
-    sp2.plot(accumulated_charge_m2)
+    sp2.plot(accumulated_charge_m2, 'g', linewidth=2)
 
 
 if compare_against_charge_in_chamber:
@@ -108,9 +118,10 @@ if compare_against_charge_in_chamber:
     
     Q_chamb_patch = np.sum(ob.nel_hist[:, mask_xg_patch], axis=1)*qe/patch_area
     
-    sp2.plot(Q_chamb_patch-Q_chamb_patch[0])
+    sp2.plot(Q_chamb_patch-Q_chamb_patch[0], 'r--', linewidth=2)
     
-    sp1.plot(ob.t/ob.b_spac, ob.Qpatch_ave*patch_area/qe)
+    sp1.plot(ob.t/ob.b_spac, ob.Qpatch_ave*patch_area/qe, 'r--', 
+                linewidth=2)
 
 fig200 = plt.figure(200)
 fig200.set_facecolor('w')
