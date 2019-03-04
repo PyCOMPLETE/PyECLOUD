@@ -10,6 +10,7 @@ import scipy
 plt.close('all')
 ms.mystyle(12)
 linewid = 2
+fontsz = 16
 
 furman_pivi_surface_LHC = {'exclude_rediffused': True,
                            'choice': 'poisson',
@@ -90,7 +91,7 @@ plt.suptitle('Furman-Pivi tests: Energy distributions', fontsize=30)
 axlist = [ax1, ax2, ax4, ax5, ax6, ax8]
 for ax in axlist:
     ax.grid(alpha=alpha)
-    ax.set_xlabel('Energy [eV]')
+    ax.set_xlabel('Energy [eV]', fontsize=fontsz)
 
 # Backscattered
 prob_density_e = test_obj.backscattered_energy_PDF(energy, E_0)
@@ -123,7 +124,8 @@ delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP pape
 
 nn = 2
 prob_density_ts, pnts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E_0=E_0_single, energy=energy)
-ax4.plot(energy, prob_density_ts, label='PDF of true secondary electrons', linewidth=linewid)
+ax4.plot(energy, prob_density_ts, label='PDF', linewidth=linewid)
+ax4.legend()
 ax4.set_title(r'True secondary energy distribution, $f_{%i,ts}$' % nn)
 area = scipy.integrate.simps(prob_density_ts, energy)
 area = round(area, round_to_digits)
@@ -157,28 +159,31 @@ for costheta in np.linspace(0, 1, 10):
 
 for sp in [sp1, sp2, sp3, sp4]:
     sp.grid(alpha=alpha)
+    sp.set_xlabel('Energy [eV]', fontsize=fontsz)
 plt.suptitle('Furman Pivi test: SEY components', fontsize=30)
 
 # Tests for multiple nn
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
 E_0 = np.array([E_0_single] * int(1e5))
 fig2, axarr = plt.subplots(2, 10, sharex=True, figsize=(1.8 * 12, 12), facecolor='w')
+fig2.subplots_adjust(left=0.05, right=0.95)
 plt.suptitle('Furman-Pivi tests: True secondary energy distributions', fontsize=30)
 all_draws = np.array([])
-weights_P_n_ts = np.array([])
 for kk in np.arange(1, 10.1, 1):
     nn = np.repeat(kk, 1e5)
     prob_density_ts, P_n_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=kk, E_0=E_0_single, energy=energy)
-    weights_P_n_ts = np.concatenate([weights_P_n_ts, np.array([P_n_ts] * int(len(energy)))])
     cdf, _ = test_obj._true_sec_energy_CDF(nn=kk, energy=energy)
     axarr[0, int(kk - 1)].plot(energy, prob_density_ts, label='PDF of true secondary electrons', linewidth=linewid)
     axarr[0, int(kk - 1)].set_title(r'$f_{%i,ts}$' % kk)
     draws = test_obj.get_energy_true_sec(nn=nn, E_0=E_0)
     all_draws = np.concatenate([all_draws, draws])
     axarr[0, int(kk - 1)].hist(draws, density=True, bins=np.arange(0, E_0_single + 1, E_0_single / 100.))
-    axarr[0, int(kk - 1)].text(E_0_single / 4., ax4.get_ylim()[1] * 0.3, 'Average: ' + str(np.mean(draws)))
     axarr[0, int(kk - 1)].grid(alpha=alpha)
     axarr[1, int(kk - 1)].plot(energy, cdf, label='CDF', linewidth=linewid)
     axarr[1, int(kk - 1)].grid(alpha=alpha)
+    axarr[0, int(kk - 1)].set_xlabel('Energy [eV]', fontsize=fontsz)
+    axarr[1, int(kk - 1)].set_xlabel('Energy [eV]', fontsize=fontsz)
+axarr[0, 0].set_ylabel('PDF', fontsize=fontsz)
+axarr[1, 0].set_ylabel('CDF', fontsize=fontsz)
 
 plt.show()
