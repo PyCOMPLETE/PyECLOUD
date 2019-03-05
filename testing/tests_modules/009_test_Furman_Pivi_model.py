@@ -119,7 +119,7 @@ ax6.legend()
 
 # True secondary
 
-delta_e, delta_r, delta_ts = test_obj._yield_fun_furman_pivi(E=E_0_single, costheta=1.)
+delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 
 nn = 2
@@ -145,16 +145,16 @@ sp3 = plt.subplot(2, 2, 3, sharex=sp1, sharey=sp1)
 sp4 = plt.subplot(2, 2, 4, sharex=sp1, sharey=sp1)
 
 energy = np.linspace(0., 2000, num=int(1e3))
-sp1.plot(energy, test_obj._delta_e(energy, 1), label=r'$\delta_e$', color='r', linewidth=linewid)
-sp1.plot(energy, test_obj._delta_r(energy, 1), label=r'$\delta_r$', color='g', linewidth=linewid)
-sp1.plot(energy, test_obj._delta_ts(energy, 1), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
-sp1.plot(energy, test_obj._delta_ts(energy, 1) + test_obj._delta_r(energy, 1) + test_obj._delta_e(energy, 1), label=r'$\delta_{tot}$', color='k', linewidth=linewid)
+sp1.plot(energy, test_obj.delta_e(energy, 1), label=r'$\delta_e$', color='r', linewidth=linewid)
+sp1.plot(energy, test_obj.delta_r(energy, 1), label=r'$\delta_r$', color='g', linewidth=linewid)
+sp1.plot(energy, test_obj.delta_ts(energy, 1), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
+sp1.plot(energy, test_obj.delta_ts(energy, 1) + test_obj.delta_r(energy, 1) + test_obj.delta_e(energy, 1), label=r'$\delta_{tot}$', color='k', linewidth=linewid)
 sp1.legend()
 
 for costheta in np.linspace(0, 1, 10):
-    sp2.plot(energy, test_obj._delta_e(energy, costheta), label=r'$\delta_e$', color='r', linewidth=linewid)
-    sp3.plot(energy, test_obj._delta_r(energy, costheta), label=r'$\delta_r$', color='g', linewidth=linewid)
-    sp4.plot(energy, test_obj._delta_ts(energy, costheta), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
+    sp2.plot(energy, test_obj.delta_e(energy, costheta), label=r'$\delta_e$', color='r', linewidth=linewid)
+    sp3.plot(energy, test_obj.delta_r(energy, costheta), label=r'$\delta_r$', color='g', linewidth=linewid)
+    sp4.plot(energy, test_obj.delta_ts(energy, costheta), label=r'$\delta_{ts}$', color='b', linewidth=linewid)
 
 
 for sp in [sp1, sp2, sp3, sp4]:

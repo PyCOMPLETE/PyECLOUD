@@ -58,7 +58,6 @@ from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
 from scipy.misc import factorial
-from scipy.integrate import cumtrapz
 
 
 class SEY_model_furman_pivi():
@@ -140,7 +139,7 @@ class SEY_model_furman_pivi():
         # Already implemented in the impact_man class.
 
         # (2): Compute delta_e, delta_r, delta_ts
-        delta_e, delta_r, delta_ts = self._yield_fun_furman_pivi(E_impact_eV, costheta_impact)
+        delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact)
 
         # (3): Generate probability of number electrons created
 
@@ -168,15 +167,15 @@ class SEY_model_furman_pivi():
 
         return flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
-    def _yield_fun_furman_pivi(self, E, costheta):
-        delta_e = self._delta_e(E, costheta)
-        delta_r = self._delta_r(E, costheta)
-        delta_ts = self._delta_ts(E, costheta)
+    def yield_fun_furman_pivi(self, E, costheta):
+        delta_e = self.delta_e(E, costheta)
+        delta_r = self.delta_r(E, costheta)
+        delta_ts = self.delta_ts(E, costheta)
         if (delta_e + delta_r >= 1).any():
             raise ValueError('delta_e + delta_r is greater than 1')
         return delta_e, delta_r, delta_ts
 
-    def _delta_e(self, E_impact_eV, costheta_impact):
+    def delta_e(self, E_impact_eV, costheta_impact):
         """
         SEY component of backscattered electrons (elastically scattered).
         (25) in FP paper.
@@ -187,7 +186,7 @@ class SEY_model_furman_pivi():
 
         return delta_e0 * angular_factor
 
-    def _delta_r(self, E_impact_eV, costheta_impact):
+    def delta_r(self, E_impact_eV, costheta_impact):
         """
         SEY component of rediffused electrons (not in ECLOUD model).
         (28) in FP paper.
@@ -198,7 +197,7 @@ class SEY_model_furman_pivi():
 
         return delta_r0 * angular_factor
 
-    def _delta_ts(self, E_impact_eV, costheta_impact):
+    def delta_ts(self, E_impact_eV, costheta_impact):
         """
         SEY component of true secondaries.
         (31) in FP paper.
@@ -475,62 +474,5 @@ class SEY_model_furman_pivi():
             average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
         area = scipy.integrate.simps(average_f_n_ts, energy)
         return average_f_n_ts / area
-
-    def average_true_sec_energy_CDF(self, delta_ts, E_0, energy):
-        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, energy=energy)
-        CDF = cumtrapz(pdf, energy, initial=0)
-        return CDF
-
-    def get_energy_average_true_sec(self, delta_ts, E_0):
-        uu = random.rand(len(E_0))
-        out_array = np.empty(0)
-        for ii, E_i in enumerate(E_0):
-            energy = np.linspace(0., E_i, 1000)
-            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_i, energy=energy)
-            out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
-        return out_array
     ############################################################################
     ############################################################################
-
-
-class SEY_model_FP_Cu(SEY_model_furman_pivi):
-
-    p_n = np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5])
-    eps_n = np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.])
-
-    # Parameters for backscattered (elastically scattered) electrons
-    # (25) in FP paper
-    p1EInf = 0.02      # Minimum probability of elastic scattering (at infinite energy)
-    p1Ehat = 0.496     # Peak probability
-    eEHat = 0.        # Peak energy
-    w = 60.86     # Exponential factor 1
-    p = 1.        # Exponential factor 2
-    # (47a)                 # Angular factors
-    e1 = 0.26
-    e2 = 2.
-    # (26)
-    sigmaE = 2.
-
-    # Parameters for rediffused electrons
-    # (28)
-    p1RInf = 0.2       # Minimum probability of rediffused scattering (at infinite energy)
-    eR = 0.041     # Peak energy
-    r = 0.104     # Exponential factor
-    # (29)
-    q = 0.5
-    # (47b)                 # Angular factors
-    r1 = 0.26
-    r2 = 2.
-
-    # Parameters for true secondaries
-    # (31)
-    deltaTSHat = 1.8848    # Maximum probability of secondaries
-    eHat0 = 276.8     # Peak enery
-    # (32)
-    s = 1.54      # Form factor of fitting curve
-    # (48a)                 # Angular factors
-    t1 = 0.66
-    t2 = 0.8
-    # (48b)
-    t3 = 0.7
-    t4 = 1.

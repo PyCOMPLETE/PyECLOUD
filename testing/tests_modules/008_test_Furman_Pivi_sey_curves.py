@@ -223,9 +223,9 @@ test_obj = sey_mod  # 276.8, 1.8848)
 energy = np.linspace(0., 2000, num=int(1e3))
 
 for costheta in np.linspace(0, 1., 10):
-    delta_ts_vec = test_obj._delta_ts(energy, costheta)
-    delta_e_vec = test_obj._delta_e(energy, costheta)
-    delta_r_vec = test_obj._delta_r(energy, costheta)
+    delta_ts_vec = test_obj.delta_ts(energy, costheta)
+    delta_e_vec = test_obj.delta_e(energy, costheta)
+    delta_r_vec = test_obj.delta_r(energy, costheta)
 
     sp2.plot(energy, delta_e_vec, color='k', linewidth=linewid)
     sp3.plot(energy, delta_r_vec, color='k', linewidth=linewid)

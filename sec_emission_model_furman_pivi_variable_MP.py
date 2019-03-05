@@ -51,8 +51,8 @@
 
 import numpy as np
 import numpy.random as random
-import electron_emission as ee
 from sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from scipy.integrate import cumtrapz
 
 
 class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
@@ -77,6 +77,20 @@ class SEY_model_furman_pivi_variable_MP(SEY_model_furman_pivi):
         self.variable_MP_size = True
 
         print('Secondary emission model: Furman-Pivi, varaible MP size, s=%.4f' % (self.s))
+
+    def average_true_sec_energy_CDF(self, delta_ts, E_0, energy):
+        pdf = self.average_true_sec_energy_PDF(delta_ts=delta_ts, E_0=E_0, energy=energy)
+        CDF = cumtrapz(pdf, energy, initial=0)
+        return CDF
+
+    def get_energy_average_true_sec(self, delta_ts, E_0):
+        uu = random.rand(len(E_0))
+        out_array = np.empty(0)
+        for ii, E_i in enumerate(E_0):
+            energy = np.linspace(0., E_i, 1000)
+            CDF = self.average_true_sec_energy_CDF(delta_ts=delta_ts[ii], E_0=E_i, energy=energy)
+            out_array = np.concatenate([out_array, np.array([np.interp(uu[ii], CDF, energy)])])
+        return out_array
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
         # Furman-Pivi algorithm
