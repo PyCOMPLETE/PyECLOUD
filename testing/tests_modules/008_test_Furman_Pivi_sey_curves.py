@@ -31,12 +31,12 @@ furman_pivi_surface_tweaked = {'exclude_rediffused': False,
                                'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
                                'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
                                # Parameters for backscattered electrons
-                               'p1EInf': 0.005,  # Changed this
-                               'p1Ehat': 0.496,
+                               'p1EInf': 0.002158,  # Changed this
+                               'p1Ehat': 0.709633,  # Changed this
                                'eEHat': 0.,
-                               'w': 40.86,  # Changed this
-                               'p': 0.5,  # Changed this
-                               'e1': 0.26,
+                               'w': 46.028959,  # Changed this
+                               'p': 0.468907,  # Changed this
+                               'e1': 0.,  # Changed this
                                'e2': 2.,
                                'sigmaE': 2.,
                                # Parameters for rediffused electrons
@@ -50,8 +50,8 @@ furman_pivi_surface_tweaked = {'exclude_rediffused': False,
                                'deltaTSHat': 1.8848,
                                'eHat0': 332.,
                                's': 1.35,
-                               't1': 0.5,  # t1 and t2 based on taylor expansion
-                               't2': 1.,   # of PyECLOUD formula for E_max(theta)
+                               't1': 0.727814,  # Changed this
+                               't2': 0.69333,  # Changed this
                                't3': 0.7,
                                't4': 1.,
                                }
@@ -117,7 +117,7 @@ furman_pivi_surface = {'exclude_rediffused': False,
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_LHC)
+                                   furman_pivi_surface=furman_pivi_surface_tweaked)
 
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
