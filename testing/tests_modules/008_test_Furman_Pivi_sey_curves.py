@@ -27,6 +27,37 @@ def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332.):
     return del_true
 
 
+furman_pivi_surface_tweaked = {'exclude_rediffused': False,
+                               'choice': 'poisson',
+                               'M_cut': 10,
+                               'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+                               'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+                               # Parameters for backscattered electrons
+                               'p1EInf': 0.005,  # Changed this
+                               'p1Ehat': 0.496,
+                               'eEHat': 0.,
+                               'w': 40.86,  # Changed this
+                               'p': 0.5,  # Changed this
+                               'e1': 0.26,
+                               'e2': 2.,
+                               'sigmaE': 2.,
+                               # Parameters for rediffused electrons
+                               'p1RInf': 0.2,
+                               'eR': 0.041,
+                               'r': 0.104,
+                               'q': 0.5,
+                               'r1': 0.26,
+                               'r2': 2.,
+                               # Parameters for true secondaries
+                               'deltaTSHat': 1.8848,
+                               'eHat0': 332.,
+                               's': 1.35,
+                               't1': 0.5,  # t1 and t2 based on taylor expansion
+                               't2': 1.,   # of PyECLOUD formula for E_max(theta)
+                               't3': 0.7,
+                               't4': 1.,
+                               }
+
 furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
@@ -57,6 +88,7 @@ furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            't3': 0.7,
                            't4': 1.,
                            }
+
 furman_pivi_surface = {'exclude_rediffused': False,
                        'choice': 'poisson',
                        'M_cut': 10,
@@ -186,11 +218,11 @@ for sp in [sp1, sp2, sp3, sp4, sp5, sp6]:
 
 plt.subplots_adjust(right=0.99, left=.05)
 
-test_obj = fp.SEY_model_furman_pivi(furman_pivi_surface=furman_pivi_surface_LHC)  # 276.8, 1.8848)
+test_obj = sey_mod  # 276.8, 1.8848)
 
 energy = np.linspace(0., 2000, num=int(1e3))
 
-for costheta in np.linspace(0, 1, 10):
+for costheta in np.linspace(0, 1., 10):
     delta_ts_vec = test_obj._delta_ts(energy, costheta)
     delta_e_vec = test_obj._delta_e(energy, costheta)
     delta_r_vec = test_obj._delta_r(energy, costheta)
