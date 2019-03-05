@@ -68,7 +68,6 @@ from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
 from sec_emission_model_furman_pivi import SEY_model_furman_pivi
-from sec_emission_model_furman_pivi_variable_MP import SEY_model_furman_pivi_variable_MP as SEY_model_FP_variable
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
@@ -358,13 +357,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                                 secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                                 furman_pivi_surface=thiscloud.furman_pivi_surface,
                                                 **kwargs_secem)
-            elif(thiscloud.switch_model == 'furman_pivi_variable_MP'):
-                sey_mod = SEY_model_FP_variable(E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
-                                                switch_no_increase_energy=thiscloud.switch_no_increase_energy,
-                                                thresh_low_energy=thiscloud.thresh_low_energy,
-                                                secondary_angle_distribution=thiscloud.secondary_angle_distribution,
-                                                furman_pivi_surface=thiscloud.furman_pivi_surface,
-                                                **kwargs_secem)
+
             else:
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 

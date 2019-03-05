@@ -77,10 +77,7 @@ furman_pivi_surface = {'exclude_rediffused': False,
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
                                    furman_pivi_surface=furman_pivi_surface_LHC)
-# sey_mod = fp_var.SEY_model_furman_pivi_variable_MP(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
-#                                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-#                                                    furman_pivi_surface=furman_pivi_surface_LHC)
-
+                                   
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hist=.1, scrub_en_th=25.,
                                              Nbin_En_hist=100, En_hist_max=3000, flag_seg=False,
