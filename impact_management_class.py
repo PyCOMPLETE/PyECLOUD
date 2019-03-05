@@ -321,6 +321,13 @@ class impact_management(object):
         return deltas
 
     def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass):
+        """
+        Extract energy distributions for secondary electrons.
+        Returns a dictionary containing one list for each event type. Each list
+        constains len(cos_theta_test) arrays with energy values corresponding to
+        one value of cos_theta_test and the energies E_impact_eV. To produce
+        energy distribution plots, make histograms of these arrays.
+        """
         dists = {}
 
         for etype in self.sey_mod.event_types.keys():

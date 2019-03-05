@@ -16,6 +16,17 @@ linewid = 2
 me = 9.10938356e-31
 
 
+def del_elas_ECLOUD(energy, R_0=0.7, E_max=332., E_0=150.):
+    del_elas = R_0 * ((np.sqrt(energy) - np.sqrt(energy + E_0)) / (np.sqrt(energy) + np.sqrt(energy + E_0)))**2
+    return del_elas
+
+
+def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332.):
+    x = energy / E_max
+    del_true = del_max * s * x / (s - 1 + x**s)
+    return del_true
+
+
 furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
@@ -39,7 +50,7 @@ furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            'r2': 2.,
                            # Parameters for true secondaries
                            'deltaTSHat': 1.8848,
-                           'eHat0': 322.,
+                           'eHat0': 332.,
                            's': 1.35,
                            't1': 0.5,  # t1 and t2 based on taylor expansion
                            't2': 1.,   # of PyECLOUD formula for E_max(theta)
@@ -162,7 +173,6 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
 
 sp3.plot(0, 0, 'white', label='Model')
-sp3.legend(loc='best', prop={'size': 14})
 sp1.set_ylabel('Delta true')
 sp2.set_ylabel('Delta elast')
 sp3.set_ylabel('Delta rediff')
@@ -175,7 +185,6 @@ for sp in [sp1, sp2, sp3, sp4, sp5, sp6]:
     sp.set_xlabel('Electron energy [eV]')
 
 plt.subplots_adjust(right=0.99, left=.05)
-
 
 test_obj = fp.SEY_model_furman_pivi(furman_pivi_surface=furman_pivi_surface_LHC)  # 276.8, 1.8848)
 
@@ -192,6 +201,10 @@ for costheta in np.linspace(0, 1, 10):
     sp5.plot(energy, delta_r_vec + delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
     sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
 
-plt.suptitle('SEY extraction tests: Furman-Pivi model', fontsize=30)
+sp2.plot(energy, del_elas_ECLOUD(energy), '--', color='r', linewidth=linewid, label='ECLOUD model \nnormal incidence')
+sp1.plot(energy, del_true_ECLOUD(energy, del_max=furman_pivi_surface_LHC['deltaTSHat']), '--', color='r', linewidth=linewid, label='ECLOUD model')
+sp2.legend(loc='best', prop={'size': 14})
+
+plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s'%str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)
 
 plt.show()

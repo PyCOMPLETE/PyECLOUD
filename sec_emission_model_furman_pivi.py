@@ -376,7 +376,7 @@ class SEY_model_furman_pivi():
             i_seg_new_MPs = np.array([])
 
         # extended_nel_emit_tot_events used for extraction of energy distributions
-        extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
+        # extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
         events = flag_truesec.astype(int)
         if N_true_sec > 0:
@@ -393,10 +393,11 @@ class SEY_model_furman_pivi():
             events = np.concatenate([events, events_add])
         extended_event_type = events
 
-        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
-                      'extended_event_type': extended_event_type,
+        # event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
+        #               'extended_event_type': extended_event_type,
+        #               }
+        event_info = {'extended_event_type': extended_event_type,
                       }
-
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
         n_emit_MPs[flag_backscattered] = 1.

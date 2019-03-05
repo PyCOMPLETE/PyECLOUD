@@ -35,7 +35,7 @@ furman_pivi_surface_LHC = {'exclude_rediffused': True,
                            'r2': 2.,
                            # Parameters for true secondaries
                            'deltaTSHat': 1.8848,
-                           'eHat0': 322.,
+                           'eHat0': 332.,
                            's': 1.35,
                            't1': 0.5,  # t1 and t2 based on taylor expansion
                            't2': 1.,   # of PyECLOUD formula for E_max(theta)
