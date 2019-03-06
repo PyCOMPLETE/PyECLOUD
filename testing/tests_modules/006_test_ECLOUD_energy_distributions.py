@@ -28,7 +28,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
 
 
 cos_theta_test = np.linspace(.1, 1., 10)
-E_0_single = 100
+E_0_single = 100.
 E_impact_eV_test = np.array([E_0_single] * int(1e5))
 n_rep = 100000
 alpha = 0.9
