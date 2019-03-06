@@ -69,7 +69,7 @@ sp1.set_title('switch_no_increase_energy=%d' % switch)
 
 for sp in [sp1, sp2]:
     sp.grid('on')
-    sp.set_xlabel('Electron energy [eV]')
+    sp.set_xlabel('Electron energy [eV]', fontsize=sz)
 
 plt.subplots_adjust(right=0.99, left=.06)
 
