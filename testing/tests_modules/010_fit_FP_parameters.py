@@ -24,7 +24,7 @@ def del_elas_ECLOUD(energy, R_0=0.7, E_max=332., E_0=150.):
     return del_elas
 
 
-def del_elas_FP(energy, p1EInf, p1Ehat, ww, pp):
+def del_elas_FP(energy, p1EInf, p1Ehat, ww, pp, p0=[1., 1., 1., 1.]):
     eEHat = 0
     exp_factor = -(np.abs(energy - eEHat) / ww)**pp / pp
     delta_e0 = p1EInf + (p1Ehat - p1EInf) * np.exp(exp_factor)
@@ -63,7 +63,7 @@ def _D(x, s):
     return s * x / (s - 1 + x**s)
 
 
-energy = np.linspace(0., 3000, num=int(1e3))
+energy = np.linspace(0.00001, 3000, num=int(1e3))
 del_max = 1.8848
 cos_theta = 0.9
 
@@ -161,10 +161,10 @@ def simple_pdf(energy, pp, eps):
     area = simps(pdf, energy)
     return pdf / area
 
-
+energy = np.linspace(0.0000001, 35., num=int(1e3))
 ene_hilleret = hilleret_energy(energy)
 
-popt_ene_true, pcov_ene_true = curve_fit(simple_pdf, energy, ene_hilleret)
+popt_ene_true, pcov_ene_true = curve_fit(simple_pdf, energy, ene_hilleret, p0=[1., 1.])
 fitted_ene_true = simple_pdf(energy, *popt_ene_true)
 
 sp3 = fig.add_subplot(2, 2, 3)
@@ -174,7 +174,7 @@ sp3.legend()
 sp3.set_ylabel('Energy distribution', fontsize=fontsz)
 sp3.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
 sp3.grid(alpha=alph)
-sp3.text(310, 0.3, 'Fitted parameters: \np: %f \neps: %f' % (popt_ene_true[0], popt_ene_true[1]))
+sp3.text(20, 0.04, 'Fitted parameters: \np: %f \neps: %f' % (popt_ene_true[0], popt_ene_true[1]))
 
 
 
