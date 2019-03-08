@@ -88,6 +88,13 @@ class polyg_cham_geom_object(object):
             self.R0_segments = np.squeeze(dict_chm['R0_segments'])
             self.Emax_segments = np.squeeze(dict_chm['Emax_segments'])
 
+            if 'flag_charging' in dict_chm.keys():
+                self.flag_charging = np.squeeze(dict_chm['flag_charging'])
+                self.Q_max_segments = np.squeeze(dict_chm['Q_max_segments'])
+                self.EQ_segments = np.squeeze(dict_chm['EQ_segments'])
+                self.tau_segments = np.squeeze(dict_chm['tau_segments'])
+
+
         if np.any(np.sqrt(np.diff(Vx)**2 + np.diff(Vy)**2) < 1e-9):
             raise PyECLOUD_ChamberException('There is a zero length segment!')
 
@@ -127,6 +134,8 @@ class polyg_cham_geom_object(object):
         self.N_edg = N_edg
         self.cx = cx
         self.cy = cy
+
+        self.L_edg = norm_N
 
         self.N_mp_impact = 0
         self.N_mp_corrected = 0

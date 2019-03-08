@@ -117,6 +117,9 @@ class SEY_model_ECLOUD(object):
 
         print('Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s))
 
+    def SEY_model_evol(self, Dt):
+        pass
+    
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = yield_fun2(
