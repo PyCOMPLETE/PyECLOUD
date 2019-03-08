@@ -64,8 +64,8 @@ class impact_management(object):
 
         print 'Start impact man. init.'
 
-        if flag_seg and chamb.chamb_type != 'polyg':
-                raise ValueError("""flag_seg can be True only with chamb_type='polyg'!!!!""")
+        if flag_seg and not(hasattr(chamb, 'N_vert')):
+                raise ValueError("""flag_seg can be True only with polygonal chambers!!!!""")
 
         self.chamb = chamb
         self.sey_mod = sey_mod

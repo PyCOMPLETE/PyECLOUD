@@ -286,7 +286,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
-            sey_mod = None
+            sey_mod = pac.Dummy_SEY()
         else:
 
             kwargs_secem = {}
@@ -364,6 +364,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init impact management
         flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+
+        if flag_seg and cc.chamb_type == 'ellip':
+            print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
+            flag_seg = False
+
+
         if thiscloud.switch_model == 'perfect_absorber':
             impact_man_class = pac.impact_management_perfect_absorber
         else:
