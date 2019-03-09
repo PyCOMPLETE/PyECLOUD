@@ -203,6 +203,7 @@ class Ecloud(object):
         self.save_beam_distributions_last_track = False
         self.save_beam_potential_and_field = False
         self.save_beam_potential = False
+        self.save_beam_field = False
 
         self.track_only_first_time = False
 
