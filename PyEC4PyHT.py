@@ -199,6 +199,10 @@ class Ecloud(object):
         self.save_ele_MP_position = False
         self.save_ele_MP_velocity = False
         self.save_ele_MP_size = False
+        
+        self.save_beam_distributions_last_track = False
+        self.save_beam_potential_and_field = False
+        self.save_beam_potential = False
 
         self.track_only_first_time = False
 
@@ -449,7 +453,6 @@ class Ecloud(object):
 
             if self.save_ele_distributions_last_track:
                 self.rho_ele_last_track.append(spacech_ele.rho.copy())
-                #print 'Here'
 
             if self.save_ele_potential:
                 self.phi_ele_last_track.append(spacech_ele.phi.copy())
@@ -457,6 +460,27 @@ class Ecloud(object):
             if self.save_ele_field:
                 self.Ex_ele_last_track.append(spacech_ele.efx.copy())
                 self.Ey_ele_last_track.append(spacech_ele.efy.copy())
+
+
+
+
+
+
+
+            if self.save_beam_distributions_last_track:
+                self.rho_beam_last_track.append(spacech_ele.rho.copy())
+
+            if self.save_beam_potential:
+                self.phi_beam_last_track.append(spacech_ele.phi.copy())
+
+            if self.save_beam_field:
+                self.Ex_beam_last_track.append(spacech_ele.efx.copy())
+                self.Ey_beam_last_track.append(spacech_ele.efy.copy())
+
+
+
+
+
 
             if self.save_ele_MP_position:
                 self.x_MP_last_track.append(MPe_for_save.x_mp.copy())
