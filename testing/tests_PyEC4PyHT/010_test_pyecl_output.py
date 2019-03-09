@@ -5,7 +5,7 @@ sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 from scipy.constants import c, e, m_p
 import numpy as np
 import pylab as pl
-import myfilemanager as mlm
+import PyECLOUD.myfilemanager as mlm
 import PyECLOUD.mystyle as ms
 
 n_segments = 1
