@@ -8,6 +8,8 @@ import pylab as plt
 import PyECLOUD.myfilemanager as mfm
 import PyECLOUD.mystyle as ms
 
+save_beam_fields = True
+
 n_segments = 1
 machine_configuration = '6.5_TeV_collision_tunes'
 p0_GeV = 2000
@@ -66,6 +68,11 @@ ecloud_multigrid.save_ele_distributions_last_track = True
 ecloud_multigrid.save_ele_field = True
 ecloud_multigrid.save_ele_potential = True
 
+if save_beam_fields:
+    ecloud_multigrid.save_beam_distributions_last_track = True
+    ecloud_multigrid.save_beam_field = True
+    ecloud_multigrid.save_beam_potential = True
+
 ecloud_multigrid.track(bunch)
 
 slices = bunch.get_slices(ecloud_multigrid.slicer)
@@ -87,7 +94,20 @@ sio.savemat('pinch_pic_data.mat', {
     'sigma_y_beam': bunch.sigma_y(),
     'sigma_z_beam': bunch.sigma_z(),
     }, oned_as = 'row')
-    
+
+if save_beam_fields:
+    sio.savemat('beam_pic_data.mat', {
+        'xg': xg,
+        'yg': yg,
+        'zg': slices.z_centers,
+        'rho': ecloud_multigrid.rho_beam_last_track,
+        'phi': ecloud_multigrid.phi_beam_last_track,
+        'Ex': ecloud_multigrid.Ex_beam_last_track,
+        'Ey': ecloud_multigrid.Ey_beam_last_track,
+        'sigma_x_beam': bunch.sigma_x(),
+        'sigma_y_beam': bunch.sigma_y(),
+        'sigma_z_beam': bunch.sigma_z(),
+        }, oned_as = 'row')
 
 x_obs = 0. 
 ix_obs = np.argmin(np.abs(xg - x_obs))

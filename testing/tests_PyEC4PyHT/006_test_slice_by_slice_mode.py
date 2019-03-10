@@ -5,7 +5,7 @@ sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 import numpy as np
 import pylab as pl
-import mystyle as ms
+import PyECLOUD.mystyle as ms
 import time
 
 

@@ -9,7 +9,7 @@ print ''
 
 import numpy as np
 import pylab as pl
-import mystyle as ms
+import PyECLOUD.mystyle as ms
 
 
 #~ filename = 'headtail_for_test/test_protons/shortSPS_Q20_proton_check_tune_spread_prb.dat'
