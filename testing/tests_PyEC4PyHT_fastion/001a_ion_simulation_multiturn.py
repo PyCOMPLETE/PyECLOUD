@@ -110,8 +110,8 @@ machine.buncher.add_statistics(sliceset=bunch_slots, beam=beam, statistics=True)
 
 mask_filled_slots = bunch_slots.n_macroparticles_per_slice > 0
 n_filled_slots = np.sum(mask_filled_slots)
-z_cuts_filled_slots = (np.min(bunch_slots.z_bins[mask_filled_slots]),
-                       np.max(bunch_slots.z_bins[np.append(mask_filled_slots, True)]))
+z_cuts_filled_slots = (np.min(bunch_slots.z_bins[:-1][mask_filled_slots]),
+                       np.max(bunch_slots.z_bins[1:][mask_filled_slots]))
 
 bunch_slicer = UniformBinSlicer(n_filled_slots, z_cuts=z_cuts_filled_slots)
 bunch_slices = beam.get_slices(bunch_slicer)
@@ -146,7 +146,7 @@ ecloud_sk = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / n_segments, slicer
 
 #print grid size
 nx, ny = ecloud_sk.spacech_ele.PyPICobj.nx, ecloud_sk.spacech_ele.PyPICobj.ny
-print 'nx = %d, ny = %d'%(nx, ny)
+print('nx = %d, ny = %d'%(nx, ny))
 
 
 # install ion clouds in the machine
@@ -155,12 +155,12 @@ machine.install_after_each_transverse_segment(ecloud_sk)
 
 # run simulation
 beam_monitor.dump(beam)
-print 'Start track...'
+print('Start track...')
 t_start_sw = time.mktime(time.localtime())
-print 'Time for initialization ', (t_start_sw - t_start), 's'
+print('Time for initialization %.3e s'%(t_start_sw - t_start))
 for i_turn in xrange(n_turns):
-    print 'Turn %d'%(i_turn + 1)
+    print('Turn %d'%(i_turn + 1))
     machine.track(beam)
     beam_monitor.dump(beam)
 t_stop_sw = time.mktime(time.localtime())
-print 'Done track in ', (t_stop_sw - t_start_sw), 's'
+print('Done track in %.3e s'%(t_stop_sw - t_start_sw))
