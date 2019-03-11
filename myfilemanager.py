@@ -4,16 +4,17 @@ import numpy as np
 class obj_from_dict:
     def __init__(self, dictto):
         for kk in dictto.keys():
-            exec 'self.'+kk +'= dictto[kk]'
+            setattr(self, kk, dictto[kk])
             
             
 def obj_to_dict(obj):
     dict_out={}
     members = dir(obj)
     for member in members:
-        exec "dict_out['%s'] = obj.%s"%(member,member)
+        dict_out[member] = getattr(obj, member)
     return dict_out
-            
+    
+
 def myloadmat(filename, squeeze = True):
     import scipy.io as sio
     dict_var=sio.loadmat(filename)
@@ -24,7 +25,6 @@ def myloadmat(filename, squeeze = True):
             except:
                 pass
     return dict_var
-    
             
             
 def myloadmat_to_obj(filename, squeeze = True):
@@ -43,7 +43,8 @@ def dict_of_arrays_and_scalar_from_h5(filename):
     
 def object_with_arrays_and_scalar_from_h5(filename):
     return  obj_from_dict(dict_of_arrays_and_scalar_from_h5(filename))
-    
+
+
 def monitorh5_to_dict(filename, key= 'Bunch'):
     import h5py
     with h5py.File(filename, 'r') as monitor_ev:

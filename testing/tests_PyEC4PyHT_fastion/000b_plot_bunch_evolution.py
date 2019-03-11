@@ -1,7 +1,7 @@
 import pylab as pl
 import numpy as np
 import seaborn as sns
-import myfilemanager as mfm
+import PyECLOUD.myfilemanager as mfm
 import pickle
 
 

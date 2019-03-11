@@ -1,8 +1,9 @@
 import pylab as pl
 import numpy as np
 import seaborn as sns
-import myfilemanager as mfm
 import time
+
+import PyECLOUD.myfilemanager as mfm
 
 pyhdtl = mfm.bunchh5_to_dict('bunch_evolution_A44_156b_26ips_10turns_5.00nTorr.h5')
 N_turns = 10

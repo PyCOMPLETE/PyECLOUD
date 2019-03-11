@@ -106,9 +106,11 @@ class beam_and_timing:
                     if 'sigmaz_vect' in dict_fillp.keys():
                         sigmaz_vect = np.squeeze(dict_fillp['sigmaz_vect'])
                 else:
-                    f = open(filling_pattern_file)
-                    exec(f.read())
-                    f.close()
+                    raise ValueError('Input of filling scheme via txt files is discontinued!')
+                    # Incompatible with Python3 because of the exec                   
+                    # f = open(filling_pattern_file)
+                    # exec(f.read())
+                    # f.close()
             else:
                 ppb_vect = np.atleast_1d(np.float_(np.array(filling_pattern_file)))
 
