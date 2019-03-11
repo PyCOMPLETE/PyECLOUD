@@ -45,7 +45,7 @@ class LHC(Synchrotron):
                 raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
             pp.n_segments = kwargs['n_segments']
-            pp.circumference = h_RF * 2.5e-9 * c
+            pp.circumference = pp.h_RF * 2.5e-9 * c
 
             pp.name = None
 
