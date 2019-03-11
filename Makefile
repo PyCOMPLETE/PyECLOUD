@@ -1,16 +1,17 @@
 
 .PHONY: local cern all
 
-# On arch linux, the command f2py2 has to be used for python2 programs such as PyECLOUD.
-# On ubuntu, there is no command called f2py2
-F2PY2_EXIST := $(shell command -v f2py2 2> /dev/null)
+# # On arch linux, the command f2py2 has to be used for python2 programs such as PyECLOUD.
+# # On ubuntu, there is no command called f2py2
+# F2PY2_EXIST := $(shell command -v f2py2 2> /dev/null)
+# 
+# ifdef F2PY2_EXIST
+# 		F2PY = f2py2
+# else
+# 		F2PY = f2py
+# endif
 
-ifdef F2PY2_EXIST
-		F2PY = f2py2
-else
-		F2PY = f2py
-endif
-
+F2PY = f2py
 
 all:local
 
