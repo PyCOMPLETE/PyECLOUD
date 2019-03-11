@@ -16,6 +16,8 @@ class LHC(Synchrotron):
         pp.machine_configuration = machine_configuration
         pp.optics_mode = optics_mode
 
+        pp.RF_at='end_of_transverse'
+
         pp.longitudinal_mode = 'non-linear'
         pp.alpha        = 3.225e-04
         pp.h_RF         = 35640
@@ -114,5 +116,5 @@ class LHC(Synchrotron):
                             accQ_x=pp.accQ_x, accQ_y=pp.accQ_y, Qp_x=pp.Qp_x, Qp_y=pp.Qp_y, app_x=pp.app_x, app_y=pp.app_y, app_xy=pp.app_xy,
                             alpha_mom_compaction=pp.alpha, longitudinal_mode=pp.longitudinal_mode,
                             h_RF=np.atleast_1d(pp.h_RF), V_RF=np.atleast_1d(pp.V_RF), dphi_RF=np.atleast_1d(pp.dphi_RF), p0=pp.p0, p_increment=pp.p_increment,
-                            charge=pp.charge, mass=pp.mass)
+                            charge=pp.charge, mass=pp.mass, RF_at=pp.RF_at)
 
