@@ -16,6 +16,8 @@ class LHC(Synchrotron):
         pp.machine_configuration = machine_configuration
         pp.optics_mode = optics_mode
 
+        pp.n_segments = 1
+
         pp.RF_at='end_of_transverse'
 
         pp.longitudinal_mode = 'non-linear'
