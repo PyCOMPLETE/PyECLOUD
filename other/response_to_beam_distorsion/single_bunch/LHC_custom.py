@@ -14,6 +14,8 @@ class LHC(BasicSynchrotron):
 
         pp = EmptyObject()
 
+        pp.n_segments = n_segments
+
         pp.machine_configuration = machine_configuration
 
         pp.circumference = 35640 * 2.5e-9 * c
