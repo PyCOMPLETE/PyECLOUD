@@ -76,3 +76,15 @@ def monitorh5list_to_dict(filename_list, key= 'Bunch', flag_transpose=False):
 def monitorh5list_to_obj(filename_list, key= 'Bunch', flag_transpose=False):
     return  obj_from_dict(monitorh5list_to_dict(filename_list, key, flag_transpose))
 
+
+def dict_to_h5(dict_save, filename):
+    import h5py
+    with h5py.File(filename, 'w') as fid:
+        for kk in dict_save.keys():
+                fid[kk] = dict_save[kk]
+
+
+
+
+
+

@@ -2,10 +2,15 @@ import time
 import numpy as np
 from scipy.constants import c, e, m_p
 import pickle
+
 import sys
 sys.path.append("../../../")
 sys.path.append("../../../PyHEADTAIL")
+
+
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
+import PyECLOUD.myfilemanager as mfm
+
 
 print 'Start initialization'
 t_start = time.mktime(time.localtime())
@@ -51,9 +56,14 @@ if optics_mode == 'smooth':
     machine = CLIC_DR(machine_configuration=machine_configuration, n_segments=n_segments)
 
 elif optics_mode == 'non-smooth':
-    with open('CLIC_DR_n260_optics.pkl') as fid:
-        optics = pickle.load(fid)
-    optics.pop('circumference')
+
+    # with open('CLIC_DR_n260_optics.pkl') as fid:
+    #     optics = pickle.load(fid)
+    # optics.pop('circumference')
+    # mfm.dict_to_h5(optics, 'CLIC_DR_n260_optics.h5')
+    
+    optics = mfm.dict_of_arrays_and_scalar_from_h5('CLIC_DR_n260_optics.h5')
+    
     machine = CLIC_DR(machine_configuration=machine_configuration, optics_mode='non-smooth', **optics)
 
 

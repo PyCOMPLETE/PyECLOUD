@@ -22,6 +22,7 @@ class CLIC_DR(Synchrotron):
 
         pp.machine_configuration = machine_configuration
         pp.optics_mode = optics_mode
+        pp.wrap_z = wrap_z
 
         pp.longitudinal_mode = 'non-linear' # we have to take the non-linear to try the multibunch
         pp.alpha        = 0.0001276102729
