@@ -212,11 +212,11 @@ class shortSPS(Synchrotron):
 
                 setattr(pp, attr, kwargs[attr]) 
  
-       super(shortSPS, self).__init__(optics_mode=pp.optics_mode, circumference=pp.circumference, n_segments=pp.n_segments, s=pp.s, name=pp.name,
+        super(shortSPS, self).__init__(optics_mode=pp.optics_mode, circumference=pp.circumference, n_segments=pp.n_segments, s=pp.s, name=pp.name,
                                  alpha_x=pp.alpha_x, beta_x=pp.beta_x, D_x=pp.D_x, alpha_y=pp.alpha_y, beta_y=pp.beta_y, D_y=pp.D_y,
                                  accQ_x=pp.accQ_x, accQ_y=pp.accQ_y, Qp_x=pp.Qp_x, Qp_y=pp.Qp_y, app_x=pp.app_x, app_y=pp.app_y, app_xy=pp.app_xy,
                                  alpha_mom_compaction=pp.alpha, longitudinal_mode=pp.longitudinal_mode,
-                                 h_RF=pp.np.atleast_1d(h_RF), V_RF=pp.np.atleast_1d(V_RF), dphi_RF=pp.np.atleast_1d(dphi_RF),
+                                 h_RF=np.atleast_1d(pp.h_RF), V_RF=np.atleast_1d(pp.V_RF), dphi_RF=np.atleast_1d(pp.dphi_RF),
                                  p0=pp.p0, p_increment=pp.p_increment,
                                  charge=pp.charge, mass=pp.mass)
 
@@ -327,7 +327,7 @@ class LHC(Synchrotron):
                             alpha_x=pp.alpha_x, beta_x=pp.beta_x, D_x=pp.D_x, alpha_y=pp.alpha_y, beta_y=pp.beta_y, D_y=pp.D_y,
                             accQ_x=pp.accQ_x, accQ_y=pp.accQ_y, Qp_x=pp.Qp_x, Qp_y=pp.Qp_y, app_x=pp.app_x, app_y=pp.app_y, app_xy=pp.app_xy,
                             alpha_mom_compaction=pp.alpha, longitudinal_mode=pp.longitudinal_mode,
-                            h_RF=pp.np.atleast_1d(h_RF), V_RF=pp.np.atleast_1d(V_RF), dphi_RF=pp.np.atleast_1d(dphi_RF), p0=pp.p0, p_increment=pp.p_increment,
+                            h_RF=np.atleast_1d(pp.h_RF), V_RF=np.atleast_1d(pp.V_RF), dphi_RF=np.atleast_1d(pp.dphi_RF), p0=pp.p0, p_increment=pp.p_increment,
                             charge=pp.charge, mass=pp.mass)
 
 
