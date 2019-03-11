@@ -15,7 +15,6 @@ class LHC(BasicSynchrotron):
         pp = EmptyObject()
 
         pp.machine_configuration = machine_configuration
-        pp.optics_mode = optics_mode
 
         pp.circumference = 35640 * 2.5e-9 * c
         pp.longitudinal_mode = 'non-linear'
