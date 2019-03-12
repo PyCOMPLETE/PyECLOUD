@@ -58,6 +58,7 @@ from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
 from scipy.misc import factorial
+import electron_emission
 
 
 class SEY_model_furman_pivi():
@@ -82,7 +83,6 @@ class SEY_model_furman_pivi():
         self.secondary_angle_distribution = secondary_angle_distribution
 
         if secondary_angle_distribution is not None:
-            import electron_emission
             self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
         else:
             self.angle_dist_func = None
