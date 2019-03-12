@@ -33,7 +33,7 @@ def myloadmat_to_obj(filename, squeeze = True):
     
 def dict_of_arrays_and_scalar_from_h5(filename):
     import h5py
-    with h5py.File(filename) as fid:
+    with h5py.File(filename, 'r') as fid:
         f_dict = {}
         for kk in fid.keys():
             f_dict[kk] = np.array(fid[kk]).copy()
