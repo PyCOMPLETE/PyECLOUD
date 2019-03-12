@@ -5,17 +5,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mystyle as ms
 from scipy.optimize import curve_fit
-from scipy.special import binom
 from scipy.misc import factorial
 from scipy.integrate import simps
-import sec_emission_model_furman_pivi as fp
 import scipy
 
 
 plt.close('all')
 ms.mystyle(20)
 linewid = 2
-fontsz = 20
+fontsz = 25
 alph = 0.5
 
 
@@ -44,8 +42,8 @@ popt, pcov = curve_fit(del_elas_FP, energy, del_e_ECLOUD)
 fitted = del_elas_FP(energy, *popt)
 
 fig = plt.figure(figsize=(20, 18), facecolor='white')
-fig.suptitle('Fitting Furman-Pivi model to ECLOUD model')
-sp1 = fig.add_subplot(2, 2, 1)
+fig.suptitle('Fitting Furman-Pivi model to ECLOUD model', fontsize=fontsz)
+sp1 = fig.add_subplot(3, 2, 1)
 sp1.plot(energy, del_e_ECLOUD, color='k', label='ECLOUD', linewidth=linewid)
 sp1.plot(energy, fitted, '--', color='r', label='Furman-Pivi', linewidth=linewid)
 sp1.legend()
@@ -96,7 +94,7 @@ popt_true, pcov_true = curve_fit(fit_func, energy, del_ts_ECLOUD)
 
 fitted_true = fit_func(energy, *popt_true)
 
-sp2 = fig.add_subplot(2, 2, 2)
+sp2 = fig.add_subplot(3, 2, 2)
 sp2.plot(energy, del_ts_ECLOUD, color='k', label='ECLOUD', linewidth=linewid)
 sp2.plot(energy, fitted_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
 sp2.legend()
@@ -125,7 +123,7 @@ ene_hilleret = hilleret_energy(energy)
 popt_ene_true, pcov_ene_true = curve_fit(simple_pdf, energy, ene_hilleret, p0=[1., 1.])
 fitted_ene_true = simple_pdf(energy, *popt_ene_true)
 
-sp3 = fig.add_subplot(2, 2, 3)
+sp3 = fig.add_subplot(3, 2, 3)
 sp3.plot(energy, ene_hilleret, color='k', label='ECLOUD', linewidth=linewid)
 sp3.plot(energy, fitted_ene_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
 sp3.legend()
@@ -138,10 +136,12 @@ sp3.text(20, 0.04, 'Fitted parameters: \np: %f \neps: %f' % (popt_ene_true[0], p
 M_cut = 10
 
 
-def true_sec_energy_PDF(delta_ts, nn, E_0, energy, p_n, eps_n):
+def true_sec_energy_PDF(nn, energy, p_n, eps_n):
     """The PDF for true secondary electrons."""
     if nn == 0:
         raise ValueError('nn = 0, you cannot emit zero electrons.')
+
+    delta_ts = 1.88
 
     nn_all = np.arange(0, M_cut + 1, 1)
 
@@ -152,10 +152,7 @@ def true_sec_energy_PDF(delta_ts, nn, E_0, energy, p_n, eps_n):
     eps_curr = eps_n[int(nn - 1)]
     p_n_curr = p_n[int(nn - 1)]
 
-    if E_0 == 0:
-        F_n = 0
-    else:
-        F_n = 1
+    F_n = 1
     f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
     area = scipy.integrate.simps(f_n_ts, energy)
     f_n_ts = f_n_ts / area  # normalisation
@@ -163,29 +160,89 @@ def true_sec_energy_PDF(delta_ts, nn, E_0, energy, p_n, eps_n):
     return f_n_ts, P_n_ts_return
 
 
-def average_true_sec_energy_PDF(delta_ts, E_0, energy, p_n, eps_n):
+def average_true_sec_energy_PDF(energy, p_1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+                                eps_1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10):
+
+    p_n = np.array([p_1, p2, p3, p4, p5, p6, p7, p8, p9, p10])
+    eps_n = np.array([eps_1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10])
+
     nns = np.arange(1, M_cut + 1, 1)
     average_f_n_ts = np.zeros_like(energy)
     for ii in nns:
-        f_n_ts, P_n_ts = true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, energy=energy, p_n=p_n, eps_n=eps_n)
+        f_n_ts, P_n_ts = true_sec_energy_PDF(nn=ii, energy=energy, p_n=p_n, eps_n=eps_n)
         average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
     area = scipy.integrate.simps(average_f_n_ts, energy)
     return average_f_n_ts / area
 
 
-energy = np.linspace(0.0000001, 35., num=int(1e3))
-ene_FP = pdf_elas_FP(energy, E_imp=35., sigma_e=.01)
+energy = np.linspace(0.00001, 35., num=int(1e3))
+ene_hilleret = hilleret_energy(energy)
 
-popt_ene_elas, pcov_ene_elas = curve_fit(pdf_elas_FP, energy, ene_FP, p0=[1., 1.])
-fitted_ene_elas = pdf_elas_FP(energy, *popt_ene_elas)
+popt_ene_true, pcov_ene_true = curve_fit(average_true_sec_energy_PDF, energy, ene_hilleret,
+                                         p0=[1.] * 20, bounds=(0.01, 100.))
+fitted_ene_true = average_true_sec_energy_PDF(energy, *popt_ene_true)
 
-sp4 = fig.add_subplot(2, 2, 4)
-sp4.plot(energy, ene_FP, color='k', label='ECLOUD', linewidth=linewid)
-sp4.plot(energy, fitted_ene_elas, '--', color='r', label='Furman-Pivi', linewidth=linewid)
+sp4 = fig.add_subplot(3, 2, 4)
+sp4.plot(energy, ene_hilleret, color='k', label='ECLOUD', linewidth=linewid)
+sp4.plot(energy, fitted_ene_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
 sp4.legend()
 sp4.set_ylabel('Energy distribution', fontsize=fontsz)
 sp4.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
 sp4.grid(alpha=alph)
-sp4.text(20, 0.04, 'Fitted parameters: \nE_0: %f \n$\sigma_e$: %f' % (popt_ene_elas[0], popt_ene_elas[1]))
+sp4.text(4, 0.068, 'Fitted parameters: \np_n: %s \n %s \n %s \nep_n: %s \n %s \n %s' % (str(popt_ene_true[0:4]),
+                                                                                        str(popt_ene_true[4:7]),
+                                                                                        str(popt_ene_true[7:10]),
+                                                                                        str(popt_ene_true[10:14]),
+                                                                                        str(popt_ene_true[14:17]),
+                                                                                        str(popt_ene_true[17:])))
+print('Fitted parameters for average true energy PDF:')
+print('p_n:')
+print(popt_ene_true[0:10])
+print('eps_n:')
+print(popt_ene_true[10:])
+
+
+# Comparison with other impactin energies
+# energy = np.linspace(0.00001, 100., num=int(1e3))
+# ene_hilleret = hilleret_energy(energy)
+#
+# fitted_ene_true = average_true_sec_energy_PDF(energy, *popt_ene_true)
+#
+# sp5 = fig.add_subplot(3, 2, 5)
+# sp5.plot(energy, ene_hilleret, color='k', label='ECLOUD', linewidth=linewid)
+# sp5.plot(energy, fitted_ene_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
+# sp5.legend()
+# sp5.set_ylabel('Energy distribution', fontsize=fontsz)
+# sp5.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
+# sp5.grid(alpha=alph)
+#
+# energy = np.linspace(0.00001, 10., num=int(1e3))
+# ene_hilleret = hilleret_energy(energy)
+#
+# fitted_ene_true = average_true_sec_energy_PDF(energy, *popt_ene_true)
+#
+# sp6 = fig.add_subplot(3, 2, 6)
+# sp6.plot(energy, ene_hilleret, color='k', label='ECLOUD', linewidth=linewid)
+# sp6.plot(energy, fitted_ene_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
+# sp6.legend()
+# sp6.set_ylabel('Energy distribution', fontsize=fontsz)
+# sp6.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
+# sp6.grid(alpha=alph)
+
+
+# energy = np.linspace(0.0000001, 35., num=int(1e3))
+# ene_FP = pdf_elas_FP(energy, E_imp=35., sigma_e=.01)
+#
+# popt_ene_elas, pcov_ene_elas = curve_fit(pdf_elas_FP, energy, ene_FP, p0=[1., 1.])
+# fitted_ene_elas = pdf_elas_FP(energy, *popt_ene_elas)
+#
+# sp4 = fig.add_subplot(2, 2, 4)
+# sp4.plot(energy, ene_FP, color='k', label='ECLOUD', linewidth=linewid)
+# sp4.plot(energy, fitted_ene_elas, '--', color='r', label='Furman-Pivi', linewidth=linewid)
+# sp4.legend()
+# sp4.set_ylabel('Energy distribution', fontsize=fontsz)
+# sp4.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
+# sp4.grid(alpha=alph)
+# sp4.text(20, 0.04, 'Fitted parameters: \nE_0: %f \n$\sigma_e$: %f' % (popt_ene_elas[0], popt_ene_elas[1]))
 
 plt.show()
