@@ -59,8 +59,8 @@ def monitorh5_to_dict(filename, key= 'Bunch'):
 def monitorh5_to_obj(filename, key= 'Bunch'):
     return  obj_from_dict(monitorh5_to_dict(filename, key))
     
-def monitorh5list_to_dict(filename_list, permissive=False):
-    monitor_dict = monitorh5_to_dict(filename_list[0])
+def monitorh5list_to_dict(filename_list, key='Bunch', permissive=False):
+    monitor_dict = monitorh5_to_dict(filename_list[0], key=key)
     for i_file in xrange(1,len(filename_list)):
         print('Loading '+filename_list[i_file])
         try:
@@ -75,8 +75,8 @@ def monitorh5list_to_dict(filename_list, permissive=False):
     
     return monitor_dict   
 
-def monitorh5list_to_obj(filename_list, key= 'Bunch', flag_transpose=False):
-    return  obj_from_dict(monitorh5list_to_dict(filename_list, key, flag_transpose))
+def monitorh5list_to_obj(filename_list, key= 'Bunch', permissive=False):
+    return  obj_from_dict(monitorh5list_to_dict(filename_list, key, permissive))
 
 
 def dict_to_h5(dict_save, filename):
