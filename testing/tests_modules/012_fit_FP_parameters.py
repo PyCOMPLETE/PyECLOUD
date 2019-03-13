@@ -58,7 +58,8 @@ def make_it_easier(*args):
                                'choice': 'poisson',
                                'M_cut': M_cut,
                                'p_n': np.array(args[0:10]),
-                               'eps_n': np.array(args[10:]),
+                               # 'eps_n': np.array(args[10:]),
+                               'eps_n': 1.634185 / (np.array(args[0:10]) - 1),
                                # Parameters for backscattered electrons
                                'p1EInf': 0.02,
                                'p1Ehat': 0.496,
@@ -102,7 +103,7 @@ ms.mystyle(20)
 linewid = 2
 fontsz = 25
 alph = 0.5
-E_imp_used_for_fit = 35.
+E_imp_used_for_fit = 100.
 
 
 def hilleret_energy(energy):
@@ -148,11 +149,12 @@ def true_sec_energy_PDF(nn, energy, p_n, eps_n):
 
 
 def average_true_sec_energy_PDF(energy, p_1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
-                                eps_1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10):
+                                # eps_1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10):
+                                ):
 
     p_n = np.array([p_1, p2, p3, p4, p5, p6, p7, p8, p9, p10])
-    eps_n = np.array([eps_1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10])
-
+    # eps_n = np.array([eps_1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10])
+    eps_n = 1.634185 / (p_n - 1)
     nns = np.arange(1, M_cut + 1, 1)
     average_f_n_ts = np.zeros_like(energy)
     for ii in nns:
@@ -170,16 +172,20 @@ bounds = ([1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
 energy = np.linspace(0.0001, E_imp_used_for_fit, 1000)
 ene_hilleret = hilleret_energy(energy)
 popt, pcov = curve_fit(average_true_sec_energy_PDF, energy, ene_hilleret, bounds=(1., 30.))
+print('Fitted parameters for average true energy PDF:')
+print('p_n:')
+print(popt[0:10])
+print('eps_n:')
+print(1.634185 / (popt[0:10] - 1))
 
-
-plt.figure(2)
-E_0s = np.array([5., 10., 20., 35., 50., 75., 100.])
-E_0s = np.array([20., 35., 50., 100.])
+plt.figure(2, figsize=(20, 15), facecolor='white')
+E_0s = np.array([10., 20., 35., 50., 75., 100., 300.])
+# E_0s = np.array([20., 35., 50., 100.])
 
 for i_E, E_0_curr in enumerate(E_0s):
     thiscol = ms.colorprog(i_E, len(E_0s))
     energy = np.linspace(0.00001, E_0_curr, num=int(1e3))
-    ene_hilleret = hilleret_energy(energy)
+    # ene_hilleret = hilleret_energy(energy)
 
     sey_mod_FP, impact_management_object, _ = make_it_easier(*popt)
 
@@ -188,13 +194,18 @@ for i_E, E_0_curr in enumerate(E_0s):
 
     dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=np.array([E_0_curr] * int(1e5)), cos_theta_test=[1], mass=me)
 
-    pdf_from_module = sey_mod_FP.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_curr, energy=energy)
-    plt.plot(energy, pdf_from_module, 'k', linewidth=linewid)
+    # pdf_from_module = sey_mod_FP.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_curr, energy=energy)
+    # plt.plot(energy, pdf_from_module, 'k', linewidth=linewid)
     pdf = average_true_sec_energy_PDF(energy, *popt)
     plt.plot(energy, pdf, color=thiscol, linestyle='--', linewidth=linewid, label='FP, $E_0 =$ %.0f' % E_0_curr)
-    plt.plot(energy, ene_hilleret, color=thiscol, linestyle='-', linewidth=linewid, label='ECLOUD, $E_0 =$ %.0f' % E_0_curr)
+    # plt.plot(energy, ene_hilleret, color=thiscol, linestyle='-', linewidth=linewid, label='ECLOUD, $E_0 =$ %.0f' % E_0_curr)
     # plt.hist(dists['true'][0], color=thiscol, alpha=alpha, density=True)
+ene_hilleret = hilleret_energy(energy=np.linspace(0.0001, 35., 1000))
+plt.plot(np.linspace(0.0001, 35., 1000), ene_hilleret, color='k', linestyle='-', linewidth=linewid, label='ECLOUD')
 plt.legend()
+plt.xlabel('Energy [eV]')
+plt.ylabel('Normalized energy distribution')
+plt.text(E_imp_used_for_fit / 2, 0.05, 'E_imp_used_for_fit= %.1f eV' % E_imp_used_for_fit)
 
 
 plt.show()

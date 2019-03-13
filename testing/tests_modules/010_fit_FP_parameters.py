@@ -50,7 +50,7 @@ furman_pivi_surface_LHC = {'exclude_rediffused': True,
 sey_mod_FP = fp.SEY_model_furman_pivi(furman_pivi_surface_LHC,
                                       E_th=None, sigmafit=None, mufit=None,
                                       switch_no_increase_energy=0, thresh_low_energy=None,
-                                      secondary_angle_distribution=None)
+                                      secondary_angle_distribution='cosine_3D')
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod_FP, Dx_hist=.1, scrub_en_th=25.,
@@ -399,7 +399,7 @@ for i_E, E_0_curr in enumerate(E_0s):
     delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_0_curr, costheta=1.)
     delta_ts_prime = delta_ts / (1 - delta_e)
 
-    dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=[E_0_curr] * int(1e5), cos_theta_test=1., mass=me)
+    dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=np.array([E_0_curr] * int(1e5)), cos_theta_test=[1.], mass=me)
 
 
     # def true_sec_energy_PDF(nn, energy, p_n, eps_n):
