@@ -2,375 +2,116 @@ from PyHEADTAIL.machines.synchrotron import Synchrotron
 import numpy as np
 from scipy.constants import c, e, m_p
 
-
-class SPS(Synchrotron):
-
-	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
-
-		longitudinal_mode = 'linear'
-		h_RF       	= 4620
-		mass 		= m_p
-		charge		= e
-
-		if machine_configuration == 'Q26-injection':
-			p0 		= 26e9 * e / c
-			p_increment 	= 0.
-			accQ_x		= 26.13
-			accQ_y		= 26.18
-			V_RF		= 2e6
-			dphi_RF		= 0.
-			alpha		= 0.00192
-			beta_x 		= 42.
-			D_x 		= 0
-			beta_y 		= 42.
-			D_y 		= 0
-		elif machine_configuration == 'Q20-injection':
-			p0 		= 26e9 * e / c
-			p_increment 	= 0.
-			accQ_x		= 20.13
-			accQ_y		= 20.18
-			V_RF		= 5.75e6
-			dphi_RF		= 0.
-			alpha		= 0.00308642
-			beta_x 		= 54.6
-			D_x 		= 0
-			beta_y 		= 54.6
-			D_y 		= 0
-		else:
-			raise ValueError('machine_configuration not recognized!')
-
-		if optics_mode == 'smooth':
-			if 's' in kwargs.keys():
-				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
-
-			n_segments = kwargs['n_segments']
-			circumference = 1100 * 2 * np.pi
-
-			name = None
-
-			alpha_x 	= None
-			alpha_y 	= None
-
-			s = None
-
-		elif optics_mode == 'non-smooth':
-			if 'n_segments' in kwargs.keys():
-				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
-			n_segments = None
-			circumference = None
-
-			name		= kwargs['name']
-
-			beta_x 		= kwargs['beta_x']
-			beta_y 		= kwargs['beta_y']
-
-			try:
-				D_x 		= kwargs['D_x']
-			except KeyError:
-				D_x 		= 0 * np.array(kwargs['s'])
-			try:
-				D_y 		= kwargs['D_y']
-			except KeyError:
-				D_y 		= 0 * np.array(kwargs['s'])
-
-			alpha_x 	= kwargs['alpha_x']
-			alpha_y 	= kwargs['alpha_y']
-
-			s = kwargs['s']
-
-		else:
-			raise ValueError('optics_mode not recognized!')
-
-		# detunings
-		Qp_x		= 0
-		Qp_y		= 0
-
-		app_x		= 0
-		app_y		= 0
-		app_xy		= 0
-
-		i_octupole_focusing = None
-		i_octupole_defocusing = None
-		octupole_knob = None
-
-		for attr in kwargs.keys():
-			if kwargs[attr] is not None:
-				if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
-					str2print = '[%s ...]'%repr(kwargs[attr][0])
-				else:
-					str2print = repr(kwargs[attr])
-				self.prints('Synchrotron init. From kwargs: %s = %s'
-                                    % (attr, str2print))
-				temp = kwargs[attr]
-				exec('%s = temp'%attr)
-
-		super(SPS, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-                            alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-                            accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-                            alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-                            h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-                            charge=charge, mass=mass)
-
-
-class shortSPS(Synchrotron):
-
-	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
-
-		longitudinal_mode = 'linear'
-		h_RF       	= 4620 / 6
-		mass 		= m_p
-		charge		= e
-
-		if machine_configuration == 'Q20-injection-like':
-			p0 		= 26e9 * e / c
-			p_increment 	= 0.
-			accQ_x		= 5.13
-			accQ_y		= 5.18
-			V_RF		= 5.75e6
-			dphi_RF		= 0.
-			alpha		= 6 * 0.00308642
-			beta_x 		= 54.6
-			D_x 		= 0
-			beta_y 		= 54.6
-			D_y 		= 0
-		else:
-			raise ValueError('machine_configuration not recognized!')
-
-		if optics_mode == 'smooth':
-			if 's' in kwargs.keys():
-				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
-
-			n_segments = kwargs['n_segments']
-			circumference = 1100 * 2 * np.pi / 6.
-
-			name = None
-
-			alpha_x 	= None
-			alpha_y 	= None
-
-			s = None
-
-		elif optics_mode == 'non-smooth':
-			if 'n_segments' in kwargs.keys():
-				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
-			n_segments = None
-			circumference = None
-
-			name		= kwargs['name']
-
-			beta_x 		= kwargs['beta_x']
-			beta_y 		= kwargs['beta_y']
-
-			try:
-				D_x 		= kwargs['D_x']
-			except KeyError:
-				D_x 		= 0 * np.array(kwargs['s'])
-			try:
-				D_y 		= kwargs['D_y']
-			except KeyError:
-				D_y 		= 0 * np.array(kwargs['s'])
-
-			alpha_x 	= kwargs['alpha_x']
-			alpha_y 	= kwargs['alpha_y']
-
-			s = kwargs['s']
-
-		else:
-			raise ValueError('optics_mode not recognized!')
-
-		# detunings
-		Qp_x		= 0
-		Qp_y		= 0
-
-		app_x		= 0
-		app_y		= 0
-		app_xy		= 0
-
-		i_octupole_focusing = None
-		i_octupole_defocusing = None
-		octupole_knob = None
-
-		for attr in kwargs.keys():
-			if kwargs[attr] is not None:
-				if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
-					str2print = '[%s ...]'%repr(kwargs[attr][0])
-				else:
-					str2print = repr(kwargs[attr])
-				self.prints('Synchrotron init. From kwargs: %s = %s'
-                                    % (attr, str2print))
-				temp = kwargs[attr]
-				exec('%s = temp'%attr)
-
-		super(shortSPS, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-                                 alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-                                 accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-                                 alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-                                 h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-                                 charge=charge, mass=mass)
-
+class EmptyObject(object):
+    pass
 
 class LHC(Synchrotron):
 
-	def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
+    def __init__(self, machine_configuration=None, optics_mode='smooth', **kwargs):
 
-		longitudinal_mode = 'non-linear'
-		alpha		= 3.225e-04
-		h_RF       	= 35640
-		mass 		= m_p
-		charge		= e
+        pp = EmptyObject()
 
-		if machine_configuration == 'Injection':
-			p0 			= 450e9 * e / c
-			p_increment = 0.
-			accQ_x		= 64.28
-			accQ_y		= 59.31
-			V_RF		= 6e6
-			dphi_RF		= 0.
-		elif machine_configuration == '6.5_TeV_collision_tunes':
-			p0 			= 6500e9 * e / c
-			p_increment = 0.
-			accQ_x		= 64.31
-			accQ_y		= 59.32
-			V_RF		= 12e6
-			dphi_RF		= 0.
-		else:
-			raise ValueError('machine_configuration not recognized!')
+        pp.machine_configuration = machine_configuration
+        pp.optics_mode = optics_mode
+        
+        pp.longitudinal_mode = 'non-linear'
+        pp.alpha       = 3.225e-04
+        pp.h_RF        = 35640
+        pp.mass        = m_p
+        pp.charge      = e
 
-		if optics_mode == 'smooth':
-			if 's' in kwargs.keys():
-				raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+        if pp.machine_configuration == 'Injection':
+            pp.p0          = 450e9 * e / c
+            pp.p_increment = 0.
+            pp.accQ_x      = 64.28
+            pp.accQ_y      = 59.31
+            pp.V_RF        = 6e6
+            pp.dphi_RF     = 0.
+        elif pp.machine_configuration == '6.5_TeV_collision_tunes':
+            pp.p0          = 6500e9 * e / c
+            pp.p_increment = 0.
+            pp.accQ_x      = 64.31
+            pp.accQ_y      = 59.32
+            pp.V_RF        = 12e6
+            pp.dphi_RF     = 0.
+        else:
+            raise ValueError('machine_configuration not recognized!')
 
-			n_segments = kwargs['n_segments']
-			circumference = 26658.8832
+        if pp.optics_mode == 'smooth':
+            if 's' in kwargs.keys():
+                raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
-			name = None
+            pp.n_segments = kwargs['n_segments']
+            pp.circumference = 26658.8832
 
-			beta_x 		= 92.7
-			D_x 		= 0
-			beta_y 		= 93.2
-			D_y 		= 0
+            pp.name = None
 
-			alpha_x 	= None
-			alpha_y 	= None
+            pp.beta_x      = 92.7
+            pp.D_x         = 0
+            pp.beta_y      = 93.2
+            pp.D_y         = 0
 
-			s = None
+            pp.alpha_x     = None
+            pp.alpha_y     = None
 
-		elif optics_mode == 'non-smooth':
-			if 'n_segments' in kwargs.keys():
-				raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
-			n_segments = None
-			circumference = None
+            pp.s = None
 
-			name		= kwargs['name']
+        elif pp.optics_mode == 'non-smooth':
+            if 'n_segments' in kwargs.keys():
+                raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+            pp.n_segments = None
+            pp.circumference = None
 
-			beta_x 		= kwargs['beta_x']
-			beta_y 		= kwargs['beta_y']
+            pp.name        = kwargs['name']
 
-			try:
-				D_x 		= kwargs['D_x']
-			except KeyError:
-				D_x 		= 0 * np.array(kwargs['s'])
-			try:
-				D_y 		= kwargs['D_y']
-			except KeyError:
-				D_y 		= 0 * np.array(kwargs['s'])
+            pp.beta_x      = kwargs['beta_x']
+            pp.beta_y      = kwargs['beta_y']
 
-			alpha_x 	= kwargs['alpha_x']
-			alpha_y 	= kwargs['alpha_y']
+            try:
+                pp.D_x         = kwargs['D_x']
+            except KeyError:
+                pp.D_x         = 0 * np.array(kwargs['s'])
+            try:
+                pp.D_y         = kwargs['D_y']
+            except KeyError:
+                pp.D_y         = 0 * np.array(kwargs['s'])
 
-			s = kwargs['s']
+            pp.alpha_x     = kwargs['alpha_x']
+            pp.alpha_y     = kwargs['alpha_y']
 
-		else:
-			raise ValueError('optics_mode not recognized!')
+            pp.s = kwargs['s']
 
-		# detunings
-		Qp_x		= 0
-		Qp_y		= 0
+        else:
+            raise ValueError('optics_mode not recognized!')
 
-		app_x		= 0
-		app_y		= 0
-		app_xy		= 0
+        # detunings
+        pp.Qp_x        = 0
+        pp.Qp_y        = 0
 
-		i_octupole_focusing = None
-		i_octupole_defocusing = None
-		octupole_knob = None
+        pp.app_x       = 0
+        pp.app_y       = 0
+        pp.app_xy      = 0
 
-		for attr in kwargs.keys():
-			if kwargs[attr] is not None:
-				if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
-					str2print = '[%s ...]'%repr(kwargs[attr][0])
-				else:
-					str2print = repr(kwargs[attr])
-				self.prints('Synchrotron init. From kwargs: %s = %s'
-                                    % (attr, str2print))
-				temp = kwargs[attr]
-				exec('%s = temp'%attr)
+        for attr in kwargs.keys():
+            if kwargs[attr] is not None:
+                if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
+                    str2print = '[%s ...]'%repr(kwargs[attr][0])
+                else:
+                    str2print = repr(kwargs[attr])
+                self.prints('Synchrotron init. From kwargs: %s = %s'
+                            % (attr, str2print))
 
-		if i_octupole_focusing is not None or i_octupole_defocusing is not None:
-			if octupole_knob is not None:
-				raise ValueError('octupole_knobs and octupole currents cannot be used at the same time!')
-			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)
-			self.i_octupole_focusing = i_octupole_focusing
-			self.i_octupole_defocusing = i_octupole_defocusing
+                if not hasattr(pp, attr):
+                    raise NameError("I don't understand %s"%attr)
 
-		if octupole_knob is not None:
-			if i_octupole_focusing is not None or i_octupole_defocusing is not None:
-				raise ValueError('octupole_knobs and octupole currents cannot be used at the same time!')
-			i_octupole_focusing, i_octupole_defocusing = self._octupole_currents_from_octupole_knobs(octupole_knob, p0)
-			app_x, app_y, app_xy = self._anharmonicities_from_octupole_current_settings(i_octupole_focusing, i_octupole_defocusing)
-			self.i_octupole_focusing = i_octupole_focusing
-			self.i_octupole_defocusing = i_octupole_defocusing
+                setattr(pp, attr, kwargs[attr]) 
 
-		super(LHC, self).__init__(optics_mode=optics_mode, circumference=circumference, n_segments=n_segments, s=s, name=name,
-                            alpha_x=alpha_x, beta_x=beta_x, D_x=D_x, alpha_y=alpha_y, beta_y=beta_y, D_y=D_y,
-                            accQ_x=accQ_x, accQ_y=accQ_y, Qp_x=Qp_x, Qp_y=Qp_y, app_x=app_x, app_y=app_y, app_xy=app_xy,
-                            alpha_mom_compaction=alpha, longitudinal_mode=longitudinal_mode,
-                            h_RF=np.atleast_1d(h_RF), V_RF=np.atleast_1d(V_RF), dphi_RF=np.atleast_1d(dphi_RF), p0=p0, p_increment=p_increment,
-                            charge=charge, mass=mass)
 
-	def _anharmonicities_from_octupole_current_settings(self, i_octupole_focusing, i_octupole_defocusing):
-			"""Calculate the constants of proportionality app_x, app_y and
-			app_xy (== app_yx) for the amplitude detuning introduced by the
-			LHC octupole magnets (aka. LHC Landau octupoles) from the
-			electric currents i_octupole_focusing [A] and i_octupole_defocusing [A] flowing
-			through the magnets. The maximum current is given by
-			i_max = +/- 550 [A]. The values app_x, app_y, app_xy obtained
-			from the formulae are proportional to the strength of detuning
-			for one complete turn around the accelerator, i.e. one-turn
-			values.
-			The calculation is based on formulae (3.6) taken from 'The LHC
-			transverse coupled-bunch instability' by N. Mounet, EPFL PhD
-			Thesis, 2012. Values (hard-coded numbers below) are valid for
-			LHC Landau octupoles before LS1. Beta functions in x and y are
-			correctly taken into account. Note that here, the values of
-			app_x, app_y and app_xy are not normalized to the reference
-			momentum p0. This is done only during the calculation of the
-			detuning in the corresponding detune method of the
-			AmplitudeDetuningSegment.
-			More detailed explanations and references on how the formulae
-			were obtained are given in the PhD thesis (pg. 85ff) cited
-			above.
-			"""
-			i_max = 550.  # [A]
-			E_max = 7000. # [GeV]
+        super(LHC, self).__init__(optics_mode=pp.optics_mode, circumference=pp.circumference, n_segments=pp.n_segments, s=pp.s, name=pp.name,
+                            alpha_x=pp.alpha_x, beta_x=pp.beta_x, D_x=pp.D_x, alpha_y=pp.alpha_y, beta_y=pp.beta_y, D_y=pp.D_y,
+                            accQ_x=pp.accQ_x, accQ_y=pp.accQ_y, Qp_x=pp.Qp_x, Qp_y=pp.Qp_y, app_x=pp.app_x, app_y=pp.app_y, app_xy=pp.app_xy,
+                            alpha_mom_compaction=pp.alpha, longitudinal_mode=pp.longitudinal_mode,
+                            h_RF=np.atleast_1d(pp.h_RF), V_RF=np.atleast_1d(pp.V_RF), dphi_RF=np.atleast_1d(pp.dphi_RF), p0=pp.p0, p_increment=pp.p_increment,
+                            charge=pp.charge, mass=pp.mass)
 
-			app_x = E_max * (267065. * i_octupole_focusing / i_max -
-                            7856. * i_octupole_defocusing / i_max)
-			app_y = E_max * (9789. * i_octupole_focusing / i_max -
-                            277203. * i_octupole_defocusing / i_max)
-			app_xy = E_max * (-102261. * i_octupole_focusing / i_max +
-                            93331. * i_octupole_defocusing / i_max)
-
-			# Convert to SI units.
-			convert_to_SI = e / (1.e-9 * c)
-			app_x *= convert_to_SI
-			app_y *= convert_to_SI
-			app_xy *= convert_to_SI
-
-			return app_x, app_y, app_xy
-
-	def _octupole_currents_from_octupole_knobs(self, octupole_knob, p0):
-		i_octupole_focusing = 19.557 * octupole_knob / (-1.5) * p0 / 2.4049285931335872e-16
-		i_octupole_defocusing = - i_octupole_focusing
-		return i_octupole_focusing, i_octupole_defocusing
 

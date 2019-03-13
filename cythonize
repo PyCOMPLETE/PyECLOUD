@@ -3,4 +3,4 @@
 #compile flags and link flags
 #CFLAGS="-Iinclude -fPIC"  \
 #LDFLAGS="-Llib "     \
-    python2 setup.py build_ext -i
+    python setup.py build_ext -i

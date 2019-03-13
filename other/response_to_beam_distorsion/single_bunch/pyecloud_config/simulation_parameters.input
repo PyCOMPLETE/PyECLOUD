@@ -15,7 +15,7 @@ import numpy as np
 dec_fact_out = 4.9
 
 lam_th=1.e2        #e-/m
-Dx_hist=0e-3      #m
+Dx_hist=0.2e-3      #m
 r_center=1.e-3     #m
 
 
