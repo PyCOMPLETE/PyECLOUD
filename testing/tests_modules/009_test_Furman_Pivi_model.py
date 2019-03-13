@@ -10,7 +10,7 @@ import scipy
 plt.close('all')
 ms.mystyle(12)
 linewid = 2
-fontsz = 16
+fontsz = 25
 
 furman_pivi_surface_LHC = {'exclude_rediffused': True,
                            'choice': 'poisson',
@@ -116,6 +116,16 @@ ax2.text(E_0_single / 2., ax2.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize
 ax2.hist(test_obj.get_energy_rediffused(E_0), density=True, bins=20)
 ax2.legend()
 ax6.legend()
+
+# Plot for slides
+# plt.figure(6, figsize=(12, 9), facecolor='white')
+# plt.plot(energy, prob_density_r, label='PDF', linewidth=linewid + 1)
+# plt.ylabel('Normalised energy spectrum', fontsize=fontsz)
+# plt.xlabel('Energy of the rediffused electrons', fontsize=fontsz)
+# plt.xticks(fontsize=fontsz - 5)
+# plt.yticks(fontsize=fontsz - 5)
+# plt.grid(.3)
+# plt.title('$E_0=$ %.0f eV' % E_0_single, fontsize=fontsz)
 
 # True secondary
 

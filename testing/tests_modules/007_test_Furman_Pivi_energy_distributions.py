@@ -10,7 +10,7 @@ from geom_impact_ellip import ellip_cham_geom_object
 
 
 plt.close('all')
-ms.mystyle(12)
+ms.mystyle(35)
 linewid = 2
 
 me = 9.10938356e-31
@@ -83,7 +83,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
 cos_theta_test = np.linspace(.1, 1., 10)
-E_0_single = 100
+E_0_single = 35.
 n_rep = int(1e5)
 E_impact_eV_test = np.array([E_0_single] * n_rep)
 alpha = 0.9
@@ -111,7 +111,7 @@ for i_ct, ct in enumerate(cos_theta_test):
 linewid = 3
 sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
 sp2.legend(loc='best', prop={'size': 14})
-sz = 24
+sz = 35
 sp1.set_ylabel('True secondaries', fontsize=sz)
 sp2.set_ylabel('Elastic', fontsize=sz)
 sp3.set_ylabel('Rediffused', fontsize=sz)
@@ -137,16 +137,18 @@ for sp in [sp1, sp2, sp3, sp4]:
     sp.grid('on')
     sp.set_xlabel('Electron energy [eV]')
 
-plt.subplots_adjust(right=0.99, left=.06)
+plt.subplots_adjust(right=0.99, left=.075)
 
 plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
 
-plt.figure(2, figsize=(1.5 * 8, 8), facecolor='white')
+plt.figure(2, figsize=(12, 9), facecolor='white')
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
     prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts_prime, nn=M, E_0=E_0_single, energy=energy)
     plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid)
 plt.legend()
-plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model')
-plt.xlabel('Energy [eV]')
+plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
+plt.xlabel('Energy [eV]', fontsize=sz - 10)
+plt.ylabel('Normalised energy spectrum', fontsize=sz - 10)
+plt.grid(.3)
 
 plt.show()
