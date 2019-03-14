@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -64,6 +64,7 @@ import geom_impact_rect_fast_impact as girfi
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
 from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
 from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
+from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
@@ -174,7 +175,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     # Init chamber
     flag_non_unif_sey = False
     for cloud_par in cloud_par_list:
-        if cloud_par.cc.switch_model == "ECLOUD_nunif":
+        if cloud_par.cc.switch_model=="ECLOUD_nunif" or cloud_par.cc.switch_model=="ECLOUD_nunif_charging":
             flag_non_unif_sey = True
 
     chamber_kwargs = {
@@ -285,7 +286,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
-            sey_mod = None
+            sey_mod = pac.Dummy_SEY()
         else:
 
             kwargs_secem = {}
@@ -317,6 +318,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                                 **kwargs_secem)
             elif thiscloud.switch_model == 'ECLOUD_nunif':
                 sey_mod = SEY_model_ECLOUD_non_unif(chamb, thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
+                                                    E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                    switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                    thresh_low_energy=thiscloud.thresh_low_energy,
+                                                    secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                    **kwargs_secem)
+            elif thiscloud.switch_model == 'ECLOUD_nunif_charging':
+                sey_mod = SEY_model_ECLOUD_non_unif_charging(chamb, thiscloud.Emax, thiscloud.del_max, thiscloud.R0,
                                                     E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                                     switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                                     thresh_low_energy=thiscloud.thresh_low_energy,
@@ -356,6 +364,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init impact management
         flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+
+        if flag_seg and cc.chamb_type == 'ellip':
+            print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
+            flag_seg = False
+
+
         if thiscloud.switch_model == 'perfect_absorber':
             impact_man_class = pac.impact_management_perfect_absorber
         else:
@@ -413,7 +427,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
                                        flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud,
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
-                                       copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey)
+                                       copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
+                                       step_by_step_custom_observables=cc.step_by_step_custom_observables,
+                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables, 
+                                       save_once_custom_observables=cc.save_once_custom_observables)
+
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker

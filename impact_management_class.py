@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -64,8 +64,8 @@ class impact_management(object):
 
         print 'Start impact man. init.'
 
-        if flag_seg and chamb.chamb_type != 'polyg':
-                raise ValueError("""flag_seg can be True only with chamb_type='polyg'!!!!""")
+        if flag_seg and not(hasattr(chamb, 'N_vert')):
+                raise ValueError("""flag_seg can be True only with polygonal chambers!!!!""")
 
         self.chamb = chamb
         self.sey_mod = sey_mod
@@ -110,6 +110,7 @@ class impact_management(object):
 
         if flag_seg:
             self.nel_hist_impact_seg = np.zeros(chamb.N_vert, float)
+            self.nel_hist_emit_seg = np.zeros(chamb.N_vert, float)
             self.energ_eV_impact_seg = np.zeros(chamb.N_vert, float)
 
         print 'Done impact man. init.'
@@ -129,6 +130,10 @@ class impact_management(object):
     def reset_hist_impact_seg(self):
         if self.flag_seg:
             self.nel_hist_impact_seg *= 0.
+
+    def reset_hist_emit_seg(self):
+        if self.flag_seg:
+            self.nel_hist_emit_seg *= 0.
 
     def reset_energ_impact_seg(self):
         if self.flag_seg:
@@ -255,6 +260,7 @@ class impact_management(object):
                 histf.compute_hist(x_replace, -nel_replace * E_replace_eV, bias_x_hist, Dx_hist, self.energ_eV_impact_hist)
                 if flag_seg:
                     segi.update_seg_impact(i_seg_replace, -nel_replace * E_replace_eV, self.energ_eV_impact_seg)
+                    segi.update_seg_impact(i_seg_replace, nel_replace, self.nel_hist_emit_seg)
 
                 # New macroparticles
                 N_new_MPs = len(nel_new_MPs)
@@ -270,7 +276,8 @@ class impact_management(object):
 
                     if flag_seg:
                         segi.update_seg_impact(i_seg_new_MPs, -nel_new_MPs * E_new_MPs_eV, self.energ_eV_impact_seg)
-
+                        segi.update_seg_impact(i_seg_new_MPs, nel_new_MPs, self.nel_hist_emit_seg)
+                    
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV * nel_new_MPs)
 
         return MP_e

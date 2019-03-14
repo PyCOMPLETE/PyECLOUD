@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -104,7 +104,7 @@ class Ecloud(object):
                  beam_monitor=None, verbose=False, save_pyecl_outp_as=None,
                  **kwargs):
 
-        print 'PyECLOUD Version 7.6.1'
+        print 'PyECLOUD Version 7.7.0'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) + '/.git'
@@ -199,6 +199,11 @@ class Ecloud(object):
         self.save_ele_MP_position = False
         self.save_ele_MP_velocity = False
         self.save_ele_MP_size = False
+        
+        self.save_beam_distributions_last_track = False
+        self.save_beam_potential_and_field = False
+        self.save_beam_potential = False
+        self.save_beam_field = False
 
         self.track_only_first_time = False
 
@@ -449,7 +454,6 @@ class Ecloud(object):
 
             if self.save_ele_distributions_last_track:
                 self.rho_ele_last_track.append(spacech_ele.rho.copy())
-                #print 'Here'
 
             if self.save_ele_potential:
                 self.phi_ele_last_track.append(spacech_ele.phi.copy())
@@ -457,6 +461,16 @@ class Ecloud(object):
             if self.save_ele_field:
                 self.Ex_ele_last_track.append(spacech_ele.efx.copy())
                 self.Ey_ele_last_track.append(spacech_ele.efy.copy())
+
+            if self.save_beam_distributions_last_track:
+                self.rho_beam_last_track.append(self.beam_PyPIC_state.rho.copy())
+
+            if self.save_beam_potential:
+                self.phi_beam_last_track.append(self.beam_PyPIC_state.phi.copy())
+
+            if self.save_beam_field:
+                self.Ex_beam_last_track.append(self.beam_PyPIC_state.efx.copy())
+                self.Ey_beam_last_track.append(self.beam_PyPIC_state.efy.copy())
 
             if self.save_ele_MP_position:
                 self.x_MP_last_track.append(MPe_for_save.x_mp.copy())
@@ -526,6 +540,20 @@ class Ecloud(object):
             self.Ex_ele_last_track = []
             self.Ey_ele_last_track = []
 
+        if self.save_beam_distributions_last_track:
+            self.rho_beam_last_track = []
+
+        if self.save_beam_potential_and_field:
+            self.save_beam_potential = True
+            self.save_beam_field = True
+
+        if self.save_beam_potential:
+            self.phi_beam_last_track = []
+
+        if self.save_beam_field:
+            self.Ex_beam_last_track = []
+            self.Ey_beam_last_track = []
+
         if self.save_ele_MP_position:
             self.x_MP_last_track = []
             self.y_MP_last_track = []
@@ -559,6 +587,16 @@ class Ecloud(object):
         if self.save_ele_field:
             self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
             self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
+        
+        if self.save_beam_distributions_last_track:
+            self.rho_beam_last_track = np.array(self.rho_beam_last_track[::-1])
+
+        if self.save_beam_potential:
+            self.phi_beam_last_track = np.array(self.phi_beam_last_track[::-1])
+
+        if self.save_beam_field:
+            self.Ex_beam_last_track = np.array(self.Ex_beam_last_track[::-1])
+            self.Ey_beam_last_track = np.array(self.Ey_beam_last_track[::-1])
 
         if self.save_ele_MP_position:
             self.x_MP_last_track = np.array(self.x_MP_last_track[::-1])
