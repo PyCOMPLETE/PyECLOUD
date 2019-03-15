@@ -179,7 +179,7 @@ print('eps_n:')
 print(1.634185 / (popt[0:10] - 1))
 
 plt.figure(2, figsize=(20, 15), facecolor='white')
-E_0s = np.array([10., 20., 35., 50., 75., 100., 300.])
+E_0s = np.array([10., 20., 35., 50., 75., 100., 300., 500.])
 # E_0s = np.array([20., 35., 50., 100.])
 
 for i_E, E_0_curr in enumerate(E_0s):

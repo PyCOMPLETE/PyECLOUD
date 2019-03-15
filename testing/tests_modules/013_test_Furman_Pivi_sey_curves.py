@@ -167,15 +167,27 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
     return deltas
 
 
+E_ts = 3000.
+E_e = 100.
+E_r = 10.
 cos_theta_test = np.linspace(0, 1., 10)
-E_impact_eV_test = np.array(list(np.arange(0, 499., 5.)) + list(np.arange(500., 2000, 25.)))
+E_impact_eV_test = np.array(list(np.arange(0, 499., 5.)) + list(np.arange(500., E_ts, 25.)))
+E_impact_eV_test_e = np.array(list(np.arange(0, E_e, .5)))
+E_impact_eV_test_r = np.array(list(np.arange(0, E_r, .05)))
 n_rep = int(1e3)
 
 deltas = extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge=qe, mass=me)
+deltas_e = extract_sey_curves(n_rep, E_impact_eV_test_e, cos_theta_test, charge=qe, mass=me)
+deltas_r = extract_sey_curves(n_rep, E_impact_eV_test_r, cos_theta_test, charge=qe, mass=me)
+
 del_true_mat = deltas['true']
 del_elast_mat = deltas['elast']
 del_rediff_mat = deltas['rediff']
 del_absorb_mat = deltas['absorb']
+
+del_elast_mat_2 = deltas_e['elast']
+del_rediff_mat_2 = deltas_r['rediff']
+
 
 plt.close('all')
 ms.mystyle_arial()
@@ -205,58 +217,64 @@ plt.yticks(fontsize=sz - 5)
 plt.subplots_adjust(bottom=.11)
 sp_r = fig_r.add_subplot(1, 1, 1)
 
-for i_ct, ct in enumerate(cos_theta_test):
-    thiscol = ms.colorprog(i_ct, len(cos_theta_test))
-    label = 'costheta=%.2f' % ct
-    sp1.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp_ts.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp2.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp_e.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp_r.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
-
-sp3.plot(0, 0, 'white', label='Model')
-sp1.set_ylabel('$\delta_{ts}$', fontsize=sz)
-sp_ts.set_ylabel('$\delta_{ts}$', fontsize=sz)
-sp2.set_ylabel('$\delta_{e}$', fontsize=sz)
-sp_e.set_ylabel('$\delta_{e}$', fontsize=sz)
-sp3.set_ylabel('$\delta_{r}$', fontsize=sz)
-sp_r.set_ylabel('$\delta_{r}$', fontsize=sz)
-sp4.set_ylabel('$\delta_{absorbed}$', fontsize=sz)
-sp5.set_ylabel('$\delta_{tot}$', fontsize=sz)
-sp6.set_ylabel(r'$\delta_{ts} + \delta_{e}$', fontsize=sz)
-
-for sp in [sp1, sp2, sp3, sp4, sp5, sp6, sp_ts, sp_e, sp_r]:
-    sp.grid('on')
-    sp.set_xlabel('Electron energy [eV]', fontsize=sz)
-
 plt.figure(fig1.number)
 plt.subplots_adjust(right=0.99, left=.07)
 
 test_obj = sey_mod
 
-energy = np.linspace(0., 2000, num=int(1e3))
+energy = np.linspace(0., E_ts, num=int(1e3))
+energy_e = np.linspace(0., E_e, num=int(2e2))
+energy_r = np.linspace(0., E_r, num=int(1e3))
 
 for costheta in np.linspace(0, 1., 10):
     delta_ts_vec = test_obj.delta_ts(energy, costheta)
     delta_e_vec = test_obj.delta_e(energy, costheta)
     delta_r_vec = test_obj.delta_r(energy, costheta)
 
+    delta_e_vec_2 = test_obj.delta_e(energy_e, costheta)
+    delta_r_vec_2 = test_obj.delta_r(energy_r, costheta)
+
     sp2.plot(energy, delta_e_vec, color='k', linewidth=linewid)
-    sp_e.plot(energy, delta_e_vec, color='k', linewidth=linewid)
+    sp_e.plot(energy_e, delta_e_vec_2, color='k', linewidth=linewid)
     sp3.plot(energy, delta_r_vec, color='k', linewidth=linewid)
-    sp_r.plot(energy, delta_r_vec, color='k', linewidth=linewid)
+    sp_r.plot(energy_r, delta_r_vec_2, color='k', linewidth=linewid)
     sp1.plot(energy, delta_ts_vec, color='k', linewidth=linewid)
     sp_ts.plot(energy, delta_ts_vec, color='k', linewidth=linewid)
     sp5.plot(energy, delta_r_vec + delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
     sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
 
-sp2.plot(energy, del_elas_ECLOUD(energy), '--', color='r', linewidth=linewid, label='ECLOUD model \nnormal incidence')
-sp1.plot(energy, del_true_ECLOUD(energy, del_max=furman_pivi_surface_LHC['deltaTSHat']), '--', color='r', linewidth=linewid, label='ECLOUD model')
-sp2.legend(loc='best', prop={'size': 14})
+for i_ct, ct in enumerate(cos_theta_test):
+    thiscol = ms.colorprog(i_ct, len(cos_theta_test))
+    label = 'costheta=%.2f' % ct
+    sp1.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp_ts.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp2.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp_e.plot(E_impact_eV_test_e, del_elast_mat_2[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp_r.plot(E_impact_eV_test_r, del_rediff_mat_2[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+
+sp3.plot(0, 0, 'white', label='Model')
+sp1.set_ylabel(r'$\delta_{ts}$', fontsize=sz)
+sp_ts.set_ylabel(r'$\delta_{ts}$', fontsize=sz)
+sp2.set_ylabel(r'$\delta_{e}$', fontsize=sz)
+sp_e.set_ylabel(r'$\delta_{e}$', fontsize=sz)
+sp3.set_ylabel(r'$\delta_{r}$', fontsize=sz)
+sp_r.set_ylabel(r'$\delta_{r}$', fontsize=sz)
+sp4.set_ylabel(r'$\delta_{absorbed}$', fontsize=sz)
+sp5.set_ylabel(r'$\delta_{tot}$', fontsize=sz)
+sp6.set_ylabel(r'$\delta_{ts} + \delta_{e}$', fontsize=sz)
+
+for sp in [sp1, sp2, sp3, sp4, sp5, sp6, sp_ts, sp_e, sp_r]:
+    sp.grid('on')
+    sp.set_xlabel('Electron energy [eV]', fontsize=sz)
+
+
+# sp2.plot(energy, del_elas_ECLOUD(energy), '--', color='r', linewidth=linewid, label='ECLOUD model \nnormal incidence')
+# sp1.plot(energy, del_true_ECLOUD(energy, del_max=furman_pivi_surface_LHC['deltaTSHat']), '--', color='r', linewidth=linewid, label='ECLOUD model')
+# sp2.legend(loc='best', prop={'size': 14})
 
 plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s'%str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)
 

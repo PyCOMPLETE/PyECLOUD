@@ -115,7 +115,7 @@ def _D(x, s):
 
 energy = np.linspace(0.00001, 3000, num=int(1e3))
 del_max = 1.8848
-cos_theta = 0.9
+cos_theta = 1.
 
 
 def delta_ts(energy, cos_theta, t1, t2):
@@ -184,7 +184,7 @@ sp3.text(20, 0.04, 'Fitted parameters: \np: %f \neps: %f' % (popt_ene_true[0], p
 M_cut = 10
 
 
-E_imp_used_for_fit = 100.
+E_imp_used_for_fit = 35.
 delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
@@ -375,102 +375,22 @@ sp6.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
 sp6.grid(alpha=alph)
 
 
-# energy = np.linspace(0.0000001, 35., num=int(1e3))
-# ene_FP = pdf_elas_FP(energy, E_imp=35., sigma_e=.01)
+# plt.figure(2)
+# E_0s = np.array([5., 10., 20., 35., 50., 75., 100.])
+# for i_E, E_0_curr in enumerate(E_0s):
+#     thiscol = ms.colorprog(i_E, len(E_0s))
+#     energy = np.linspace(0.00001, E_0_curr, num=int(1e3))
+#     ene_hilleret = hilleret_energy(energy)
+#     delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_0_curr, costheta=1.)
+#     delta_ts_prime = delta_ts / (1 - delta_e)
 #
-# popt_ene_elas, pcov_ene_elas = curve_fit(pdf_elas_FP, energy, ene_FP, p0=[1., 1.])
-# fitted_ene_elas = pdf_elas_FP(energy, *popt_ene_elas)
+#     dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=np.array([E_0_curr] * int(1e5)), cos_theta_test=[1.], mass=me)
 #
-# sp4 = fig.add_subplot(2, 2, 4)
-# sp4.plot(energy, ene_FP, color='k', label='ECLOUD', linewidth=linewid)
-# sp4.plot(energy, fitted_ene_elas, '--', color='r', label='Furman-Pivi', linewidth=linewid)
-# sp4.legend()
-# sp4.set_ylabel('Energy distribution', fontsize=fontsz)
-# sp4.set_xlabel('Emitted electron energy [eV]', fontsize=fontsz)
-# sp4.grid(alpha=alph)
-# sp4.text(20, 0.04, 'Fitted parameters: \nE_0: %f \n$\sigma_e$: %f' % (popt_ene_elas[0], popt_ene_elas[1]))
-
-plt.figure(2)
-E_0s = np.array([5., 10., 20., 35., 50., 75., 100.])
-for i_E, E_0_curr in enumerate(E_0s):
-    thiscol = ms.colorprog(i_E, len(E_0s))
-    energy = np.linspace(0.00001, E_0_curr, num=int(1e3))
-    ene_hilleret = hilleret_energy(energy)
-    delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_0_curr, costheta=1.)
-    delta_ts_prime = delta_ts / (1 - delta_e)
-
-    dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=np.array([E_0_curr] * int(1e5)), cos_theta_test=[1.], mass=me)
-
-
-    # def true_sec_energy_PDF(nn, energy, p_n, eps_n):
-    #     """The PDF for true secondary electrons."""
-    #     if nn == 0:
-    #         raise ValueError('nn = 0, you cannot emit zero electrons.')
-    #
-    #     delta_ts = delta_ts_prime
-    #
-    #     nn_all = np.arange(0, M_cut + 1, 1)
-    #
-    #     P_n_ts = np.squeeze(delta_ts**nn_all / factorial(nn_all) * np.exp(-delta_ts))
-    #
-    #     P_n_ts = P_n_ts / np.sum(P_n_ts)
-    #     P_n_ts_return = P_n_ts[int(nn)]
-    #     eps_curr = eps_n[int(nn - 1)]
-    #     p_n_curr = p_n[int(nn - 1)]
-    #
-    #     F_n = 1
-    #     f_n_ts = F_n * energy**(p_n_curr - 1) * np.exp(-energy / eps_curr)
-    #     area = scipy.integrate.simps(f_n_ts, energy)
-    #     f_n_ts = f_n_ts / area  # normalisation
-    #
-    #     return f_n_ts, P_n_ts_return
-    #
-    #
-    # def average_true_sec_energy_PDF(energy, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
-    #                                 eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10):
-    #
-    #     p_n = np.array([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10])
-    #     eps_n = np.array([eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10])
-    #
-    #     nns = np.arange(1, M_cut + 1, 1)
-    #     average_f_n_ts = np.zeros_like(energy)
-    #     for ii in nns:
-    #         f_n_ts, P_n_ts = true_sec_energy_PDF(nn=ii, energy=energy, p_n=p_n, eps_n=eps_n)
-    #         average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
-    #     area = scipy.integrate.simps(average_f_n_ts, energy)
-    #     return average_f_n_ts / area
-    #
-    # p1 = 2.5
-    # p2 = 3.3
-    # p3 = 2.5
-    # p4 = 2.5
-    # p5 = 2.8
-    # p6 = 1.3
-    # p7 = 1.5
-    # p8 = 1.5
-    # p9 = 1.5
-    # p10 = 1.5
-    # eps1 = 1.5
-    # eps2 = 1.75
-    # eps3 = 1.
-    # eps4 = 3.75
-    # eps5 = 8.5
-    # eps6 = 11.5
-    # eps7 = 2.5
-    # eps8 = 3.0
-    # eps9 = 2.5
-    # eps10 = 3.0
-    #
-    # pdf = average_true_sec_energy_PDF(energy, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
-    #                                   eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, eps9, eps10)
-    # plt.plot(energy, pdf, color=thiscol, linewidth=linewid, label='$E_0 =$ %.0f' % E_0_curr)
-    # pdf = sey_mod_FP.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_imp_used_for_fit, energy=energy)
-
-    pdf = average_true_sec_energy_PDF(energy, *popt_ene_true)
-    plt.plot(energy, pdf, color=thiscol, linestyle='--', linewidth=linewid, label='$E_0 =$ %.0f' % E_0_curr)
-    plt.plot(energy, ene_hilleret, color=thiscol, linestyle='-', linewidth=linewid, label='$E_0 =$ %.0f' % E_0_curr)
-    plt.hist(dists['true'][0], color=thiscol, alpha=alpha, density=True)
-plt.legend()
+#     pdf = average_true_sec_energy_PDF(energy, *popt_ene_true)
+#     plt.plot(energy, pdf, color=thiscol, linestyle='--', linewidth=linewid, label='$E_0 =$ %.0f' % E_0_curr)
+#     plt.plot(energy, ene_hilleret, color=thiscol, linestyle='-', linewidth=linewid, label='$E_0 =$ %.0f' % E_0_curr)
+#     plt.hist(dists['true'][0], color=thiscol, alpha=alpha, density=True)
+# plt.legend()
 
 
 plt.show()
