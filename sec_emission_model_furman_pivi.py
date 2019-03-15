@@ -334,18 +334,6 @@ class SEY_model_furman_pivi():
                 E_0=E_impact_eV[flag_truesec_and_above_zero])  # First generated MPs
 
             N_true_sec = np.sum(flag_above_zero)
-            vx_replace[flag_truesec_and_above_zero], vy_replace[flag_truesec_and_above_zero], vz_replace[flag_truesec_and_above_zero] = self.angle_dist_func(
-                N_true_sec, En_truesec_eV, Norm_x[flag_truesec_and_above_zero], Norm_y[flag_truesec_and_above_zero], mass)
-
-            # Handle absorbed MPs
-            flag_truesec_and_zero = flag_truesec & (n_emit_truesec_MPs == 0)
-            nel_replace[flag_truesec_and_zero] = 0.0
-            vx_replace[flag_truesec_and_zero] = 0.0
-            vy_replace[flag_truesec_and_zero] = 0.0
-            vz_replace[flag_truesec_and_zero] = 0.0
-            x_replace[flag_truesec_and_zero] = 0.0
-            y_replace[flag_truesec_and_zero] = 0.0
-            z_replace[flag_truesec_and_zero] = 0.0
 
             # Add new MPs
             n_add = n_emit_truesec_MPs - 1
@@ -392,6 +380,21 @@ class SEY_model_furman_pivi():
                         flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)
                         N_violations = np.sum(flag_violation)
 
+                # Replace velocities
+                vx_replace[flag_truesec_and_above_zero], vy_replace[flag_truesec_and_above_zero], vz_replace[flag_truesec_and_above_zero] = self.angle_dist_func(
+                    N_true_sec, En_truesec_eV, Norm_x[flag_truesec_and_above_zero], Norm_y[flag_truesec_and_above_zero], mass)
+
+                # Handle absorbed MPs
+                flag_truesec_and_zero = flag_truesec & (n_emit_truesec_MPs == 0)
+                nel_replace[flag_truesec_and_zero] = 0.0
+                vx_replace[flag_truesec_and_zero] = 0.0
+                vy_replace[flag_truesec_and_zero] = 0.0
+                vz_replace[flag_truesec_and_zero] = 0.0
+                x_replace[flag_truesec_and_zero] = 0.0
+                y_replace[flag_truesec_and_zero] = 0.0
+                z_replace[flag_truesec_and_zero] = 0.0
+
+                # New velocities
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_emit_truesec_MPs_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
