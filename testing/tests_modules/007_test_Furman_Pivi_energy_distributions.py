@@ -15,6 +15,37 @@ linewid = 2
 
 me = 9.10938356e-31
 
+furman_pivi_surface_tweak = {'exclude_rediffused': True,
+                             'choice': 'poisson',
+                             'M_cut': 10,
+                             'p_n': np.array([1.21963859, 1.66070543, 1.21935223, 1.09987752, 4.28158656, 1.02052557, 1.0247471, 1.02307995, 29.93491271, 1.02045612]),
+                             'eps_n': np.array([7.44033631e+00, 2.47339424e+00, 7.45004962e+00, 1.63618903e+01, 4.97986255e-01, 7.96170380e+01, 6.60354258e+01, 7.08053955e+01, 5.64779654e-02, 7.98873331e+01]),
+                             # Parameters for backscattered electrons
+                             'p1EInf': 0.002158,  # Changed this
+                             'p1Ehat': 0.709633,  # Changed this
+                             'eEHat': 0.,
+                             'w': 46.028959,  # Changed this
+                             'p': 0.468907,  # Changed this
+                             'e1': 0.,  # Changed this
+                             'e2': 2.,
+                             'sigmaE': 2.,
+                             # Parameters for rediffused electrons
+                             'p1RInf': 0.2,
+                             'eR': 0.041,
+                             'r': 0.104,
+                             'q': 0.5,
+                             'r1': 0.26,
+                             'r2': 2.,
+                             # Parameters for true secondaries
+                             'deltaTSHat': 1.8848,
+                             'eHat0': 332.,
+                             's': 1.35,
+                             't1': 0.706340,  # Changed this
+                             't2': 0.715223,  # Changed this
+                             't3': 0.7,
+                             't4': 1.,
+                             }
+
 furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
@@ -75,7 +106,7 @@ furman_pivi_surface = {'exclude_rediffused': False,
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_LHC)
+                                   furman_pivi_surface=furman_pivi_surface_tweak)
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hist=.1, scrub_en_th=25.,
@@ -83,7 +114,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
 cos_theta_test = np.linspace(.1, 1., 10)
-E_0_single = 35.
+E_0_single = 10.
 n_rep = int(1e5)
 E_impact_eV_test = np.array([E_0_single] * n_rep)
 alpha = 0.9

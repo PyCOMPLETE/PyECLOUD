@@ -16,6 +16,37 @@ me = 9.10938356e-31
 alpha = 0.9
 M_cut = 10
 
+furman_pivi_surface_tweak = {'exclude_rediffused': True,
+                             'choice': 'poisson',
+                             'M_cut': 10,
+                             'p_n': np.array([1.21963859, 1.66070543, 1.21935223, 1.09987752, 4.28158656, 1.02052557, 1.0247471, 1.02307995, 29.93491271, 1.02045612]),
+                             'eps_n': np.array([7.44033631e+00, 2.47339424e+00, 7.45004962e+00, 1.63618903e+01, 4.97986255e-01, 7.96170380e+01, 6.60354258e+01, 7.08053955e+01, 5.64779654e-02, 7.98873331e+01]),
+                             # Parameters for backscattered electrons
+                             'p1EInf': 0.002158,  # Changed this
+                             'p1Ehat': 0.709633,  # Changed this
+                             'eEHat': 0.,
+                             'w': 46.028959,  # Changed this
+                             'p': 0.468907,  # Changed this
+                             'e1': 0.,  # Changed this
+                             'e2': 2.,
+                             'sigmaE': 2.,
+                             # Parameters for rediffused electrons
+                             'p1RInf': 0.2,
+                             'eR': 0.041,
+                             'r': 0.104,
+                             'q': 0.5,
+                             'r1': 0.26,
+                             'r2': 2.,
+                             # Parameters for true secondaries
+                             'deltaTSHat': 1.8848,
+                             'eHat0': 332.,
+                             's': 1.35,
+                             't1': 0.706340,  # Changed this
+                             't2': 0.715223,  # Changed this
+                             't3': 0.7,
+                             't4': 1.,
+                             }
+
 furman_pivi_surface_LHC = {'exclude_rediffused': True,
                            'choice': 'poisson',
                            'M_cut': 10,
