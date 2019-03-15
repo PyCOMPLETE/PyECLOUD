@@ -15,7 +15,8 @@ from geom_impact_ellip import ellip_cham_geom_object
 me = 9.10938356e-31
 alpha = 0.9
 
-furman_pivi_surface_LHC = {'exclude_rediffused': True,
+furman_pivi_surface_LHC = {'conserve_energy': False,
+                           'exclude_rediffused': True,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),

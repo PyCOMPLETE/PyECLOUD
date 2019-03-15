@@ -15,7 +15,8 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_tweak = {'exclude_rediffused': True,
+furman_pivi_surface_tweak = {'conserve_energy': True,
+                             'exclude_rediffused': True,
                              'choice': 'poisson',
                              'M_cut': 10,
                              'p_n': np.array([1.21963859, 1.66070543, 1.21935223, 1.09987752, 4.28158656, 1.02052557, 1.0247471, 1.02307995, 29.93491271, 1.02045612]),
@@ -46,7 +47,8 @@ furman_pivi_surface_tweak = {'exclude_rediffused': True,
                              't4': 1.,
                              }
 
-furman_pivi_surface_LHC = {'exclude_rediffused': False,
+furman_pivi_surface_LHC = {'conserve_energy': True,
+                           'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -76,7 +78,8 @@ furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'exclude_rediffused': False,
+furman_pivi_surface = {'conserve_energy': False,
+                       'exclude_rediffused': False,
                        'choice': 'poisson',
                        'M_cut': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -106,7 +109,7 @@ furman_pivi_surface = {'exclude_rediffused': False,
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak)
+                                   furman_pivi_surface=furman_pivi_surface_LHC)
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hist=.1, scrub_en_th=25.,
@@ -114,8 +117,8 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
 cos_theta_test = np.linspace(.1, 1., 10)
-E_0_single = 10.
-n_rep = int(1e5)
+E_0_single = 35.
+n_rep = int(1e4)
 E_impact_eV_test = np.array([E_0_single] * n_rep)
 alpha = 0.9
 
