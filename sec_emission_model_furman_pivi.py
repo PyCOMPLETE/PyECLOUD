@@ -88,6 +88,7 @@ class SEY_model_furman_pivi():
             self.angle_dist_func = None
 
         # General model parameters
+        self.conserve_energy = furman_pivi_surface['conserve_energy']
         self.choice = furman_pivi_surface['choice']
         self.M_cut = furman_pivi_surface['M_cut']
         self.p_n = furman_pivi_surface['p_n']
@@ -356,6 +357,22 @@ class SEY_model_furman_pivi():
                 n_emit_truesec_MPs_extended = np.repeat(n_emit_truesec_MPs_flag_true_sec, n_add[flag_truesec])
 
                 En_truesec_eV_add = self.get_energy_true_sec(nn=n_emit_truesec_MPs_extended, E_0=E_impact_eV_add)
+
+                # Ensure energy conservation in each event
+                if self.conserve_energy:
+                    En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])
+                    E_impact_eV_add = np.repeat(E_impact_eV[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
+                    En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add
+                    flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
+                    N_violations = np.sum(flag_violation)
+                    while N_violations > 0:
+                        En_truesec_eV_add[flag_violation] = self.get_energy_true_sec(
+                            nn=n_emit_truesec_MPs_extended[flag_violation],
+                            E_0=E_impact_eV_add[flag_violation])
+                        En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add
+                        flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
+                        N_violations = np.sum(flag_violation)
+
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_emit_truesec_MPs_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 

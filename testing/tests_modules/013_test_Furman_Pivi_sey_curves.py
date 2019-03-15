@@ -27,7 +27,8 @@ def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332.):
     return del_true
 
 
-furman_pivi_surface_tweaked = {'exclude_rediffused': False,
+furman_pivi_surface_tweaked = {'conserve_energy': False,
+                               'exclude_rediffused': False,
                                'choice': 'poisson',
                                'M_cut': 10,
                                'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -58,7 +59,8 @@ furman_pivi_surface_tweaked = {'exclude_rediffused': False,
                                't4': 1.,
                                }
 
-furman_pivi_surface_LHC = {'exclude_rediffused': False,
+furman_pivi_surface_LHC = {'conserve_energy': False,
+                           'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -89,7 +91,8 @@ furman_pivi_surface_LHC = {'exclude_rediffused': False,
                            't4': 1.,
                            }
 
-furman_pivi_surface = {'exclude_rediffused': False,
+furman_pivi_surface = {'conserve_energy': False,
+                       'exclude_rediffused': False,
                        'choice': 'poisson',
                        'M_cut': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),

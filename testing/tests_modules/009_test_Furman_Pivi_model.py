@@ -13,7 +13,8 @@ linewid = 2
 fontsz = 25
 legendsize = fontsz
 
-furman_pivi_surface_tweak = {'exclude_rediffused': True,
+furman_pivi_surface_tweak = {'conserve_energy': False,
+                             'exclude_rediffused': True,
                              'choice': 'poisson',
                              'M_cut': 10,
                              'p_n': np.array([1.21963859, 1.66070543, 1.21935223, 1.09987752, 4.28158656, 1.02052557, 1.0247471, 1.02307995, 29.93491271, 1.02045612]),
@@ -44,7 +45,8 @@ furman_pivi_surface_tweak = {'exclude_rediffused': True,
                              't4': 1.,
                              }
 
-furman_pivi_surface_LHC = {'exclude_rediffused': True,
+furman_pivi_surface_LHC = {'conserve_energy': False,
+                           'exclude_rediffused': True,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -74,7 +76,8 @@ furman_pivi_surface_LHC = {'exclude_rediffused': True,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'exclude_rediffused': False,
+furman_pivi_surface = {'conserve_energy': False,
+                       'exclude_rediffused': False,
                        'choice': 'poisson',
                        'M_cut': 10,
                        'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
