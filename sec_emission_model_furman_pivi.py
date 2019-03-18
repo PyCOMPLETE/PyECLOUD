@@ -399,7 +399,7 @@ class SEY_model_furman_pivi():
                     n_emit_truesec_MPs_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
                 if flag_seg:
-                    i_seg_new_MPs = np.repeat(i_found, n_emit_truesec_MPs)
+                    i_seg_new_MPs = np.repeat(i_found, n_add)
                 else:
                     i_seg_new_MPs = None
 
