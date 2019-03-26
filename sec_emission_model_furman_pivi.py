@@ -386,17 +386,6 @@ class SEY_model_furman_pivi():
                 # Replace velocities
                 vx_replace[flag_truesec_and_above_zero], vy_replace[flag_truesec_and_above_zero], vz_replace[flag_truesec_and_above_zero] = self.angle_dist_func(
                     N_true_sec, En_truesec_eV, Norm_x[flag_truesec_and_above_zero], Norm_y[flag_truesec_and_above_zero], mass)
-
-                # Handle absorbed MPs
-                flag_truesec_and_zero = flag_truesec & (n_emit_truesec_MPs == 0)
-                nel_replace[flag_truesec_and_zero] = 0.0
-                vx_replace[flag_truesec_and_zero] = 0.0
-                vy_replace[flag_truesec_and_zero] = 0.0
-                vz_replace[flag_truesec_and_zero] = 0.0
-                x_replace[flag_truesec_and_zero] = 0.0
-                y_replace[flag_truesec_and_zero] = 0.0
-                z_replace[flag_truesec_and_zero] = 0.0
-
                 # New velocities
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
                     n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
@@ -405,6 +394,16 @@ class SEY_model_furman_pivi():
                     i_seg_new_MPs = np.repeat(i_found, n_add)
                 else:
                     i_seg_new_MPs = None
+
+            # Handle absorbed MPs
+            flag_truesec_and_zero = flag_truesec & (n_emit_truesec_MPs == 0)
+            nel_replace[flag_truesec_and_zero] = 0.0
+            vx_replace[flag_truesec_and_zero] = 0.0
+            vy_replace[flag_truesec_and_zero] = 0.0
+            vz_replace[flag_truesec_and_zero] = 0.0
+            x_replace[flag_truesec_and_zero] = 0.0
+            y_replace[flag_truesec_and_zero] = 0.0
+            z_replace[flag_truesec_and_zero] = 0.0
 
         if n_add_total == 0:
             nel_new_MPs = np.array([])
@@ -442,11 +441,13 @@ class SEY_model_furman_pivi():
                       }
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
-        n_emit_MPs[flag_backscattered] = 1.
+        n_emit_MPs[flag_backscattered] = 1
         if not self.exclude_rediffused:
-            n_emit_MPs[flag_rediffused] = 1.
+            n_emit_MPs[flag_rediffused] = 1
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
+        # if np.sum(nel_emit_tot_events) != np.sum(extended_nel_emit_tot_events):
+        #     raise ValueError('There is something wrong in the adding of new MPs\nnel_emit_tot_events: %d\nextended_nel_emit_tot_events: %d\nnel_replace + nel_new: %d' % (np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), np.sum(nel_replace) + np.sum(nel_new_MPs)))
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
