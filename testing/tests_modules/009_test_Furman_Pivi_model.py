@@ -13,7 +13,7 @@ linewid = 2
 fontsz = 25
 legendsize = fontsz
 
-furman_pivi_surface_tweak = {'conserve_energy': False,
+furman_pivi_surface_tweak = {'conserve_energy': True,
                              'exclude_rediffused': True,
                              'choice': 'poisson',
                              'M_cut': 10,

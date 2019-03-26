@@ -109,7 +109,7 @@ furman_pivi_surface = {'conserve_energy': False,
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_LHC)
+                                   furman_pivi_surface=furman_pivi_surface_tweak)
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hist=.1, scrub_en_th=25.,
@@ -118,7 +118,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
 
 cos_theta_test = np.linspace(.1, 1., 10)
 E_0_single = 35.
-n_rep = int(1e4)
+n_rep = int(1e5)
 E_impact_eV_test = np.array([E_0_single] * n_rep)
 alpha = 0.9
 
@@ -166,7 +166,6 @@ delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costhe
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_single, energy=energy)
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
-
 for sp in [sp1, sp2, sp3, sp4]:
     sp.grid('on')
     sp.set_xlabel('Electron energy [eV]')

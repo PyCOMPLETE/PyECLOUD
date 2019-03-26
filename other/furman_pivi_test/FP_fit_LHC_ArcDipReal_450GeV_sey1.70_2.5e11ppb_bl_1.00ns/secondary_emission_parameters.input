@@ -19,7 +19,7 @@ secondary_angle_distribution = 'cosine_3D'
 
 #Furman-Pivi
 import numpy as np
-furman_pivi_surface = {'conserve_energy': True,
+furman_pivi_surface = {'conserve_energy': False,
 					   'exclude_rediffused': True,
                        'choice': 'poisson',
                        'M_cut': 10,

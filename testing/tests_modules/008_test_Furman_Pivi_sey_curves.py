@@ -25,7 +25,7 @@ def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332.):
     return del_true
 
 
-furman_pivi_surface_tweaked = {'conserve_energy': False,
+furman_pivi_surface_tweaked = {'conserve_energy': True,
                                'exclude_rediffused': False,
                                'choice': 'poisson',
                                'M_cut': 10,

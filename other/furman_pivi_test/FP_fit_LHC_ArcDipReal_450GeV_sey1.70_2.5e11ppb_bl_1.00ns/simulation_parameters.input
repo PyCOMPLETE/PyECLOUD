@@ -57,10 +57,11 @@ Dh_sc = .3e-3
 t_sc_ON=0e-9;		#s
 sparse_solver = 'klu'
 
+flag_hist_impact_seg = 1
 
 flag_movie = 0             #1/0
 flag_sc_movie = 0          #1/0
 
 save_mp_state_time_file =  -1
 
-extract_sey = True
+extract_sey = False

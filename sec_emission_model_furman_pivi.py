@@ -52,6 +52,7 @@
 import numpy as np
 import numpy.random as random
 import scipy
+from scipy.special import gamma
 from scipy.special import gammainc
 from scipy.special import gammaincinv
 from scipy.special import binom
@@ -308,17 +309,19 @@ class SEY_model_furman_pivi():
 
         # True secondary
         N_true_sec = np.sum(flag_truesec)
-        n_emit_truesec_MPs_total = 0
+        n_add_total = 0
         n_emit_truesec_MPs = np.zeros_like(flag_truesec, dtype=int)
         if N_true_sec > 0:
             if self.exclude_rediffused:
                 delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec])
             else:
                 delta_ts_prime = delta_ts[flag_truesec] / (1 - delta_e[flag_truesec] - delta_r[flag_truesec])  # delta_ts^prime in FP paper, eq. (39)
+
+            # Decide how many MPs to be emitted
             n_emit_truesec_MPs[flag_truesec] = random.poisson(lam=delta_ts_prime)  # Using (45)
             n_emit_truesec_MPs_flag_true_sec = n_emit_truesec_MPs[flag_truesec]
             # Cut above M_cut
-            flag_above_th = (n_emit_truesec_MPs[flag_truesec] > self.M_cut)
+            flag_above_th = (n_emit_truesec_MPs_flag_true_sec > self.M_cut)
             Nabove_th = np.sum(flag_above_th)
             while Nabove_th > 0:
                 n_emit_truesec_MPs_flag_true_sec[flag_above_th] = random.poisson(delta_ts_prime[flag_above_th])
@@ -338,8 +341,8 @@ class SEY_model_furman_pivi():
             # Add new MPs
             n_add = n_emit_truesec_MPs - 1
             n_add[n_add < 0] = 0
-            n_emit_truesec_MPs_total = np.sum(n_add)
-            if n_emit_truesec_MPs_total != 0:
+            n_add_total = np.sum(n_add)
+            if n_add_total != 0:
                 # Clone MPs
                 x_new_MPs = np.repeat(x_impact, n_add)
                 y_new_MPs = np.repeat(y_impact, n_add)
@@ -396,14 +399,14 @@ class SEY_model_furman_pivi():
 
                 # New velocities
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
-                    n_emit_truesec_MPs_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
+                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
 
                 if flag_seg:
-                    i_seg_new_MPs = np.repeat(i_found, n_emit_truesec_MPs)
+                    i_seg_new_MPs = np.repeat(i_found, n_add)
                 else:
                     i_seg_new_MPs = None
 
-        if n_emit_truesec_MPs_total == 0:
+        if n_add_total == 0:
             nel_new_MPs = np.array([])
             x_new_MPs = np.array([])
             y_new_MPs = np.array([])
@@ -426,7 +429,8 @@ class SEY_model_furman_pivi():
         else:
             events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
         event_type = events
-        if n_emit_truesec_MPs_total != 0:
+
+        if n_add_total != 0:
             events_add = np.repeat(events, n_add)
             events = np.concatenate([events, events_add])
         extended_event_type = events
@@ -448,8 +452,8 @@ class SEY_model_furman_pivi():
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
 
     ############################################################################
-    #  The following functions are not used in the simulation code but are
-    #  provided here for use in tests and development.
+    #  The following functions are not used in the simulation code but are     #
+    #  provided here for use in tests and development.                         #
     ############################################################################
     def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
         """The PDF for backscattered electrons."""
@@ -510,7 +514,17 @@ class SEY_model_furman_pivi():
         average_f_n_ts = np.zeros_like(energy)
         for ii in nns:
             f_n_ts, P_n_ts = self.true_sec_energy_PDF(delta_ts=delta_ts, nn=ii, E_0=E_0, energy=energy)
-            average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
+            if False:#self.conserve_energy:
+                p_n_curr = self.p_n[ii - 1]
+                eps_n_curr = self.eps_n[ii - 1]
+                factor = eps_n_curr**p_n_curr * gamma(p_n_curr) * gammainc(ii * p_n_curr, E_0 / eps_n_curr)
+                factor = 1.
+                if ii - 1 == 0:
+                    average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii * 1. / factor
+                else:
+                    average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii * gammainc((ii - 1) * p_n_curr, (E_0 - energy) / eps_n_curr) / factor
+            else:
+                average_f_n_ts = average_f_n_ts + f_n_ts * P_n_ts * ii
         area = scipy.integrate.simps(average_f_n_ts, energy)
         return average_f_n_ts / area
     ############################################################################
