@@ -178,7 +178,7 @@ def velocities_angle_normal_emission(N_new_MP, En_gen, Norm_x, Norm_y, mass):
 
     vx_gen = v_gen_mod * Norm_x
     vy_gen = v_gen_mod * Norm_y
-    vz_gen = 0
+    vz_gen = np.zeros_like(v_gen_mod)
 
     return vx_gen, vy_gen, vz_gen
 
