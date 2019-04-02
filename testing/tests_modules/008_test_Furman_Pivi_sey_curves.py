@@ -230,9 +230,9 @@ for costheta in np.linspace(0, 1., 10):
     sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
 
 sp2.plot(energy, del_elas_ECLOUD(energy), '--', color='r', linewidth=linewid, label='ECLOUD model \nnormal incidence')
-sp1.plot(energy, del_true_ECLOUD(energy, del_max=furman_pivi_surface_LHC['deltaTSHat']), '--', color='r', linewidth=linewid, label='ECLOUD model')
+sp1.plot(energy, del_true_ECLOUD(energy, del_max=test_obj.deltaTSHat), '--', color='r', linewidth=linewid, label='ECLOUD model')
 sp2.legend(loc='best', prop={'size': 14})
 
-plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s'%str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)
+plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s' % str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)
 
 plt.show()
