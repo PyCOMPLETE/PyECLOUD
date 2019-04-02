@@ -73,17 +73,20 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
             Nabove_th = np.sum(flag_above_th)
 
     elif switch_no_increase_energy == 2:  # Cut emitted energy at En_impact_eV
+        En_emit_max = En_impact_eV.copy()
+        En_emit_max[En_impact_eV > E_th] = E_th
+
         flag_low_energy = En_impact_eV < thresh_low_energy
 
         en_eV = random.lognormal(mufit, sigmafit, Ngen)
-        flag_above_th = ((en_eV > En_impact_eV) & (~flag_low_energy))
+        flag_above_th = ((en_eV > En_emit_max) & (~flag_low_energy))
         Nabove_th = np.sum(flag_above_th)
-
         while Nabove_th > 0:
             en_eV[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
 
-            flag_above_th = ((en_eV > En_impact_eV) & (~flag_low_energy))
+            flag_above_th = ((en_eV > En_emit_max) & (~flag_low_energy))
             Nabove_th = np.sum(flag_above_th)
+
         N_low_ene = np.sum(flag_low_energy)
         en_eV[flag_low_energy] = En_impact_eV[flag_low_energy] * np.sqrt(random.rand(N_low_ene))  # Linear PDF for impacting energies < 1 eV
 
