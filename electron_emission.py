@@ -172,6 +172,17 @@ def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass):
 
     return vx_gen, vy_gen, vz_gen
 
+
+def velocities_angle_normal_emission(N_new_MP, En_gen, Norm_x, Norm_y, mass):
+    v_gen_mod = np.sqrt(2. * qe / mass * En_gen)
+
+    vx_gen = v_gen_mod * Norm_x
+    vy_gen = v_gen_mod * Norm_y
+    vz_gen = 0
+
+    return vx_gen, vy_gen, vz_gen
+
+
 # Interface
 
 
@@ -192,6 +203,9 @@ of generated electrons (https://indico.cern.ch/event/673160/).
 """)
         time.sleep(3)
         return velocities_angle_cosine_2D
+    elif string == 'normal_emission':
+        print('Electrons are emmited orthogonally to the chamber.')
+        return velocities_angle_normal_emission
     else:
         raise ValueError("""
 The emission angle distribution must be specified!
