@@ -120,7 +120,8 @@ furman_pivi_surface = {'conserve_energy': False,
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweaked)
+                                   furman_pivi_surface=furman_pivi_surface_tweaked, flag_costheta_delta_scale=True,
+                                   flag_costheta_Emax_shift=True)
 
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
@@ -193,12 +194,12 @@ sp6 = fig1.add_subplot(2, 3, 6, sharex=sp1)
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
-    sp1.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label)
-    sp2.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label)
-    sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label)
-    sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label)
-    sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
-    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label)
+    sp1.plot(E_impact_eV_test, del_true_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp2.plot(E_impact_eV_test, del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp3.plot(E_impact_eV_test, del_rediff_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+    sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
 
 sp3.plot(0, 0, 'white', label='Model')
 sp1.set_ylabel('Delta true')

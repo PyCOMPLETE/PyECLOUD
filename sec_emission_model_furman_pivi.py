@@ -74,7 +74,7 @@ class SEY_model_furman_pivi():
     def __init__(self, furman_pivi_surface,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                 ):
+                 flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
 
         self.E_th = E_th
         self.sigmafit = sigmafit
@@ -87,6 +87,9 @@ class SEY_model_furman_pivi():
             self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
         else:
             self.angle_dist_func = None
+
+        self.flag_costheta_delta_scale = flag_costheta_delta_scale
+        self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
         # General model parameters
         self.conserve_energy = furman_pivi_surface['conserve_energy']
@@ -141,7 +144,9 @@ class SEY_model_furman_pivi():
         # Already implemented in the impact_man class.
 
         # (2): Compute delta_e, delta_r, delta_ts
-        delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact)
+        delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact,
+                                                                flag_costheta_delta_scale=self.flag_costheta_delta_scale,
+                                                                flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
 
         # (3): Generate probability of number electrons created
 
@@ -169,44 +174,56 @@ class SEY_model_furman_pivi():
 
         return flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
-    def yield_fun_furman_pivi(self, E, costheta):
-        delta_e = self.delta_e(E, costheta)
-        delta_r = self.delta_r(E, costheta)
-        delta_ts = self.delta_ts(E, costheta)
+    def yield_fun_furman_pivi(self, E, costheta, flag_costheta_delta_scale, flag_costheta_Emax_shift):
+        delta_e = self.delta_e(E, costheta, flag_costheta_delta_scale)
+        delta_r = self.delta_r(E, costheta, flag_costheta_delta_scale)
+        delta_ts = self.delta_ts(E, costheta, flag_costheta_delta_scale, flag_costheta_Emax_shift)
         if (delta_e + delta_r >= 1).any():
             raise ValueError('delta_e + delta_r is greater than 1')
         return delta_e, delta_r, delta_ts
 
-    def delta_e(self, E_impact_eV, costheta_impact):
+    def delta_e(self, E_impact_eV, costheta_impact, flag_costheta_delta_scale=True):
         """
         SEY component of backscattered electrons (elastically scattered).
         (25) in FP paper.
         """
         exp_factor = -(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p
         delta_e0 = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(exp_factor)
-        angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
+        if flag_costheta_delta_scale:
+            angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
+        else:
+            angular_factor = 1
 
         return delta_e0 * angular_factor
 
-    def delta_r(self, E_impact_eV, costheta_impact):
+    def delta_r(self, E_impact_eV, costheta_impact, flag_costheta_delta_scale=True):
         """
         SEY component of rediffused electrons (not in ECLOUD model).
         (28) in FP paper.
         """
         exp_factor = -(E_impact_eV / self.eR)**self.r
         delta_r0 = self.p1RInf * (1. - np.exp(exp_factor))
-        angular_factor = 1. + self.r1 * (1. - costheta_impact**self.r2)
+        if flag_costheta_delta_scale:
+            angular_factor = 1. + self.r1 * (1. - costheta_impact**self.r2)
+        else:
+            angular_factor = 1
 
         return delta_r0 * angular_factor
 
-    def delta_ts(self, E_impact_eV, costheta_impact):
+    def delta_ts(self, E_impact_eV, costheta_impact, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
         """
         SEY component of true secondaries.
         (31) in FP paper.
         """
-        eHat = self.eHat0 * (1. + self.t3 * (1. - costheta_impact**self.t4))
+        if flag_costheta_Emax_shift:
+            eHat = self.eHat0 * (1. + self.t3 * (1. - costheta_impact**self.t4))
+        else:
+            eHat = self.eHat0
         delta_ts0 = self.deltaTSHat * self._D(E_impact_eV / eHat)
-        angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
+        if flag_costheta_delta_scale:
+            angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
+        else:
+            angular_factor = 1
 
         return delta_ts0 * angular_factor
 
