@@ -60,7 +60,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod_FP, Dx
 
 plt.close('all')
 ms.mystyle(20)
-linewid = 2
+linewid = 3
 fontsz = 25
 alph = 0.5
 
@@ -142,9 +142,12 @@ popt_true, pcov_true = curve_fit(fit_func, energy, del_ts_ECLOUD)
 
 fitted_true = fit_func(energy, *popt_true)
 
+taylor_true = delta_ts(energy, cos_theta, t1=0.5, t2=1.)
+
 sp2 = fig.add_subplot(3, 2, 2)
 sp2.plot(energy, del_ts_ECLOUD, color='k', label='ECLOUD', linewidth=linewid)
 sp2.plot(energy, fitted_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
+sp2.plot(energy, fitted_true, linestyle='-.', color='c', label='Furman-Pivi, Taylor', linewidth=linewid)
 sp2.legend()
 sp2.set_ylabel(r'$\delta_{true}$', fontsize=fontsz)
 sp2.set_xlabel('Impacting electron energy [eV]', fontsize=fontsz)
