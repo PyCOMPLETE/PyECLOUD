@@ -212,13 +212,18 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         except:
             beam_long_prof_file_path = b_par.beam_long_prof_file
 
+        if cc.progress_path is not None:
+            progress_mapgen_file = cc.progress_path + '_mapgen'
+        else:
+            progress_mapgen_file = None
+
         beamtim = beatim.beam_and_timing(b_par.flag_bunched_beam, b_par.fact_beam, b_par.coast_dens, b_par.q_part, b_par.beam_field_file, cc.lam_th,
                                          b_spac=b_par.b_spac, sigmaz=b_par.sigmaz, t_offs=b_par.t_offs, filling_pattern_file=b_par.filling_pattern_file, Dt=cc.Dt, t_end=cc.t_end,
                                          beam_long_prof_file=beam_long_prof_file_path, Dh_beam_field=b_par.Dh_beam_field, f_telescope_beam=b_par.f_telescope_beam,
                                          target_grid_beam=b_par.target_grid_beam, N_nodes_discard_beam=b_par.N_nodes_discard_beam, N_min_Dh_main_beam=b_par.N_min_Dh_main_beam,
                                          chamb=chamb, sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                                          x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
-                                         Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=(cc.progress_path + '_mapgen'))
+                                         Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=progress_mapgen_file)
 
         sec_beams_list = []
         if flag_presence_sec_beams:

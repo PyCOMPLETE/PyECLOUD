@@ -92,12 +92,13 @@ class pyecloud_saver:
             git_branch = 'Retrieving git branch failed'
             print(e)
         print(git_branch)
-
-        with open(self.logfile_path, 'w') as flog:
-            flog.write('PyECLOUD Version 7.7.0\n')
-            flog.write('%s\n' % git_hash)
-            flog.write('%s\n' % git_branch)
-            flog.write('Simulation started on %s\n' % timestr)
+        
+        if self.logfile_path is not None: 
+            with open(self.logfile_path, 'w') as flog:
+                flog.write('PyECLOUD Version 7.7.0\n')
+                flog.write('%s\n' % git_hash)
+                flog.write('%s\n' % git_branch)
+                flog.write('Simulation started on %s\n' % timestr)
 
         self.extract_sey = True
 
@@ -207,10 +208,12 @@ class pyecloud_saver:
 
         # Log
         print('Done init pyecloud_saver.')
-        flog = open(self.logfile_path, 'a')
-        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-        flog.write('Initialization finished on %s\n'%timestr)
-        flog.close()
+
+        if self.logfile_path is not None:
+            flog = open(self.logfile_path, 'a')
+            timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
+            flog.write('Initialization finished on %s\n'%timestr)
+            flog.close()
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
@@ -964,22 +967,24 @@ class pyecloud_saver:
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
             string_tolog = timestr + (' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot, self.cloud_name, np.sum(MP_e.nel_mp[0:MP_e.N_mp]), MP_e.N_mp))
-
-            try:
-                with open(self.logfile_path, 'a') as flog:
-                    flog.write(string_tolog)
-            except IOError as err:
-                print('Got: ', err)
-                print('while trying to write the following line on logfile:')
-                print(string_tolog)
-
-            try:
-                with open(self.progress_path, 'w') as flog:
-                    flog.write(('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot))))
-            except IOError as err:
-                print('Got: ', err)
-                print('while trying to write the following line on progress file:')
-                print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
+            
+            if self.logfile_path is not None:
+                try:
+                    with open(self.logfile_path, 'a') as flog:
+                        flog.write(string_tolog)
+                except IOError as err:
+                    print('Got: ', err)
+                    print('while trying to write the following line on logfile:')
+                    print(string_tolog)
+            
+            if self.progress_path is not None:
+                try:
+                    with open(self.progress_path, 'w') as flog:
+                        flog.write(('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot))))
+                except IOError as err:
+                    print('Got: ', err)
+                    print('while trying to write the following line on progress file:')
+                    print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
 
             #stop simulation
             try:
