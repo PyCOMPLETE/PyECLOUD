@@ -82,10 +82,9 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 class SEY_model_ECLOUD(object):
 
-    event_types = {
-            0: 'elast',
-            1: 'true',
-            }
+    event_types = {0: 'elast',
+                   1: 'true',
+                   }
 
     def __init__(
         self, Emax, del_max, R0,
@@ -209,8 +208,19 @@ class SEY_model_ECLOUD(object):
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
+        events = flag_truesec
         event_type = flag_truesec
-        event_info = {}
+        if n_add_total != 0:
+            events_add = np.repeat(event_type, n_add)
+            events = np.concatenate([event_type, events_add])
+        extended_event_type = events
+
+        # extended_nel_emit_tot_events used for extraction of energy distributions
+        extended_nel_emit_tot_events = np.concatenate([nel_emit_tot_events, nel_new_MPs])
+
+        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
+                      'extended_event_type': extended_event_type,
+                      }
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
