@@ -47,11 +47,15 @@ furman_pivi_surface_LHC = {'conserve_energy': False,
                            't4': 1.,
                            }
 
+flag_costheta_delta_scale = True
+flag_costheta_Emax_shift = True
 
 sey_mod_FP = fp.SEY_model_furman_pivi(furman_pivi_surface_LHC,
                                       E_th=None, sigmafit=None, mufit=None,
                                       switch_no_increase_energy=0, thresh_low_energy=None,
-                                      secondary_angle_distribution='cosine_3D')
+                                      secondary_angle_distribution='cosine_3D',
+                                      flag_costheta_Emax_shift=flag_costheta_Emax_shift,
+                                      flag_costheta_delta_scale=flag_costheta_delta_scale)
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod_FP, Dx_hist=.1, scrub_en_th=25.,
@@ -189,7 +193,9 @@ M_cut = 10
 
 
 E_imp_used_for_fit = 35.
-delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.)
+delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.,
+                                                        flag_costheta_Emax_shift=flag_costheta_Emax_shift,
+                                                        flag_costheta_delta_scale=flag_costheta_delta_scale)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 
@@ -269,7 +275,9 @@ print(popt_ene_true[10:])
 energy = np.linspace(0.00001, 100., num=int(1e3))
 ene_hilleret = hilleret_energy(energy)
 
-delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.)
+delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.,
+                                                        flag_costheta_Emax_shift=flag_costheta_Emax_shift,
+                                                        flag_costheta_delta_scale=flag_costheta_delta_scale)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 
@@ -325,7 +333,9 @@ sp5.grid(alpha=alph)
 energy = np.linspace(0.00001, 20., num=int(1e3))
 ene_hilleret = hilleret_energy(energy)
 
-delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.)
+delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.,
+                                                        flag_costheta_Emax_shift=flag_costheta_Emax_shift,
+                                                        flag_costheta_delta_scale=flag_costheta_delta_scale)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 

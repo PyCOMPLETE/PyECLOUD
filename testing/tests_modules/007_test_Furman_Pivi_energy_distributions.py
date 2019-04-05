@@ -107,9 +107,15 @@ furman_pivi_surface = {'conserve_energy': False,
                        't4': 1.,
                        }
 
+
+flag_costheta_Emax_shift = True
+flag_costheta_delta_scale = True
+
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak)
+                                   furman_pivi_surface=furman_pivi_surface_tweak,
+                                   flag_costheta_Emax_shift=flag_costheta_Emax_shift,
+                                   flag_costheta_delta_scale=flag_costheta_delta_scale)
 
 chamb = ellip_cham_geom_object(1., 1., flag_verbose_file=False)
 impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hist=.1, scrub_en_th=25.,
@@ -162,7 +168,9 @@ sp3.plot(energy, prob_density_r, 'k', label='PDF', linewidth=linewid)
 prob_density_e = test_obj.backscattered_energy_PDF(energy, E_0)
 sp2.plot(energy, prob_density_e, 'k', label='PDF', linewidth=linewid)
 # True secondaries
-delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.)
+delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.,
+                                                            flag_costheta_delta_scale=flag_costheta_delta_scale,
+                                                            flag_costheta_Emax_shift=flag_costheta_Emax_shift)
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_single, energy=energy)
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)

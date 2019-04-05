@@ -104,10 +104,14 @@ furman_pivi_surface = {'conserve_energy': False,
                        't3': 0.7,
                        't4': 1.,
                        }
+flag_costheta_Emax_shift = True
+flag_costheta_delta_scale = True
 
 test_obj = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                     switch_no_increase_energy=0, thresh_low_energy=-1,
-                                    furman_pivi_surface=furman_pivi_surface_tweak)
+                                    furman_pivi_surface=furman_pivi_surface_tweak,
+                                    flag_costheta_delta_scale=flag_costheta_delta_scale,
+                                    flag_costheta_Emax_shift=flag_costheta_Emax_shift)
 
 qq = 0.5  # From FP paper
 sigma_e = 2.
@@ -164,7 +168,9 @@ ax6.legend(loc='best', prop={'size': legendsize})
 
 # True secondary
 
-delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.)
+delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.,
+                                                            flag_costheta_Emax_shift=flag_costheta_Emax_shift,
+                                                            flag_costheta_delta_scale=flag_costheta_delta_scale)
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 
 nn = 2
