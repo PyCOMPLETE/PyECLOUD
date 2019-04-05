@@ -984,7 +984,7 @@ class pyecloud_saver:
                 except IOError as err:
                     print('Got: ', err)
                     print('while trying to write the following line on progress file:')
-                print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
+                    print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
 
             #stop simulation
             try:
