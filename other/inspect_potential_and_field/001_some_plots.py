@@ -16,6 +16,7 @@ gen_movie = False
 z_single_frame_interactive = -21e-2
 
 ob = mfm.myloadmat_to_obj('pinch_pic_data.mat')
+ob = mfm.myloadmat_to_obj('beam_pic_data.mat')
 
 ob.xg  =  ob.xg[N_discard:-N_discard]
 ob.yg  =  ob.yg[N_discard:-N_discard]  

@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -59,10 +59,12 @@ import os
 
 
 class BuildupSimulation(object):
+
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print('PyECLOUD Version 7.6.0')
+        print 'PyECLOUD Version 7.7.0'
+
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
             config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
@@ -97,6 +99,7 @@ class BuildupSimulation(object):
                 else:
                     raise ValueError('More than one checkpoint found in %s'%self.checkpoint_folder)
 
+
     def run(self, t_end_sim=None):
 
         beamtim = self.beamtim
@@ -108,6 +111,11 @@ class BuildupSimulation(object):
 
         ## simulation
         while not beamtim.end_simulation():
+            
+            if t_end_sim is not None and beamtim.tt_curr is not None:
+                if beamtim.tt_curr >= t_end_sim:
+                    print 'Reached user defined t_end_sim --> Ending simulation'
+                    break
 
             beamtim.next_time_step()
 
@@ -119,12 +127,7 @@ class BuildupSimulation(object):
 
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
-
-            ## every bunch passage
-            if t_end_sim is not None:
-                if beamtim.tt_curr > t_end_sim:
-                    print 'Reached user defined t_end_sim --> Ending simulation'
-                    break
+            
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
                       force_recompute_space_charge=False, skip_MP_cleaning=False, skip_MP_regen=False):
@@ -203,6 +206,9 @@ class BuildupSimulation(object):
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
 
+            ## Evolve SEY module (e.g. charge decay for insulators
+            impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
+
             ## Gas ionization (main and secondary beams)
             if(beamtim.tt_curr < t_ion and gas_ion_flag == 1):
                 MP_e = resgasion.generate(MP_e, beamtim.lam_t_curr, beamtim.Dt_curr, beamtim.sigmax, beamtim.sigmay,
@@ -239,7 +245,7 @@ class BuildupSimulation(object):
                 cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
                                                             cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, cloud_list, rho_cloud=cloud.rho)
+                                                            sec_beams_list, cloud_list, buildup_sim=self, rho_cloud=cloud.rho)
 
             ## Every bunch passage
             if beamtim.flag_new_bunch_pass:

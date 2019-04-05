@@ -226,6 +226,7 @@ Target number of MPs obtained after a soft regeneration.\\
 \multicolumn{2}{p{.97\textwidth}}{
 \textbf{Saving settings}
 }\\ \hline
+    \textbf{filen\_main\_outp} & Main output filename or path. (optional - default 'Pyecltest.mat') \\ \hline
     \textbf{dec\_fact\_out} & Output is saved only for every nth time step. \\ \hline
 \textbf{Dx\_hist}& 	[m] Defines the binning for the saving of the horizontal histograms.\\ \hline
 \textbf{r\_center}&	[m] Radius of a circle around the (0, 0) point (center of the chamber) for the calculation of the local central density.\\ \hline
@@ -280,6 +281,15 @@ Enables backing up the output file in regular intervals.\\ \hline
 
 [m] Defines a region of the chamber where a detailed horizontal distribution histogram is saved (\_det stands for detailed). \\
 \hline
+
+\textbf{step\_by\_step\_custom\_observables,
+            pass\_by\_pass\_custom\_observables,
+	    save\_once\_custom\_observables}&	(optional -- default: no custom output)
+
+Custom observable definition. See example for detailed usage. \\
+\hline
+
+
 \end{longtable}
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
@@ -297,6 +307,15 @@ Enables backing up the output file in regular intervals.\\ \hline
 }\\ \hline
 \textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline
 List of names of additional cloud files.\\ \hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{SEY} Extraction of the SEY curves can be disabled.
+}\\ \hline
+\textbf{extract\_sey} &  (optional -- default=True) \newline
+If set to False, it disables the extraction the SEY curves.\\ \hline
 \end{longtable}
 
 \newpage\subsection{Machine Parameters}
@@ -584,6 +603,7 @@ Different secondary emission models:
 \item switch\_model = 0 or `ECLOUD' for the model used in ECLOUD.
 \item switch\_model = `ACC\_LOW' for a more accurate treatment of low energy impacts.
 \item switch\_model = `ECLOUD\_nunif' for the model used in ECLOUD, with sey info in the chamber shape file.
+\item switch\_model = `ECLOUD\_nunif\_charging' for the model used in ECLOUD and charging effects, with sey and charging info in the chamber shape file.
 \item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
 \item switch\_model = `flat\_low\_ene' for flat low energy dependence.
 \item switch\_model = `from\_file` for interpolation of a user-specified curve.

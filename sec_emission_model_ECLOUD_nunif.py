@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -53,7 +53,7 @@ from numpy import sqrt, exp, take
 from numpy.random import rand
 import numpy as np
 from sec_emission_model_ECLOUD import SEY_model_ECLOUD
-
+from scipy.constants import e as qe
 
 def yield_fun2(E, costheta, Emax, del_max, R0, E0):
 
@@ -76,6 +76,7 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0):
 
 
 class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
+    
     def __init__(self, chamb, Emax, del_max, R0, E0=150.,
                  E_th=None, sigmafit=None, mufit=None,
                  switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
@@ -121,4 +122,73 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
             nel_emit = nel_impact * yiel
 
             return nel_emit, flag_elast, flag_truesec
+
+
+class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
+    
+    def __init__(self, chamb, Emax, del_max, R0, E0=150.,
+                 E_th=None, sigmafit=None, mufit=None,
+                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,   
+                 ):
+
+        super(SEY_model_ECLOUD_non_unif_charging, self).__init__(chamb, Emax, del_max, R0, E0,
+                    E_th, sigmafit, mufit,
+                    switch_no_increase_energy, thresh_low_energy, secondary_angle_distribution,   
+                    )
+        print 'Secondary emission model: ECLOUD non uniform E0=%f, with charging'%self.E0
+        
+        self.chamb = chamb
+        self.Q_segments = 0. * self.del_max_segments
+        self.flag_charging =  np.int_(chamb.flag_charging)>0
+        self.Q_max_segments = np.float_(chamb.Q_max_segments)
+        self.EQ_segments = np.float_(chamb.EQ_segments)
+        self.tau_segments = np.float_(chamb.tau_segments)
+
+
+    def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
+        
+        Emax_mp = take(self.Emax_segments, i_impact)
+        del_max_mp = take(self.del_max_segments, i_impact)
+        R0_mp = take(self.R0_segments, i_impact)
+
+        yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, Emax_mp, del_max_mp, R0_mp, E0=self.E0)
+                 
+        mask_charging = np.take(self.flag_charging, i_impact) 
+        if np.any(mask_charging):
+            Q_charging = np.take(self.Q_segments, i_impact[mask_charging])
+            Q_max = np.take(self.Q_max_segments, i_impact[mask_charging])
+            EQ = np.take(self.EQ_segments, i_impact[mask_charging])
+            
+            Q_charging[Q_charging<0.] = 0.
+            Q_charging[Q_charging>Q_max] = Q_max[Q_charging>Q_max]
+  
+            yiel[mask_charging] = yiel[mask_charging] * (1. - Q_charging/Q_max) + (1. - np.exp(-E_impact_eV[mask_charging]/EQ))*(Q_charging/Q_max)
+            
+            # This would preserve also the ener
+            # ref_frac[mask_charging] = ref_frac[mask_charging] * (1. - Q_charging/Q_max) + Q_charging/Q_max
+        
+        flag_elast = (rand(len(ref_frac)) < ref_frac)
+        flag_truesec = ~(flag_elast)
+   
+        nel_emit = nel_impact * yiel
+
+        for i_edg, flag_Q in enumerate(self.flag_charging):
+
+            if flag_Q:
+                mask_impact_here = (i_impact == i_edg)
+                n_impact_here = np.sum(nel_impact[mask_impact_here])
+                n_emit_here = np.sum(nel_emit[mask_impact_here])
+
+                self.Q_segments[i_edg] += (n_impact_here - n_emit_here)*(-qe)/self.chamb.L_edg[i_edg]
+
+        return nel_emit, flag_elast, flag_truesec
+
+    def SEY_model_evol(self, Dt): 
+        mask_evol = np.logical_and(self.flag_charging, self.tau_segments>0.)
+        self.Q_segments[mask_evol]*=np.exp(-Dt/self.tau_segments[mask_evol])
+
+
+
+
+
 

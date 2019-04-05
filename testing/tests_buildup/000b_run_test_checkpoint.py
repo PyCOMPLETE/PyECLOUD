@@ -40,14 +40,14 @@ filen_main_outp = sim_folder + '/Pyecltest_angle%s.mat' % args.angle_dist_func
 sim = BuildupSimulation(pyecl_input_folder=sim_folder, filen_main_outp=filen_main_outp,
                         secondary_angle_distribution=angle_distribution, photoelectron_angle_distribution=angle_distribution)
 signal.signal(signal.SIGALRM, handler)
-signal.alarm(25)
+signal.alarm(20)
 print('TIMER STARTED')
 time_0 = time.time()
 try:
     sim.run()
 except KillSimulation, exc:
     print(exc)
-    print("Checkpoint test: Termination done!")
+    print("***** Checkpoint test: Termination done!")
 
 time.sleep(5)
 

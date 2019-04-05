@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -92,12 +92,13 @@ class pyecloud_saver:
             git_branch = 'Retrieving git branch failed'
             print(e)
         print(git_branch)
-
-        with open(self.logfile_path, 'w') as flog:
-            flog.write('PyECLOUD Version 7.6.1\n')
-            flog.write('%s\n' % git_hash)
-            flog.write('%s\n' % git_branch)
-            flog.write('Simulation started on %s\n' % timestr)
+        
+        if self.logfile_path is not None: 
+            with open(self.logfile_path, 'w') as flog:
+                flog.write('PyECLOUD Version 7.7.0\n')
+                flog.write('%s\n' % git_hash)
+                flog.write('%s\n' % git_branch)
+                flog.write('Simulation started on %s\n' % timestr)
 
         self.extract_sey = True
         self.extract_ene_dist = False
@@ -113,10 +114,17 @@ class pyecloud_saver:
                         filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
-                        copy_main_outp_DT=None, extract_sey=None, extract_ene_dist=None):
-        print('Start pyecloud_saver observation')
+                        copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
+                        pass_by_pass_custom_observables=None,
+                        save_once_custom_observables=None,
+                        extract_ene_dist=None):
+      print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        self.step_by_step_custom_observables = step_by_step_custom_observables
+        self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
+        self.save_once_custom_observables = save_once_custom_observables
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
@@ -157,7 +165,8 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                   initial_size_t_vect=1000)
+                                   initial_size_t_vect=1000, 
+                                   step_by_step_custom_observables = self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
@@ -216,15 +225,17 @@ class pyecloud_saver:
 
         # Log
         print('Done init pyecloud_saver.')
-        flog = open(self.logfile_path, 'a')
-        timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
-        flog.write('Initialization finished on %s\n'%timestr)
-        flog.close()
+
+        if self.logfile_path is not None:
+            flog = open(self.logfile_path, 'a')
+            timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
+            flog.write('Initialization finished on %s\n'%timestr)
+            flog.close()
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
                 t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams, sec_beams_list,
-                cloud_list, rho_cloud=None):
+                cloud_list, buildup_sim, rho_cloud=None):
 
         ####################################################
         # Quantities saved at custom times provided by user #
@@ -254,7 +265,7 @@ class pyecloud_saver:
         #########################
         # Step-by-step saveings #
         #########################
-        self._stepbystep_data_save(impact_man, MP_e, beamtim)
+        self._stepbystep_data_save(impact_man, MP_e, beamtim, buildup_sim)
 
         ##########################################################
         # Quantities saved at each bunch passage and dump to file #
@@ -262,7 +273,7 @@ class pyecloud_saver:
 
         if beamtim.flag_new_bunch_pass:
 
-            self._pass_by_pass_data_save(MP_e, impact_man, beamtim)
+            self._pass_by_pass_data_save(MP_e, impact_man, beamtim, buildup_sim)
 
             # I want all elements that go to the output file to be members of this object
             self.xg_hist = impact_man.xg_hist
@@ -270,7 +281,7 @@ class pyecloud_saver:
             self.b_spac = beamtim.b_spac
             self.area = impact_man.chamb.area
 
-            sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
+            sio.savemat(self.filen_main_outp, self.build_outp_dict(buildup_sim), oned_as='row')
 
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
@@ -298,11 +309,13 @@ class pyecloud_saver:
         self.N_mp_ref_pass = []
 
         if impact_man.flag_seg:
-                self.nel_hist_impact_seg = []
-                self.energ_eV_impact_seg = []
+           self.nel_hist_impact_seg = []
+           self.nel_hist_emit_seg = []
+           self.energ_eV_impact_seg = []
         else:
-                self.nel_hist_impact_seg = -1
-                self.energ_eV_impact_seg = -1
+           self.nel_hist_impact_seg = -1
+           self.nel_hist_emit_seg = -1
+           self.energ_eV_impact_seg = -1
 
         # detailed hist
         self.flag_hist_det = False
@@ -325,8 +338,15 @@ class pyecloud_saver:
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
+        
+        # Custom data
+        self.pbp_custom_data = {}
+        if self.pass_by_pass_custom_observables is not None:
+            for kk in self.pass_by_pass_custom_observables.keys():
+                self.pbp_custom_data[kk] = []
 
-    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim):
+
+    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim, buildup_sim):
         #update histograms
         self.nel_hist_line = 0.0 * self.nel_hist_line
         if MP_e.N_mp > 0:
@@ -365,13 +385,22 @@ class pyecloud_saver:
             impact_man.reset_hist_impact_seg()
 
         if impact_man.flag_seg:
+            self.nel_hist_emit_seg.append(impact_man.nel_hist_emit_seg.copy())
+            impact_man.reset_hist_emit_seg()
+
+        if impact_man.flag_seg:
             self.energ_eV_impact_seg.append(impact_man.energ_eV_impact_seg.copy())
             impact_man.reset_energ_impact_seg()
 
         if self.flag_hist_det:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
-    def build_outp_dict(self):
+        if self.pass_by_pass_custom_observables is not None:
+            for kk in self.pass_by_pass_custom_observables.keys():
+               self.pbp_custom_data[kk].append(
+                       self.pass_by_pass_custom_observables[kk](buildup_sim))
+
+    def build_outp_dict(self, buildup_sim):
         saved_dict = {
             't_hist': self.t_hist,
                     'nel_hist': self.nel_hist,
@@ -390,6 +419,7 @@ class pyecloud_saver:
                     'N_mp_pass': self.N_mp_pass,
                     'N_mp_ref_pass': self.N_mp_ref_pass,
                     'nel_hist_impact_seg': self.nel_hist_impact_seg,
+                    'nel_hist_emit_seg': self.nel_hist_emit_seg,
                     'energ_eV_impact_seg': self.energ_eV_impact_seg,
                     't_sec_beams': self.t_sec_beams,
                     'sec_beam_profiles': self.sec_beam_profiles,
@@ -416,6 +446,14 @@ class pyecloud_saver:
         saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
 
         saved_dict.update(self._stepbystep_get_dict())
+
+        #custom step-by-step
+        saved_dict.update(self.pbp_custom_data)
+
+        # custom once
+        if self.save_once_custom_observables is not None:
+            for kk in self.save_once_custom_observables.keys():
+                saved_dict[kk] = self.save_once_custom_observables[kk](buildup_sim)
 
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
@@ -490,6 +528,9 @@ class pyecloud_saver:
 
     def load_from_output(self, last_t=None):
 
+        if self.step_by_step_custom_observables is not None:
+            raise ValueError('Not implemented! Sorry!')
+
         if self.copy_main_outp_folder is not None:
             load_output_folder = self.copy_main_outp_folder
         else:
@@ -526,6 +567,7 @@ class pyecloud_saver:
                                     'nel_hist',
                                     'nel_hist_det',
                                     'nel_hist_impact_seg',
+                                    'nel_hist_emit_seg',
                                     'nel_impact_hist_scrub',
                                     'nel_impact_hist_tot',
                                     'cos_angle_hist',
@@ -609,6 +651,10 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
 
+            for kk in self.sbs_custom_data.keys():
+                vv = self.sbs_custom_data[kk]
+                self.sbs_custom_data[kk] = np.concatenate((vv, 0 * vv))
+
             for mm in list_members:
                 vv = getattr(self, mm)
                 setattr(self, mm, np.concatenate((vv, 0 * vv)))
@@ -618,7 +664,8 @@ class pyecloud_saver:
                     (self.el_dens_at_probes, 0 * self.el_dens_at_probes), axis=1)
             print('Done resizing')
 
-    def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect):
+    def _stepbystep_data_init(self, Dt_ref, dec_fact_out, el_density_probes, r_center, initial_size_t_vect,
+            step_by_step_custom_observables):
 
         #step by step data
 
@@ -674,7 +721,12 @@ class pyecloud_saver:
             self.y_el_dens_probes = np.array(self.y_el_dens_probes)
             self.r_el_dens_probes = np.array(self.r_el_dens_probes)
 
-    def _stepbystep_data_save(self, impact_man, MP_e, beamtim):
+        self.sbs_custom_data = {}
+        if step_by_step_custom_observables is not None:
+            for kk in step_by_step_custom_observables.keys():
+                self.sbs_custom_data[kk] = 0 * self.t
+
+    def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim):
         #save step by step data
         # Vars to be accumulated
         self.Nel_impact_last_step_group += impact_man.Nel_impact_last_step
@@ -719,6 +771,10 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
 
+            if self.step_by_step_custom_observables is not None:
+                for kk in self.step_by_step_custom_observables.keys():
+                    self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
+
     def _stepbystep_get_dict(self):
         dict_sbs_data = {
             't': self.t[:self.i_last_save + 1],
@@ -738,6 +794,9 @@ class pyecloud_saver:
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
 
+        for kk in self.sbs_custom_data.keys():
+            dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
+        
         return dict_sbs_data
 
     def _MP_state_init(self, save_mp_state_time_file):
@@ -933,21 +992,23 @@ class pyecloud_saver:
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
             string_tolog = timestr + (' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot, self.cloud_name, np.sum(MP_e.nel_mp[0:MP_e.N_mp]), MP_e.N_mp))
-
-            try:
-                with open(self.logfile_path, 'a') as flog:
-                    flog.write(string_tolog)
-            except IOError as err:
-                print('Got: ', err)
-                print('while trying to write the following line on logfile:')
-                print(string_tolog)
-
-            try:
-                with open(self.progress_path, 'w') as flog:
-                    flog.write(('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot))))
-            except IOError as err:
-                print('Got: ', err)
-                print('while trying to write the following line on progress file:')
+            
+            if self.logfile_path is not None:
+                try:
+                    with open(self.logfile_path, 'a') as flog:
+                        flog.write(string_tolog)
+                except IOError as err:
+                    print('Got: ', err)
+                    print('while trying to write the following line on logfile:')
+                    print(string_tolog)
+            
+            if self.progress_path is not None:
+                try:
+                    with open(self.progress_path, 'w') as flog:
+                        flog.write(('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot))))
+                except IOError as err:
+                    print('Got: ', err)
+                    print('while trying to write the following line on progress file:')
                 print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
 
             #stop simulation

@@ -1,16 +1,21 @@
+import sys 
+sys.path.append('../../../')
+
 import pylab as pl
 import numpy as np
 import seaborn as sns
-import myfilemanager as mfm
+import PyECLOUD.myfilemanager as mfm
 import pickle
 
 
-pyhdtl = mfm.bunchh5_to_dict('bunch_evolution_A44_156b_260ips_1turns_20.00nTorr.h5')
-lattice_file = 'CLIC_DR_n260_optics.pkl'
+pyhdtl = mfm.monitorh5_to_dict('bunch_evolution_A44_156b_260ips_1turns_20.00nTorr.h5',
+        key='Slices')
 
+# lattice_file = 'CLIC_DR_n260_optics.pkl'
+# with open(lattice_file, 'r') as fid:
+# 	optics = pickle.load(fid)
 
-with open(lattice_file, 'r') as fid:
-	optics = pickle.load(fid)
+optics = mfm.dict_of_arrays_and_scalar_from_h5('CLIC_DR_n260_optics.h5')
 
 pl.close('all')
 

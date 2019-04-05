@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.1
+#                   PyECLOUD Version 7.7.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -53,6 +53,12 @@ import hist_for as histf
 import numpy as np
 from scipy.constants import e as qe
 from impact_management_class import impact_management
+
+
+class Dummy_SEY(object):
+
+    def SEY_model_evol(self, Dt):
+        pass
 
 
 class impact_management_perfect_absorber(impact_management):
@@ -103,8 +109,8 @@ class impact_management_perfect_absorber(impact_management):
 
             if Nimpact > 0:
 
-                if flag_seg:
-                    raise ValueError('Segment identification not implemented for perfect absorber! Sorry...')
+                # if flag_seg:
+                #     raise ValueError('Segment identification not implemented for perfect absorber! Sorry...')
 
                 # load segment endpoints
                 x_in = x_mp_old[self.flag_impact[:N_mp_old]]; y_in = y_mp_old[self.flag_impact[:N_mp_old]]; z_in = z_mp_old[self.flag_impact[:N_mp_old]]
