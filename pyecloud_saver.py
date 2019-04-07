@@ -92,8 +92,8 @@ class pyecloud_saver:
             git_branch = 'Retrieving git branch failed'
             print(e)
         print(git_branch)
-        
-        if self.logfile_path is not None: 
+
+        if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
                 flog.write('PyECLOUD Version 7.7.0\n')
                 flog.write('%s\n' % git_hash)
@@ -118,7 +118,7 @@ class pyecloud_saver:
                         pass_by_pass_custom_observables=None,
                         save_once_custom_observables=None,
                         extract_ene_dist=None):
-      print('Start pyecloud_saver observation')
+        print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
@@ -165,8 +165,8 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                   initial_size_t_vect=1000, 
-                                   step_by_step_custom_observables = self.step_by_step_custom_observables)
+                                   initial_size_t_vect=1000,
+                                   step_by_step_custom_observables=self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
@@ -338,7 +338,7 @@ class pyecloud_saver:
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
-        
+
         # Custom data
         self.pbp_custom_data = {}
         if self.pass_by_pass_custom_observables is not None:
@@ -796,7 +796,7 @@ class pyecloud_saver:
 
         for kk in self.sbs_custom_data.keys():
             dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
-        
+
         return dict_sbs_data
 
     def _MP_state_init(self, save_mp_state_time_file):
@@ -992,7 +992,7 @@ class pyecloud_saver:
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
             string_tolog = timestr + (' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot, self.cloud_name, np.sum(MP_e.nel_mp[0:MP_e.N_mp]), MP_e.N_mp))
-            
+
             if self.logfile_path is not None:
                 try:
                     with open(self.logfile_path, 'a') as flog:
@@ -1001,7 +1001,7 @@ class pyecloud_saver:
                     print('Got: ', err)
                     print('while trying to write the following line on logfile:')
                     print(string_tolog)
-            
+
             if self.progress_path is not None:
                 try:
                     with open(self.progress_path, 'w') as flog:
@@ -1009,7 +1009,7 @@ class pyecloud_saver:
                 except IOError as err:
                     print('Got: ', err)
                     print('while trying to write the following line on progress file:')
-                print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
+                    print('%f'%(float(beamtim.pass_numb) / float(beamtim.N_pass_tot)))
 
             #stop simulation
             try:
