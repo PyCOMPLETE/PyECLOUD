@@ -364,6 +364,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                               secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                               **kwargs_secem)
             elif(thiscloud.switch_model == 'furman_pivi'):
+                kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
+                kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
                 sey_mod = SEY_model_furman_pivi(E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
                                                 switch_no_increase_energy=thiscloud.switch_no_increase_energy,
                                                 thresh_low_energy=thiscloud.thresh_low_energy,
@@ -441,7 +443,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
-                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables, 
+                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
                                        save_once_custom_observables=cc.save_once_custom_observables,
                                        extract_ene_dist=cc.extract_ene_dist)
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
