@@ -131,6 +131,9 @@ class SEY_model_furman_pivi():
         else:
             print('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s))
 
+    def SEY_model_evol(self, Dt):
+        pass
+
     def SEY_process(self, E_impact_eV, costheta_impact, i_impact):
         """
         Decides event type for each MP colliding with energy E_impact_eV and

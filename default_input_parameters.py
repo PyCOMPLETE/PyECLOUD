@@ -107,7 +107,7 @@ parameters_dict = {
 
             'step_by_step_custom_observables': None,
             'pass_by_pass_custom_observables': None,
-            'save_once_custom_observables': None
+            'save_once_custom_observables': None,
 
             'extract_ene_dist': False,
 
