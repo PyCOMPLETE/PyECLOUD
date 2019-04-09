@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.0
+#                   PyECLOUD Version 7.6.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -94,7 +94,7 @@ class pyecloud_saver:
         print(git_branch)
 
         with open(self.logfile_path, 'w') as flog:
-            flog.write('PyECLOUD Version 7.7.0\n')
+            flog.write('PyECLOUD Version 7.6.1\n')
             flog.write('%s\n' % git_hash)
             flog.write('%s\n' % git_branch)
             flog.write('Simulation started on %s\n' % timestr)
@@ -120,8 +120,6 @@ class pyecloud_saver:
         self.filen_main_outp = filen_main_outp
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
-        self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
-        self.save_once_custom_observables = save_once_custom_observables
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
@@ -160,7 +158,7 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                   initial_size_t_vect=1000, 
+                                   initial_size_t_vect=1000,
                                    step_by_step_custom_observables = self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
@@ -235,7 +233,7 @@ class pyecloud_saver:
         self._sc_video_save(spacech_ele, beamtim)
 
         # Check for energy and cos angle hist update
-        self._energy_and_cos_angle_hist_save(beamtim, impact_man)
+        self._energy_and_cos_angle_hist_save(beamtim, impact_man, cloud_list, spacech_ele)
 
         #Space charge electrostatic energy
         if spacech_ele.last_recomputation_check:
@@ -253,7 +251,7 @@ class pyecloud_saver:
 
         if beamtim.flag_new_bunch_pass:
 
-            self._pass_by_pass_data_save(MP_e, impact_man, beamtim, buildup_sim)
+            self._pass_by_pass_data_save(MP_e, impact_man, beamtim)
 
             # I want all elements that go to the output file to be members of this object
             self.xg_hist = impact_man.xg_hist
@@ -261,7 +259,7 @@ class pyecloud_saver:
             self.b_spac = beamtim.b_spac
             self.area = impact_man.chamb.area
 
-            sio.savemat(self.filen_main_outp, self.build_outp_dict(buildup_sim), oned_as='row')
+            sio.savemat(self.filen_main_outp, self.build_outp_dict(), oned_as='row')
 
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
@@ -289,13 +287,11 @@ class pyecloud_saver:
         self.N_mp_ref_pass = []
 
         if impact_man.flag_seg:
-           self.nel_hist_impact_seg = []
-           self.nel_hist_emit_seg = []
-           self.energ_eV_impact_seg = []
+                self.nel_hist_impact_seg = []
+                self.energ_eV_impact_seg = []
         else:
-           self.nel_hist_impact_seg = -1
-           self.nel_hist_emit_seg = -1
-           self.energ_eV_impact_seg = -1
+                self.nel_hist_impact_seg = -1
+                self.energ_eV_impact_seg = -1
 
         # detailed hist
         self.flag_hist_det = False
@@ -318,15 +314,8 @@ class pyecloud_saver:
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
-        
-        # Custom data
-        self.pbp_custom_data = {}
-        if self.pass_by_pass_custom_observables is not None:
-            for kk in self.pass_by_pass_custom_observables.keys():
-                self.pbp_custom_data[kk] = []
 
-
-    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim, buildup_sim):
+    def _pass_by_pass_data_save(self, MP_e, impact_man, beamtim):
         #update histograms
         self.nel_hist_line = 0.0 * self.nel_hist_line
         if MP_e.N_mp > 0:
@@ -365,22 +354,13 @@ class pyecloud_saver:
             impact_man.reset_hist_impact_seg()
 
         if impact_man.flag_seg:
-            self.nel_hist_emit_seg.append(impact_man.nel_hist_emit_seg.copy())
-            impact_man.reset_hist_emit_seg()
-
-        if impact_man.flag_seg:
             self.energ_eV_impact_seg.append(impact_man.energ_eV_impact_seg.copy())
             impact_man.reset_energ_impact_seg()
 
         if self.flag_hist_det:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
-        if self.pass_by_pass_custom_observables is not None:
-            for kk in self.pass_by_pass_custom_observables.keys():
-               self.pbp_custom_data[kk].append(
-                       self.pass_by_pass_custom_observables[kk](buildup_sim))
-
-    def build_outp_dict(self, buildup_sim):
+    def build_outp_dict(self):
         saved_dict = {
             't_hist': self.t_hist,
                     'nel_hist': self.nel_hist,
@@ -390,6 +370,7 @@ class pyecloud_saver:
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
                     'En_g_hist': self.En_g_hist,
                     'En_hist': self.En_hist,
+                    'all_Ekin_hist': self.all_Ekin_hist,
                     't_En_hist': self.t_En_hist,
                     'b_spac': self.b_spac,
                     't_sc_video': np.array(self.t_sc_video),
@@ -399,7 +380,6 @@ class pyecloud_saver:
                     'N_mp_pass': self.N_mp_pass,
                     'N_mp_ref_pass': self.N_mp_ref_pass,
                     'nel_hist_impact_seg': self.nel_hist_impact_seg,
-                    'nel_hist_emit_seg': self.nel_hist_emit_seg,
                     'energ_eV_impact_seg': self.energ_eV_impact_seg,
                     't_sec_beams': self.t_sec_beams,
                     'sec_beam_profiles': self.sec_beam_profiles,
@@ -421,14 +401,6 @@ class pyecloud_saver:
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
-
-        #custom step-by-step
-        saved_dict.update(self.pbp_custom_data)
-
-        # custom once
-        if self.save_once_custom_observables is not None:
-            for kk in self.save_once_custom_observables.keys():
-                saved_dict[kk] = self.save_once_custom_observables[kk](buildup_sim)
 
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
@@ -501,10 +473,11 @@ class pyecloud_saver:
             if (beamtim.tt_curr - self.t_last_copy >= self.copy_main_outp_DT):
                 self._copy_main_outp_to_safety(outpath=self.copy_main_outp_folder, beamtim=beamtim)
 
-    def load_from_output(self, last_t=None):
+    def load_from_output(self, buildup_sim, last_t=None):
 
-        if self.step_by_step_custom_observables is not None:
-            raise ValueError('Not implemented! Sorry!')
+        #if self.step_by_step_custom_observables is not None:
+            #for kk in self.step_by_step_custom_observables.keys():
+            	#self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
 
         if self.copy_main_outp_folder is not None:
             load_output_folder = self.copy_main_outp_folder
@@ -542,7 +515,6 @@ class pyecloud_saver:
                                     'nel_hist',
                                     'nel_hist_det',
                                     'nel_hist_impact_seg',
-                                    'nel_hist_emit_seg',
                                     'nel_impact_hist_scrub',
                                     'nel_impact_hist_tot',
                                     'cos_angle_hist',
@@ -743,9 +715,9 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
 
-            if self.step_by_step_custom_observables is not None:
-                for kk in self.step_by_step_custom_observables.keys():
-                    self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
+	    if self.step_by_step_custom_observables is not None:
+            	for kk in self.step_by_step_custom_observables.keys():
+                	self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
 
     def _stepbystep_get_dict(self):
         dict_sbs_data = {
@@ -768,7 +740,7 @@ class pyecloud_saver:
 
         for kk in self.sbs_custom_data.keys():
             dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
-        
+
         return dict_sbs_data
 
     def _MP_state_init(self, save_mp_state_time_file):
@@ -931,6 +903,7 @@ class pyecloud_saver:
         self.flag_sc_video = (flag_sc_movie == 1)
         self.efx_video = None
         self.efy_video = None
+        self.phi_video = None
         self.t_efield_video = None
 
     def _sc_video_save(self, spacech_ele, beamtim):
@@ -942,21 +915,29 @@ class pyecloud_saver:
                 self.efx_video = []
                 self.efy_video = []
                 self.t_efield_video = []
+                self.phi_video = []
             if spacech_ele.last_recomputation_check:
                 self.efx_video.append(spacech_ele.efx)
                 self.efy_video.append(spacech_ele.efy)
+                self.phi_video.append(spacech_ele.phi)
                 self.t_efield_video.append(beamtim.tt_curr)
             if beamtim.flag_new_bunch_pass:
                 self.efx_video = np.array(self.efx_video)
                 self.efy_video = np.array(self.efy_video)
+                self.phi_video = np.array(self.phi_video)
                 self.t_efield_video = np.array(self.t_efield_video)
                 filename_efield = self.folder_outp + '/efield_video/efield_pass%d.mat'%(beamtim.pass_numb - 1)
                 print('Saving %s'%filename_efield)
                 sio.savemat(filename_efield, {'xg_sc': spacech_ele.xg, 'yg_sc': spacech_ele.yg, 't_efield_video': self.t_efield_video,
                                               'efx_video': self.efx_video, 'efy_video': self.efy_video}, oned_as='row')
+
+                filename_phi = self.folder_outp + '/phi_video/phi_pass%d.mat'%(beamtim.pass_numb - 1)
+                sio.savemat(filename_phi, {'xg_sc': spacech_ele.xg, 'yg_sc': spacech_ele.yg, 'phi_video': self.phi_video}, oned_as='row')
+
                 print('Done')
                 self.efx_video = []
                 self.efy_video = []
+                self.phi_video = []
                 self.t_efield_video = []
 
     def _logfile_progressfile_stofile(self, beamtim, MP_e):
@@ -991,6 +972,7 @@ class pyecloud_saver:
 
     def _energy_and_cos_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
                                         cos_angle_width):
+
         # Energy histogram init
         self.Dt_En_hist = Dt_En_hist
         self.t_last_En_hist = -1.
@@ -1007,7 +989,10 @@ class pyecloud_saver:
             self.cos_angle_hist = -1
             self.xg_hist_cos_angle = -1
 
-    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
+        # Kinetic energy histogram init
+        self.all_Ekin_hist = []
+
+    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man, cloud_list, spacech_ele):
         # Energy histogram saver
         # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
         if beamtim.tt_curr >= self.t_last_En_hist + self.Dt_En_hist or np.isclose(beamtim.tt_curr, self.t_last_En_hist + self.Dt_En_hist, rtol=1.e-10, atol=0.0):
@@ -1019,3 +1004,13 @@ class pyecloud_saver:
             if self.flag_cos_angle_hist:
                 self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
                 impact_man.reset_cos_angle_hist()
+
+            # Histogram of the kinetic energy of all the particles
+            ec = cloud_list[0]
+            v_mod = np.sqrt(ec.MP_e.vx_mp**2 + ec.MP_e.vy_mp**2 + ec.MP_e.vz_mp**2)
+            Ekin = 0.5 * ec.MP_e.mass/qe * v_mod * v_mod
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
+            nel = ec.MP_e.nel_mp[np.nonzero(ec.MP_e.nel_mp)]
+            N_mp = ec.MP_e.N_mp
+            histf.compute_hist(Ekin[np.nonzero(ec.MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+            self.all_Ekin_hist.append(ekin_hist.copy())
