@@ -7,6 +7,13 @@ import sec_emission_model_furman_pivi as fp
 import mystyle as ms
 from impact_management_class import impact_management
 from geom_impact_ellip import ellip_cham_geom_object
+import scipy
+
+
+def normalised_hilleret_energy(energy, sigmafit=1.0828, mufit=1.6636):
+    out = 1. / (energy * sigmafit * np.sqrt(2 * np.pi)) * np.exp(-(np.log(energy) - mufit)**2 / (2 * sigmafit**2))
+    area = scipy.integrate.simps(out, energy)
+    return out / area
 
 
 plt.close('all')
@@ -15,7 +22,8 @@ linewid = 2
 
 me = 9.10938356e-31
 
-furman_pivi_surface_tweak = {'conserve_energy': True,
+furman_pivi_surface_tweak = {'use_ECLOUD_energy': True,
+                             'conserve_energy': True,
                              'exclude_rediffused': True,
                              'choice': 'poisson',
                              'M_cut': 10,
@@ -47,7 +55,8 @@ furman_pivi_surface_tweak = {'conserve_energy': True,
                              't4': 1.,
                              }
 
-furman_pivi_surface_LHC = {'conserve_energy': True,
+furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
+                           'conserve_energy': False,
                            'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
@@ -78,7 +87,9 @@ furman_pivi_surface_LHC = {'conserve_energy': True,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'conserve_energy': False,
+
+furman_pivi_surface = {'use_ECLOUD_energy': False,
+                       'conserve_energy': False,
                        'exclude_rediffused': False,
                        'choice': 'poisson',
                        'M_cut': 10,
@@ -174,6 +185,7 @@ delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costhe
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_single, energy=energy)
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
+sp1.plot(energy, normalised_hilleret_energy(energy), 'k', linestyle='--', label='ECLOUD hilleret energy', linewidth=linewid)
 for sp in [sp1, sp2, sp3, sp4]:
     sp.grid('on')
     sp.set_xlabel('Electron energy [eV]')

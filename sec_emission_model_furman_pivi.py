@@ -59,7 +59,7 @@ from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
 from scipy.misc import factorial
-import electron_emission
+import electron_emission as ee
 
 
 class SEY_model_furman_pivi():
@@ -84,7 +84,7 @@ class SEY_model_furman_pivi():
         self.secondary_angle_distribution = secondary_angle_distribution
 
         if secondary_angle_distribution is not None:
-            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
+            self.angle_dist_func = ee.get_angle_dist_func(secondary_angle_distribution)
         else:
             self.angle_dist_func = None
 
@@ -92,6 +92,7 @@ class SEY_model_furman_pivi():
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
         # General model parameters
+        self.use_ECLOUD_energy = furman_pivi_surface['use_ECLOUD_energy']
         self.conserve_energy = furman_pivi_surface['conserve_energy']
         self.choice = furman_pivi_surface['choice']
         self.M_cut = furman_pivi_surface['M_cut']
@@ -271,21 +272,25 @@ class SEY_model_furman_pivi():
 
     def get_energy_true_sec(self, nn, E_0):
         """Returns emission energies for true secondary electrons."""
-        if len(E_0) == 0:
-            return np.array([])
-        p_n = self.p_n
-        eps_n = self.eps_n
+        if self.use_ECLOUD_energy:
+            Ngen = len(E_0)
+            return ee.sec_energy_hilleret_model2(self.switch_no_increase_energy, Ngen, self.sigmafit, self.mufit, self.E_th, E_0, self.thresh_low_energy)
+        else:
+            if len(E_0) == 0:
+                return np.array([])
+            p_n = self.p_n
+            eps_n = self.eps_n
 
-        eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
-        p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
-        _, area = self._true_sec_energy_CDF(nn, energy=E_0)  # Putting energy=E_0 gives area under the PDF
-        normalisation = 1. / area
-        uu = random.rand(len(E_0))
-        xx = uu / (normalisation)
+            eps_vec = np.array([eps_n[int(ii - 1)] for ii in nn])
+            p_n_vec = np.array([p_n[int(ii - 1)] for ii in nn])
+            _, area = self._true_sec_energy_CDF(nn, energy=E_0)  # Putting energy=E_0 gives area under the PDF
+            normalisation = 1. / area
+            uu = random.rand(len(E_0))
+            xx = uu / (normalisation)
 
-        xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
+            xx[xx < 1e-12] = 0.0  # gammaincinv returns nan if xx is too small but not zero
 
-        return eps_vec * gammaincinv(p_n_vec, xx)
+            return eps_vec * gammaincinv(p_n_vec, xx)
 
     def inverse_repeat(self, a, repeats, axis):
         """The inverse of numpy.repeat(a, repeats, axis)"""
@@ -315,10 +320,15 @@ class SEY_model_furman_pivi():
             i_seg_replace = i_found
 
         # Backscattered
-        En_backscattered_eV = self.get_energy_backscattered(E_impact_eV[flag_backscattered])
-        N_rediffused = np.sum(flag_backscattered)
-        vx_replace[flag_backscattered], vy_replace[flag_backscattered], vz_replace[flag_backscattered] = self.angle_dist_func(
-            N_rediffused, En_backscattered_eV, Norm_x[flag_backscattered], Norm_y[flag_backscattered], mass)
+        if self.use_ECLOUD_energy:
+            vx_replace[flag_backscattered], vy_replace[flag_backscattered] = ee.specular_velocity(
+                vx_impact[flag_backscattered], vy_impact[flag_backscattered],
+                Norm_x[flag_backscattered], Norm_y[flag_backscattered], v_impact_n[flag_backscattered])
+        else:
+            En_backscattered_eV = self.get_energy_backscattered(E_impact_eV[flag_backscattered])
+            N_backscattered = np.sum(flag_backscattered)
+            vx_replace[flag_backscattered], vy_replace[flag_backscattered], vz_replace[flag_backscattered] = self.angle_dist_func(
+                N_backscattered, En_backscattered_eV, Norm_x[flag_backscattered], Norm_y[flag_backscattered], mass)
 
         if not self.exclude_rediffused:
             # Rediffused
@@ -466,7 +476,9 @@ class SEY_model_furman_pivi():
             n_emit_MPs[flag_rediffused] = 1
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
-        # if np.sum(nel_emit_tot_events) != np.sum(extended_nel_emit_tot_events):
+        # if np.isclose(np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), atol=1e-3):
+        #     pass
+        # else:
         #     raise ValueError('There is something wrong in the adding of new MPs\nnel_emit_tot_events: %d\nextended_nel_emit_tot_events: %d\nnel_replace + nel_new: %d' % (np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), np.sum(nel_replace) + np.sum(nel_new_MPs)))
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\

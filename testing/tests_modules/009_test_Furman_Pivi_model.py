@@ -13,7 +13,8 @@ linewid = 2
 fontsz = 25
 legendsize = fontsz
 
-furman_pivi_surface_tweak = {'conserve_energy': True,
+furman_pivi_surface_tweak = {'use_ECLOUD_energy': False,
+                             'conserve_energy': True,
                              'exclude_rediffused': True,
                              'choice': 'poisson',
                              'M_cut': 10,
@@ -45,8 +46,9 @@ furman_pivi_surface_tweak = {'conserve_energy': True,
                              't4': 1.,
                              }
 
-furman_pivi_surface_LHC = {'conserve_energy': False,
-                           'exclude_rediffused': True,
+furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
+                           'conserve_energy': False,
+                           'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -76,7 +78,9 @@ furman_pivi_surface_LHC = {'conserve_energy': False,
                            't3': 0.7,
                            't4': 1.,
                            }
-furman_pivi_surface = {'conserve_energy': False,
+
+furman_pivi_surface = {'use_ECLOUD_energy': False,
+                       'conserve_energy': False,
                        'exclude_rediffused': False,
                        'choice': 'poisson',
                        'M_cut': 10,

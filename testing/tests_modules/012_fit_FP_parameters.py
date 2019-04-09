@@ -16,7 +16,8 @@ me = 9.10938356e-31
 alpha = 0.9
 M_cut = 10
 
-furman_pivi_surface_tweak = {'conserve_energy': False,
+furman_pivi_surface_tweak = {'use_ECLOUD_energy': False,
+                             'conserve_energy': True,
                              'exclude_rediffused': True,
                              'choice': 'poisson',
                              'M_cut': 10,
@@ -48,8 +49,9 @@ furman_pivi_surface_tweak = {'conserve_energy': False,
                              't4': 1.,
                              }
 
-furman_pivi_surface_LHC = {'conserve_energy': False,
-                           'exclude_rediffused': True,
+furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
+                           'conserve_energy': False,
+                           'exclude_rediffused': False,
                            'choice': 'poisson',
                            'M_cut': 10,
                            'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
@@ -80,6 +82,36 @@ furman_pivi_surface_LHC = {'conserve_energy': False,
                            't4': 1.,
                            }
 
+furman_pivi_surface = {'use_ECLOUD_energy': False,
+                       'conserve_energy': False,
+                       'exclude_rediffused': False,
+                       'choice': 'poisson',
+                       'M_cut': 10,
+                       'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+                       'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+                       'p1EInf': 0.02,
+                       'p1Ehat': 0.496,
+                       'eEHat': 0.,
+                       'w': 60.86,
+                       'p': 1.,
+                       'e1': 0.26,
+                       'e2': 2.,
+                       'sigmaE': 2.,
+                       'p1RInf': 0.2,
+                       'eR': 0.041,
+                       'r': 0.104,
+                       'q': 0.5,
+                       'r1': 0.26,
+                       'r2': 2.,
+                       'deltaTSHat': 1.8848,
+                       'eHat0': 276.8,
+                       's': 1.54,
+                       't1': 0.66,
+                       't2': 0.8,
+                       't3': 0.7,
+                       't4': 1.,
+                       }
+
 flag_costheta_Emax_shift = True
 flag_costheta_delta_scale = True
 sey_mod_initial = fp.SEY_model_furman_pivi(furman_pivi_surface_LHC,
@@ -91,7 +123,8 @@ sey_mod_initial = fp.SEY_model_furman_pivi(furman_pivi_surface_LHC,
 
 
 def make_it_easier(*args):
-    furman_pivi_surface_LHC = {'conserve_energy': False,
+    furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
+                               'conserve_energy': False,
                                'exclude_rediffused': True,
                                'choice': 'poisson',
                                'M_cut': M_cut,

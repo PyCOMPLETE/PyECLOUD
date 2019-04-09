@@ -15,7 +15,8 @@ from geom_impact_ellip import ellip_cham_geom_object
 me = 9.10938356e-31
 alpha = 0.9
 
-furman_pivi_surface_LHC = {'conserve_energy': False,
+furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
+                           'conserve_energy': False,
                            'exclude_rediffused': True,
                            'choice': 'poisson',
                            'M_cut': 10,
