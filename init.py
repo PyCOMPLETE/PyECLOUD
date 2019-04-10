@@ -380,8 +380,15 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             impact_man_class = imc.impact_management
 
+        if cc.lifetime_hist_flag == True and cc.Nbin_lifetime_hist == None:
+                raise inp_spec.PyECLOUD_ConfigException('If  lifetime_hist_flag is enabled, you need to set Nbin_lifetime_hist!')
+
+        if cc.lifetime_hist_flag == True and cc.lifetime_hist_max == None:
+                raise inp_spec.PyECLOUD_ConfigException('If  lifetime_hist_flag is enabled, you need to set lifetime_hist_max!')
+
         impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
+                                      cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.lifetime_hist_flag,
                                       flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
                                       )
 

@@ -58,7 +58,8 @@ from scipy.constants import e as qe
 class impact_management(object):
     def __init__(
         self, chamb, sey_mod,
-        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, flag_seg=False,
+        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, Nbin_lifetime_hist,
+        lifetime_hist_max, lifetime_hist_flag, flag_seg=False,
         cos_angle_width=0.05, flag_cos_angle_hist=True
     ):
 
@@ -73,6 +74,13 @@ class impact_management(object):
         self.scrub_en_th = scrub_en_th
         self.Nbin_En_hist = Nbin_En_hist
         self.En_hist_max = En_hist_max
+
+        self.lifetime_hist_flag = lifetime_hist_flag
+
+        if self.lifetime_hist_flag:
+            self.Nbin_lifetime_hist = Nbin_lifetime_hist
+            self.lifetime_hist_max = lifetime_hist_max
+
         self.flag_seg = flag_seg
 
         xg_hist = np.arange(0, chamb.x_aper + 2. * Dx_hist, Dx_hist, float)
@@ -83,7 +91,13 @@ class impact_management(object):
         bias_x_hist = np.min(xg_hist)
 
         self.En_g_hist = np.linspace(0., En_hist_max, Nbin_En_hist)  # hist. grid
+
+        if self.lifetime_hist_flag:
+            self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
+
         self.DEn_hist = self.En_g_hist[1] - self.En_g_hist[0]  # hist. step
+        if self.lifetime_hist_flag:
+            self.Dlifetime_hist = self.lifetime_g_hist[1] - self.lifetime_g_hist[0]  # hist. step
 
         self.flag_cos_angle_hist = flag_cos_angle_hist
         if flag_cos_angle_hist:
@@ -107,6 +121,9 @@ class impact_management(object):
         self.nel_impact_hist_scrub = np.zeros(Nxg_hist, float)
         self.energ_eV_impact_hist = np.zeros(Nxg_hist, float)
         self.En_hist_line = np.zeros(Nbin_En_hist, float)
+
+        if self.lifetime_hist_flag:
+            self.lifetime_hist = [[0,0]]
 
         if flag_seg:
             self.nel_hist_impact_seg = np.zeros(chamb.N_vert, float)
@@ -142,8 +159,11 @@ class impact_management(object):
     def reset_cos_angle_hist(self):
         self.cos_angle_hist *= 0
 
+    def reset_lifetime_hist(self):
+        self.lifetime_hist = [[0,0]]
+
     #@profile
-    def backtrack_and_second_emiss(self, old_pos, MP_e):
+    def backtrack_and_second_emiss(self, old_pos, MP_e, tt_curr):
 
         self.Nel_impact_last_step = 0.
         self.Nel_emit_last_step = 0.
@@ -170,13 +190,22 @@ class impact_management(object):
             Dx_hist = self.Dx_hist
             En_hist_max = self.En_hist_max
             DEn_hist = self.DEn_hist
+
+            if self.lifetime_hist_flag:
+                Dlifetime_hist = self.Dlifetime_hist
+
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
 
+            t_last_impact = MP_e.t_last_impact
+            t_last_impact_new = MP_e.t_last_impact.copy()
             ## impact management
 
             flag_impact = np.zeros_like(x_mp, dtype=bool)
             self.flag_impact = flag_impact
+
+            if self.lifetime_hist_flag:
+                loc_lifetime = np.zeros(len(MP_e.lifetime), float)
 
             # detect impact
             flag_impact[:N_mp_old] = chamb.is_outside(x_mp[0:N_mp_old], y_mp[0:N_mp_old])
@@ -192,6 +221,18 @@ class impact_management(object):
                 x_out = x_mp[flag_impact]
                 y_out = y_mp[flag_impact]
                 z_out = z_mp[flag_impact]
+
+                if self.lifetime_hist_flag:
+                    loc_lifetime[flag_impact] = tt_curr - t_last_impact[flag_impact]
+
+                    for i in np.where(flag_impact[:N_mp_old])[0]:
+                        MP_e.lifetime[i] = loc_lifetime[i]
+                        #append to the histogram iff the MP is not coming from regeneration
+                        #or primary emission
+                        if MP_e.t_last_impact[i] > 0:
+                            self.lifetime_hist = np.append(self.lifetime_hist, [[MP_e.lifetime[i],MP_e.nel_mp[i]]], axis = 0)
+
+                        MP_e.t_last_impact[i] = tt_curr
 
                 # backtracking and surface normal generation
                 [x_impact, y_impact, z_impact, Norm_x, Norm_y, i_found] =\
@@ -266,7 +307,7 @@ class impact_management(object):
                 N_new_MPs = len(nel_new_MPs)
                 if N_new_MPs > 0:
                     MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs,
-                                     vx_new_MPs, vy_new_MPs, vz_new_MPs)
+                                     vx_new_MPs, vy_new_MPs, vz_new_MPs,tt_curr)
 
                     #subtract new macroparticles
                     v_new_MPs_mod = np.sqrt(vx_new_MPs**2 + vy_new_MPs**2 + vz_new_MPs**2)

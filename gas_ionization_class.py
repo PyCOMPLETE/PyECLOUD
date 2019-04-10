@@ -121,7 +121,9 @@ class residual_gas_ionization:
             MP_e.vz_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             MP_e.nel_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = MP_e.nel_mp_ref
 
+            MP_e.t_last_impact[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = -1
+            MP_e.lifetime[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = 0
+
             MP_e.N_mp = int(MP_e.N_mp + Nint_new_MP)
 
         return MP_e
-

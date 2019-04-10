@@ -87,6 +87,9 @@ parameters_dict = {
             'x_max_hist_det': None,
             'y_max_hist_det': None,
             'Dx_hist_det': None,
+            'lifetime_hist_flag': False,
+            'Nbin_lifetime_hist': None,
+            'lifetime_hist_max': None,
 
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
@@ -401,6 +404,9 @@ parameters_dict = {
             'Dt_En_hist': (),
             'Nbin_En_hist': (),
             'En_hist_max': (),
+            'lifetime_hist_flag': False,
+            'Nbin_lifetime_hist': None,
+            'lifetime_hist_max': None,
 
             'flag_movie': (),
             'flag_sc_movie': (),

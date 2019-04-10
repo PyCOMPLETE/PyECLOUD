@@ -75,6 +75,11 @@ class MP_system:
         self.vx_mp = np.zeros(N_mp_max, float)
         self.vy_mp = np.zeros(N_mp_max, float)
         self.vz_mp = np.zeros(N_mp_max, float)
+        #Time of last impact with the chamber
+        self.t_last_impact = -1*np.ones(N_mp_max, float)
+        #lifetime
+        self.lifetime = np.zeros(N_mp_max, float)
+
         self.nel_mp = np.zeros(N_mp_max, float)
         self.N_mp = 0
 
@@ -174,6 +179,9 @@ class MP_system:
                 self.nel_mp[0:self.N_mp] = np.array(self.nel_mp[flag_keep].copy())
 
                 self.nel_mp[self.N_mp:] = 0.0
+
+                self.lifetime[:] = 0
+                self.t_last_impact[:] = -1
 
                 chrg_before = chrg
                 chrg_after = np.sum(self.nel_mp)
@@ -386,6 +394,9 @@ class MP_system:
 
             #end
 
+            self.lifetime[:] = 0
+            self.t_last_impact = -1
+
             chrg = np.sum(self.nel_mp)
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
             print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg)
@@ -476,12 +487,14 @@ class MP_system:
             self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
+
+
             self.N_mp = int(self.N_mp + Nint_new_MP)
 
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
 
-    def add_new_MPs(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz):
+    def add_new_MPs(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz, t_last_impact):
         N_mp_old = self.N_mp
         N_mp_new = self.N_mp + N_new_MP
         self.x_mp[N_mp_old:N_mp_new] = x
@@ -492,6 +505,8 @@ class MP_system:
         self.vz_mp[N_mp_old:N_mp_new] = vz
         self.nel_mp[N_mp_old:N_mp_new] = nel_new_mp
         self.N_mp = N_mp_new
+        self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
+        self.lifetime[N_mp_old:N_mp_new] = 0.
 
     def add_from_file(self, filename_MPs):
 
