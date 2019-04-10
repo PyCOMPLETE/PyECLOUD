@@ -220,7 +220,7 @@ plt.subplots_adjust(right=0.99, left=.05)
 
 test_obj = sey_mod
 
-energy = np.linspace(0., 2000, num=int(1e3))
+energy = np.linspace(0., 2000, num=int(1e5))
 
 for costheta in np.linspace(0, 1., 10):
     delta_ts_vec = test_obj.delta_ts(energy, costheta)

@@ -448,27 +448,6 @@ class SEY_model_furman_pivi():
         # extended_nel_emit_tot_events used for extraction of energy distributions
         # extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
 
-        events = flag_truesec.astype(int)
-        if N_true_sec > 0:
-            events[n_emit_truesec_MPs == 0] = 3  # Absorbed MPs
-
-        if self.exclude_rediffused:
-            events = events - flag_backscattered.astype(int) * 3
-
-        else:
-            events = events - flag_rediffused.astype(int) - flag_backscattered.astype(int) * 3
-        event_type = events
-
-        if n_add_total != 0:
-            events_add = np.repeat(events, n_add)
-            events = np.concatenate([events, events_add])
-        extended_event_type = events
-
-        # event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
-        #               'extended_event_type': extended_event_type,
-        #               }
-        event_info = {'extended_event_type': extended_event_type,
-                      }
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
         n_emit_MPs[flag_backscattered] = 1
@@ -480,6 +459,30 @@ class SEY_model_furman_pivi():
         #     pass
         # else:
         #     raise ValueError('There is something wrong in the adding of new MPs\nnel_emit_tot_events: %d\nextended_nel_emit_tot_events: %d\nnel_replace + nel_new: %d' % (np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), np.sum(nel_replace) + np.sum(nel_new_MPs)))
+
+        events = flag_truesec.astype(int)
+
+        events[n_emit_MPs == 0] = 3  # Absorbed MPs
+
+        if self.exclude_rediffused:
+            pass
+        else:
+            events = events + 2 * flag_rediffused.astype(int)
+        event_type = events
+        if np.any(event_type < 0):
+            import pdb; pdb.set_trace()
+
+        if n_add_total != 0:
+            events_add = np.repeat(events, n_add)
+            events = np.concatenate([events, events_add])
+        extended_event_type = events
+
+        # event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
+        #               'extended_event_type': extended_event_type,
+        #               }
+        event_info = {'extended_event_type': extended_event_type,
+                      }
+
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
             nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
