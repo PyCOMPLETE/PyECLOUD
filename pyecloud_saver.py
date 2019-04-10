@@ -238,7 +238,7 @@ class pyecloud_saver:
         self._sc_video_save(spacech_ele, beamtim)
 
         # Check for energy and cos angle hist update
-        self._energy_and_cos_angle_hist_save(beamtim, impact_man)
+        self._energy_and_cos_angle_hist_save(beamtim, impact_man, MP_e)
 
         #Space charge electrostatic energy
         if spacech_ele.last_recomputation_check:
@@ -393,6 +393,7 @@ class pyecloud_saver:
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
                     'En_g_hist': self.En_g_hist,
                     'En_hist': self.En_hist,
+                    'all_Ekin_hist': self.all_Ekin_hist,
                     't_En_hist': self.t_En_hist,
                     'b_spac': self.b_spac,
                     't_sc_video': np.array(self.t_sc_video),
@@ -1012,7 +1013,10 @@ class pyecloud_saver:
             self.cos_angle_hist = -1
             self.xg_hist_cos_angle = -1
 
-    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
+        # Kinetic energy histogram init
+        self.all_Ekin_hist = []
+
+    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man, MP_e):
         # Energy histogram saver
         # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
         if beamtim.tt_curr >= self.t_last_En_hist + self.Dt_En_hist or np.isclose(beamtim.tt_curr, self.t_last_En_hist + self.Dt_En_hist, rtol=1.e-10, atol=0.0):
@@ -1024,3 +1028,13 @@ class pyecloud_saver:
             if self.flag_cos_angle_hist:
                 self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
                 impact_man.reset_cos_angle_hist()
+
+            # Histogram of the kinetic energy of all the particles
+            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
+            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
+            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
+            N_mp = MP_e.N_mp
+            histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+            self.all_Ekin_hist.append(ekin_hist.copy())
+
