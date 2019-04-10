@@ -469,8 +469,6 @@ class SEY_model_furman_pivi():
         else:
             events = events + 2 * flag_rediffused.astype(int)
         event_type = events
-        if np.any(event_type < 0):
-            import pdb; pdb.set_trace()
 
         if n_add_total != 0:
             events_add = np.repeat(events, n_add)
