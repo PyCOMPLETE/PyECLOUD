@@ -1035,6 +1035,7 @@ class pyecloud_saver:
             ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
             nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
             N_mp = MP_e.N_mp
-            histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+            if N_mp > 0:
+                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
 
