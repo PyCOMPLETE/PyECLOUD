@@ -91,7 +91,8 @@ class SEY_model_furman_pivi():
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
-        # General model parameters
+        # General FP model parameters
+        self.use_ECLOUD_theta0_dependence = furman_pivi_surface['use_ECLOUD_theta0_dependence']
         self.use_ECLOUD_energy = furman_pivi_surface['use_ECLOUD_energy']
         self.conserve_energy = furman_pivi_surface['conserve_energy']
         self.choice = furman_pivi_surface['choice']
@@ -124,8 +125,14 @@ class SEY_model_furman_pivi():
         self.s = furman_pivi_surface['s']
         self.t1 = furman_pivi_surface['t1']
         self.t2 = furman_pivi_surface['t2']
-        self.t3 = furman_pivi_surface['t3']
-        self.t4 = furman_pivi_surface['t4']
+
+        if self.use_ECLOUD_theta0_dependence:
+            # Emax(theta) as in ECLOUD module
+            self.t3 = 0.7
+            self.t4 = 1.
+        else:
+            self.t3 = furman_pivi_surface['t3']
+            self.t4 = furman_pivi_surface['t4']
 
         if self.exclude_rediffused:
             print('Secondary emission model: Furman-Pivi excluding rediffused, s=%.4f' % (self.s))
@@ -194,7 +201,10 @@ class SEY_model_furman_pivi():
         exp_factor = -(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p
         delta_e0 = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(exp_factor)
         if flag_costheta_delta_scale:
-            angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
+            if self.use_ECLOUD_theta0_dependence:
+                angular_factor = 1.
+            else:
+                angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
         else:
             angular_factor = 1
 
@@ -225,7 +235,10 @@ class SEY_model_furman_pivi():
             eHat = self.eHat0
         delta_ts0 = self.deltaTSHat * self._D(E_impact_eV / eHat)
         if flag_costheta_delta_scale:
-            angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
+            if self.use_ECLOUD_theta0_dependence:
+                angular_factor = np.exp(0.5 * (1. - costheta_impact))
+            else:
+                angular_factor = 1. + self.t1 * (1. - costheta_impact**self.t2)
         else:
             angular_factor = 1
 

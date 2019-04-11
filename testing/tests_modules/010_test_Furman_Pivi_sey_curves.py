@@ -19,112 +19,120 @@ def del_elas_ECLOUD(energy, R_0=0.7, E_max=332., E_0=150.):
     return del_elas
 
 
-def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332.):
-    x = energy / E_max
+def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332., costheta=1.):
+    angular_factor = np.exp(0.5 * (1. - costheta))
+    E_max_tilde = E_max * (1. + 0.7 * (1. - costheta))
+    x = energy / E_max_tilde
     del_true = del_max * s * x / (s - 1 + x**s)
-    return del_true
+    return del_true * angular_factor
 
 
-furman_pivi_surface_tweak = {'use_ECLOUD_energy': False,
-                             'conserve_energy': True,
-                             'exclude_rediffused': True,
-                             'choice': 'poisson',
-                             'M_cut': 10,
-                             'p_n': np.array([1.21963859, 1.66070543, 1.21935223, 1.09987752, 4.28158656, 1.02052557, 1.0247471, 1.02307995, 29.93491271, 1.02045612]),
-                             'eps_n': np.array([7.44033631e+00, 2.47339424e+00, 7.45004962e+00, 1.63618903e+01, 4.97986255e-01, 7.96170380e+01, 6.60354258e+01, 7.08053955e+01, 5.64779654e-02, 7.98873331e+01]),
-                             # Parameters for backscattered electrons
-                             'p1EInf': 0.002158,  # Changed this
-                             'p1Ehat': 0.709633,  # Changed this
-                             'eEHat': 0.,
-                             'w': 46.028959,  # Changed this
-                             'p': 0.468907,  # Changed this
-                             'e1': 0.,  # Changed this
-                             'e2': 2.,
-                             'sigmaE': 2.,
-                             # Parameters for rediffused electrons
-                             'p1RInf': 0.2,
-                             'eR': 0.041,
-                             'r': 0.104,
-                             'q': 0.5,
-                             'r1': 0.26,
-                             'r2': 2.,
-                             # Parameters for true secondaries
-                             'deltaTSHat': 1.8848,
-                             'eHat0': 332.,
-                             's': 1.35,
-                             't1': 0.706340,  # Changed this
-                             't2': 0.715223,  # Changed this
-                             't3': 0.7,
-                             't4': 1.,
-                             }
+furman_pivi_surface_tweak = {
+    'use_ECLOUD_theta0_dependence': True,
+    'use_ECLOUD_energy': False,
+    'conserve_energy': False,
+    'exclude_rediffused': True,
+    'choice': 'poisson',
+    'M_cut': 10,
+    'p_n': np.array([1.21963859, 1.66070543, 1.21935223, 1.09987752, 4.28158656, 1.02052557, 1.0247471, 1.02307995, 29.93491271, 1.02045612]),
+    'eps_n': np.array([7.44033631e+00, 2.47339424e+00, 7.45004962e+00, 1.63618903e+01, 4.97986255e-01, 7.96170380e+01, 6.60354258e+01, 7.08053955e+01, 5.64779654e-02, 7.98873331e+01]),
+    # Parameters for backscattered electrons
+    'p1EInf': 0.002158,  # Changed this
+    'p1Ehat': 0.709633,  # Changed this
+    'eEHat': 0.,
+    'w': 46.028959,  # Changed this
+    'p': 0.468907,  # Changed this
+    'e1': 0.,  # Changed this
+    'e2': 2.,
+    'sigmaE': 2.,
+    # Parameters for rediffused electrons
+    'p1RInf': 0.2,
+    'eR': 0.041,
+    'r': 0.104,
+    'q': 0.5,
+    'r1': 0.26,
+    'r2': 2.,
+    # Parameters for true secondaries
+    'deltaTSHat': 1.8,
+    'eHat0': 332.,
+    's': 1.35,
+    't1': 0.5, # 0.706340,  # Changed this
+    't2': 1., #0.715223,  # Changed this
+    't3': 0.7,
+    't4': 1.}
 
-furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
-                           'conserve_energy': False,
-                           'exclude_rediffused': False,
-                           'choice': 'poisson',
-                           'M_cut': 10,
-                           'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
-                           'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
-                           # Parameters for backscattered electrons
-                           'p1EInf': 0.02,
-                           'p1Ehat': 0.496,
-                           'eEHat': 0.,
-                           'w': 60.86,
-                           'p': 1.,
-                           'e1': 0.26,
-                           'e2': 2.,
-                           'sigmaE': 2.,
-                           # Parameters for rediffused electrons
-                           'p1RInf': 0.2,
-                           'eR': 0.041,
-                           'r': 0.104,
-                           'q': 0.5,
-                           'r1': 0.26,
-                           'r2': 2.,
-                           # Parameters for true secondaries
-                           'deltaTSHat': 1.8848,
-                           'eHat0': 332.,
-                           's': 1.35,
-                           't1': 0.5,  # t1 and t2 based on taylor expansion
-                           't2': 1.,   # of PyECLOUD formula for E_max(theta)
-                           't3': 0.7,
-                           't4': 1.,
-                           }
+furman_pivi_surface_LHC = {
+    'use_ECLOUD_theta0_dependence': False,
+    'use_ECLOUD_energy': False,
+    'conserve_energy': False,
+    'exclude_rediffused': False,
+    'choice': 'poisson',
+    'M_cut': 10,
+    'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+    'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+    # Parameters for backscattered electrons
+    'p1EInf': 0.02,
+    'p1Ehat': 0.496,
+    'eEHat': 0.,
+    'w': 60.86,
+    'p': 1.,
+    'e1': 0.26,
+    'e2': 2.,
+    'sigmaE': 2.,
+    # Parameters for rediffused electrons
+    'p1RInf': 0.2,
+    'eR': 0.041,
+    'r': 0.104,
+    'q': 0.5,
+    'r1': 0.26,
+    'r2': 2.,
+    # Parameters for true secondaries
+    'deltaTSHat': 1.8848,
+    'eHat0': 332.,
+    's': 1.35,
+    't1': 0.5,  # t1 and t2 based on taylor expansion
+    't2': 1.,   # of PyECLOUD formula for E_max(theta)
+    't3': 0.7,
+    't4': 1.}
 
-furman_pivi_surface = {'use_ECLOUD_energy': False,
-                       'conserve_energy': False,
-                       'exclude_rediffused': False,
-                       'choice': 'poisson',
-                       'M_cut': 10,
-                       'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
-                       'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
-                       'p1EInf': 0.02,
-                       'p1Ehat': 0.496,
-                       'eEHat': 0.,
-                       'w': 60.86,
-                       'p': 1.,
-                       'e1': 0.26,
-                       'e2': 2.,
-                       'sigmaE': 2.,
-                       'p1RInf': 0.2,
-                       'eR': 0.041,
-                       'r': 0.104,
-                       'q': 0.5,
-                       'r1': 0.26,
-                       'r2': 2.,
-                       'deltaTSHat': 1.8848,
-                       'eHat0': 276.8,
-                       's': 1.54,
-                       't1': 0.66,
-                       't2': 0.8,
-                       't3': 0.7,
-                       't4': 1.,
-                       }
+furman_pivi_surface = {
+    'use_ECLOUD_theta0_dependence': False,
+    'use_ECLOUD_energy': False,
+    'conserve_energy': False,
+    'exclude_rediffused': False,
+    'choice': 'poisson',
+    'M_cut': 10,
+    'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+    'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+    'p1EInf': 0.02,
+    'p1Ehat': 0.496,
+    'eEHat': 0.,
+    'w': 60.86,
+    'p': 1.,
+    'e1': 0.26,
+    'e2': 2.,
+    'sigmaE': 2.,
+    'p1RInf': 0.2,
+    'eR': 0.041,
+    'r': 0.104,
+    'q': 0.5,
+    'r1': 0.26,
+    'r2': 2.,
+    'deltaTSHat': 1.8848,
+    'eHat0': 276.8,
+    's': 1.54,
+    't1': 0.66,
+    't2': 0.8,
+    't3': 0.7,
+    't4': 1.}
+
+flag_costheta_delta_scale = True
+flag_costheta_Emax_shift = True
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak, flag_costheta_delta_scale=True,
-                                   flag_costheta_Emax_shift=True)
+                                   furman_pivi_surface=furman_pivi_surface_tweak, flag_costheta_delta_scale=flag_costheta_delta_scale,
+                                   flag_costheta_Emax_shift=flag_costheta_Emax_shift)
 
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
@@ -233,8 +241,9 @@ for costheta in np.linspace(0, 1., 10):
     sp5.plot(energy, delta_r_vec + delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
     sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
 
-sp2.plot(energy, del_elas_ECLOUD(energy), '--', color='r', linewidth=linewid, label='ECLOUD model \nnormal incidence')
-sp1.plot(energy, del_true_ECLOUD(energy, del_max=test_obj.deltaTSHat), '--', color='r', linewidth=linewid, label='ECLOUD model')
+sp2.plot(energy, del_elas_ECLOUD(energy), '--', color='r', linewidth=linewid, label='ECLOUD model')
+for ct in cos_theta_test:
+    sp1.plot(energy, del_true_ECLOUD(energy, del_max=test_obj.deltaTSHat, costheta=ct), '--', color='r', linewidth=linewid, label='ECLOUD model')
 sp2.legend(loc='best', prop={'size': 14})
 
 plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s' % str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)

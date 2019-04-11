@@ -15,38 +15,39 @@ from geom_impact_ellip import ellip_cham_geom_object
 me = 9.10938356e-31
 alpha = 0.9
 
-furman_pivi_surface_LHC = {'use_ECLOUD_energy': False,
-                           'conserve_energy': False,
-                           'exclude_rediffused': True,
-                           'choice': 'poisson',
-                           'M_cut': 10,
-                           'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
-                           'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
-                           # Parameters for backscattered electrons
-                           'p1EInf': 0.02,
-                           'p1Ehat': 0.496,
-                           'eEHat': 0.,
-                           'w': 60.86,
-                           'p': 1.,
-                           'e1': 0.26,
-                           'e2': 2.,
-                           'sigmaE': 2.,
-                           # Parameters for rediffused electrons
-                           'p1RInf': 0.2,
-                           'eR': 0.041,
-                           'r': 0.104,
-                           'q': 0.5,
-                           'r1': 0.26,
-                           'r2': 2.,
-                           # Parameters for true secondaries
-                           'deltaTSHat': 1.8848,
-                           'eHat0': 332.,
-                           's': 1.35,
-                           't1': 0.5,  # t1 and t2 based on taylor expansion
-                           't2': 1.,   # of PyECLOUD formula for E_max(theta)
-                           't3': 0.7,
-                           't4': 1.,
-                           }
+furman_pivi_surface_LHC = {
+    'use_ECLOUD_theta0_dependence': False,
+    'use_ECLOUD_energy': False,
+    'conserve_energy': False,
+    'exclude_rediffused': True,
+    'choice': 'poisson',
+    'M_cut': 10,
+    'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+    'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+    # Parameters for backscattered electrons
+    'p1EInf': 0.02,
+    'p1Ehat': 0.496,
+    'eEHat': 0.,
+    'w': 60.86,
+    'p': 1.,
+    'e1': 0.26,
+    'e2': 2.,
+    'sigmaE': 2.,
+    # Parameters for rediffused electrons
+    'p1RInf': 0.2,
+    'eR': 0.041,
+    'r': 0.104,
+    'q': 0.5,
+    'r1': 0.26,
+    'r2': 2.,
+    # Parameters for true secondaries
+    'deltaTSHat': 1.8848,
+    'eHat0': 332.,
+    's': 1.35,
+    't1': 0.5,  # t1 and t2 based on taylor expansion
+    't2': 1.,   # of PyECLOUD formula for E_max(theta)
+    't3': 0.7,
+    't4': 1.}
 
 flag_costheta_delta_scale = True
 flag_costheta_Emax_shift = True
