@@ -110,7 +110,7 @@ class BuildupSimulation(object):
 
         ## simulation
         while not beamtim.end_simulation():
-            
+
             if t_end_sim is not None and beamtim.tt_curr is not None:
                 if beamtim.tt_curr >= t_end_sim:
                     print 'Reached user defined t_end_sim --> Ending simulation'
@@ -126,7 +126,7 @@ class BuildupSimulation(object):
 
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
-            
+
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
                       force_recompute_space_charge=False, skip_MP_cleaning=False, skip_MP_regen=False):
@@ -301,7 +301,7 @@ class BuildupSimulation(object):
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)
 
         for cloud in self.cloud_list:
-            cloud.pyeclsaver.load_from_output(last_t=self.beamtim.tt_curr)
+            cloud.pyeclsaver.load_from_output( cloud.impact_man, last_t=self.beamtim.tt_curr)
             cloud.pyeclsaver.i_checkp = i_checkp + 1
             cloud.pyeclsaver.t_last_checkp = self.beamtim.tt_curr
             cloud.pyeclsaver.t_last_En_hist = dict_state['t_last_En_hist']
