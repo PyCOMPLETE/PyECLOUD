@@ -74,13 +74,6 @@ class impact_management(object):
         self.scrub_en_th = scrub_en_th
         self.Nbin_En_hist = Nbin_En_hist
         self.En_hist_max = En_hist_max
-
-        self.lifetime_hist_flag = lifetime_hist_flag
-
-        if self.lifetime_hist_flag:
-            self.Nbin_lifetime_hist = Nbin_lifetime_hist
-            self.lifetime_hist_max = lifetime_hist_max
-
         self.flag_seg = flag_seg
 
         xg_hist = np.arange(0, chamb.x_aper + 2. * Dx_hist, Dx_hist, float)
@@ -91,13 +84,7 @@ class impact_management(object):
         bias_x_hist = np.min(xg_hist)
 
         self.En_g_hist = np.linspace(0., En_hist_max, Nbin_En_hist)  # hist. grid
-
-        if self.lifetime_hist_flag:
-            self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
-
         self.DEn_hist = self.En_g_hist[1] - self.En_g_hist[0]  # hist. step
-        if self.lifetime_hist_flag:
-            self.Dlifetime_hist = self.lifetime_g_hist[1] - self.lifetime_g_hist[0]  # hist. step
 
         self.flag_cos_angle_hist = flag_cos_angle_hist
         if flag_cos_angle_hist:
@@ -122,7 +109,13 @@ class impact_management(object):
         self.energ_eV_impact_hist = np.zeros(Nxg_hist, float)
         self.En_hist_line = np.zeros(Nbin_En_hist, float)
 
+        self.lifetime_hist_flag = lifetime_hist_flag
+
         if self.lifetime_hist_flag:
+            self.Nbin_lifetime_hist = Nbin_lifetime_hist
+            self.lifetime_hist_max = lifetime_hist_max
+            self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
+            self.Dlifetime_hist = self.lifetime_g_hist[1] - self.lifetime_g_hist[0]  # hist. step
             self.lifetime_hist = [[0,0]]
 
         if flag_seg:
@@ -193,19 +186,17 @@ class impact_management(object):
 
             if self.lifetime_hist_flag:
                 Dlifetime_hist = self.Dlifetime_hist
-
+                loc_lifetime = np.zeros(len(MP_e.lifetime), float)	
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
 
             t_last_impact = MP_e.t_last_impact
             t_last_impact_new = MP_e.t_last_impact.copy()
+
             ## impact management
 
             flag_impact = np.zeros_like(x_mp, dtype=bool)
             self.flag_impact = flag_impact
-
-            if self.lifetime_hist_flag:
-                loc_lifetime = np.zeros(len(MP_e.lifetime), float)
 
             # detect impact
             flag_impact[:N_mp_old] = chamb.is_outside(x_mp[0:N_mp_old], y_mp[0:N_mp_old])
@@ -229,7 +220,7 @@ class impact_management(object):
                         MP_e.lifetime[i] = loc_lifetime[i]
                         #append to the histogram iff the MP is not coming from regeneration
                         #or primary emission
-                        if MP_e.t_last_impact[i] > 0:
+                        if (MP_e.t_last_impact[i] > 0) and (MP_e.lifetime[i] > 0):
                             self.lifetime_hist = np.append(self.lifetime_hist, [[MP_e.lifetime[i],MP_e.nel_mp[i]]], axis = 0)
 
                         MP_e.t_last_impact[i] = tt_curr

@@ -183,7 +183,7 @@ class BuildupSimulation(object):
 
             ## Save position before motion step
             old_pos = MP_e.get_positions()
-            old_lifetime = MP_e.lifetime
+
             ## Motion
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
                 # Standard simulation mode

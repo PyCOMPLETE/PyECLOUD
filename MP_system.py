@@ -445,6 +445,9 @@ class MP_system:
 
                 self.N_mp = int(self.N_mp + Nint_new_MP)
 
+                self.lifetime[self.N_mp:self.N_mp + Nint_new_MP] = 0
+                self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
 
         if x_max is None:
@@ -487,7 +490,8 @@ class MP_system:
             self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
-
+            self.lifetime[self.N_mp:self.N_mp + Nint_new_MP] = 0
+            self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
             self.N_mp = int(self.N_mp + Nint_new_MP)
 
