@@ -115,7 +115,7 @@ class pyecloud_saver:
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
                         pass_by_pass_custom_observables=None,
-                        save_once_custom_observables=None):
+                        save_once_custom_observables=None, Dt_lifetime_hist = 0):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -169,7 +169,10 @@ class pyecloud_saver:
                                      x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det)
 
         # Init energy and cos angle histogram saving
-        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
+        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width, impact_man)
+        
+        # Init lifetime histogram saving
+        self._lifetime_hist_init(impact_man, Dt_lifetime_hist)
 
         #Space charge electrostatic energy
         self.t_sc_video = []
@@ -240,6 +243,9 @@ class pyecloud_saver:
         # Check for energy and cos angle hist update
         self._energy_and_cos_angle_hist_save(beamtim, impact_man)
 
+        # Check for energy and cos angle hist update
+        self._lifetime_hist_save(beamtim, impact_man)
+        
         #Space charge electrostatic energy
         if spacech_ele.last_recomputation_check:
             self.t_sc_video.append(beamtim.tt_curr)
@@ -294,9 +300,6 @@ class pyecloud_saver:
         self.N_mp_corrected_pass = []
         self.N_mp_pass = []
         self.N_mp_ref_pass = []
-
-        if impact_man.lifetime_hist_flag:
-            self.lifetime_hist = []
 
         if impact_man.flag_seg:
            self.nel_hist_impact_seg = []
@@ -369,14 +372,6 @@ class pyecloud_saver:
         self.N_mp_corrected_pass.append(impact_man.chamb.N_mp_corrected)
         self.N_mp_pass.append(MP_e.N_mp)
         self.N_mp_ref_pass.append(MP_e.nel_mp_ref)
-
-        if impact_man.lifetime_hist_flag:
-            loc_lifetime_hist = np.zeros(impact_man.Nbin_lifetime_hist, float)
-            if len(impact_man.lifetime_hist)>1:
-                histf.compute_hist(impact_man.lifetime_hist[:,0], impact_man.lifetime_hist[:,1], 0, impact_man.Dlifetime_hist, loc_lifetime_hist)
-
-                self.lifetime_hist.append(loc_lifetime_hist.copy())
-            impact_man.reset_lifetime_hist()
 
         if impact_man.flag_seg:
             self.nel_hist_impact_seg.append(impact_man.nel_hist_impact_seg.copy())
@@ -1017,7 +1012,7 @@ class pyecloud_saver:
                 pass
 
     def _energy_and_cos_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
-                                        cos_angle_width):
+                                        cos_angle_width, impact_man):
         # Energy histogram init
         self.Dt_En_hist = Dt_En_hist
         self.t_last_En_hist = -1.
@@ -1033,6 +1028,13 @@ class pyecloud_saver:
         else:
             self.cos_angle_hist = -1
             self.xg_hist_cos_angle = -1
+    
+    def _lifetime_hist_init(self, impact_man, Dt_lifetime_hist):
+        # Lifetime histogram init
+        self.t_last_lifetime_hist = -1.
+        self.Dt_lifetime_hist = Dt_lifetime_hist
+        if impact_man.lifetime_hist_flag:
+            self.lifetime_hist = []
 
     def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
         # Energy histogram saver
@@ -1046,3 +1048,19 @@ class pyecloud_saver:
             if self.flag_cos_angle_hist:
                 self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
                 impact_man.reset_cos_angle_hist()
+            
+    def _lifetime_hist_save(self, beamtim, impact_man):
+        # Lifetime histogram saver
+        if beamtim.tt_curr >= self.t_last_lifetime_hist + self.Dt_lifetime_hist or np.isclose(beamtim.tt_curr, self.t_last_lifetime_hist + self.Dt_lifetime_hist, rtol=1.e-10, atol=0.0):
+            if impact_man.lifetime_hist_flag:
+                loc_lifetime_hist = np.zeros(impact_man.Nbin_lifetime_hist, float)
+                if len(impact_man.lifetime_hist)>1:
+                    histf.compute_hist(impact_man.lifetime_hist[:,0], impact_man.lifetime_hist[:,1], 0, impact_man.Dlifetime_hist, loc_lifetime_hist)
+                    self.lifetime_hist.append(loc_lifetime_hist.copy())
+                else:
+                    #If no impact has happened save a dummy histogram 
+                    self.lifetime_hist.append(loc_lifetime_hist.copy())
+                
+                impact_man.reset_lifetime_hist()
+                self.t_last_lifetime_hist = beamtim.tt_curr
+        

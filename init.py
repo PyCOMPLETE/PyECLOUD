@@ -386,6 +386,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.lifetime_hist_flag == True and cc.lifetime_hist_max == None:
                 raise inp_spec.PyECLOUD_ConfigException('If  lifetime_hist_flag is enabled, you need to set lifetime_hist_max!')
 
+        if cc.lifetime_hist_flag == True and cc.Dt_lifetime_hist == 0:
+                raise inp_spec.PyECLOUD_ConfigException('If  lifetime_hist_flag is enabled, you need to set Dt_lifetime_hist!')
+
         impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
                                       cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.lifetime_hist_flag,
@@ -442,7 +445,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables, 
-                                       save_once_custom_observables=cc.save_once_custom_observables)
+                                       save_once_custom_observables=cc.save_once_custom_observables, Dt_lifetime_hist = thiscloud.Dt_lifetime_hist)
 
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 

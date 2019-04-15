@@ -180,8 +180,8 @@ class MP_system:
 
                 self.nel_mp[self.N_mp:] = 0.0
 
-                self.lifetime[:] = 0
-                self.t_last_impact[:] = -1
+                self.lifetime[0:self.N_mp] = np.array(self.lifetime[flag_keep].copy())
+                self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
                 chrg_before = chrg
                 chrg_after = np.sum(self.nel_mp)
@@ -395,7 +395,7 @@ class MP_system:
             #end
 
             self.lifetime[:] = 0
-            self.t_last_impact = -1
+            self.t_last_impact[:] = -1
 
             chrg = np.sum(self.nel_mp)
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))

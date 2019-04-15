@@ -186,7 +186,7 @@ class impact_management(object):
 
             if self.lifetime_hist_flag:
                 Dlifetime_hist = self.Dlifetime_hist
-                loc_lifetime = np.zeros(len(MP_e.lifetime), float)	
+
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
 
@@ -214,13 +214,11 @@ class impact_management(object):
                 z_out = z_mp[flag_impact]
 
                 if self.lifetime_hist_flag:
-                    loc_lifetime[flag_impact] = tt_curr - t_last_impact[flag_impact]
-
                     for i in np.where(flag_impact[:N_mp_old])[0]:
-                        MP_e.lifetime[i] = loc_lifetime[i]
                         #append to the histogram iff the MP is not coming from regeneration
                         #or primary emission
-                        if (MP_e.t_last_impact[i] > 0) and (MP_e.lifetime[i] > 0):
+                        if MP_e.t_last_impact[i] > 0:
+                            MP_e.lifetime[i] = tt_curr - t_last_impact[i]
                             self.lifetime_hist = np.append(self.lifetime_hist, [[MP_e.lifetime[i],MP_e.nel_mp[i]]], axis = 0)
 
                         MP_e.t_last_impact[i] = tt_curr
