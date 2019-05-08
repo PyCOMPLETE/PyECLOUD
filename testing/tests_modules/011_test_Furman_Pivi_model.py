@@ -111,18 +111,51 @@ furman_pivi_surface = {
     't2': 0.8,
     't3': 0.7,
     't4': 1.}
+
+# Scaled py POSINST to del_tot_max = 1.6
+furman_pivi_surface_scaled = {
+    'use_ECLOUD_theta0_dependence': False,
+    'use_ECLOUD_energy': False,
+    'conserve_energy': False,
+    'exclude_rediffused': False,
+    'choice': 'poisson',
+    'M_cut': 10,
+    'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+    'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+    'p1EInf': 0.015294,  # Changed this
+    'p1Ehat': 0.382362,  # Changed this
+    'eEHat': 0.,
+    'w': 60.86,
+    'p': 1.,
+    'e1': 0.26,
+    'e2': 2.,
+    'sigmaE': 2.,
+    'p1RInf': 0.152945,  # Changed this
+    'eR': 0.041,
+    'r': 0.104,
+    'q': 0.5,
+    'r1': 0.26,
+    'r2': 2.,
+    'deltaTSHat': 1.441353,  # Changed this
+    'eHat0': 276.8,
+    's': 1.54,
+    't1': 0.66,
+    't2': 0.8,
+    't3': 0.7,
+    't4': 1.}
+
 flag_costheta_Emax_shift = True
 flag_costheta_delta_scale = True
 
 test_obj = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                     switch_no_increase_energy=0, thresh_low_energy=-1,
-                                    furman_pivi_surface=furman_pivi_surface_tweak,
+                                    furman_pivi_surface=furman_pivi_surface_scaled,
                                     flag_costheta_delta_scale=flag_costheta_delta_scale,
                                     flag_costheta_Emax_shift=flag_costheta_Emax_shift)
 
 qq = 0.5  # From FP paper
 sigma_e = 2.
-E_0_single = 100.
+E_0_single = 1600.
 E_0 = np.array([E_0_single] * int(1e5))
 energy = np.linspace(0.001, E_0_single, num=int(1e5))
 
@@ -175,9 +208,7 @@ ax6.legend(loc='best', prop={'size': legendsize})
 
 # True secondary
 
-delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.,
-                                                            flag_costheta_Emax_shift=flag_costheta_Emax_shift,
-                                                            flag_costheta_delta_scale=flag_costheta_delta_scale)
+delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 
 nn = 2

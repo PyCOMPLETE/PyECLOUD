@@ -128,7 +128,7 @@ furman_pivi_surface = {
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak)
+                                   furman_pivi_surface=furman_pivi_surface_LHC)
 
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
@@ -177,7 +177,7 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
 
 E_ts = 3000.
-E_e = 100.
+E_e = 500.
 E_r = 10.
 cos_theta_test = np.linspace(0, 1., 10)
 E_impact_eV_test = np.array(list(np.arange(0, 499., 5.)) + list(np.arange(500., E_ts, 25.)))
@@ -235,23 +235,6 @@ energy = np.linspace(0., E_ts, num=int(1e3))
 energy_e = np.linspace(0., E_e, num=int(2e2))
 energy_r = np.linspace(0., E_r, num=int(1e3))
 
-for costheta in np.linspace(0, 1., 10):
-    delta_ts_vec = test_obj.delta_ts(energy, costheta)
-    delta_e_vec = test_obj.delta_e(energy, costheta)
-    delta_r_vec = test_obj.delta_r(energy, costheta)
-
-    delta_e_vec_2 = test_obj.delta_e(energy_e, costheta)
-    delta_r_vec_2 = test_obj.delta_r(energy_r, costheta)
-
-    sp2.plot(energy, delta_e_vec, color='k', linewidth=linewid)
-    sp_e.plot(energy_e, delta_e_vec_2, color='k', linewidth=linewid)
-    sp3.plot(energy, delta_r_vec, color='k', linewidth=linewid)
-    sp_r.plot(energy_r, delta_r_vec_2, color='k', linewidth=linewid)
-    sp1.plot(energy, delta_ts_vec, color='k', linewidth=linewid)
-    sp_ts.plot(energy, delta_ts_vec, color='k', linewidth=linewid)
-    sp5.plot(energy, delta_r_vec + delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
-    sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid)
-
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
@@ -264,6 +247,24 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp4.plot(E_impact_eV_test, del_absorb_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
     sp5.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_rediff_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
     sp6.plot(E_impact_eV_test, del_true_mat[i_ct, :] + del_elast_mat[i_ct, :], color=thiscol, label=label, linewidth=linewid)
+
+stl = '--'
+for costheta in np.linspace(0, 1., 10):
+    delta_ts_vec = test_obj.delta_ts(energy, costheta)
+    delta_e_vec = test_obj.delta_e(energy, costheta)
+    delta_r_vec = test_obj.delta_r(energy, costheta)
+
+    delta_e_vec_2 = test_obj.delta_e(energy_e, costheta)
+    delta_r_vec_2 = test_obj.delta_r(energy_r, costheta)
+
+    sp2.plot(energy, delta_e_vec, color='k', linewidth=linewid, linestyle=stl)
+    sp_e.plot(energy_e, delta_e_vec_2, color='k', linewidth=linewid, linestyle=stl)
+    sp3.plot(energy, delta_r_vec, color='k', linewidth=linewid, linestyle=stl)
+    sp_r.plot(energy_r, delta_r_vec_2, color='k', linewidth=linewid, linestyle=stl)
+    sp1.plot(energy, delta_ts_vec, color='k', linewidth=linewid, linestyle=stl)
+    sp_ts.plot(energy, delta_ts_vec, color='k', linewidth=linewid, linestyle=stl)
+    sp5.plot(energy, delta_r_vec + delta_ts_vec + delta_e_vec, color='k', linewidth=linewid, linestyle=stl)
+    sp6.plot(energy, delta_ts_vec + delta_e_vec, color='k', linewidth=linewid, linestyle=stl)
 
 sp3.plot(0, 0, 'white', label='Model')
 sp1.set_ylabel(r'$\delta_{ts}$', fontsize=sz)

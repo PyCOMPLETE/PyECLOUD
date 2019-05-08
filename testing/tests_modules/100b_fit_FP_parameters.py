@@ -121,8 +121,8 @@ def _D(x, s):
 
 
 energy = np.linspace(0.00001, 3000, num=int(1e3))
-del_max = 1.8848
-cos_theta = 1.
+del_max = 1.6
+cos_theta = .7
 
 
 def delta_ts(energy, cos_theta, t1, t2):
@@ -148,12 +148,12 @@ popt_true, pcov_true = curve_fit(fit_func, energy, del_ts_ECLOUD)
 
 fitted_true = fit_func(energy, *popt_true)
 
-taylor_true = delta_ts(energy, cos_theta, t1=0.5, t2=1.)
+taylor_true = delta_ts(energy, cos_theta, t1=0.675766, t2=0.767523)
 
 sp2 = fig.add_subplot(3, 2, 2)
 sp2.plot(energy, del_ts_ECLOUD, color='k', label='ECLOUD', linewidth=linewid)
 sp2.plot(energy, fitted_true, '--', color='r', label='Furman-Pivi', linewidth=linewid)
-sp2.plot(energy, fitted_true, linestyle='-.', color='c', label='Furman-Pivi, Taylor', linewidth=linewid)
+sp2.plot(energy, taylor_true, linestyle='-.', color='c', label='Furman-Pivi, Taylor', linewidth=linewid)
 sp2.legend()
 sp2.set_ylabel(r'$\delta_{true}$', fontsize=fontsz)
 sp2.set_xlabel('Impacting electron energy [eV]', fontsize=fontsz)
@@ -195,9 +195,7 @@ M_cut = 10
 
 
 E_imp_used_for_fit = 35.
-delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.,
-                                                        flag_costheta_Emax_shift=flag_costheta_Emax_shift,
-                                                        flag_costheta_delta_scale=flag_costheta_delta_scale)
+delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 
@@ -277,9 +275,7 @@ print(popt_ene_true[10:])
 energy = np.linspace(0.00001, 100., num=int(1e3))
 ene_hilleret = hilleret_energy(energy)
 
-delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.,
-                                                        flag_costheta_Emax_shift=flag_costheta_Emax_shift,
-                                                        flag_costheta_delta_scale=flag_costheta_delta_scale)
+delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 
@@ -335,9 +331,7 @@ sp5.grid(alpha=alph)
 energy = np.linspace(0.00001, 20., num=int(1e3))
 ene_hilleret = hilleret_energy(energy)
 
-delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.,
-                                                        flag_costheta_Emax_shift=flag_costheta_Emax_shift,
-                                                        flag_costheta_delta_scale=flag_costheta_delta_scale)
+delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=energy[-1], costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 

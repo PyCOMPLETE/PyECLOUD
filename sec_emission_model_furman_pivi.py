@@ -155,9 +155,7 @@ class SEY_model_furman_pivi():
         # Already implemented in the impact_man class.
 
         # (2): Compute delta_e, delta_r, delta_ts
-        delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact,
-                                                                flag_costheta_delta_scale=self.flag_costheta_delta_scale,
-                                                                flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
+        delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact)
 
         # (3): Generate probability of number electrons created
 
@@ -185,22 +183,22 @@ class SEY_model_furman_pivi():
 
         return flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
-    def yield_fun_furman_pivi(self, E, costheta, flag_costheta_delta_scale, flag_costheta_Emax_shift):
-        delta_e = self.delta_e(E, costheta, flag_costheta_delta_scale)
-        delta_r = self.delta_r(E, costheta, flag_costheta_delta_scale)
-        delta_ts = self.delta_ts(E, costheta, flag_costheta_delta_scale, flag_costheta_Emax_shift)
+    def yield_fun_furman_pivi(self, E, costheta):
+        delta_e = self.delta_e(E, costheta)
+        delta_r = self.delta_r(E, costheta)
+        delta_ts = self.delta_ts(E, costheta)
         if (delta_e + delta_r >= 1).any():
             raise ValueError('delta_e + delta_r is greater than 1')
         return delta_e, delta_r, delta_ts
 
-    def delta_e(self, E_impact_eV, costheta_impact, flag_costheta_delta_scale=True):
+    def delta_e(self, E_impact_eV, costheta_impact):
         """
         SEY component of backscattered electrons (elastically scattered).
         (25) in FP paper.
         """
         exp_factor = -(np.abs(E_impact_eV - self.eEHat) / self.w)**self.p / self.p
         delta_e0 = self.p1EInf + (self.p1Ehat - self.p1EInf) * np.exp(exp_factor)
-        if flag_costheta_delta_scale:
+        if self.flag_costheta_delta_scale:
             if self.use_ECLOUD_theta0_dependence:
                 angular_factor = 1.
             else:
@@ -210,31 +208,31 @@ class SEY_model_furman_pivi():
 
         return delta_e0 * angular_factor
 
-    def delta_r(self, E_impact_eV, costheta_impact, flag_costheta_delta_scale=True):
+    def delta_r(self, E_impact_eV, costheta_impact):
         """
         SEY component of rediffused electrons (not in ECLOUD model).
         (28) in FP paper.
         """
         exp_factor = -(E_impact_eV / self.eR)**self.r
         delta_r0 = self.p1RInf * (1. - np.exp(exp_factor))
-        if flag_costheta_delta_scale:
+        if self.flag_costheta_delta_scale:
             angular_factor = 1. + self.r1 * (1. - costheta_impact**self.r2)
         else:
             angular_factor = 1
 
         return delta_r0 * angular_factor
 
-    def delta_ts(self, E_impact_eV, costheta_impact, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
+    def delta_ts(self, E_impact_eV, costheta_impact):
         """
         SEY component of true secondaries.
         (31) in FP paper.
         """
-        if flag_costheta_Emax_shift:
+        if self.flag_costheta_Emax_shift:
             eHat = self.eHat0 * (1. + self.t3 * (1. - costheta_impact**self.t4))
         else:
             eHat = self.eHat0
         delta_ts0 = self.deltaTSHat * self._D(E_impact_eV / eHat)
-        if flag_costheta_delta_scale:
+        if self.flag_costheta_delta_scale:
             if self.use_ECLOUD_theta0_dependence:
                 angular_factor = np.exp(0.5 * (1. - costheta_impact))
             else:

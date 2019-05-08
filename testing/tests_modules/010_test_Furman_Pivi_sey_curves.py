@@ -118,7 +118,39 @@ furman_pivi_surface = {
     'q': 0.5,
     'r1': 0.26,
     'r2': 2.,
-    'deltaTSHat': 1.8848,
+    'deltaTSHat': 1.6 - 0.22, #1.8848,
+    'eHat0': 276.8,
+    's': 1.54,
+    't1': 0.66,
+    't2': 0.8,
+    't3': 0.7,
+    't4': 1.}
+
+# Scaled py POSINST to del_tot_max = 1.6
+furman_pivi_surface_scaled = {
+    'use_ECLOUD_theta0_dependence': False,
+    'use_ECLOUD_energy': False,
+    'conserve_energy': False,
+    'exclude_rediffused': False,
+    'choice': 'poisson',
+    'M_cut': 10,
+    'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
+    'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
+    'p1EInf': 0.015294,  # Changed this
+    'p1Ehat': 0.382362,  # Changed this
+    'eEHat': 0.,
+    'w': 60.86,
+    'p': 1.,
+    'e1': 0.26,
+    'e2': 2.,
+    'sigmaE': 2.,
+    'p1RInf': 0.152945,  # Changed this
+    'eR': 0.041,
+    'r': 0.104,
+    'q': 0.5,
+    'r1': 0.26,
+    'r2': 2.,
+    'deltaTSHat': 1.441353,  # Changed this
     'eHat0': 276.8,
     's': 1.54,
     't1': 0.66,

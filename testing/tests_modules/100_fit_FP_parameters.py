@@ -195,9 +195,7 @@ def simple_pdf(energy, pp, eps):
     return pdf / area
 
 
-delta_e, _, delta_ts = sey_mod_initial.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.,
-                                                             flag_costheta_Emax_shift=flag_costheta_Emax_shift,
-                                                             flag_costheta_delta_scale=flag_costheta_delta_scale)
+delta_e, _, delta_ts = sey_mod_initial.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
 
@@ -266,9 +264,7 @@ for i_E, E_0_curr in enumerate(E_0s):
 
     sey_mod_FP, impact_management_object, _ = make_it_easier(*popt)
 
-    delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_0_curr, costheta=1.,
-                                                            flag_costheta_Emax_shift=flag_costheta_Emax_shift,
-                                                            flag_costheta_delta_scale=flag_costheta_delta_scale)
+    delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_0_curr, costheta=1.)
     delta_ts_prime = delta_ts / (1 - delta_e)
 
     dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=np.array([E_0_curr] * int(1e5)), cos_theta_test=[1], mass=me)
