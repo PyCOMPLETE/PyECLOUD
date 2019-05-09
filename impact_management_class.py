@@ -59,7 +59,7 @@ class impact_management(object):
     def __init__(
         self, chamb, sey_mod,
         Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, Nbin_lifetime_hist,
-        lifetime_hist_max, lifetime_hist_flag, flag_seg=False,
+        lifetime_hist_max, flag_seg=False,
         cos_angle_width=0.05, flag_cos_angle_hist=True
     ):
 
@@ -109,10 +109,8 @@ class impact_management(object):
         self.energ_eV_impact_hist = np.zeros(Nxg_hist, float)
         self.En_hist_line = np.zeros(Nbin_En_hist, float)
 
-        self.lifetime_hist_flag = lifetime_hist_flag
-
-        if self.lifetime_hist_flag:
-            self.Nbin_lifetime_hist = Nbin_lifetime_hist
+	self.Nbin_lifetime_hist = Nbin_lifetime_hist
+        if Nbin_lifetime_hist is not None:
             self.lifetime_hist_max = lifetime_hist_max
             self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
             self.Dlifetime_hist = self.lifetime_g_hist[1] - self.lifetime_g_hist[0]  # hist. step
@@ -184,14 +182,11 @@ class impact_management(object):
             En_hist_max = self.En_hist_max
             DEn_hist = self.DEn_hist
 
-            if self.lifetime_hist_flag:
+            if self.Nbin_lifetime_hist is not None:
                 Dlifetime_hist = self.Dlifetime_hist
 
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
-
-            t_last_impact = MP_e.t_last_impact
-            t_last_impact_new = MP_e.t_last_impact.copy()
 
             ## impact management
 
@@ -213,14 +208,11 @@ class impact_management(object):
                 y_out = y_mp[flag_impact]
                 z_out = z_mp[flag_impact]
 
-                if self.lifetime_hist_flag:
+		# append to lifetime histogram
+                if self.Nbin_lifetime_hist is not None:
                     for i in np.where(flag_impact[:N_mp_old])[0]:
-                        #append to the histogram iff the MP is not coming from regeneration
-                        #or primary emission
                         if MP_e.t_last_impact[i] > 0:
-                            MP_e.lifetime[i] = tt_curr - t_last_impact[i]
-                            self.lifetime_hist = np.append(self.lifetime_hist, [[MP_e.lifetime[i],MP_e.nel_mp[i]]], axis = 0)
-
+                            self.lifetime_hist = np.append(self.lifetime_hist, [[tt_curr - MP_e.t_last_impact[i],MP_e.nel_mp[i]]], axis = 0)
                         MP_e.t_last_impact[i] = tt_curr
 
                 # backtracking and surface normal generation

@@ -301,7 +301,7 @@ class BuildupSimulation(object):
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)
 
         for cloud in self.cloud_list:
-            cloud.pyeclsaver.load_from_output( cloud.impact_man, last_t=self.beamtim.tt_curr)
+            cloud.pyeclsaver.load_from_output(last_t=self.beamtim.tt_curr)
             cloud.pyeclsaver.i_checkp = i_checkp + 1
             cloud.pyeclsaver.t_last_checkp = self.beamtim.tt_curr
             cloud.pyeclsaver.t_last_En_hist = dict_state['t_last_En_hist']

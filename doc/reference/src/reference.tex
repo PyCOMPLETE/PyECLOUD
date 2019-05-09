@@ -233,7 +233,7 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
 \textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
-\textbf{lifetime\_hist\_flag}&	Save the histogram of the electrons lifetime (optional - default=False). \\ \hline
+\multicolumn{2}{p{.97\textwidth}}{If the three following variables are set, lifetime histograms are computed}\\ \hline
 \textbf{Dt\_lifetime\_hist}&	[s] Time step used to store the histogram of the electrons lifetime.\\ \hline
 \textbf{Nbin\_lifetime\_hist}&	Number of bins used for the histogram of the electrons lifetime.\\ \hline
 \textbf{lifetime\_hist\_max}& 	[s] Maximum lifetime in the histogram of the electrons lifetime. Larger lifetimes are attributed to the last bin of the histogram.	\\ \hline
@@ -743,8 +743,8 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
     t\_En\_hist & [s] & The time at which the electron energy spectrum is saved.\\\hline
     En\_g\_hist &[eV]& Center of the energy bins used to save the energy spectrum.\\\hline
 
-		lifetime\_hist &  & Histogram of the electrons lifetime for each bunch passage. The last bin contains all electrons falling outside the selected time interval. \\\hline
-		lifetime\_g\_hist &[s]& Center of the time bins used to save the lifetime histogram.\\\hline
+    lifetime\_hist &  & Histogram of the electrons lifetime for each bunch passage. The last bin contains all electrons falling outside the selected time interval. \\\hline
+    lifetime\_g\_hist &[s]& Center of the time bins used to save the lifetime histogram.\\\hline
 
     xg\_hist($N\_{\mathrm{bins}}$) & [m] & The $x$ coordinates corresponding to related histogram bins.\\\hline
 

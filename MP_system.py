@@ -77,8 +77,6 @@ class MP_system:
         self.vz_mp = np.zeros(N_mp_max, float)
         #Time of last impact with the chamber
         self.t_last_impact = -1*np.ones(N_mp_max, float)
-        #lifetime
-        self.lifetime = np.zeros(N_mp_max, float)
 
         self.nel_mp = np.zeros(N_mp_max, float)
         self.N_mp = 0
@@ -139,6 +137,8 @@ class MP_system:
         self.nel_mp[0:self.N_mp] = self.nel_mp[flag_keep].copy()
 
         self.nel_mp[self.N_mp:] = 0.0
+                
+        self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
         print "Done clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
 
@@ -180,7 +180,6 @@ class MP_system:
 
                 self.nel_mp[self.N_mp:] = 0.0
 
-                self.lifetime[0:self.N_mp] = np.array(self.lifetime[flag_keep].copy())
                 self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
                 chrg_before = chrg
@@ -394,7 +393,6 @@ class MP_system:
 
             #end
 
-            self.lifetime[:] = 0
             self.t_last_impact[:] = -1
 
             chrg = np.sum(self.nel_mp)
@@ -445,7 +443,6 @@ class MP_system:
 
                 self.N_mp = int(self.N_mp + Nint_new_MP)
 
-                self.lifetime[self.N_mp:self.N_mp + Nint_new_MP] = 0
                 self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
@@ -490,7 +487,6 @@ class MP_system:
             self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
-            self.lifetime[self.N_mp:self.N_mp + Nint_new_MP] = 0
             self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
             self.N_mp = int(self.N_mp + Nint_new_MP)
@@ -510,7 +506,6 @@ class MP_system:
         self.nel_mp[N_mp_old:N_mp_new] = nel_new_mp
         self.N_mp = N_mp_new
         self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
-        self.lifetime[N_mp_old:N_mp_new] = 0.
 
     def add_from_file(self, filename_MPs):
 
