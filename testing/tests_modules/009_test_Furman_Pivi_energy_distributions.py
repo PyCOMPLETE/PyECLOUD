@@ -17,7 +17,7 @@ def normalised_hilleret_energy(energy, sigmafit=1.0828, mufit=1.6636):
 
 
 plt.close('all')
-ms.mystyle(35)
+ms.mystyle(50)
 linewid = 2
 
 me = 9.10938356e-31
@@ -39,7 +39,7 @@ furman_pivi_surface_tweak = {
     'p': 0.468907,  # Changed this
     'e1': 0.,  # Changed this
     'e2': 2.,
-    'sigmaE': 2.,
+    'sigmaE': 1e-4,
     # Parameters for rediffused electrons
     'p1RInf': 0.2,
     'eR': 0.041,
@@ -127,7 +127,7 @@ flag_costheta_delta_scale = True
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak,
+                                   furman_pivi_surface=furman_pivi_surface,
                                    flag_costheta_Emax_shift=flag_costheta_Emax_shift,
                                    flag_costheta_delta_scale=flag_costheta_delta_scale)
 
@@ -136,9 +136,10 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              Nbin_En_hist=100, En_hist_max=3000, flag_seg=False,
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
-cos_theta_test = np.linspace(.1, 1., 10)
-E_0_single = 35.
-n_rep = int(1e5)
+cos_theta_test = np.linspace(1., 1., 1)
+E_0_single = 50.
+n_rep = int(5e6)
+# n_rep = int(1e5)
 E_impact_eV_test = np.array([E_0_single] * n_rep)
 alpha = 0.9
 
@@ -157,6 +158,7 @@ sp4 = fig1.add_subplot(2, 2, 4)
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
+    label = 'Extracted histogram'
     sp1.hist(dists['true'][i_ct], bins=60, color=thiscol, label=label, alpha=alpha, density=True)
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
@@ -164,9 +166,9 @@ for i_ct, ct in enumerate(cos_theta_test):
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='FP-model PDF', linewidth=linewid)
-sp2.plot(0, 0, 'k', label='ECLOUD-model PDF', linewidth=linewid, linestyle='--')
-sp2.legend(loc='best', prop={'size': 14})
-sz = 35
+# sp2.plot(0, 0, 'k', label='ECLOUD-model PDF', linewidth=linewid, linestyle='--')
+sp2.legend(loc='best', prop={'size': 20})
+sz = 40
 sp1.set_ylabel('True secondaries', fontsize=sz)
 sp2.set_ylabel('Elastic', fontsize=sz)
 sp3.set_ylabel('Rediffused', fontsize=sz)
@@ -187,14 +189,15 @@ delta_e, delta_r, delta_ts = test_obj.yield_fun_furman_pivi(E=E_0_single, costhe
 delta_ts_prime = delta_ts / (1 - delta_e - delta_r)  # delta_ts^prime in FP paper, eq. (39)
 prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_single, energy=energy)
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
-sp1.plot(energy, normalised_hilleret_energy(energy), 'k', linestyle='--', label='ECLOUD hilleret energy', linewidth=linewid)
+# sp1.plot(energy, normalised_hilleret_energy(energy), 'k', linestyle='--', label='ECLOUD hilleret energy', linewidth=linewid)
 for sp in [sp1, sp2, sp3, sp4]:
     sp.grid('on')
-    sp.set_xlabel('Electron energy [eV]')
+    sp.set_xlabel('Electron energy [eV]', fontsize=sz)
+    sp.tick_params(axis='both', labelsize=sz - 10)
 
-plt.subplots_adjust(right=0.99, left=.075)
+plt.subplots_adjust(right=0.97, left=.09)
 
-plt.suptitle('Energy distribution extraction tests: Furman-Pivi model', fontsize=30)
+plt.suptitle(r'Energy distribution extraction tests: Furman-Pivi model, $E_0 = %.1f eV$' % E_0_single, fontsize=30)
 
 plt.figure(2, figsize=(12, 9), facecolor='white')
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
