@@ -75,7 +75,7 @@
 \hfill Giovanni Iadarola, \\
 \hfill Eleonora Belli, Philipp, Dijkstal,\\
 \hfill Lotta Mether, Annalisa Romano,\\
-\hfill Giovanni Rumolo Eric Wulff\\
+\hfill Giovanni Rumolo, Eric Wulff\\
 \hfill CERN - Geneva, Switzerland
 
 \HRule{1pt}} % Horizontal line, thickness changed here
@@ -316,6 +316,18 @@ List of names of additional cloud files.\\ \hline
 }\\ \hline
 \textbf{extract\_sey} &  (optional -- default=True) \newline
 If set to False, it disables the extraction the SEY curves.\\ \hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Extraction of electron emission energy distribution}
+}\\ \hline
+\textbf{extract\_ene\_dist} &  (optional -- default=False) \newline
+If set to True, secondary emission energy distributions are extracted and saved.\\ \hline
+\textbf{ene\_dist\_test\_E\_impact\_eV} &  The impacting energy used in the energy distribution extraction. [eV]\\ \hline
+\textbf{D\_ene\_dist} &  Defines the bin width for the extracted energy distribution. [eV]\\ \hline
+\textbf{factor\_ene\_dist\_max} &  Defines the maximum energy included in the extracted energy distribution. The maximum energy is factor\_ene\_dist\_max * ene\_dist\_test\_E\_impact\_eV\\ \hline
 \end{longtable}
 
 \newpage\subsection{Machine Parameters}
@@ -641,10 +653,10 @@ Typically this feature is NOT enabled.\\ \hline
 \textbf{thresh\_low\_energy}&	Maximum energy for which the energy check is performed.\\ \hline
 \textbf{scrub\_en\_th}&	Minimum energy of scrubbing electrons (for scrubbing current estimations).\\
 \hline
-\textbf{secondary\_angle\_distribution} & Can be 'cosine\_2D' or 'cosine\_3D'.
+\textbf{secondary\_angle\_distribution} & Can be 'cosine\_2D', 'cosine\_3D' or 'normal\_emission'.
     For new electrons, $\theta$ describes the angle between the surface normal and their initial velocity vector.
     d$n$/d$\theta=\cos\theta$ or d$n$/d$\theta=\cos\theta\sin\theta$ in the 2D or 3D cases, respectively. More info \href{http://www.sciencedirect.com/science/article/pii/S0042207X02001732}{here}.
-The more accurate is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates.
+The more accurate is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates. For 'normal\_emission', $\theta = 0$.
 \\ \hline
 \end{longtable}
 
