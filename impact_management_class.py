@@ -109,7 +109,8 @@ class impact_management(object):
         self.energ_eV_impact_hist = np.zeros(Nxg_hist, float)
         self.En_hist_line = np.zeros(Nbin_En_hist, float)
 
-	self.Nbin_lifetime_hist = Nbin_lifetime_hist
+        self.Nbin_lifetime_hist = Nbin_lifetime_hist
+
         if Nbin_lifetime_hist is not None:
             self.lifetime_hist_max = lifetime_hist_max
             self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
@@ -299,7 +300,7 @@ class impact_management(object):
                     if flag_seg:
                         segi.update_seg_impact(i_seg_new_MPs, -nel_new_MPs * E_new_MPs_eV, self.energ_eV_impact_seg)
                         segi.update_seg_impact(i_seg_new_MPs, nel_new_MPs, self.nel_hist_emit_seg)
-                    
+
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV * nel_new_MPs)
 
         return MP_e

@@ -380,8 +380,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             impact_man_class = imc.impact_management
 
-        if cc.Nbin_lifetime_hist is not None or cc.lifetime_hist_max is not None or cc.Dt_lifetime_hist is not 0:
-            if not (cc.Nbin_lifetime_hist is not None and cc.lifetime_hist_max is not None and cc.Dt_lifetime_hist is not 0):
+        if cc.Nbin_lifetime_hist is not None or cc.lifetime_hist_max is not None or cc.Dt_lifetime_hist is not None:
+            if not (cc.Nbin_lifetime_hist is not None and cc.lifetime_hist_max is not None and cc.Dt_lifetime_hist is not None):
                 raise inp_spec.PyECLOUD_ConfigException('If one of the lifetime hist parameters is set, also the others must be')
 
         impact_man = impact_man_class(chamb, sey_mod,
@@ -439,7 +439,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
-                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables, 
+                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
                                        save_once_custom_observables=cc.save_once_custom_observables, Dt_lifetime_hist = thiscloud.Dt_lifetime_hist)
 
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)

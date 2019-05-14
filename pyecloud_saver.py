@@ -92,8 +92,8 @@ class pyecloud_saver:
             git_branch = 'Retrieving git branch failed'
             print(e)
         print(git_branch)
-        
-        if self.logfile_path is not None: 
+
+        if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
                 flog.write('PyECLOUD Version 7.7.1\n')
                 flog.write('%s\n' % git_hash)
@@ -115,7 +115,7 @@ class pyecloud_saver:
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
                         pass_by_pass_custom_observables=None,
-                        save_once_custom_observables=None, Dt_lifetime_hist = 0):
+                        save_once_custom_observables=None, Dt_lifetime_hist = None):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -161,7 +161,7 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                   initial_size_t_vect=1000, 
+                                   initial_size_t_vect=1000,
                                    step_by_step_custom_observables = self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
@@ -263,7 +263,7 @@ class pyecloud_saver:
             self.xg_hist = impact_man.xg_hist
             self.En_g_hist = impact_man.En_g_hist
 
-            if self.Dt_lifetime_hist is not 0:
+            if self.Dt_lifetime_hist is not None:
                 self.lifetime_g_hist = impact_man.lifetime_g_hist
 
             self.b_spac = beamtim.b_spac
@@ -326,7 +326,7 @@ class pyecloud_saver:
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
-        
+
         # Custom data
         self.pbp_custom_data = {}
         if self.pass_by_pass_custom_observables is not None:
@@ -422,7 +422,7 @@ class pyecloud_saver:
                     'xg_hist_cos_angle': self.xg_hist_cos_angle
         }
 
-        if self.Dt_lifetime_hist is not 0:
+        if self.Dt_lifetime_hist is not None:
             saved_dict['lifetime_g_hist'] = self.lifetime_g_hist
             saved_dict['lifetime_hist'] = self.lifetime_hist
 
@@ -581,7 +581,7 @@ class pyecloud_saver:
                                    'U_sc_eV'
                                    ]
 
-        if self.Dt_lifetime_hist is not 0:
+        if self.Dt_lifetime_hist is not None:
             not_time_dependent_list.append('lifetime_g_hist')
 
         should_be_list_list = ['U_sc_eV',
@@ -783,7 +783,7 @@ class pyecloud_saver:
 
         for kk in self.sbs_custom_data.keys():
             dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
-        
+
         return dict_sbs_data
 
     def _MP_state_init(self, save_mp_state_time_file):
@@ -979,7 +979,7 @@ class pyecloud_saver:
             timestr = time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
             string_tolog = timestr + (' pass. %d/%d, cloud=%s: Nel_tot=%e N_mp=%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot, self.cloud_name, np.sum(MP_e.nel_mp[0:MP_e.N_mp]), MP_e.N_mp))
-            
+
             if self.logfile_path is not None:
                 try:
                     with open(self.logfile_path, 'a') as flog:
@@ -988,7 +988,7 @@ class pyecloud_saver:
                     print('Got: ', err)
                     print('while trying to write the following line on logfile:')
                     print(string_tolog)
-            
+
             if self.progress_path is not None:
                 try:
                     with open(self.progress_path, 'w') as flog:
@@ -1023,11 +1023,11 @@ class pyecloud_saver:
         else:
             self.cos_angle_hist = -1
             self.xg_hist_cos_angle = -1
-    
+
         # Lifetime histogram init
         self.t_last_lifetime_hist = -1.
         self.Dt_lifetime_hist = Dt_lifetime_hist
-        if self.Dt_lifetime_hist is not 0:
+        if self.Dt_lifetime_hist is not None:
             self.lifetime_hist = []
 
     def _energy_and_cos_angle_hist_save(self, beamtim, impact_man):
@@ -1042,18 +1042,17 @@ class pyecloud_saver:
             if self.flag_cos_angle_hist:
                 self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
                 impact_man.reset_cos_angle_hist()
-            
+
         # Lifetime histogram saver
-        if beamtim.tt_curr >= self.t_last_lifetime_hist + self.Dt_lifetime_hist or np.isclose(beamtim.tt_curr, self.t_last_lifetime_hist + self.Dt_lifetime_hist, rtol=1.e-10, atol=0.0):
-             if self.Dt_lifetime_hist is not 0:
+        if self.Dt_lifetime_hist is not None:
+            if beamtim.tt_curr >= self.t_last_lifetime_hist + self.Dt_lifetime_hist or np.isclose(beamtim.tt_curr, self.t_last_lifetime_hist + self.Dt_lifetime_hist, rtol=1.e-10, atol=0.0):
                 loc_lifetime_hist = np.zeros(impact_man.Nbin_lifetime_hist, float)
                 if len(impact_man.lifetime_hist)>1:
                     histf.compute_hist(impact_man.lifetime_hist[:,0], impact_man.lifetime_hist[:,1], 0, impact_man.Dlifetime_hist, loc_lifetime_hist)
                     self.lifetime_hist.append(loc_lifetime_hist.copy())
                 else:
-                    #If no impact has happened save a dummy histogram 
+                    #If no impact has happened save a dummy histogram
                     self.lifetime_hist.append(loc_lifetime_hist.copy())
-                
+
                 impact_man.reset_lifetime_hist()
                 self.t_last_lifetime_hist = beamtim.tt_curr
-        
