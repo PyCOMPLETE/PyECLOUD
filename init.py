@@ -287,7 +287,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Dx_hist, thiscloud.Nx_regen, thiscloud.Ny_regen, thiscloud.Nvx_regen,
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
-                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass)
+                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
@@ -380,20 +380,20 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         else:
             impact_man_class = imc.impact_management
 
-        if cc.Nbin_lifetime_hist is not None or cc.lifetime_hist_max is not None or cc.Dt_lifetime_hist is not None:
-            if not (cc.Nbin_lifetime_hist is not None and cc.lifetime_hist_max is not None and cc.Dt_lifetime_hist is not None):
-                raise inp_spec.PyECLOUD_ConfigException('If one of the lifetime hist parameters is set, also the others must be')
+        if cc.flag_lifetime_hist:
+            if cc.Nbin_lifetime_hist is None or cc.lifetime_hist_max is None or cc.Dt_lifetime_hist is None:
+                raise inp_spec.PyECLOUD_ConfigException('If flag_lifetime_hist is True then all the histogram parameters must be specfied')
 
         impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
-                                      cc.Nbin_lifetime_hist, cc.lifetime_hist_max,
+                                      cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
                                       flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
                                       )
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag == 1:
             resgasion = gic.residual_gas_ionization(thiscloud.unif_frac, thiscloud.P_nTorr, thiscloud.sigma_ion_MBarn,
-                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion)
+                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion, thiscloud.flag_lifetime_hist)
         else:
             resgasion = None
 
@@ -440,7 +440,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
-                                       save_once_custom_observables=cc.save_once_custom_observables, Dt_lifetime_hist = thiscloud.Dt_lifetime_hist)
+                                       save_once_custom_observables=cc.save_once_custom_observables, flag_lifetime_hist = thiscloud.flag_lifetime_hist,
+				       Dt_lifetime_hist = thiscloud.Dt_lifetime_hist)
 
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 

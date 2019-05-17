@@ -233,7 +233,8 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
 \textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
-\multicolumn{2}{p{.97\textwidth}}{If the three following variables are set, lifetime histograms are computed}\\ \hline
+\textbf{flag\_lifetime\_hist}&   If set to True enables lifetime histogram (optional -- default=False).\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{If \textbf{flag\_lifetime\_hist} is set to True, the variables \textbf{Dt\_lifetime\_hist}, \textbf{Nbin\_lifetime\_hist} and \textbf{lifetime\_hist\_max} need to be set.}\\ \hline
 \textbf{Dt\_lifetime\_hist}&	[s] Time step used to store the histogram of the electrons lifetime.\\ \hline
 \textbf{Nbin\_lifetime\_hist}&	Number of bins used for the histogram of the electrons lifetime.\\ \hline
 \textbf{lifetime\_hist\_max}& 	[s] Maximum lifetime in the histogram of the electrons lifetime. Larger lifetimes are attributed to the last bin of the histogram.	\\ \hline

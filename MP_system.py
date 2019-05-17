@@ -66,7 +66,7 @@ class MP_system:
     def __init__(self, N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                  N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                  Dx_hist_reg, Nx_reg, Ny_reg, Nvx_reg, Nvy_reg, Nvz_reg, regen_hist_cut, chamb,
-                 N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e):
+                 N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e, flag_lifetime_hist = False):
 
         N_mp_max = int(N_mp_max)
         self.x_mp = np.zeros(N_mp_max, float)
@@ -76,7 +76,9 @@ class MP_system:
         self.vy_mp = np.zeros(N_mp_max, float)
         self.vz_mp = np.zeros(N_mp_max, float)
         #Time of last impact with the chamber
-        self.t_last_impact = -1*np.ones(N_mp_max, float)
+	self.flag_lifetime_hist = flag_lifetime_hist
+	if self.flag_lifetime_hist:
+        	self.t_last_impact = -1*np.ones(N_mp_max, float)
 
         self.nel_mp = np.zeros(N_mp_max, float)
         self.N_mp = 0
@@ -137,8 +139,9 @@ class MP_system:
         self.nel_mp[0:self.N_mp] = self.nel_mp[flag_keep].copy()
 
         self.nel_mp[self.N_mp:] = 0.0
-                
-        self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
+	
+	if self.flag_lifetime_hist:
+        	self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
         print "Done clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
 
@@ -180,7 +183,8 @@ class MP_system:
 
                 self.nel_mp[self.N_mp:] = 0.0
 
-                self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
+		if self.flag_lifetime_hist:
+                	self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
                 chrg_before = chrg
                 chrg_after = np.sum(self.nel_mp)
@@ -392,8 +396,9 @@ class MP_system:
                 n_add_step = np.sum(flag_add)
 
             #end
-
-            self.t_last_impact[:] = -1
+		
+	    if self.flag_lifetime_hist:
+            	self.t_last_impact[:] = -1
 
             chrg = np.sum(self.nel_mp)
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
@@ -443,7 +448,8 @@ class MP_system:
 
                 self.N_mp = int(self.N_mp + Nint_new_MP)
 
-                self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+		if self.flag_lifetime_hist:
+                	self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
 
@@ -487,7 +493,8 @@ class MP_system:
             self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
-            self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+	    if self.flag_lifetime_hist:
+		self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
             self.N_mp = int(self.N_mp + Nint_new_MP)
 
@@ -505,7 +512,9 @@ class MP_system:
         self.vz_mp[N_mp_old:N_mp_new] = vz
         self.nel_mp[N_mp_old:N_mp_new] = nel_new_mp
         self.N_mp = N_mp_new
-        self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
+
+	if self.flag_lifetime_hist:
+        	self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
 
     def add_from_file(self, filename_MPs):
 
