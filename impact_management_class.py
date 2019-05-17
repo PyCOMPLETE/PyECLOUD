@@ -156,7 +156,7 @@ class impact_management(object):
         self.lifetime_hist_line *= 0.
 
     #@profile
-    def backtrack_and_second_emiss(self, old_pos, MP_e, tt_curr):
+    def backtrack_and_second_emiss(self, old_pos, MP_e, tt_curr = None):
 
         self.Nel_impact_last_step = 0.
         self.Nel_emit_last_step = 0.
