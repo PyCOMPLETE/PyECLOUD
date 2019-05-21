@@ -46,18 +46,36 @@ def phi_emit(E):
 k_ele = qe**2/(2*np.pi*epsilon_0*R**2*m_e)
 
 N_vect = np.logspace(8, 11, 100)
+P_surv_vect = N_vect*0
+for ii, N in enumerate(N_vect):
+        
+    tanh2 = (np.tanh(0.5*np.sqrt(k_ele*N)*ob.b_spac))**2
+    
+    E_minus_eV = 0.5*m_e*k_ele*N*R**2*tanh2/qe
+    E_plus_eV = 0.5*m_e*k_ele*N*R**2/tanh2/qe
+    
+    E_vect = np.linspace(E_minus_eV, E_plus_eV, 1000)
+    P_surv = np.trapz(phi_emit(E_vect), E_vect)
 
-N = N_vect[-1]
+    P_surv_vect[ii] = P_surv
 
-tanh2 = (np.tanh(0.5*np.sqrt(k_ele*N)*ob.b_spac))**2
+fig3 = plt.figure(3)
+sp31 = fig3.add_subplot(1,1,1)
+sp31.semilogx(N_vect, P_surv_vect)
+sp31.axhline(1/del_bar)
 
-E_minus_eV = 0.5*m_e*k_ele*N*R**2*tanh2/qe
-E_plus_eV = 0.5*m_e*k_ele*N*R**2/tanh2/qe
+N_sat = N_vect[np.argmin(np.abs(1./del_bar-P_surv_vect))]
 
-E_vect = np.linspace(0, 50, 1000)
+sp31.axvline(N_sat)
 
-fig100 = plt.figure(100)
-sp100 = fig100.add_subplot(1,1,1)
-sp100.plot(E_vect, phi_emit(E_vect))
+sp1.axhline(N_sat)
+
+
+# ## A check
+# E_vect = np.linspace(0, 50, 1000)
+# 
+# fig100 = plt.figure(100)
+# sp100 = fig100.add_subplot(1,1,1)
+# sp100.plot(E_vect, phi_emit(E_vect))
 
 plt.show()
