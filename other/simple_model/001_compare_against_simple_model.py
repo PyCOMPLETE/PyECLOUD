@@ -41,4 +41,17 @@ del_bar, _ = seymod.yield_fun2(
         flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True)
 
 
+k_ele = qe**2/(2*np.pi*epsilon_0*R**2*m_e)
+
+N_vect = np.logspace(8, 11, 100)
+
+N = N_vect[-1]
+
+tanh2 = (np.tanh(0.5*np.sqrt(k_ele*N)*ob.b_spac))**2
+
+E_minus_eV = 0.5*m_e*k_ele*N*R**2*tanh2/qe
+E_plus_eV = 0.5*m_e*k_ele*N*R**2/tanh2/qe
+
+
+
 plt.show()
