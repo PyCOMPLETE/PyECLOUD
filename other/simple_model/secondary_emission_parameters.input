@@ -14,5 +14,7 @@ thresh_low_energy=-1
 
 scrub_en_th=20.#eV
 
+flag_costheta_delta_scale=False
+flag_costheta_Emax_shift=False
 
 secondary_angle_distribution = 'normal_emission'

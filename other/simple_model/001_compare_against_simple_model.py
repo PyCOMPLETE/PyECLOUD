@@ -19,4 +19,26 @@ t_det = ob.t[mask_det]
 t_det -= t_det[0]
 
 sp21.plot(t_det, ob.Nel_timep[mask_det]/ob.Nel_timep[mask_det][0])
+
+
+# Compute simple model
+N_b = 1.15e11
+R = 2.e-2
+
+from scipy.constants import e as qe
+from scipy.constants import c as clight
+from scipy.constants import epsilon_0
+from scipy.constants import m_e
+Dp_bar = 3./4. * qe**2 * N_b/(np.pi*epsilon_0*clight*R)
+E_bar_J = Dp_bar**2/(2*m_e)
+E_bar_eV = E_bar_J/qe
+
+import PyECLOUD.sec_emission_model_ECLOUD as seymod
+
+del_bar, _ = seymod.yield_fun2(
+        E=np.atleast_1d(E_bar_eV), costheta=1., Emax=ob.Emax, 
+        del_max=ob.del_max, R0=ob.R0, E0=ob.E0, s=ob.s, 
+        flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True)
+
+
 plt.show()
