@@ -40,6 +40,8 @@ del_bar, _ = seymod.yield_fun2(
         del_max=ob.del_max, R0=ob.R0, E0=ob.E0, s=ob.s, 
         flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True)
 
+def phi_emit(E):
+    return 1./E*1./(ob.sigmafit*np.sqrt(2*np.pi))*np.exp(-(np.log(E)-ob.mufit)**2/(2*ob.sigmafit**2))
 
 k_ele = qe**2/(2*np.pi*epsilon_0*R**2*m_e)
 
@@ -52,6 +54,10 @@ tanh2 = (np.tanh(0.5*np.sqrt(k_ele*N)*ob.b_spac))**2
 E_minus_eV = 0.5*m_e*k_ele*N*R**2*tanh2/qe
 E_plus_eV = 0.5*m_e*k_ele*N*R**2/tanh2/qe
 
+E_vect = np.linspace(0, 50, 1000)
 
+fig100 = plt.figure(100)
+sp100 = fig100.add_subplot(1,1,1)
+sp100.plot(E_vect, phi_emit(E_vect))
 
 plt.show()

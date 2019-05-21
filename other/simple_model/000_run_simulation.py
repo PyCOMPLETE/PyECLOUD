@@ -10,7 +10,9 @@ save_once_custom_observables = {
         'del_max': lambda sim: sim.cloud_list[0].impact_man.sey_mod.del_max,
         'R0': lambda sim: sim.cloud_list[0].impact_man.sey_mod.R0,
         'E0': lambda sim: sim.cloud_list[0].impact_man.sey_mod.E0,
-        's': lambda sim: sim.cloud_list[0].impact_man.sey_mod.s
+        's': lambda sim: sim.cloud_list[0].impact_man.sey_mod.s,
+        'sigmafit': lambda sim: sim.cloud_list[0].impact_man.sey_mod.sigmafit,
+        'mufit': lambda sim: sim.cloud_list[0].impact_man.sey_mod.mufit
          }
 
 sim = BuildupSimulation(pyecl_input_folder=sim_input_folder, 
