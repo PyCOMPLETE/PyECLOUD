@@ -11,7 +11,7 @@ plt.close('all')
 ms.mystyle_arial(fontsz=14, dist_tick_lab=5)
 fig1 = plt.figure(1)
 sp1 = fig1.add_subplot(1,1,1)
-sp1.plot(ob.t/ob.b_spac, ob.Nel_timep)
+sp1.semilogy(ob.t/ob.b_spac, ob.Nel_timep)
 
 fig2 = plt.figure()
 sp21 = fig2.add_subplot(2,1,1)
@@ -43,7 +43,7 @@ del_bar, _ = seymod.yield_fun2(
         E=np.atleast_1d(E_bar_eV), costheta=1., Emax=ob.Emax, 
         del_max=ob.del_max, R0=ob.R0, E0=ob.E0, s=ob.s, 
         flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True)
-
+del_bar = del_bar[0]
 # Compute electric field gradient coefficient
 k_ele = qe**2/(2*np.pi*epsilon_0*R**2*m_e)
 
@@ -51,13 +51,8 @@ k_ele = qe**2/(2*np.pi*epsilon_0*R**2*m_e)
 def phi_emit(E):
     return 1./E*1./(ob.sigmafit*np.sqrt(2*np.pi))*np.exp(-(np.log(E)-ob.mufit)**2/(2*ob.sigmafit**2))
 
-# Evaluate abosorption factor for different electron densities
-N_vect = np.logspace(6, 11, 200)
-P_surv_vect = N_vect*0
-E_minus_vect = N_vect*0
-E_plus_vect = N_vect*0
-for ii, N in enumerate(N_vect):
-        
+
+def compute_P_surv(N):
     tanh2 = (np.tanh(0.5*np.sqrt(k_ele*N)*ob.b_spac))**2
     
     E_minus_eV = 0.5*m_e*k_ele*N*R**2*tanh2/qe
@@ -65,6 +60,18 @@ for ii, N in enumerate(N_vect):
     
     E_vect = np.linspace(E_minus_eV, E_plus_eV, 1000)
     P_surv = np.trapz(phi_emit(E_vect), E_vect)
+
+    return P_surv, E_minus_eV, E_plus_eV
+
+
+# Evaluate abosorption factor for different electron densities
+N_vect = np.logspace(6, 11, 200)
+P_surv_vect = N_vect*0
+E_minus_vect = N_vect*0
+E_plus_vect = N_vect*0
+for ii, N in enumerate(N_vect):
+    
+    P_surv, E_minus_eV, E_plus_eV = compute_P_surv(N)
 
     P_surv_vect[ii] = P_surv
     E_minus_vect[ii] = E_minus_eV
@@ -74,6 +81,20 @@ for ii, N in enumerate(N_vect):
 # Identify saturation level
 N_sat = N_vect[np.argmin(np.abs(1./del_bar-P_surv_vect))]
 
+# Buildup from the model
+N_pass = np.int(np.max(ob.t/ob.b_spac))
+
+N_0 = ob.Nel_timep[0]
+N_iter_vect = [N_0]
+del_eff_vect = []
+N_after_impact = []
+P_surv_iter_vect = []
+for ii in range(N_pass):
+    P_surv, _, _ = compute_P_surv(N_iter_vect[-1])
+    P_surv_iter_vect.append(P_surv)
+    del_eff_vect.append(del_bar*P_surv)
+    N_after_impact.append(N_iter_vect[-1]*del_bar)
+    N_iter_vect.append(N_iter_vect[-1]*del_bar*P_surv)
 # Some plots
 fig3 = plt.figure(3)
 fig3.set_facecolor('w')
@@ -94,8 +115,8 @@ for sp in [sp31, sp32]:
 sp31.axvline(N_sat)
 
 sp1.axhline(N_sat)
-
-
+sp1.plot(N_iter_vect, '.')
+sp1.plot(N_after_impact, '.r')
 # ## A check
 # E_vect = np.linspace(0, 50, 1000)
 # 

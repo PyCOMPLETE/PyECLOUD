@@ -40,7 +40,7 @@ regen_hist_cut = 1.e-4
 N_mp_soft_regen = 6000
 N_mp_after_soft_regen = 2000
 
-nel_mp_ref_0= 2e8/(0.7*N_mp_soft_regen)   #e-/m
+nel_mp_ref_0= 2e6/(0.7*N_mp_soft_regen)   #e-/m
 
 
 # Number of bins
