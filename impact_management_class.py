@@ -331,17 +331,14 @@ class impact_management(object):
         """
         Extract energy distributions for secondary electrons.
         """
-        dists = {}
-        extract_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
-        Dextract_ene = extract_ene_g_hist[1] - extract_ene_g_hist[0]
+        emit_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
+        Dextract_ene = emit_ene_g_hist[1] - emit_ene_g_hist[0]
         extract_ene_hist = {}
 
         for etype in self.sey_mod.event_types.keys():
             etype_name = self.sey_mod.event_types[etype]
-            extract_ene_hist[etype_name] = np.zeros(shape=(len(extract_ene_g_hist), len(cos_theta_test)), dtype=float)
+            extract_ene_hist[etype_name] = np.zeros(shape=(len(emit_ene_g_hist), len(cos_theta_test)), dtype=float)
 
-            etype_name = self.sey_mod.event_types[etype]
-            dists[etype_name] = []
 
         print('Extracting energy distributions...')
         for i_ct, ct in enumerate(cos_theta_test):
@@ -382,11 +379,14 @@ class impact_management(object):
             extended_event_type = event_info['extended_event_type']
             for etype in self.sey_mod.event_types.keys():
                 etype_name = self.sey_mod.event_types[etype]
-                dists[etype_name].append(E_all_MPs_eV[extended_event_type == etype])
-
-                histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, extract_ene_hist[etype_name][:, i_ct])
+                extract_type = extract_ene_hist[etype_name]
+                if E_all_MPs_eV[extended_event_type == etype].shape == (0,):
+                    pass
+                else:
+                    histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, extract_type[:, i_ct])
+                extract_ene_hist[etype_name] = extract_type
 
         print('Done extracting energy distributions.')
-        extract_ene_hist['extract_ene_g_hist'] = extract_ene_g_hist
+        extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
 
-        return dists, extract_ene_hist
+        return extract_ene_hist
