@@ -445,7 +445,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
                                        save_once_custom_observables=cc.save_once_custom_observables,
-                                       extract_ene_dist=cc.extract_ene_dist)
+                                       extract_ene_dist=cc.extract_ene_dist,
+                                       ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
+                                       Nbin_extract_ene=cc.Nbin_extract_ene,
+                                       factor_ene_dist_max=cc.factor_ene_dist_max
+                                       )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker

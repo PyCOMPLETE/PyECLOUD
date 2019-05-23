@@ -110,6 +110,9 @@ parameters_dict = {
             'save_once_custom_observables': None,
 
             'extract_ene_dist': False,
+            'ene_dist_test_E_impact_eV': None,
+            'Nbin_extract_ene': None,
+            'factor_ene_dist_max': None,
 
         },
     },

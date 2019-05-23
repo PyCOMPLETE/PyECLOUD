@@ -138,12 +138,12 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
 
 cos_theta_test = np.linspace(1., 1., 1)
 E_0_single = 50.
-n_rep = int(5e6)
+n_rep = int(1e6)
 # n_rep = int(1e5)
-E_impact_eV_test = np.array([E_0_single] * n_rep)
+E_impact_eV_test = E_0_single # np.array([E_0_single] * n_rep)
 alpha = 0.9
 
-dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me)
+dists, extract_ene_hist = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me, Nbin_extract_ene=500, factor_ene_dist_max=1.1)
 
 plt.close('all')
 ms.mystyle_arial()
@@ -163,6 +163,16 @@ for i_ct, ct in enumerate(cos_theta_test):
     sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
     sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
+
+    areats = scipy.integrate.simps(extract_ene_hist['true'][:, 0], extract_ene_hist['extract_ene_g_hist'])
+    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, 0], extract_ene_hist['extract_ene_g_hist'])
+    arear = scipy.integrate.simps(extract_ene_hist['rediff'][:, 0], extract_ene_hist['extract_ene_g_hist'])
+    areaab = scipy.integrate.simps(extract_ene_hist['absorb'][:, 0], extract_ene_hist['extract_ene_g_hist'])
+
+    sp1.plot(extract_ene_hist['extract_ene_g_hist'], extract_ene_hist['true'] / areats, color='b', label=label, alpha=alpha, linestyle='--', linewidth=linewid, marker='o')
+    sp2.plot(extract_ene_hist['extract_ene_g_hist'], extract_ene_hist['elast'] / areae, color='b', label=label, alpha=alpha, linestyle='--', linewidth=linewid, marker='o')
+    sp3.plot(extract_ene_hist['extract_ene_g_hist'], extract_ene_hist['rediff'] / arear, color='b', label=label, alpha=alpha, linestyle='--', linewidth=linewid, marker='o')
+    sp4.plot(extract_ene_hist['extract_ene_g_hist'], extract_ene_hist['absorb'] / areaab, color='b', label=label, alpha=alpha, linestyle='--', linewidth=linewid, marker='o')
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='FP-model PDF', linewidth=linewid)

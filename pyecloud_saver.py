@@ -117,7 +117,11 @@ class pyecloud_saver:
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
                         pass_by_pass_custom_observables=None,
                         save_once_custom_observables=None,
-                        extract_ene_dist=None):
+                        extract_ene_dist=None,
+                        ene_dist_test_E_impact_eV=None,
+                        Nbin_extract_ene=None,
+                        factor_ene_dist_max=None,
+                        ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -130,6 +134,10 @@ class pyecloud_saver:
             self.extract_sey = extract_sey
         if extract_ene_dist is not None:
             self.extract_ene_dist = extract_ene_dist
+            self.ene_dist_test_E_impact_eV = ene_dist_test_E_impact_eV
+            self.Nbin_extract_ene = Nbin_extract_ene
+            self.factor_ene_dist_max = factor_ene_dist_max
+
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
@@ -212,9 +220,7 @@ class pyecloud_saver:
 
         # extract energy distributions
         if self.extract_ene_dist:
-            n_rep = 100000
-            ene_impact_single = 300.
-            self.ene_dist_test_E_impact_eV = np.array([ene_impact_single] * int(1e5))
+            n_rep = 1e5
             self.ene_dist_test_cos_theta = np.linspace(0, 1., 10)
             self.ene_dist_test_emitted_energies = impact_man.extract_energy_distributions(n_rep, self.ene_dist_test_E_impact_eV,
                 self.ene_dist_test_cos_theta, mass=MP_e.mass)
@@ -1063,4 +1069,3 @@ class pyecloud_saver:
             if N_mp > 0:
                 histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
-

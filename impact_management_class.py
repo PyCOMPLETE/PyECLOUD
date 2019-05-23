@@ -277,7 +277,7 @@ class impact_management(object):
                     if flag_seg:
                         segi.update_seg_impact(i_seg_new_MPs, -nel_new_MPs * E_new_MPs_eV, self.energ_eV_impact_seg)
                         segi.update_seg_impact(i_seg_new_MPs, nel_new_MPs, self.nel_hist_emit_seg)
-                    
+
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV * nel_new_MPs)
 
         return MP_e
@@ -327,19 +327,22 @@ class impact_management(object):
 
         return deltas
 
-    def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass):
+    def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass, Nbin_extract_ene, factor_ene_dist_max):
         """
         Extract energy distributions for secondary electrons.
-        Returns a dictionary containing one list for each event type. Each list
-        constains len(cos_theta_test) arrays with energy values corresponding to
-        one value of cos_theta_test and the energies E_impact_eV. To produce
-        energy distribution plots, make histograms of these arrays.
         """
         dists = {}
+        extract_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
+        Dextract_ene = extract_ene_g_hist[1] - extract_ene_g_hist[0]
+        extract_ene_hist = {}
 
         for etype in self.sey_mod.event_types.keys():
             etype_name = self.sey_mod.event_types[etype]
+            extract_ene_hist[etype_name] = np.zeros(shape=(len(extract_ene_g_hist), len(cos_theta_test)), dtype=float)
+
+            etype_name = self.sey_mod.event_types[etype]
             dists[etype_name] = []
+
         print('Extracting energy distributions...')
         for i_ct, ct in enumerate(cos_theta_test):
             print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
@@ -381,6 +384,9 @@ class impact_management(object):
                 etype_name = self.sey_mod.event_types[etype]
                 dists[etype_name].append(E_all_MPs_eV[extended_event_type == etype])
 
-        print('Done extracting energy distributions.')
+                histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, extract_ene_hist[etype_name][:, i_ct])
 
-        return dists
+        print('Done extracting energy distributions.')
+        extract_ene_hist['extract_ene_g_hist'] = extract_ene_g_hist
+
+        return dists, extract_ene_hist
