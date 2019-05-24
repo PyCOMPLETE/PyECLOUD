@@ -618,6 +618,7 @@ Different secondary emission models:
 \item switch\_model = `ECLOUD\_nunif\_charging' for the model used in ECLOUD and charging effects, with sey and charging info in the chamber shape file.
 \item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
 \item switch\_model = `flat\_low\_ene' for flat low energy dependence.
+\item switch\_model = `furman\_pivi` for the Furman-Pivi model of secondary electron emission.
 \item switch\_model = `from\_file` for interpolation of a user-specified curve.
 \end{enumerate}\\
 \hline
@@ -635,6 +636,62 @@ Different secondary emission models:
 \textbf{E\_th}& 	Maximum energy for true secondary electrons.\\ \hline
 \textbf{sigmafit}& 	Sigma parameter of the lognormal distribution.\\ \hline
 \textbf{mufit}&Mu parameter of the lognormal distribution.\\
+\hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Secondary Electron Yield} These are the parameters for the `furman\_pivi` model.}\\ \hline
+\textbf{E\_th}& 	Maximum energy for true secondary electrons.\\ \hline
+\textbf{furman\_pivi\_surface}&	A Python dict containing all parameters needed for the Furman-Pivi model. The parameters are listed and described below.\\
+\hline
+General parameters. To be specified in furman\_pivi\_surface.
+&\begin{enumerate}
+\item	'use\_ECLOUD\_theta0\_dependence': Boolean, use same incident angle dependence of SEY as in ECLOUD.
+\item	'use\_ECLOUD\_energy': Boolean, use same secondary electron energy distribution as in ECLOUD.
+\item	'conserve\_energy': Boolean, ensures the sum of emitted electron energies in a single event is not greater than the impacting electron energy.
+\item	'exclude\_rediffused': Boolean, sets $\delta_r = 0$.
+\item	'choice': 'poisson' or 'binomial', choice of probability distribution for $P^\prime_{n,ts}$
+\item	'M\_cut': int, the maximum number of macroparticles that can be emitted in a single event.
+\item	'p\_n': numpy array containing M\_cut floats. Corresponds to $p_n$ in FP paper.
+\item	'eps\_n': numpy array containing M\_cut floats. Corresponds to $\epsilon_n$ in FP paper.
+\end{enumerate}\\
+\hline
+Parameters for backscattered electrons. To be specified in furman\_pivi\_surface.
+&\begin{enumerate}
+\item	'p1EInf': float, $P_{1,e}(\infty)$.
+\item	'p1Ehat': float, $\hat{P}_{1,e}$.
+\item	'eEHat': float, $\hat{E}_e$.
+\item	'w': float, $W$.
+\item	'p': float, $p$.
+\item	'e1': float, $e_1$.
+\item	'e2': float, $e_2$.
+\item	'sigmaE': float, $\sigma_e$.
+\end{enumerate}\\
+\hline
+Parameters for rediffused electrons\\
+To be specified in furman\_pivi\_surface
+&\begin{enumerate}
+\item	'p1RInf': float, $P_{1,r}(\infty)$.
+\item	'eR': float, $E_r$.
+\item	'r': float, $r$
+\item	'q': float, $q$.
+\item	'r1': float, $r_1$.
+\item	'r2': float, $r_2$.
+\end{enumerate}\\
+\hline
+Parameters for true secondaries. To be specified in furman\_pivi\_surface.
+&\begin{enumerate}
+\item	'deltaTSHat': float, $\hat{\delta}_{ts}$.
+\item	'eHat0': float, $\hat{E}_{ts}$.
+\item	's': float, $s$.
+\item	't1': float, $t_1$
+\item	't2': float, $t_2$
+\item	't3': float, $t_3$
+\item	't4': float, $t_4$
+\end{enumerate}\\
+\hline
 \hline
 \end{longtable}
 
