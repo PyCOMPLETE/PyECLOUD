@@ -448,11 +448,12 @@ class pyecloud_saver:
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
         # Extracted energy distributions
-        saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
-        saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
-        saved_dict['emit_ene_g_hist'] = self.emit_ene_dist_test['emit_ene_g_hist']
-        for etypn in self.emit_ene_dist_test.keys():
-            saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
+        if self.extract_ene_dist:
+            saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
+            saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
+            saved_dict['emit_ene_g_hist'] = self.emit_ene_dist_test['emit_ene_g_hist']
+            for etypn in self.emit_ene_dist_test.keys():
+                saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
 
