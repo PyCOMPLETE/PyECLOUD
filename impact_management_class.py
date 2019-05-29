@@ -374,7 +374,7 @@ class impact_management(object):
 
             E_all_MPs_eV = np.concatenate([E_replace_eV, E_new_MPs_eV])
             # extended_nel_emit_tot_events = event_info['extended_nel_emit_tot_events']
-            E_all_MPs_eV = E_all_MPs_eV #* extended_nel_emit_tot_events
+            # E_all_MPs_eV = E_all_MPs_eV * extended_nel_emit_tot_events
 
             extended_event_type = event_info['extended_event_type']
             for etype in self.sey_mod.event_types.keys():
@@ -386,7 +386,9 @@ class impact_management(object):
                     histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, extract_type[:, i_ct])
                 extract_ene_hist[etype_name] = extract_type
 
+            extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
+
         print('Done extracting energy distributions.')
-        extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
+
 
         return extract_ene_hist
