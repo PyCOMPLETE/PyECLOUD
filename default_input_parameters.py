@@ -1,5 +1,4 @@
 from scipy.constants import m_p, m_e, e as qe
-import numpy as np
 
 # To be safe, only use immutable python types as default values in the parameters_dict.
 # This most importantly excludes python lists. Tuples may be used in their place.
@@ -109,6 +108,7 @@ parameters_dict = {
             'pass_by_pass_custom_observables': None,
             'save_once_custom_observables': None,
 
+            # Energy extraction parameters
             'extract_ene_dist': False,
             'ene_dist_test_E_impact_eV': None,
             'Nbin_extract_ene': None,

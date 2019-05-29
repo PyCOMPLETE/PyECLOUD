@@ -139,7 +139,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
 cos_theta_test = np.linspace(1., 1., 1)
 E_0_single = 50.
 n_rep = int(1e5)
-E_impact_eV_test = E_0_single # np.array([E_0_single] * n_rep)
+E_impact_eV_test = E_0_single
 alpha = 0.9
 
 extract_ene_hist = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me, Nbin_extract_ene=500, factor_ene_dist_max=1.0)

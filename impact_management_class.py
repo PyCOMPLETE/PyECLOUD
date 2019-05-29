@@ -328,9 +328,7 @@ class impact_management(object):
         return deltas
 
     def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass, Nbin_extract_ene, factor_ene_dist_max):
-        """
-        Extract energy distributions for secondary electrons.
-        """
+        """Extract energy distributions for secondary electrons."""
         emit_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
         Dextract_ene = emit_ene_g_hist[1] - emit_ene_g_hist[0]
         extract_ene_hist = {}
@@ -338,7 +336,6 @@ class impact_management(object):
         for etype in self.sey_mod.event_types.keys():
             etype_name = self.sey_mod.event_types[etype]
             extract_ene_hist[etype_name] = np.zeros(shape=(len(emit_ene_g_hist), len(cos_theta_test)), dtype=float)
-
 
         print('Extracting energy distributions...')
         for i_ct, ct in enumerate(cos_theta_test):
@@ -373,14 +370,12 @@ class impact_management(object):
             E_new_MPs_eV = 0.5 * mass / qe * v_new_MPs_mod * v_new_MPs_mod
 
             E_all_MPs_eV = np.concatenate([E_replace_eV, E_new_MPs_eV])
-            # extended_nel_emit_tot_events = event_info['extended_nel_emit_tot_events']
-            # E_all_MPs_eV = E_all_MPs_eV * extended_nel_emit_tot_events
 
             extended_event_type = event_info['extended_event_type']
             for etype in self.sey_mod.event_types.keys():
                 etype_name = self.sey_mod.event_types[etype]
                 extract_type = extract_ene_hist[etype_name]
-                if E_all_MPs_eV[extended_event_type == etype].shape == (0,):
+                if E_all_MPs_eV[extended_event_type == etype].shape == (0,):  # if there are no events of type etype
                     pass
                 else:
                     histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, extract_type[:, i_ct])
@@ -389,6 +384,5 @@ class impact_management(object):
             extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
 
         print('Done extracting energy distributions.')
-
 
         return extract_ene_hist

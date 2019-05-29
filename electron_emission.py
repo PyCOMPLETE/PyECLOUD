@@ -204,7 +204,7 @@ of generated electrons (https://indico.cern.ch/event/673160/).
         time.sleep(3)
         return velocities_angle_cosine_2D
     elif string == 'normal_emission':
-        print('Electrons are emmited orthogonally to the chamber.')
+        print('Electrons are emmited orthogonally to the chamber surface.')
         return velocities_angle_normal_emission
     else:
         raise ValueError("""
