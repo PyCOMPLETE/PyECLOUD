@@ -400,26 +400,29 @@ class SEY_model_furman_pivi():
                 if self.conserve_energy:
                     En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])  # Energy of replaced MPs
                     E_impact_eV_add = np.repeat(E_impact_eV[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])  # Energy of new MPs
-
                     En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add  # Total energy emitted in each trusec event
-                    flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
-                    flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)
+
+                    flag_violation = (En_emit_eV_event_add > E_impact_eV_add)  # Violation flag for the new MPs
+                    flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)  # Violation flag for the replaced MPs
 
                     N_violations = np.sum(flag_violation)
                     while N_violations > 0:
+                        # Regenerating energies for the new MPs
                         En_truesec_eV_add[flag_violation] = self.get_energy_true_sec(
                             nn=n_emit_truesec_MPs_extended[flag_violation],
                             E_0=E_impact_eV_add[flag_violation])
 
+                        # Regenerating energies for the replaced MPs
                         En_truesec_eV[flag_violation_replace] = self.get_energy_true_sec(
                             nn=n_emit_truesec_MPs_flag_true_sec[flag_above_zero][flag_violation_replace],
                             E_0=E_impact_eV[flag_truesec][flag_above_zero][flag_violation_replace])
 
                         En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])
-
                         En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add
+
                         flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
                         flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)
+
                         N_violations = np.sum(flag_violation)
 
                 # Replace velocities
@@ -470,8 +473,8 @@ class SEY_model_furman_pivi():
             events = events + 2 * flag_rediffused.astype(int)
         event_type = events
 
-        # extended_event_type keeps track of the event type for new MPs.
-        # It is needed for the extraction of emission-energy distributions.
+        # extended_event_type keeps track of the event type for new MPs, it is
+        # needed for the extraction of emission-energy distributions.
         if n_add_total != 0:
             events_add = np.repeat(events, n_add)
             events = np.concatenate([events, events_add])
