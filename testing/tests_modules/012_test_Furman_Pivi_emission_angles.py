@@ -187,12 +187,14 @@ plt.hist(np.arccos(cos_theta_emit), density=True, bins=60)
 plt.xlabel(r'$\theta_{emit}$')
 plt.ylabel('Normalized emission angle spectrum')
 plt.title('cos_theta_imp=%.2f' % cos_theta_test)
+plt.grid(alpha=.3)
 
 plt.figure(2, facecolor='white', figsize=(12, 9))
 plt.hist(cos_theta_emit, density=True, bins=60)
 plt.xlabel(r'cos($\theta_{emit}$)')
 plt.title('cos_theta_imp=%.2f' % cos_theta_test)
 plt.ylabel('Normalized emission angle spectrum')
+plt.grid(alpha=.3)
 
 
 plt.show()

@@ -70,7 +70,7 @@ sp1.plot(energy, hilleret_energy / area, 'k', linewidth=linewid)
 sp1.set_title('switch_no_increase_energy=%d' % switch)
 
 for sp in [sp1, sp2]:
-    sp.grid('on')
+    sp.grid(alpha=.5)
     sp.set_xlabel('Electron energy [eV]', fontsize=sz)
 
 plt.subplots_adjust(right=0.99, left=.06)

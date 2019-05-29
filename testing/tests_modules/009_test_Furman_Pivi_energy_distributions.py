@@ -196,7 +196,7 @@ prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, 
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
 # sp1.plot(energy, normalised_hilleret_energy(energy), 'k', linestyle='--', label='ECLOUD hilleret energy', linewidth=linewid)
 for sp in [sp1, sp2, sp3, sp4]:
-    sp.grid('on')
+    sp.grid(alpha=.5)
     sp.set_xlabel('Electron energy [eV]', fontsize=sz)
     sp.tick_params(axis='both', labelsize=sz - 10)
 
@@ -212,6 +212,6 @@ plt.legend()
 plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
 plt.xlabel('Energy [eV]', fontsize=sz - 10)
 plt.ylabel('Normalised energy spectrum', fontsize=sz - 10)
-plt.grid(.3)
+plt.grid(alpha=.5)
 
 plt.show()

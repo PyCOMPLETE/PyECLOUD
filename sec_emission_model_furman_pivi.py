@@ -151,15 +151,13 @@ class SEY_model_furman_pivi():
         """
         # Furman-Pivi algorithm
         # (1): Compute emission angles and energy
-
-        # Already implemented in the impact_man class.
+        # Implemented in the impact_management_class.
 
         # (2): Compute delta_e, delta_r, delta_ts
         delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact)
 
-        # (3): Generate probability of number electrons created
-
-        # Emission probability per penetrated electron
+        # (3): Generate probability of number of electrons created
+        # Implemented in the impact_management_class.
 
         # Decide on type
         rand = random.rand(E_impact_eV.size)
@@ -243,6 +241,7 @@ class SEY_model_furman_pivi():
         return delta_ts0 * angular_factor
 
     def _D(self, x):
+        """(32) in FP paper"""
         s = self.s
         return s * x / (s - 1 + x**s)
 
@@ -395,15 +394,14 @@ class SEY_model_furman_pivi():
 
                 # Generate new MP properties, angles and energies
                 n_emit_truesec_MPs_extended = np.repeat(n_emit_truesec_MPs_flag_true_sec, n_add[flag_truesec])
-
                 En_truesec_eV_add = self.get_energy_true_sec(nn=n_emit_truesec_MPs_extended, E_0=E_impact_eV_add)
 
                 # Ensure energy conservation in each event
                 if self.conserve_energy:
-                    En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])
-                    E_impact_eV_add = np.repeat(E_impact_eV[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
+                    En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])  # Energy of replaced MPs
+                    E_impact_eV_add = np.repeat(E_impact_eV[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])  # Energy of new MPs
 
-                    En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add
+                    En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add  # Total energy emitted in each trusec event
                     flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
                     flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)
 
@@ -456,9 +454,6 @@ class SEY_model_furman_pivi():
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-        # extended_nel_emit_tot_events used for extraction of energy distributions
-        # extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
-
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
         n_emit_MPs[flag_backscattered] = 1
@@ -466,13 +461,7 @@ class SEY_model_furman_pivi():
             n_emit_MPs[flag_rediffused] = 1
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
-        # if np.isclose(np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), atol=1e-3):
-        #     pass
-        # else:
-        #     raise ValueError('There is something wrong in the adding of new MPs\nnel_emit_tot_events: %d\nextended_nel_emit_tot_events: %d\nnel_replace + nel_new: %d' % (np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), np.sum(nel_replace) + np.sum(nel_new_MPs)))
-
         events = flag_truesec.astype(int)
-
         events[n_emit_MPs == 0] = 3  # Absorbed MPs
 
         if self.exclude_rediffused:
@@ -481,14 +470,13 @@ class SEY_model_furman_pivi():
             events = events + 2 * flag_rediffused.astype(int)
         event_type = events
 
+        # extended_event_type keeps track of the event type for new MPs.
+        # It is needed for the extraction of emission-energy distributions.
         if n_add_total != 0:
             events_add = np.repeat(events, n_add)
             events = np.concatenate([events, events_add])
         extended_event_type = events
 
-        # event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
-        #               'extended_event_type': extended_event_type,
-        #               }
         event_info = {'extended_event_type': extended_event_type,
                       }
 
