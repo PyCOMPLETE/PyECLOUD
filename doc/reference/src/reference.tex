@@ -649,7 +649,7 @@ Different secondary emission models:
 General parameters. To be specified in furman\_pivi\_surface.
 &\begin{enumerate}
 \item	'use\_ECLOUD\_theta0\_dependence': Boolean, use same incident angle dependence of SEY as in ECLOUD.
-\item	'use\_ECLOUD\_energy': Boolean, use same secondary electron energy distribution as in ECLOUD.
+\item	'use\_ECLOUD\_energy': Boolean, use same secondary electron energy distribution as in ECLOUD. Also makes elastic electrons use the ECLOUD emission angle.
 \item	'conserve\_energy': Boolean, ensures the sum of emitted electron energies in a single event is not greater than the impacting electron energy.
 \item	'exclude\_rediffused': Boolean, sets $\delta_r = 0$.
 \item	'choice': 'poisson' or 'binomial', choice of probability distribution for $P^\prime_{n,ts}$
