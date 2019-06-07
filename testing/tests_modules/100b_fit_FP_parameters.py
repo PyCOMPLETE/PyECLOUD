@@ -5,9 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mystyle as ms
 from scipy.optimize import curve_fit
-from scipy.misc import factorial
-from scipy.integrate import simps
-import scipy
 import sec_emission_model_furman_pivi as fp
 from impact_management_class import impact_management
 from geom_impact_ellip import ellip_cham_geom_object
@@ -84,10 +81,6 @@ def del_elas_FP(energy, p1EInf, p1Ehat, ww, pp, p0=[1., 1., 1., 1.]):
     return delta_e0
 
 
-def pdf_elas_FP(energy, E_imp, sigma_e=2.):
-    return 2 * np.exp(-(energy - E_imp)**2 / (2 * sigma_e**2)) / (np.sqrt(2 * np.pi) * sigma_e * scipy.special.erf(E_imp / np.sqrt(2) / sigma_e))
-
-
 energy = np.linspace(0., 800, num=int(1e3))
 del_e_ECLOUD = del_elas_ECLOUD(energy)
 
@@ -161,7 +154,6 @@ sp2.grid(alpha=alph)
 sp2.text(310, 0.3, 'Fitted parameters: \nt1: %f \nt2: %f' % (popt_true[0], popt_true[1]))
 fig.subplots_adjust(left=0.06, right=0.95)
 
-
-
+print("NOTE: The angular dependence of del_true is not the same, t1 and t2 can't be chosen such that there is good agreement for all impacting angles.")
 
 plt.show()

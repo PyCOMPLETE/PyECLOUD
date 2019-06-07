@@ -84,36 +84,6 @@ furman_pivi_surface_LHC = {
     't3': 0.7,
     't4': 1.}
 
-furman_pivi_surface = {
-    'use_ECLOUD_theta0_dependence': False,
-    'use_ECLOUD_energy': False,
-    'conserve_energy': False,
-    'exclude_rediffused': False,
-    'choice': 'poisson',
-    'M_cut': 10,
-    'p_n': np.array([2.5, 3.3, 2.5, 2.5, 2.8, 1.3, 1.5, 1.5, 1.5, 1.5]),
-    'eps_n': np.array([1.5, 1.75, 1., 3.75, 8.5, 11.5, 2.5, 3., 2.5, 3.]),
-    'p1EInf': 0.02,
-    'p1Ehat': 0.496,
-    'eEHat': 0.,
-    'w': 60.86,
-    'p': 1.,
-    'e1': 0.26,
-    'e2': 2.,
-    'sigmaE': 2.,
-    'p1RInf': 0.2,
-    'eR': 0.041,
-    'r': 0.104,
-    'q': 0.5,
-    'r1': 0.26,
-    'r2': 2.,
-    'deltaTSHat': 1.8848,
-    'eHat0': 276.8,
-    's': 1.54,
-    't1': 0.66,
-    't2': 0.8,
-    't3': 0.7,
-    't4': 1.}
 
 flag_costheta_Emax_shift = True
 flag_costheta_delta_scale = True
@@ -189,12 +159,6 @@ def hilleret_energy(energy):
     return hilleret / area
 
 
-def simple_pdf(energy, pp, eps):
-    pdf = energy**(pp - 1) * np.exp(-energy / eps)
-    area = simps(pdf, energy)
-    return pdf / area
-
-
 delta_e, _, delta_ts = sey_mod_initial.yield_fun_furman_pivi(E=E_imp_used_for_fit, costheta=1.)
 delta_ts_prime = delta_ts / (1 - delta_e)
 
@@ -255,32 +219,24 @@ print(1.634185 / (popt[0:10] - 1))
 
 plt.figure(2, figsize=(20, 15), facecolor='white')
 E_0s = np.array([10., 20., 35., 50., 75., 100., 300., 500.])
-# E_0s = np.array([20., 35., 50., 100.])
 
 for i_E, E_0_curr in enumerate(E_0s):
     thiscol = ms.colorprog(i_E, len(E_0s))
     energy = np.linspace(0.00001, E_0_curr, num=int(1e3))
-    # ene_hilleret = hilleret_energy(energy)
 
     sey_mod_FP, impact_management_object, _ = make_it_easier(*popt)
 
     delta_e, _, delta_ts = sey_mod_FP.yield_fun_furman_pivi(E=E_0_curr, costheta=1.)
     delta_ts_prime = delta_ts / (1 - delta_e)
 
-    dists = impact_management_object.extract_energy_distributions(n_rep=int(1e5), E_impact_eV_test=np.array([E_0_curr] * int(1e5)), cos_theta_test=[1], mass=me)
-
-    # pdf_from_module = sey_mod_FP.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, E_0=E_0_curr, energy=energy)
-    # plt.plot(energy, pdf_from_module, 'k', linewidth=linewid)
     pdf = average_true_sec_energy_PDF(energy, *popt)
     plt.plot(energy, pdf, color=thiscol, linestyle='--', linewidth=linewid, label='FP, $E_0 =$ %.0f' % E_0_curr)
-    # plt.plot(energy, ene_hilleret, color=thiscol, linestyle='-', linewidth=linewid, label='ECLOUD, $E_0 =$ %.0f' % E_0_curr)
-    # plt.hist(dists['true'][0], color=thiscol, alpha=alpha, density=True)
+
 ene_hilleret = hilleret_energy(energy=np.linspace(0.0001, 35., 1000))
 plt.plot(np.linspace(0.0001, 35., 1000), ene_hilleret, color='k', linestyle='-', linewidth=linewid, label='ECLOUD')
 plt.legend()
 plt.xlabel('Energy [eV]')
 plt.ylabel('Normalized energy distribution')
 plt.text(E_imp_used_for_fit / 2, 0.05, 'E_imp_used_for_fit= %.1f eV' % E_imp_used_for_fit)
-
 
 plt.show()
