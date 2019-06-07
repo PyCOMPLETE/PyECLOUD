@@ -33,7 +33,7 @@ from PyECLOUD.buildup_simulation import BuildupSimulation
 # sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver'
 # sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime'
 # sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/'
-sim_folder = 'Rectagular_Dip_450GeV_sey1.60_1.1e11ppb_furman_pivi'
+sim_folder = 'Rectangular_Dip_450GeV_sey1.60_1.1e11ppb_furman_pivi'
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation_folder')

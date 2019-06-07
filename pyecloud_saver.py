@@ -453,7 +453,8 @@ class pyecloud_saver:
             saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
             saved_dict['emit_ene_g_hist'] = self.emit_ene_dist_test['emit_ene_g_hist']
             for etypn in self.emit_ene_dist_test.keys():
-                saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
+                if 'hist' not in etypn:
+                    saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
 
