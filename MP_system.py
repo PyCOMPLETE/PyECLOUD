@@ -247,6 +247,12 @@ class MP_system:
             vx_max = max(abs(self.vx_mp))
             vy_max = max(abs(self.vy_mp))
             vz_max = max(abs(self.vz_mp))
+            if vx_max == 0:
+                vx_max = 1e-5
+            if vy_max == 0:
+                vy_max = 1e-5
+            if vz_max == 0:
+                vz_max = 1e-5
             #
             #
             Dx_reg = 2 * x_max / (self.Nx_reg - 1)
