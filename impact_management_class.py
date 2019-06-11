@@ -378,10 +378,12 @@ class impact_management(object):
                 if E_all_MPs_eV[extended_event_type == etype].shape == (0,):  # if there are no events of type etype
                     pass
                 else:
-                    histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, extract_type[:, i_ct])
+                    temp = extract_type[:, i_ct].copy()
+                    histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, temp)
+                    extract_type[:, i_ct] = temp
                 extract_ene_hist[etype_name] = extract_type
 
-            extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
+        extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
 
         print('Done extracting energy distributions.')
 

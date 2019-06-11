@@ -136,7 +136,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              Nbin_En_hist=100, En_hist_max=3000, flag_seg=False,
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
-cos_theta_test = np.linspace(1., 1., 1)
+cos_theta_test = np.linspace(0., 1., 10)
 E_0_single = 50.
 n_rep = int(1e5)
 E_impact_eV_test = E_0_single
