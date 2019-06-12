@@ -92,8 +92,8 @@ class pyecloud_saver:
             git_branch = 'Retrieving git branch failed'
             print(e)
         print(git_branch)
-        
-        if self.logfile_path is not None: 
+
+        if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
                 flog.write('PyECLOUD Version 7.7.1\n')
                 flog.write('%s\n' % git_hash)
@@ -161,7 +161,7 @@ class pyecloud_saver:
 
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
-                                   initial_size_t_vect=1000, 
+                                   initial_size_t_vect=1000,
                                    step_by_step_custom_observables = self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
@@ -169,7 +169,7 @@ class pyecloud_saver:
                                      x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det)
 
         # Init energy and cos angle histogram saving
-        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width, flag_lifetime_hist, Dt_lifetime_hist)
+        self._energy_cos_and_lifetime_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width, flag_lifetime_hist, Dt_lifetime_hist)
 
 
         #Space charge electrostatic energy
@@ -239,7 +239,7 @@ class pyecloud_saver:
         self._sc_video_save(spacech_ele, beamtim)
 
         # Check for energy and cos angle hist update
-        self._energy_and_cos_angle_hist_save(beamtim, impact_man, MP_e)
+        self._energy_cos_and_lifetime_angle_hist_save(beamtim, impact_man, MP_e)
 
         #Space charge electrostatic energy
         if spacech_ele.last_recomputation_check:
@@ -326,7 +326,7 @@ class pyecloud_saver:
 
             self.nel_hist_det_line = np.zeros(self.Nxg_hist_det, float)
             self.nel_hist_det = []
-        
+
         # Custom data
         self.pbp_custom_data = {}
         if self.pass_by_pass_custom_observables is not None:
@@ -866,7 +866,7 @@ class pyecloud_saver:
                 'flag_multiple_clouds': self.flag_multiple_clouds,
                 'cloud_list': cloud_list,
                 't_last_En_hist': self.t_last_En_hist}
-            
+
             if self.flag_lifetime_hist:
                 dict_state['t_last_lifetime_hist'] = self.t_last_lifetime_hist
 
@@ -1014,7 +1014,7 @@ class pyecloud_saver:
             except IOError:
                 pass
 
-    def _energy_and_cos_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
+    def _energy_cos_and_lifetime_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
                                         cos_angle_width, flag_lifetime_hist, Dt_lifetime_hist):
         # Energy histogram init
         self.Dt_En_hist = Dt_En_hist
@@ -1043,8 +1043,7 @@ class pyecloud_saver:
         # Kinetic energy histogram init
         self.all_Ekin_hist = []
 
-    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man, MP_e):
-        
+    def _energy_cos_and_lifetime_angle_hist_save(self, beamtim, impact_man, MP_e):
         # Energy histogram saver
         # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
         if beamtim.tt_curr >= self.t_last_En_hist + self.Dt_En_hist or np.isclose(beamtim.tt_curr, self.t_last_En_hist + self.Dt_En_hist, rtol=1.e-10, atol=0.0):
@@ -1056,7 +1055,7 @@ class pyecloud_saver:
             if self.flag_cos_angle_hist:
                 self.cos_angle_hist.append(impact_man.cos_angle_hist.copy())
                 impact_man.reset_cos_angle_hist()
-            
+
             # Histogram of the kinetic energy of all the particles
             v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
             Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
@@ -1068,6 +1067,16 @@ class pyecloud_saver:
             self.all_Ekin_hist.append(ekin_hist.copy())
 
 
+            # Histogram of the kinetic energy of all the particles
+            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
+            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
+            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
+            N_mp = MP_e.N_mp
+            if N_mp > 0:
+                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+            self.all_Ekin_hist.append(ekin_hist.copy())
+
         # Lifetime histogram saver
         if self.flag_lifetime_hist:
             if beamtim.tt_curr >= self.t_last_lifetime_hist + self.Dt_lifetime_hist or np.isclose(beamtim.tt_curr, self.t_last_lifetime_hist + self.Dt_lifetime_hist, rtol=1.e-10, atol=0.0):
@@ -1075,4 +1084,3 @@ class pyecloud_saver:
                 self.t_lifetime_hist.append(beamtim.tt_curr)
                 impact_man.reset_lifetime_hist_line()
                 self.t_last_lifetime_hist = beamtim.tt_curr
-

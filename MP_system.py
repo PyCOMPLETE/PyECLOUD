@@ -75,10 +75,11 @@ class MP_system:
         self.vx_mp = np.zeros(N_mp_max, float)
         self.vy_mp = np.zeros(N_mp_max, float)
         self.vz_mp = np.zeros(N_mp_max, float)
+
         #Time of last impact with the chamber
-	self.flag_lifetime_hist = flag_lifetime_hist
-	if self.flag_lifetime_hist:
-        	self.t_last_impact = -1*np.ones(N_mp_max, float)
+        self.flag_lifetime_hist = flag_lifetime_hist
+        if self.flag_lifetime_hist:
+            self.t_last_impact = -1*np.ones(N_mp_max, float)
 
         self.nel_mp = np.zeros(N_mp_max, float)
         self.N_mp = 0
@@ -139,9 +140,9 @@ class MP_system:
         self.nel_mp[0:self.N_mp] = self.nel_mp[flag_keep].copy()
 
         self.nel_mp[self.N_mp:] = 0.0
-	
-	if self.flag_lifetime_hist:
-        	self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
+
+        if self.flag_lifetime_hist:
+            self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
         print "Done clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
 
@@ -183,8 +184,8 @@ class MP_system:
 
                 self.nel_mp[self.N_mp:] = 0.0
 
-		if self.flag_lifetime_hist:
-                	self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
+                if self.flag_lifetime_hist:
+                    self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
 
                 chrg_before = chrg
                 chrg_after = np.sum(self.nel_mp)
@@ -402,9 +403,9 @@ class MP_system:
                 n_add_step = np.sum(flag_add)
 
             #end
-		
-	    if self.flag_lifetime_hist:
-            	self.t_last_impact[:] = -1
+
+            if self.flag_lifetime_hist:
+                self.t_last_impact[:] = -1
 
             chrg = np.sum(self.nel_mp)
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
@@ -454,8 +455,8 @@ class MP_system:
 
                 self.N_mp = int(self.N_mp + Nint_new_MP)
 
-		if self.flag_lifetime_hist:
-                	self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+                if self.flag_lifetime_hist:
+                    self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
 
