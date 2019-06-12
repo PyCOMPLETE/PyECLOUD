@@ -64,7 +64,7 @@ flag_sc_movie = 0          #1/0
 
 save_mp_state_time_file =  -1
 
-extract_sey = True
+extract_sey = False
 
 extract_ene_dist = True
 ene_dist_test_E_impact_eV = 100.

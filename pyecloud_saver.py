@@ -221,7 +221,7 @@ class pyecloud_saver:
         # extract energy distributions
         if self.extract_ene_dist:
             n_rep = int(1e5)
-            self.ene_dist_test_cos_theta = np.linspace(1., 1., 1)
+            self.ene_dist_test_cos_theta = np.linspace(0., 1., 10)
             self.emit_ene_dist_test = impact_man.extract_energy_distributions(n_rep, self.ene_dist_test_E_impact_eV,
                 self.ene_dist_test_cos_theta, mass=MP_e.mass, Nbin_extract_ene=self.Nbin_extract_ene, factor_ene_dist_max=self.factor_ene_dist_max)
         else:
