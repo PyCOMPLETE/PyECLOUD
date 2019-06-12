@@ -1066,17 +1066,6 @@ class pyecloud_saver:
                 histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
 
-
-            # Histogram of the kinetic energy of all the particles
-            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
-            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
-            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
-            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
-            N_mp = MP_e.N_mp
-            if N_mp > 0:
-                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
-            self.all_Ekin_hist.append(ekin_hist.copy())
-
         # Lifetime histogram saver
         if self.flag_lifetime_hist:
             if beamtim.tt_curr >= self.t_last_lifetime_hist + self.Dt_lifetime_hist or np.isclose(beamtim.tt_curr, self.t_last_lifetime_hist + self.Dt_lifetime_hist, rtol=1.e-10, atol=0.0):
