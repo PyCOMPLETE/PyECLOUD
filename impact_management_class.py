@@ -58,7 +58,8 @@ from scipy.constants import e as qe
 class impact_management(object):
     def __init__(
         self, chamb, sey_mod,
-        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, flag_seg=False,
+        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, Nbin_lifetime_hist = None,
+        lifetime_hist_max = None, flag_lifetime_hist = False, flag_seg=False,
         cos_angle_width=0.05, flag_cos_angle_hist=True
     ):
 
@@ -108,6 +109,15 @@ class impact_management(object):
         self.energ_eV_impact_hist = np.zeros(Nxg_hist, float)
         self.En_hist_line = np.zeros(Nbin_En_hist, float)
 
+        self.flag_lifetime_hist = flag_lifetime_hist
+
+        if flag_lifetime_hist:
+            self.Nbin_lifetime_hist = Nbin_lifetime_hist
+            self.lifetime_hist_max = lifetime_hist_max
+            self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
+            self.Dt_lifetime_hist = self.lifetime_g_hist[1] - self.lifetime_g_hist[0]  # hist. step
+            self.lifetime_hist_line = np.zeros(Nbin_lifetime_hist, float)
+
         if flag_seg:
             self.nel_hist_impact_seg = np.zeros(chamb.N_vert, float)
             self.nel_hist_emit_seg = np.zeros(chamb.N_vert, float)
@@ -142,8 +152,11 @@ class impact_management(object):
     def reset_cos_angle_hist(self):
         self.cos_angle_hist *= 0
 
+    def reset_lifetime_hist_line(self):
+        self.lifetime_hist_line *= 0.
+
     #@profile
-    def backtrack_and_second_emiss(self, old_pos, MP_e):
+    def backtrack_and_second_emiss(self, old_pos, MP_e, tt_curr = None):
 
         self.Nel_impact_last_step = 0.
         self.Nel_emit_last_step = 0.
@@ -170,6 +183,10 @@ class impact_management(object):
             Dx_hist = self.Dx_hist
             En_hist_max = self.En_hist_max
             DEn_hist = self.DEn_hist
+
+            if self.flag_lifetime_hist:
+                Dt_lifetime_hist = self.Dt_lifetime_hist
+
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
 
@@ -202,6 +219,14 @@ class impact_management(object):
                 vy_impact = vy_mp[flag_impact]
                 vz_impact = vz_mp[flag_impact]
                 nel_impact = nel_mp[flag_impact]
+
+        # add to lifetime histogram
+                if self.flag_lifetime_hist:
+                    lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
+                    if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
+                        histf.compute_hist(lifetime_impact[MP_e.t_last_impact[flag_impact] > 0], nel_impact[MP_e.t_last_impact[flag_impact] > 0], 0., Dt_lifetime_hist, self.lifetime_hist_line)
+
+                    MP_e.t_last_impact[flag_impact] = tt_curr
 
                 # compute impact velocities, energy and angle
                 v_impact_mod = np.sqrt(vx_impact * vx_impact + vy_impact * vy_impact + vz_impact * vz_impact)
@@ -266,7 +291,7 @@ class impact_management(object):
                 N_new_MPs = len(nel_new_MPs)
                 if N_new_MPs > 0:
                     MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs,
-                                     vx_new_MPs, vy_new_MPs, vz_new_MPs)
+                                     vx_new_MPs, vy_new_MPs, vz_new_MPs,tt_curr)
 
                     #subtract new macroparticles
                     v_new_MPs_mod = np.sqrt(vx_new_MPs**2 + vy_new_MPs**2 + vz_new_MPs**2)

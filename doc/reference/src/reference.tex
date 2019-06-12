@@ -233,10 +233,13 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
 \textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
-\textbf{flag\_cos\_angle\_hist} & Save the cosine of the incident angle of impacting electrons. (optional -- default True)
-\\ \hline
-\textbf{cos\_angle\_width} & Width of the histogram bins. (optional -- default 0.05)
-\\ \hline
+\textbf{flag\_lifetime\_hist}&   If set to True enables lifetime histogram (optional -- default=False).\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{If \textbf{flag\_lifetime\_hist} is set to True, the variables \textbf{Dt\_lifetime\_hist}, \textbf{Nbin\_lifetime\_hist} and \textbf{lifetime\_hist\_max} need to be set.}\\ \hline
+\textbf{Dt\_lifetime\_hist}&	[s] Time step used to store the histogram of the electrons lifetime.\\ \hline
+\textbf{Nbin\_lifetime\_hist}&	Number of bins used for the histogram of the electrons lifetime.\\ \hline
+\textbf{lifetime\_hist\_max}& 	[s] Maximum lifetime in the histogram of the electrons lifetime. Larger lifetimes are attributed to the last bin of the histogram.	\\ \hline
+\textbf{flag\_cos\_angle\_hist} & Save the cosine of the incident angle of impacting electrons. (optional -- default True) \\ \hline
+\textbf{cos\_angle\_width} & Width of the histogram bins. (optional -- default 0.05) \\ \hline
 \textbf{flag\_movie}&	(optional -- default=0)
 
 (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron density distribution at each space charge evaluation.\\ \hline
@@ -741,6 +744,9 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
 		all\_Ekin\_hist &  & Kinetic energy histogram of all the electrons in the chamber (electron per time interval and per energy bin). The last bin contains all electrons falling outside the selected enegy interval. \\\hline
     t\_En\_hist & [s] & The time at which the electron energy spectrum is saved.\\\hline
     En\_g\_hist &[eV]& Center of the energy bins used to save the energy spectrum.\\\hline
+
+    lifetime\_hist &  & Histogram of the electrons lifetime for each bunch passage. The last bin contains all electrons falling outside the selected time interval. \\\hline
+    lifetime\_g\_hist &[s]& Center of the time bins used to save the lifetime histogram.\\\hline
 
     xg\_hist($N\_{\mathrm{bins}}$) & [m] & The $x$ coordinates corresponding to related histogram bins.\\\hline
 

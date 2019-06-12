@@ -203,7 +203,7 @@ class BuildupSimulation(object):
                 MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
 
             ## Impacts: backtracking and secondary emission
-            MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
+            MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
 
             ## Evolve SEY module (e.g. charge decay for insulators
             impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
