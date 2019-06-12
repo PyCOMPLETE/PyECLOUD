@@ -220,7 +220,7 @@ class impact_management(object):
                 vz_impact = vz_mp[flag_impact]
                 nel_impact = nel_mp[flag_impact]
 
-		# append to lifetime histogram
+		# add to lifetime histogram
                 if self.flag_lifetime_hist:
                     lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
                     if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
@@ -302,7 +302,7 @@ class impact_management(object):
                     if flag_seg:
                         segi.update_seg_impact(i_seg_new_MPs, -nel_new_MPs * E_new_MPs_eV, self.energ_eV_impact_seg)
                         segi.update_seg_impact(i_seg_new_MPs, nel_new_MPs, self.nel_hist_emit_seg)
-
+                    
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV * nel_new_MPs)
 
         return MP_e
