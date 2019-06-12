@@ -118,7 +118,7 @@ class SEY_model_ECLOUD(object):
 
     def SEY_model_evol(self, Dt):
         pass
-    
+
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = yield_fun2(
@@ -215,12 +215,7 @@ class SEY_model_ECLOUD(object):
             events = np.concatenate([event_type, events_add])
         extended_event_type = events
 
-        # extended_nel_emit_tot_events used for extraction of energy distributions
-        extended_nel_emit_tot_events = np.concatenate([nel_emit_tot_events, nel_new_MPs])
-
-        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
-                      'extended_event_type': extended_event_type,
-                      }
+        event_info = {'extended_event_type': extended_event_type}
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
