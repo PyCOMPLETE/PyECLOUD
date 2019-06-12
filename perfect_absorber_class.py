@@ -172,3 +172,19 @@ class impact_management_perfect_absorber(impact_management):
         print('Done extracting SEY curves.')
 
         return deltas
+
+    def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass, Nbin_extract_ene, factor_ene_dist_max):
+        """Extract energy distributions for secondary electrons."""
+        emit_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
+        Dextract_ene = emit_ene_g_hist[1] - emit_ene_g_hist[0]
+        extract_ene_hist = {}
+
+        for etype_name in ['elast', 'true']:
+            extract_ene_hist[etype_name] = np.zeros(shape=(len(emit_ene_g_hist), len(cos_theta_test)), dtype=float)
+
+        print('Extracting energy distributions...')
+        extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
+
+        print('Done extracting energy distributions.')
+
+        return extract_ene_hist

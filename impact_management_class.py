@@ -302,7 +302,7 @@ class impact_management(object):
                     if flag_seg:
                         segi.update_seg_impact(i_seg_new_MPs, -nel_new_MPs * E_new_MPs_eV, self.energ_eV_impact_seg)
                         segi.update_seg_impact(i_seg_new_MPs, nel_new_MPs, self.nel_hist_emit_seg)
-                    
+
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV * nel_new_MPs)
 
         return MP_e
@@ -351,3 +351,65 @@ class impact_management(object):
         print('Done extracting SEY curves.')
 
         return deltas
+
+    def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass, Nbin_extract_ene, factor_ene_dist_max):
+        """Extract energy distributions for secondary electrons."""
+        emit_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
+        Dextract_ene = emit_ene_g_hist[1] - emit_ene_g_hist[0]
+        extract_ene_hist = {}
+
+        for etype in self.sey_mod.event_types.keys():
+            etype_name = self.sey_mod.event_types[etype]
+            extract_ene_hist[etype_name] = np.zeros(shape=(len(emit_ene_g_hist), len(cos_theta_test)), dtype=float)
+
+        print('Extracting energy distributions...')
+        for i_ct, ct in enumerate(cos_theta_test):
+            print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
+            Ene = E_impact_eV_test
+            nel_impact = np.ones(n_rep)
+            # Assuming normal is along x
+            v_mod = np.sqrt(2 * Ene * qe / mass) * np.ones_like(nel_impact)
+            vx = v_mod * ct
+            vy = v_mod * np.sqrt(1 - ct * ct)
+
+            nel_emit_tot_events, event_type, event_info,\
+                nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
+                nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
+                self.sey_mod.impacts_on_surface(
+                    mass=mass, nel_impact=nel_impact, x_impact=nel_impact * 0, y_impact=nel_impact * 0, z_impact=nel_impact * 0,
+                    vx_impact=vx * np.ones_like(nel_impact),
+                    vy_impact=vy * np.ones_like(nel_impact),
+                    vz_impact=nel_impact * 0,
+                    Norm_x=np.ones_like(nel_impact), Norm_y=np.zeros_like(nel_impact),
+                    i_found=np.int_(np.ones_like(nel_impact)),
+                    v_impact_n=vx * np.ones_like(nel_impact),
+                    E_impact_eV=Ene * np.ones_like(nel_impact),
+                    costheta_impact=ct * np.ones_like(nel_impact),
+                    nel_mp_th=1,
+                    flag_seg=True)
+
+            v_replace_mod = np.sqrt(vx_replace**2 + vy_replace**2 + vz_replace**2)
+            E_replace_eV = 0.5 * mass / qe * v_replace_mod * v_replace_mod
+
+            v_new_MPs_mod = np.sqrt(vx_new_MPs**2 + vy_new_MPs**2 + vz_new_MPs**2)
+            E_new_MPs_eV = 0.5 * mass / qe * v_new_MPs_mod * v_new_MPs_mod
+
+            E_all_MPs_eV = np.concatenate([E_replace_eV, E_new_MPs_eV])
+
+            extended_event_type = event_info['extended_event_type']
+            for etype in self.sey_mod.event_types.keys():
+                etype_name = self.sey_mod.event_types[etype]
+                extract_type = extract_ene_hist[etype_name]
+                if E_all_MPs_eV[extended_event_type == etype].shape == (0,):  # if there are no events of type etype
+                    pass
+                else:
+                    temp = extract_type[:, i_ct].copy()
+                    histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, temp)
+                    extract_type[:, i_ct] = temp
+                extract_ene_hist[etype_name] = extract_type
+
+        extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
+
+        print('Done extracting energy distributions.')
+
+        return extract_ene_hist

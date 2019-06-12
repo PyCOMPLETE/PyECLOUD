@@ -72,6 +72,24 @@ def sec_energy_hilleret_model2(switch_no_increase_energy, Ngen, sigmafit, mufit,
             flag_above_th = (en_eV > E_th)
             Nabove_th = np.sum(flag_above_th)
 
+    elif switch_no_increase_energy == 2:  # Cut emitted energy at En_impact_eV
+        En_emit_max = En_impact_eV.copy()
+        En_emit_max[En_impact_eV > E_th] = E_th
+
+        flag_low_energy = En_impact_eV < thresh_low_energy
+
+        en_eV = random.lognormal(mufit, sigmafit, Ngen)
+        flag_above_th = ((en_eV > En_emit_max) & (~flag_low_energy))
+        Nabove_th = np.sum(flag_above_th)
+        while Nabove_th > 0:
+            en_eV[flag_above_th] = random.lognormal(mufit, sigmafit, Nabove_th)
+
+            flag_above_th = ((en_eV > En_emit_max) & (~flag_low_energy))
+            Nabove_th = np.sum(flag_above_th)
+
+        N_low_ene = np.sum(flag_low_energy)
+        en_eV[flag_low_energy] = En_impact_eV[flag_low_energy] * np.sqrt(random.rand(N_low_ene))  # Linear PDF for impacting energies < 1 eV
+
     elif switch_no_increase_energy == 1:
 
         raise ValueError('This part of the code is not supported anymore!')
@@ -154,6 +172,17 @@ def _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass):
 
     return vx_gen, vy_gen, vz_gen
 
+
+def velocities_angle_normal_emission(N_new_MP, En_gen, Norm_x, Norm_y, mass):
+    v_gen_mod = np.sqrt(2. * qe / mass * En_gen)
+
+    vx_gen = v_gen_mod * Norm_x
+    vy_gen = v_gen_mod * Norm_y
+    vz_gen = np.zeros_like(v_gen_mod)
+
+    return vx_gen, vy_gen, vz_gen
+
+
 # Interface
 
 
@@ -174,6 +203,9 @@ of generated electrons (https://indico.cern.ch/event/673160/).
 """)
         time.sleep(3)
         return velocities_angle_cosine_2D
+    elif string == 'normal_emission':
+        print('Electrons are emmited orthogonally to the chamber surface.')
+        return velocities_angle_normal_emission
     else:
         raise ValueError("""
 The emission angle distribution must be specified!

@@ -101,6 +101,7 @@ class pyecloud_saver:
                 flog.write('Simulation started on %s\n' % timestr)
 
         self.extract_sey = True
+        self.extract_ene_dist = False
 
     def start_observing(self, Dt_ref, MP_e, beamtim, impact_man,
                         r_center, Dt_En_hist, logfile_path, progress_path, flag_detailed_MP_info=0,
@@ -115,7 +116,14 @@ class pyecloud_saver:
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
                         pass_by_pass_custom_observables=None,
-                        save_once_custom_observables=None, flag_lifetime_hist = False, Dt_lifetime_hist = None):
+                        save_once_custom_observables=None,
+                        flag_lifetime_hist = False,
+                        Dt_lifetime_hist = None,
+                        extract_ene_dist=None,
+                        ene_dist_test_E_impact_eV=None,
+                        Nbin_extract_ene=None,
+                        factor_ene_dist_max=None,
+                        ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
@@ -126,6 +134,12 @@ class pyecloud_saver:
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
+        if extract_ene_dist is not None:
+            self.extract_ene_dist = extract_ene_dist
+            self.ene_dist_test_E_impact_eV = ene_dist_test_E_impact_eV
+            self.Nbin_extract_ene = Nbin_extract_ene
+            self.factor_ene_dist_max = factor_ene_dist_max
+
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
@@ -162,7 +176,7 @@ class pyecloud_saver:
         # Init step by step data saving
         self._stepbystep_data_init(Dt_ref, dec_fact_out, el_density_probes, r_center,
                                    initial_size_t_vect=1000,
-                                   step_by_step_custom_observables = self.step_by_step_custom_observables)
+                                   step_by_step_custom_observables=self.step_by_step_custom_observables)
 
         # Init pass by pass data saving
         self._pass_by_pass_data_init(impact_man,
@@ -206,6 +220,17 @@ class pyecloud_saver:
             self.sey_test_E_impact_eV = 0.
             self.sey_test_cos_theta = 0.
             self.sey_test_deltas = {}
+
+        # extract energy distributions
+        if self.extract_ene_dist:
+            n_rep = int(1e5)
+            self.ene_dist_test_cos_theta = np.linspace(0., 1., 10)
+            self.emit_ene_dist_test = impact_man.extract_energy_distributions(n_rep, self.ene_dist_test_E_impact_eV,
+                self.ene_dist_test_cos_theta, mass=MP_e.mass, Nbin_extract_ene=self.Nbin_extract_ene, factor_ene_dist_max=self.factor_ene_dist_max)
+        else:
+            self.ene_dist_test_cos_theta = 0.
+            self.ene_dist_test_E_impact_eV = 0.
+            self.emit_ene_dist_test = {}
 
         # Log
         print('Done init pyecloud_saver.')
@@ -390,7 +415,7 @@ class pyecloud_saver:
 
     def build_outp_dict(self, buildup_sim):
         saved_dict = {
-            't_hist': self.t_hist,
+                    't_hist': self.t_hist,
                     'nel_hist': self.nel_hist,
                     'xg_hist': self.xg_hist,
                     'nel_impact_hist_tot': self.nel_impact_hist_tot,
@@ -434,6 +459,15 @@ class pyecloud_saver:
         saved_dict['sey_test_cos_theta'] = self.sey_test_cos_theta
         for etypn in self.sey_test_deltas.keys():
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
+
+        # Extracted energy distributions
+        if self.extract_ene_dist:
+            saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
+            saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
+            saved_dict['emit_ene_g_hist'] = self.emit_ene_dist_test['emit_ene_g_hist']
+            for etypn in self.emit_ene_dist_test.keys():
+                if 'hist' not in etypn:
+                    saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
 
@@ -583,6 +617,9 @@ class pyecloud_saver:
                                    'sey_test_del_elast_mat',
                                    'del_rediff_mat',
                                    'sey_test_cos_theta',
+                                   'ene_dist_test_cos_theta',
+                                   'ene_dist_test_E_impact_eV',
+                                   'emit_ene_dist_test',
                                    'U_sc_eV'
                                    ]
 
@@ -1073,3 +1110,4 @@ class pyecloud_saver:
                 self.t_lifetime_hist.append(beamtim.tt_curr)
                 impact_man.reset_lifetime_hist_line()
                 self.t_last_lifetime_hist = beamtim.tt_curr
+

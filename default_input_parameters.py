@@ -110,7 +110,13 @@ parameters_dict = {
 
             'step_by_step_custom_observables': None,
             'pass_by_pass_custom_observables': None,
-            'save_once_custom_observables': None
+            'save_once_custom_observables': None,
+
+            # Energy extraction parameters
+            'extract_ene_dist': False,
+            'ene_dist_test_E_impact_eV': None,
+            'Nbin_extract_ene': None,
+            'factor_ene_dist_max': None,
 
         },
     },
@@ -288,6 +294,10 @@ parameters_dict = {
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
             'flag_costheta_delta_scale': True,
+
+            # Furman-Pivi Model
+            'furman_pivi_surface': None
+
         },
     },
     'combined_simulations_secondaryEmission_machine_parameters': {
@@ -398,6 +408,9 @@ parameters_dict = {
             'sey_file': (),
             'flag_costheta_Emax_shift': (),
             'flag_costheta_delta_scale': (),
+
+            # Furman-Pivi model of SEY
+            'furman_pivi_surface': (),
 
             # Saving settings
             'Dx_hist': (),
