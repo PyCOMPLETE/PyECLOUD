@@ -382,7 +382,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         if cc.flag_lifetime_hist:
             if cc.Nbin_lifetime_hist is None or cc.lifetime_hist_max is None or cc.Dt_lifetime_hist is None:
-                raise inp_spec.PyECLOUD_ConfigException('If flag_lifetime_hist is True then all the histogram parameters must be specfied')
+                raise inp_spec.PyECLOUD_ConfigException('If flag_lifetime_hist is True then all the histogram parameters must be specified')
 
         impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
