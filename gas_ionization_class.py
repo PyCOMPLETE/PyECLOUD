@@ -73,7 +73,7 @@ class residual_gas_ionization:
 #         self.x_beam_pos = x_beam_pos
 #         self.y_beam_pos = y_beam_pos
 
-	self.flag_lifetime_hist = flag_lifetime_hist
+    self.flag_lifetime_hist = flag_lifetime_hist
 
         print 'Done res. gas ioniz. init.'
 
@@ -122,9 +122,9 @@ class residual_gas_ionization:
             MP_e.vy_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             MP_e.vz_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             MP_e.nel_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = MP_e.nel_mp_ref
-	    
+        
             if self.flag_lifetime_hist:
-            	MP_e.t_last_impact[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = -1
+                MP_e.t_last_impact[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = -1
 
             MP_e.N_mp = int(MP_e.N_mp + Nint_new_MP)
 

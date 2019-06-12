@@ -500,8 +500,8 @@ class MP_system:
             self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
-	    if self.flag_lifetime_hist:
-		self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+        if self.flag_lifetime_hist:
+        self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
             self.N_mp = int(self.N_mp + Nint_new_MP)
 
@@ -520,8 +520,8 @@ class MP_system:
         self.nel_mp[N_mp_old:N_mp_new] = nel_new_mp
         self.N_mp = N_mp_new
 
-	if self.flag_lifetime_hist:
-        	self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
+    if self.flag_lifetime_hist:
+            self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
 
     def add_from_file(self, filename_MPs):
 

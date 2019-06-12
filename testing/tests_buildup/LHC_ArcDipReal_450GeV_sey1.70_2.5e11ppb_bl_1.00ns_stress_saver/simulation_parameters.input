@@ -58,7 +58,7 @@ Nvz_regen=51;#it must be odd!
 #Sp_ch params
 Dt_sc = .5e-9
 Dh_sc = .3e-3
-t_sc_ON=0e-9;		#s
+t_sc_ON=0e-9;       #s
 sparse_solver = 'klu'
 
 
