@@ -157,17 +157,16 @@ sp4 = fig1.add_subplot(2, 2, 4)
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
-    label = 'Extracted histogram'
 
-    areats = scipy.integrate.simps(extract_ene_hist['true'][:, 0], extract_ene_hist['emit_ene_g_hist'])
-    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, 0], extract_ene_hist['emit_ene_g_hist'])
-    arear = scipy.integrate.simps(extract_ene_hist['rediff'][:, 0], extract_ene_hist['emit_ene_g_hist'])
-    areaab = scipy.integrate.simps(extract_ene_hist['absorb'][:, 0], extract_ene_hist['emit_ene_g_hist'])
+    areats = scipy.integrate.simps(extract_ene_hist['true'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    arear = scipy.integrate.simps(extract_ene_hist['rediff'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areaab = scipy.integrate.simps(extract_ene_hist['absorb'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
 
-    sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
-    sp2.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['elast'] / areae, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
-    sp3.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['rediff'] / arear, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
-    sp4.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['absorb'] / areaab, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'][:, i_ct] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp2.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['elast'][:, i_ct] / areae, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp3.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['rediff'][:, i_ct] / arear, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp4.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['absorb'][:, i_ct] / areaab, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='FP-model PDF', linewidth=linewid)

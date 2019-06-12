@@ -27,7 +27,7 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
 
-cos_theta_test = np.linspace(1., 1., 1)
+cos_theta_test = np.linspace(0., 1., 10)
 E_0_single = 35.
 E_impact_eV_test = E_0_single
 n_rep = 100000
@@ -45,12 +45,12 @@ sp2 = fig1.add_subplot(1, 2, 2)
 
 
 for i_ct, ct in enumerate(cos_theta_test):
-    areats = scipy.integrate.simps(extract_ene_hist['true'][:, 0], extract_ene_hist['emit_ene_g_hist'])
-    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, 0], extract_ene_hist['emit_ene_g_hist'])
+    areats = scipy.integrate.simps(extract_ene_hist['true'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
-    sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
-    sp2.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['elast'] / areae, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'][:, i_ct] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp2.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['elast'][:, i_ct] / areae, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='Model PDF', linewidth=linewid)
