@@ -520,8 +520,8 @@ class MP_system:
         self.nel_mp[N_mp_old:N_mp_new] = nel_new_mp
         self.N_mp = N_mp_new
 
-    if self.flag_lifetime_hist:
-        self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
+        if self.flag_lifetime_hist:
+            self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
 
     def add_from_file(self, filename_MPs):
 
