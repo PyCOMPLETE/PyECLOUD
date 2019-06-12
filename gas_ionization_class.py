@@ -73,7 +73,7 @@ class residual_gas_ionization:
 #         self.x_beam_pos = x_beam_pos
 #         self.y_beam_pos = y_beam_pos
 
-    self.flag_lifetime_hist = flag_lifetime_hist
+        self.flag_lifetime_hist = flag_lifetime_hist
 
         print 'Done res. gas ioniz. init.'
 
