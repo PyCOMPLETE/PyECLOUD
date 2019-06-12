@@ -163,7 +163,7 @@ flag_costheta_Emax_shift = True
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak, flag_costheta_delta_scale=flag_costheta_delta_scale,
+                                   furman_pivi_surface=furman_pivi_surface, flag_costheta_delta_scale=flag_costheta_delta_scale,
                                    flag_costheta_Emax_shift=flag_costheta_Emax_shift)
 
 
@@ -253,7 +253,7 @@ sp5.set_ylabel('Delta total')
 sp6.set_ylabel(r'$\delta_{ts} + \delta_{e}$')
 
 for sp in [sp1, sp2, sp3, sp4, sp5, sp6]:
-    sp.grid('on')
+    sp.grid(True)
     sp.set_xlabel('Electron energy [eV]')
 
 plt.subplots_adjust(right=0.99, left=.05)
@@ -278,6 +278,6 @@ for ct in cos_theta_test:
     sp1.plot(energy, del_true_ECLOUD(energy, del_max=test_obj.deltaTSHat, costheta=ct), '--', color='r', linewidth=linewid, label='ECLOUD model')
 sp2.legend(loc='best', prop={'size': 14})
 
-plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s' % str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)
+plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s' % str(sey_mod.exclude_rediffused), fontsize=30)
 
 plt.show()
