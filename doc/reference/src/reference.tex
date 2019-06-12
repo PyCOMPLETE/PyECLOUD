@@ -705,8 +705,13 @@ Parameters for true secondaries. To be specified in furman\_pivi\_surface.
     An example can be found in the subfolder sey\_files in the PyECLOUD code.\\\hline
 \textbf{flag\_costheta\_delta\_scale} & If enabled the SEY curve associated to true secondary electrons is scaled as a function of the angle of the impacting electron. Default is TRUE.\\ \hline
 \textbf{flag\_costheta\_Emax\_shift} & If enabled the SEY curve associated to true secondary electrons is shifted (chenge of energy scale) as a function of the angle of the impacting electron. Default is TRUE.\\ \hline
-\textbf{switch\_no\_increase\_energy}&	switch\_no\_increase\_energy = 1 checks that the true secondaries do not have more energy than the corresponding impacting electrons.
-Typically this feature is NOT enabled.\\ \hline
+\textbf{switch\_no\_increase\_energy}&	(Default=0)
+\begin{enumerate}
+\item	switch\_no\_increase\_energy = 0 : Off.
+\item switch\_no\_increase\_energy = 1 : No longer in use.
+\item switch\_no\_increase\_energy = 2 : Ensure that the true secondaries do not have more energy than the corresponding impacting electrons.
+\end{enumerate}\\
+\hline
 \textbf{thresh\_low\_energy}&	Maximum energy for which the energy check is performed.\\ \hline
 \textbf{scrub\_en\_th}&	Minimum energy of scrubbing electrons (for scrubbing current estimations).\\
 \hline
