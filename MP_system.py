@@ -501,9 +501,9 @@ class MP_system:
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
         if self.flag_lifetime_hist:
-        self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+            self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
-            self.N_mp = int(self.N_mp + Nint_new_MP)
+        self.N_mp = int(self.N_mp + Nint_new_MP)
 
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
@@ -521,7 +521,7 @@ class MP_system:
         self.N_mp = N_mp_new
 
     if self.flag_lifetime_hist:
-            self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
+        self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
 
     def add_from_file(self, filename_MPs):
 
@@ -540,6 +540,13 @@ class MP_system:
         self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
         self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vz_mp'])
         self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['nel_mp'])
+
+        if self.flag_lifetime_hist:
+            if 't_last_impact' in dict_MP_init.keys():
+                self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(
+                    dict_MP_init['t_last_impact'])
+            else:
+                self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
         self.N_mp = int(self.N_mp + Nint_new_MP)
 
