@@ -63,7 +63,6 @@ class space_charge_electromagnetic(space_charge):
         
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
-        self.state_Az = self.PyPICobj.get_state_object()
 
 
     def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
@@ -78,16 +77,19 @@ class space_charge_electromagnetic(space_charge):
         self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
                 MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp], 
                 charge=MP_e.charge, flag_add=not(flag_reset))
-        self.state_Az.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
-                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp], 
-                charge=MP_e.charge, flag_add=not(flag_reset))
-
 
         # solve
         if flag_solve:
             self.PyPICobj.solve()
             PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_Az])
 
+    
+    def get_sc_magnetic_field(self, MP_e):
+
+        _, dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+        dAx_dy, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+
+        dphi_dx, dpi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
             
 
