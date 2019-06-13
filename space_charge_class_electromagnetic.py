@@ -101,7 +101,7 @@ class space_charge_electromagnetic(space_charge):
 
         Bx_prime = dAz_dx
         By_prime = -dAz_dy
-        Bz_prime = dAx_dy - dAy_dx
+        Bz_prime = gamma*(dAx_dy - dAy_dx)
 
         Ex_sc_n = gamma*(Ex_prime + beta*c*By_prime)
         Ey_sc_n = gamma*(Ey_prime - beta*c*Bx_prime)
