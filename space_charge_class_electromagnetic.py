@@ -63,7 +63,8 @@ class space_charge_electromagnetic(space_charge):
 
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
-
+        self.gamma = gamma
+        self.beta = np.sqrt(1-1/(gamma*gamma))
 
     def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
         # scatter rho
@@ -90,3 +91,8 @@ class space_charge_electromagnetic(space_charge):
         dAx_dy, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
         dphi_dx, dpi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+
+        Ex_prime = gamma*dphi_dx
+        Ey_prime = gamma*dphi_dy
+
+        dAz_dx =
