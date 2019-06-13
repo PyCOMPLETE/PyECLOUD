@@ -50,6 +50,7 @@
 #-End-preamble---------------------------------------------------------
 
 import numpy as np
+from scipy.constants import c, epsilon_0, mu_0
 
 na = lambda x: np.array([x])
 
@@ -95,4 +96,19 @@ class space_charge_electromagnetic(space_charge):
         Ex_prime = gamma*dphi_dx
         Ey_prime = gamma*dphi_dy
 
-        dAz_dx =
+        dAz_dx = -gamma*beta*c*epsilon_0/mu_0*dphi_dx
+        dAz_dy = -gamma*beta*c*epsilon_0/mu_0*dphi_dy
+
+        Bx_prime = dAz_dx
+        By_prime = -dAz_dy
+        Bz_prime = dAx_dy - dAy_dx
+
+        Ex_sc_n = gamma*(Ex_prime + beta*c*By_prime)
+        Ey_sc_n = gamma*(Ey_prime - beta*c*Bx_prime)
+
+        Bx_sc_n = gamma*(Bx_prime - beta/c*Ey_prime)
+        By_sc_n = gamma*(By_prime - beta/c*Ex_prime)
+        By_sc_n = Bz_prime
+
+
+        
