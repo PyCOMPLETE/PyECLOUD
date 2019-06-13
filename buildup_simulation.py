@@ -167,6 +167,10 @@ class BuildupSimulation(object):
 
             ## Compute electron space charge electric field
             Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+            
+            #!#! Compute magnetic field from electrons
+            Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_b_field(MP_e)
+            
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
@@ -185,6 +189,7 @@ class BuildupSimulation(object):
             old_pos = MP_e.get_positions()
 
             ## Motion
+            #!#! Needs to be modified to swallow the magnetic field from here
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
                 # Standard simulation mode
                 MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
@@ -195,12 +200,12 @@ class BuildupSimulation(object):
                 Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
                 N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
                 Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
-                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr, Bx_sc_n, By_sc_n, Bz_sc_n)
             else:
                 # Custom steps and substeps provided as arguments of sim_time_step
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
                     raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
-                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom, Bx_sc_n, By_sc_n, Bz_sc_n)
 
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
@@ -229,6 +234,7 @@ class BuildupSimulation(object):
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
+                #!#! Needs to be modified
                 spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
 
                 # Copy rho to cloud
