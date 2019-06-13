@@ -61,7 +61,7 @@ import os
 class BuildupSimulation(object):
 
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
-                 skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
+                 skip_pyeclsaver=False, lorentz_boost = False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
         print 'PyECLOUD Version 7.7.1'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
@@ -167,10 +167,10 @@ class BuildupSimulation(object):
 
             ## Compute electron space charge electric field
             Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-            
+
             #!#! Compute magnetic field from electrons
-            Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_b_field(MP_e)
-            
+            if lorentz_boost:
+                Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_b_field(MP_e)
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
