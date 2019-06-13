@@ -1,0 +1,94 @@
+#-Begin-preamble-------------------------------------------------------
+#
+#                           CERN
+#
+#     European Organization for Nuclear Research
+#
+#
+#     This file is part of the code:
+#
+#                   PyECLOUD Version 7.7.1
+#
+#
+#     Main author:          Giovanni IADAROLA
+#                           BE-ABP Group
+#                           CERN
+#                           CH-1211 GENEVA 23
+#                           SWITZERLAND
+#                           giovanni.iadarola@cern.ch
+#
+#     Contributors:         Eleonora Belli
+#                           Philipp Dijkstal
+#                           Lotta Mether
+#                           Annalisa Romano
+#                           Giovanni Rumolo
+#                           Eric Wulff
+#
+#
+#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
+#     appropriate  legal  protection  of  this  computer program and
+#     associated documentation reserved  in  all  countries  of  the
+#     world.
+#
+#     Organizations collaborating with CERN may receive this program
+#     and documentation freely and without charge.
+#
+#     CERN undertakes no obligation  for  the  maintenance  of  this
+#     program,  nor responsibility for its correctness,  and accepts
+#     no liability whatsoever resulting from its use.
+#
+#     Program  and documentation are provided solely for the use  of
+#     the organization to which they are distributed.
+#
+#     This program  may  not  be  copied  or  otherwise  distributed
+#     without  permission. This message must be retained on this and
+#     any other authorized copies.
+#
+#     The material cannot be sold. CERN should be  given  credit  in
+#     all references.
+#
+#-End-preamble---------------------------------------------------------
+
+import numpy as np
+
+na = lambda x: np.array([x])
+
+
+class space_charge_electromagnetic(space_charge):
+
+    def __init__(self, chamb, Dh, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
+                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
+
+        super(BLABLA)
+        
+        self.state_Ax = self.PyPICobj.get_state_object()
+        self.state_Ay = self.PyPICobj.get_state_object()
+        self.state_Az = self.PyPICobj.get_state_object()
+
+
+    def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
+        # scatter rho
+        self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], 
+                charge=MP_e.charge, flag_add=not(flag_reset))
+        
+        # scatter currents
+        self.state_Ax.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
+                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp], 
+                charge=MP_e.charge, flag_add=not(flag_reset))
+        self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
+                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp], 
+                charge=MP_e.charge, flag_add=not(flag_reset))
+        self.state_Az.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
+                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp], 
+                charge=MP_e.charge, flag_add=not(flag_reset))
+
+
+        # solve
+        if flag_solve:
+            self.PyPICobj.solve()
+            PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_Az])
+
+
+            
+
+
