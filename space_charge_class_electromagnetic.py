@@ -57,25 +57,25 @@ na = lambda x: np.array([x])
 class space_charge_electromagnetic(space_charge):
 
     def __init__(self, chamb, Dh, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
-                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
+                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None, gamma = None):
 
         super(BLABLA)
-        
+
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
 
 
     def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
         # scatter rho
-        self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], 
+        self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
-        
+
         # scatter currents
-        self.state_Ax.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
-                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp], 
+        self.state_Ax.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
+                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
-        self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], 
-                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp], 
+        self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
+                MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
 
         # solve
@@ -83,14 +83,10 @@ class space_charge_electromagnetic(space_charge):
             self.PyPICobj.solve()
             PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_Az])
 
-    
+
     def get_sc_magnetic_field(self, MP_e):
 
         _, dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         dAx_dy, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
         dphi_dx, dpi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-
-            
-
-
