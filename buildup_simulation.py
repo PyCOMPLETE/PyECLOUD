@@ -171,7 +171,9 @@ class BuildupSimulation(object):
             else:
                 ## Compute electron space charge electric field
                 Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-
+                Bx_sc_n = 0
+                By_sc_n = 0
+                Bz_sc_n = 0
 
 
             if kick_mode_for_beam_field:
