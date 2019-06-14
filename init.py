@@ -76,7 +76,7 @@ import dynamics_strong_B_generalized as dyngen
 import dynamics_Boris_multipole as dynmul
 
 import MP_system as MPs
-import space_charge_class as scc
+import space_charge_class_electromagnetic as scc
 import impact_management_class as imc
 import perfect_absorber_class as pac
 import pyecloud_saver as pysav
@@ -263,7 +263,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.sparse_solver == 'klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver = 'PyKLU'
-        spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+        spacech_ele_sim = scc.space_charge_electromagnetic(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                                            f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
 
     # Loop over clouds to init all cloud-specific objects
@@ -449,7 +449,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
-                                       save_once_custom_observables=cc.save_once_custom_observables, 
+                                       save_once_custom_observables=cc.save_once_custom_observables,
                                        flag_lifetime_hist = thiscloud.flag_lifetime_hist,
                                        Dt_lifetime_hist = thiscloud.Dt_lifetime_hist,
                                        extract_ene_dist=cc.extract_ene_dist,
