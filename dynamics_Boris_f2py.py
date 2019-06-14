@@ -150,8 +150,11 @@ class pusher_Boris():
         print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
-    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0.):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0.):
 
+        if  Bx_n != 0 or By_n != 0 or  Bz_n != 0:
+            raise ValueError("""Track_method should be 'BorisMultipole' to use electromagnetic space charge!""")
+            
         if MP_e.N_mp > 0:
 
             xn1 = MP_e.x_mp[0:MP_e.N_mp]

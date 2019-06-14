@@ -111,8 +111,11 @@ class pusher_strong_B_generalized():
 
 
 #    def step(self, xn, yn, zn, vxn, vyn, vzn,Ex_n,Ey_n):
-    def step(self, MP_e, Ex_n, Ey_n):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0.):
 
+        if  Bx_n != 0 or By_n != 0 or  Bz_n != 0:
+            raise ValueError("""Track_method should be 'BorisMultipole' to use electromagnetic space charge!""")
+            
         if MP_e.N_mp > 0:
             xn = MP_e.x_mp[0:MP_e.N_mp]
             yn = MP_e.y_mp[0:MP_e.N_mp]
@@ -192,5 +195,3 @@ class pusher_strong_B_generalized():
             MP_e.vz_mp[0:MP_e.N_mp] = vzn1
 
         return MP_e
-
-
