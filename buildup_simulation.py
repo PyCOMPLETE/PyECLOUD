@@ -196,7 +196,7 @@ class BuildupSimulation(object):
             #!#! Needs to be modified to swallow the magnetic field from here
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
                 # Standard simulation mode
-                MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
+                MP_e = dynamics.step(MP_e, Ex_n, Ey_n, Bx_sc_n, By_sc_n, Bz_sc_n)
             elif Dt_substep_custom is None and N_sub_steps_custom is None and not(beamtim.flag_unif_Dt):
                 # Dt from non-uniform beam profile
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
