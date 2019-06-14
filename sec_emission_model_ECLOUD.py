@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.0.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -82,10 +82,9 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 class SEY_model_ECLOUD(object):
 
-    event_types = {
-            0: 'elast',
-            1: 'true',
-            }
+    event_types = {0: 'elast',
+                   1: 'true',
+                   }
 
     def __init__(
         self, Emax, del_max, R0,
@@ -119,7 +118,7 @@ class SEY_model_ECLOUD(object):
 
     def SEY_model_evol(self, Dt):
         pass
-    
+
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = yield_fun2(
@@ -209,8 +208,14 @@ class SEY_model_ECLOUD(object):
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
+        events = flag_truesec
         event_type = flag_truesec
-        event_info = {}
+        if n_add_total != 0:
+            events_add = np.repeat(event_type, n_add)
+            events = np.concatenate([event_type, events_add])
+        extended_event_type = events
+
+        event_info = {'extended_event_type': extended_event_type}
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\

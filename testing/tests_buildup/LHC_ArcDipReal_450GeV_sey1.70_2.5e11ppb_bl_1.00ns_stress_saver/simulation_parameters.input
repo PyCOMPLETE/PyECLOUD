@@ -2,7 +2,7 @@
 
 machine_param_file='machine_parameters.input'
 secondary_emission_parameters_file='secondary_emission_parameters.input'
-beam_parameters_file='beam.beam' 
+beam_parameters_file='beam.beam'
 
 logfile_path = None #'./logfile.txt'
 progress_path = None #'./progress.txt'
@@ -18,6 +18,10 @@ lam_th=1.e2        #e-/m
 Dx_hist=1.e-3      #m
 r_center=1.e-3     #m
 
+flag_lifetime_hist = True
+Dt_lifetime_hist = 25e-9 #s
+Nbin_lifetime_hist= 500
+lifetime_hist_max= 5e-8  #eV
 
 Dt_En_hist = 25e-9 #s
 Nbin_En_hist= 250
@@ -25,7 +29,7 @@ En_hist_max= 5000.  #eV
 
 t_ion=100.;        #s
 
-N_mp_max=250000;   #size of allocated vectors 
+N_mp_max=250000;   #size of allocated vectors
 
 #Regen parameters
 
@@ -52,9 +56,9 @@ Nvz_regen=51;#it must be odd!
 
 
 #Sp_ch params
-Dt_sc = .5e-9 
+Dt_sc = .5e-9
 Dh_sc = .3e-3
-t_sc_ON=0e-9;		#s
+t_sc_ON=0e-9;       #s
 sparse_solver = 'klu'
 
 
@@ -79,5 +83,3 @@ y_min_hist_det = -5e-3
 y_max_hist_det = 5e-3
 
 Dx_hist_det = 0.5e-3
-
-

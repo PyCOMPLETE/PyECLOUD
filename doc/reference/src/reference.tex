@@ -75,7 +75,7 @@
 \hfill Giovanni Iadarola, \\
 \hfill Eleonora Belli, Philipp, Dijkstal,\\
 \hfill Lotta Mether, Annalisa Romano,\\
-\hfill Giovanni Rumolo Eric Wulff\\
+\hfill Giovanni Rumolo, Eric Wulff\\
 \hfill CERN - Geneva, Switzerland
 
 \HRule{1pt}} % Horizontal line, thickness changed here
@@ -233,10 +233,13 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
 \textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
-\textbf{flag\_cos\_angle\_hist} & Save the cosine of the incident angle of impacting electrons. (optional -- default True)
-\\ \hline
-\textbf{cos\_angle\_width} & Width of the histogram bins. (optional -- default 0.05)
-\\ \hline
+\textbf{flag\_lifetime\_hist}&   If set to True enables lifetime histogram (optional -- default=False).\\ \hline
+\multicolumn{2}{p{.97\textwidth}}{If \textbf{flag\_lifetime\_hist} is set to True, the variables \textbf{Dt\_lifetime\_hist}, \textbf{Nbin\_lifetime\_hist} and \textbf{lifetime\_hist\_max} need to be set.}\\ \hline
+\textbf{Dt\_lifetime\_hist}&	[s] Time step used to store the histogram of the electrons lifetime.\\ \hline
+\textbf{Nbin\_lifetime\_hist}&	Number of bins used for the histogram of the electrons lifetime.\\ \hline
+\textbf{lifetime\_hist\_max}& 	[s] Maximum lifetime in the histogram of the electrons lifetime. Larger lifetimes are attributed to the last bin of the histogram.	\\ \hline
+\textbf{flag\_cos\_angle\_hist} & Save the cosine of the incident angle of impacting electrons. (optional -- default True) \\ \hline
+\textbf{cos\_angle\_width} & Width of the histogram bins. (optional -- default 0.05) \\ \hline
 \textbf{flag\_movie}&	(optional -- default=0)
 
 (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron density distribution at each space charge evaluation.\\ \hline
@@ -316,6 +319,18 @@ List of names of additional cloud files.\\ \hline
 }\\ \hline
 \textbf{extract\_sey} &  (optional -- default=True) \newline
 If set to False, it disables the extraction the SEY curves.\\ \hline
+\end{longtable}
+
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Extraction of electron emission energy distribution}
+}\\ \hline
+\textbf{extract\_ene\_dist} &  (optional -- default=False) \newline
+If set to True, secondary emission energy distributions are extracted and saved.\\ \hline
+\textbf{ene\_dist\_test\_E\_impact\_eV} &  The impacting energy used in the energy distribution extraction. [eV]\\ \hline
+\textbf{Nbin\_extract\_ene} &  The number of bins used in the extracted energy distributions.\\ \hline
+\textbf{factor\_ene\_dist\_max} &  Defines the maximum energy included in the extracted energy distribution. The maximum energy is factor\_ene\_dist\_max * ene\_dist\_test\_E\_impact\_eV\\ \hline
 \end{longtable}
 
 \newpage\subsection{Machine Parameters}
@@ -606,6 +621,7 @@ Different secondary emission models:
 \item switch\_model = `ECLOUD\_nunif\_charging' for the model used in ECLOUD and charging effects, with sey and charging info in the chamber shape file.
 \item switch\_model = `cos\_low\_ene' for cosine low energy dependence.
 \item switch\_model = `flat\_low\_ene' for flat low energy dependence.
+\item switch\_model = `furman\_pivi` for the Furman-Pivi model of secondary electron emission.
 \item switch\_model = `from\_file` for interpolation of a user-specified curve.
 \end{enumerate}\\
 \hline
@@ -626,6 +642,62 @@ Different secondary emission models:
 \hline
 \end{longtable}
 
+\begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
+\hline\endfirsthead\hline\endhead\rowcolor{Gray}
+\multicolumn{2}{p{.97\textwidth}}{
+\textbf{Secondary Electron Yield} These are the parameters for the `furman\_pivi` model.}\\ \hline
+\textbf{E\_th}& 	Maximum energy for true secondary electrons.\\ \hline
+\textbf{furman\_pivi\_surface}&	A Python dict containing all parameters needed for the Furman-Pivi model. The parameters are listed and described below.\\
+\hline
+General parameters. To be specified in furman\_pivi\_surface.
+&\begin{enumerate}
+\item	'use\_ECLOUD\_theta0\_dependence': Boolean, use same incident angle dependence of SEY as in ECLOUD.
+\item	'use\_ECLOUD\_energy': Boolean, use same secondary electron energy distribution as in ECLOUD. Also makes elastic electrons use the ECLOUD emission angle.
+\item	'conserve\_energy': Boolean, ensures the sum of emitted electron energies in a single event is not greater than the impacting electron energy.
+\item	'exclude\_rediffused': Boolean, sets $\delta_r = 0$.
+\item	'choice': 'poisson' or 'binomial', choice of probability distribution for $P^\prime_{n,ts}$
+\item	'M\_cut': int, the maximum number of macroparticles that can be emitted in a single event.
+\item	'p\_n': numpy array containing M\_cut floats. Corresponds to $p_n$ in FP paper.
+\item	'eps\_n': numpy array containing M\_cut floats. Corresponds to $\epsilon_n$ in FP paper.
+\end{enumerate}\\
+\hline
+Parameters for backscattered electrons. To be specified in furman\_pivi\_surface.
+&\begin{enumerate}
+\item	'p1EInf': float, $P_{1,e}(\infty)$.
+\item	'p1Ehat': float, $\hat{P}_{1,e}$.
+\item	'eEHat': float, $\hat{E}_e$.
+\item	'w': float, $W$.
+\item	'p': float, $p$.
+\item	'e1': float, $e_1$.
+\item	'e2': float, $e_2$.
+\item	'sigmaE': float, $\sigma_e$.
+\end{enumerate}\\
+\hline
+Parameters for rediffused electrons\\
+To be specified in furman\_pivi\_surface
+&\begin{enumerate}
+\item	'p1RInf': float, $P_{1,r}(\infty)$.
+\item	'eR': float, $E_r$.
+\item	'r': float, $r$
+\item	'q': float, $q$.
+\item	'r1': float, $r_1$.
+\item	'r2': float, $r_2$.
+\end{enumerate}\\
+\hline
+Parameters for true secondaries. To be specified in furman\_pivi\_surface.
+&\begin{enumerate}
+\item	'deltaTSHat': float, $\hat{\delta}_{ts}$.
+\item	'eHat0': float, $\hat{E}_{ts}$.
+\item	's': float, $s$.
+\item	't1': float, $t_1$
+\item	't2': float, $t_2$
+\item	't3': float, $t_3$
+\item	't4': float, $t_4$
+\end{enumerate}\\
+\hline
+\hline
+\end{longtable}
+
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
@@ -636,15 +708,20 @@ Different secondary emission models:
     An example can be found in the subfolder sey\_files in the PyECLOUD code.\\\hline
 \textbf{flag\_costheta\_delta\_scale} & If enabled the SEY curve associated to true secondary electrons is scaled as a function of the angle of the impacting electron. Default is TRUE.\\ \hline
 \textbf{flag\_costheta\_Emax\_shift} & If enabled the SEY curve associated to true secondary electrons is shifted (chenge of energy scale) as a function of the angle of the impacting electron. Default is TRUE.\\ \hline
-\textbf{switch\_no\_increase\_energy}&	switch\_no\_increase\_energy = 1 checks that the true secondaries do not have more energy than the corresponding impacting electrons.
-Typically this feature is NOT enabled.\\ \hline
+\textbf{switch\_no\_increase\_energy}&	(Default=0)
+\begin{enumerate}
+\item	switch\_no\_increase\_energy = 0 : Off.
+\item switch\_no\_increase\_energy = 1 : No longer in use.
+\item switch\_no\_increase\_energy = 2 : Ensure that the true secondaries do not have more energy than the corresponding impacting electrons.
+\end{enumerate}\\
+\hline
 \textbf{thresh\_low\_energy}&	Maximum energy for which the energy check is performed.\\ \hline
 \textbf{scrub\_en\_th}&	Minimum energy of scrubbing electrons (for scrubbing current estimations).\\
 \hline
-\textbf{secondary\_angle\_distribution} & Can be 'cosine\_2D' or 'cosine\_3D'.
+\textbf{secondary\_angle\_distribution} & Can be 'cosine\_2D', 'cosine\_3D' or 'normal\_emission'.
     For new electrons, $\theta$ describes the angle between the surface normal and their initial velocity vector.
     d$n$/d$\theta=\cos\theta$ or d$n$/d$\theta=\cos\theta\sin\theta$ in the 2D or 3D cases, respectively. More info \href{http://www.sciencedirect.com/science/article/pii/S0042207X02001732}{here}.
-The more accurate is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates.
+The more accurate is the 3D cosine distribution which takes into account the surface element $\sin\theta$ in spherical coordinates. For 'normal\_emission', $\theta = 0$.
 \\ \hline
 \end{longtable}
 
@@ -738,8 +815,12 @@ $N\_\mathrm{en}$ is the number of bins in impact energy used to produce related 
     t\_hist($N\_{\mathrm{pass}}$) & [s] & The time at which data for the bunch passages are saved.\\\hline
 
     En\_hist &  & Energy spectrum of the impacting electrons (electron per time interval and per energy bin). The last bin contains all electrons falling outside the selected enegy interval. \\\hline
+		all\_Ekin\_hist &  & Kinetic energy histogram of all the electrons in the chamber (electron per time interval and per energy bin). The last bin contains all electrons falling outside the selected enegy interval. \\\hline
     t\_En\_hist & [s] & The time at which the electron energy spectrum is saved.\\\hline
     En\_g\_hist &[eV]& Center of the energy bins used to save the energy spectrum.\\\hline
+
+    lifetime\_hist &  & Histogram of the electrons lifetime for each bunch passage. The last bin contains all electrons falling outside the selected time interval. \\\hline
+    lifetime\_g\_hist &[s]& Center of the time bins used to save the lifetime histogram.\\\hline
 
     xg\_hist($N\_{\mathrm{bins}}$) & [m] & The $x$ coordinates corresponding to related histogram bins.\\\hline
 

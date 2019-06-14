@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.0.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -58,7 +58,8 @@ from scipy.constants import e as qe
 class impact_management(object):
     def __init__(
         self, chamb, sey_mod,
-        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, flag_seg=False,
+        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, Nbin_lifetime_hist = None,
+        lifetime_hist_max = None, flag_lifetime_hist = False, flag_seg=False,
         cos_angle_width=0.05, flag_cos_angle_hist=True
     ):
 
@@ -108,6 +109,15 @@ class impact_management(object):
         self.energ_eV_impact_hist = np.zeros(Nxg_hist, float)
         self.En_hist_line = np.zeros(Nbin_En_hist, float)
 
+        self.flag_lifetime_hist = flag_lifetime_hist
+
+        if flag_lifetime_hist:
+            self.Nbin_lifetime_hist = Nbin_lifetime_hist
+            self.lifetime_hist_max = lifetime_hist_max
+            self.lifetime_g_hist = np.linspace(0., lifetime_hist_max, Nbin_lifetime_hist)  # hist. grid
+            self.Dt_lifetime_hist = self.lifetime_g_hist[1] - self.lifetime_g_hist[0]  # hist. step
+            self.lifetime_hist_line = np.zeros(Nbin_lifetime_hist, float)
+
         if flag_seg:
             self.nel_hist_impact_seg = np.zeros(chamb.N_vert, float)
             self.nel_hist_emit_seg = np.zeros(chamb.N_vert, float)
@@ -142,8 +152,11 @@ class impact_management(object):
     def reset_cos_angle_hist(self):
         self.cos_angle_hist *= 0
 
+    def reset_lifetime_hist_line(self):
+        self.lifetime_hist_line *= 0.
+
     #@profile
-    def backtrack_and_second_emiss(self, old_pos, MP_e):
+    def backtrack_and_second_emiss(self, old_pos, MP_e, tt_curr = None):
 
         self.Nel_impact_last_step = 0.
         self.Nel_emit_last_step = 0.
@@ -170,6 +183,10 @@ class impact_management(object):
             Dx_hist = self.Dx_hist
             En_hist_max = self.En_hist_max
             DEn_hist = self.DEn_hist
+
+            if self.flag_lifetime_hist:
+                Dt_lifetime_hist = self.Dt_lifetime_hist
+
             flag_seg = self.flag_seg
             scrub_en_th = self.scrub_en_th
 
@@ -202,6 +219,14 @@ class impact_management(object):
                 vy_impact = vy_mp[flag_impact]
                 vz_impact = vz_mp[flag_impact]
                 nel_impact = nel_mp[flag_impact]
+
+        # add to lifetime histogram
+                if self.flag_lifetime_hist:
+                    lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
+                    if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
+                        histf.compute_hist(lifetime_impact[MP_e.t_last_impact[flag_impact] > 0], nel_impact[MP_e.t_last_impact[flag_impact] > 0], 0., Dt_lifetime_hist, self.lifetime_hist_line)
+
+                    MP_e.t_last_impact[flag_impact] = tt_curr
 
                 # compute impact velocities, energy and angle
                 v_impact_mod = np.sqrt(vx_impact * vx_impact + vy_impact * vy_impact + vz_impact * vz_impact)
@@ -266,7 +291,7 @@ class impact_management(object):
                 N_new_MPs = len(nel_new_MPs)
                 if N_new_MPs > 0:
                     MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs,
-                                     vx_new_MPs, vy_new_MPs, vz_new_MPs)
+                                     vx_new_MPs, vy_new_MPs, vz_new_MPs,tt_curr)
 
                     #subtract new macroparticles
                     v_new_MPs_mod = np.sqrt(vx_new_MPs**2 + vy_new_MPs**2 + vz_new_MPs**2)
@@ -277,7 +302,7 @@ class impact_management(object):
                     if flag_seg:
                         segi.update_seg_impact(i_seg_new_MPs, -nel_new_MPs * E_new_MPs_eV, self.energ_eV_impact_seg)
                         segi.update_seg_impact(i_seg_new_MPs, nel_new_MPs, self.nel_hist_emit_seg)
-                    
+
                     self.En_emit_last_step_eV += np.sum(E_new_MPs_eV * nel_new_MPs)
 
         return MP_e
@@ -326,3 +351,65 @@ class impact_management(object):
         print('Done extracting SEY curves.')
 
         return deltas
+
+    def extract_energy_distributions(self, n_rep, E_impact_eV_test, cos_theta_test, mass, Nbin_extract_ene, factor_ene_dist_max):
+        """Extract energy distributions for secondary electrons."""
+        emit_ene_g_hist = np.linspace(0., E_impact_eV_test * factor_ene_dist_max, Nbin_extract_ene)
+        Dextract_ene = emit_ene_g_hist[1] - emit_ene_g_hist[0]
+        extract_ene_hist = {}
+
+        for etype in self.sey_mod.event_types.keys():
+            etype_name = self.sey_mod.event_types[etype]
+            extract_ene_hist[etype_name] = np.zeros(shape=(len(emit_ene_g_hist), len(cos_theta_test)), dtype=float)
+
+        print('Extracting energy distributions...')
+        for i_ct, ct in enumerate(cos_theta_test):
+            print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
+            Ene = E_impact_eV_test
+            nel_impact = np.ones(n_rep)
+            # Assuming normal is along x
+            v_mod = np.sqrt(2 * Ene * qe / mass) * np.ones_like(nel_impact)
+            vx = v_mod * ct
+            vy = v_mod * np.sqrt(1 - ct * ct)
+
+            nel_emit_tot_events, event_type, event_info,\
+                nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
+                nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
+                self.sey_mod.impacts_on_surface(
+                    mass=mass, nel_impact=nel_impact, x_impact=nel_impact * 0, y_impact=nel_impact * 0, z_impact=nel_impact * 0,
+                    vx_impact=vx * np.ones_like(nel_impact),
+                    vy_impact=vy * np.ones_like(nel_impact),
+                    vz_impact=nel_impact * 0,
+                    Norm_x=np.ones_like(nel_impact), Norm_y=np.zeros_like(nel_impact),
+                    i_found=np.int_(np.ones_like(nel_impact)),
+                    v_impact_n=vx * np.ones_like(nel_impact),
+                    E_impact_eV=Ene * np.ones_like(nel_impact),
+                    costheta_impact=ct * np.ones_like(nel_impact),
+                    nel_mp_th=1,
+                    flag_seg=True)
+
+            v_replace_mod = np.sqrt(vx_replace**2 + vy_replace**2 + vz_replace**2)
+            E_replace_eV = 0.5 * mass / qe * v_replace_mod * v_replace_mod
+
+            v_new_MPs_mod = np.sqrt(vx_new_MPs**2 + vy_new_MPs**2 + vz_new_MPs**2)
+            E_new_MPs_eV = 0.5 * mass / qe * v_new_MPs_mod * v_new_MPs_mod
+
+            E_all_MPs_eV = np.concatenate([E_replace_eV, E_new_MPs_eV])
+
+            extended_event_type = event_info['extended_event_type']
+            for etype in self.sey_mod.event_types.keys():
+                etype_name = self.sey_mod.event_types[etype]
+                extract_type = extract_ene_hist[etype_name]
+                if E_all_MPs_eV[extended_event_type == etype].shape == (0,):  # if there are no events of type etype
+                    pass
+                else:
+                    temp = extract_type[:, i_ct].copy()
+                    histf.compute_hist(E_all_MPs_eV[extended_event_type == etype], np.ones(len(E_all_MPs_eV[extended_event_type == etype])), 0., Dextract_ene, temp)
+                    extract_type[:, i_ct] = temp
+                extract_ene_hist[etype_name] = extract_type
+
+        extract_ene_hist['emit_ene_g_hist'] = emit_ene_g_hist
+
+        print('Done extracting energy distributions.')
+
+        return extract_ene_hist
