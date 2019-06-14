@@ -99,8 +99,8 @@ class space_charge_electromagnetic(space_charge, object):
         Ex_prime = self.gamma*dphi_dx
         Ey_prime = self.gamma*dphi_dy
 
-        dAz_dx = -self.gamma*self.beta*c*epsilon_0/mu_0*dphi_dx
-        dAz_dy = -self.gamma*self.beta*c*epsilon_0/mu_0*dphi_dy
+        dAz_dx = -self.gamma*self.beta*c*epsilon_0*mu_0*dphi_dx
+        dAz_dy = -self.gamma*self.beta*c*epsilon_0*mu_0*dphi_dy
 
         Bx_prime = dAz_dx
         By_prime = -dAz_dy
