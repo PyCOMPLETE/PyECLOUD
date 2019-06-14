@@ -165,12 +165,14 @@ class BuildupSimulation(object):
                     Ex_n_beam += Ex_n_secbeam
                     Ey_n_beam += Ey_n_secbeam
 
-            ## Compute electron space charge electric field
-            Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
-
-            #!#! Compute magnetic field from electrons
+            #!#! Either compute electromagnetic field or electrostatic
             if lorentz_boost:
-                Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_b_field(MP_e)
+                Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_b_field(MP_e)
+            else:
+                ## Compute electron space charge electric field
+                Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+
+
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
