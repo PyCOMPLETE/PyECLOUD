@@ -103,7 +103,7 @@ class pusher_Boris_multipole():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_sc_n=0, By_sc_n=0, Bz_sc_n=0, Dt_substep=None, N_sub_steps=None):
 
         if MP_e.N_mp > 0:
 
@@ -122,4 +122,3 @@ class pusher_Boris_multipole():
                                  Ex_n, Ey_n, MP_e.charge, MP_e.mass)
 
         return MP_e
-
