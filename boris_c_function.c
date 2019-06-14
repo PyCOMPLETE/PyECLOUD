@@ -65,26 +65,28 @@ void boris_c(int N_sub_steps, double Dtt,
 				Bz_n += Bz_n_custom[p]; 
 			}
 
-			GENERALIZE: tBx = 0.5*qm*Dtt*Bx_n;
-			GENERALIZE: tBy = 0.5*qm*Dtt*By_n;
-			GENERALIZE: tBsq = tBx*tBx + tBy*tBy;
+			tBx = 0.5*qm*Dtt*Bx_n;
+			tBy = 0.5*qm*Dtt*By_n;
+			tBz = 0.5*qm*Dtt*Bz_n;
+			tBsq = tBx*tBx + tBy*tBy + tBz*tBz;
 
-			GENERALIZE: sBx = 2.*tBx/(1.+tBsq);
-			GENERALIZE: sBy = 2.*tBy/(1.+tBsq);
+			sBx = 2.*tBx/(1.+tBsq);
+			sBy = 2.*tBy/(1.+tBsq);
+			sBz = 2.*tBz/(1.+tBsq);
 
 			vx_min = vxn1p + 0.5*qm*Ex_np*Dtt;
 			vy_min = vyn1p + 0.5*qm*Ey_np*Dtt;
 			vz_min = vzn1p;
 
 			//v_prime = v_min + cross(v_min, tB)
-			GENERALIZE: vx_prime = -vz_min*tBy + vx_min;
-			GENERALIZE: vy_prime = vz_min*tBx + vy_min;
-			GENERALIZE: vz_prime = vx_min*tBy-vy_min*tBx + vz_min;
+			vx_prime = vy_min*tBz - vz_min*tBy + vx_min;
+			vy_prime = vz_min*tBx - vx_min*tBz + vy_min;
+			vz_prime = vx_min*tBy - vy_min*tBx + vz_min;
 
 			//v_plus = v_min + cross(v_prime, sB)
-			GENERALIZE: vx_plus = -vz_prime*sBy + vx_min;
-			GENERALIZE: vy_plus = vz_prime*sBx + vy_min;
-			GENERALIZE: vz_plus = vx_prime*sBy-vy_prime*sBx + vz_min;
+			vx_plus = vy_prime*sBz - vz_prime*sBy + vx_min;
+			vy_plus = vz_prime*sBx - vx_prime*sBz+ vy_min;
+			vz_plus = vx_prime*sBy - vy_prime*sBx + vz_min;
 
 			vxn1p = vx_plus + 0.5*qm*Ex_np*Dtt;
 			vyn1p = vy_plus + 0.5*qm*Ey_np*Dtt;
