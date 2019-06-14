@@ -83,7 +83,12 @@ class pusher_Boris_multipole():
         print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
-    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0.):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0.):
+
+        if Bx_n == 0. and By_n == 0. and Bz_n == 0.:
+            custom_B = 0
+        else:
+            custom_B = 1
 
         if MP_e.N_mp > 0:
 
@@ -99,13 +104,13 @@ class pusher_Boris_multipole():
 
             boris_step_multipole(self.N_sub_steps, self.Dtt, self.B_field, self.B_field_skew,
                                  xn1, yn1, zn1, vxn1, vyn1, vzn1,
-                                 Ex_n, Ey_n, MP_e.charge, MP_e.mass)
+                                 Ex_n, Ey_n, Bx_n, By_n, Bz_n, custom_B, MP_e.charge, MP_e.mass)
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0, By_n=0, Bz_n=0, Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0., Dt_substep=None, N_sub_steps=None):
 
-        if Bx_n == 0 and By_n == 0 and Bz_n == 0:
+        if Bx_n == 0. and By_n == 0. and Bz_n == 0.:
             custom_B = 0
         else:
             custom_B = 1
