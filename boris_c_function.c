@@ -12,10 +12,10 @@ void boris_c(int N_sub_steps, double Dtt,
 {
 	int p, isub, order;
 	double Ex_np, Ey_np;
-	double Bx_n, By_n;
+	double Bx_n, By_n, Bz_n;
 	double rexy, imxy, rexy_0;
-	double tBx, tBy, tBsq;
-	double sBx, sBy;
+	double tBx, tBy, tBz, tBsq;
+	double sBx, sBy, sBz;
 	double vx_prime, vy_prime, vz_prime;
 	double vx_min, vy_min, vz_min;
 	double vx_plus, vy_plus, vz_plus;
@@ -42,7 +42,7 @@ void boris_c(int N_sub_steps, double Dtt,
 			imxy = 0.;
 			By_n = B_field[0];
 			Bx_n = B_skew[0];
-			Bz_n = 0.
+			Bz_n = 0.;
 
 			for(order = 1; order < N_multipoles; order++)
 			{
