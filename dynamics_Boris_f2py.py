@@ -181,7 +181,10 @@ class pusher_Boris():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_sc_n=None, By_sc_n=None, Bz_sc_n=None, Dt_substep=None, N_sub_steps=None):
+
+        if  Bx_sc_n is not None or By_sc_n is not None or  Bz_sc_n is not None,:
+            raise ValueError("""Track_method should be 'BorisMultipole' to use electromagnetic space charge!""")
 
         if MP_e.N_mp > 0:
 
@@ -211,4 +214,3 @@ class pusher_Boris():
             MP_e.vz_mp[0:MP_e.N_mp] = vzn1
 
         return MP_e
-
