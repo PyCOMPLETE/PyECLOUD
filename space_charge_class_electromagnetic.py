@@ -110,4 +110,4 @@ class space_charge_electromagnetic(space_charge):
         By_sc_n = gamma*(By_prime - beta/c*Ex_prime)
         Bz_sc_n = Bz_prime
 
-        return Bx_sc_n, By_sc_n, Bz_sc_n
+        return Ex_sc_n, Ex_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
