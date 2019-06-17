@@ -77,10 +77,10 @@ class space_charge_electromagnetic(space_charge, object):
 
         # scatter currents
         self.state_Ax.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
-                self.gamma * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp],
+                epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
         self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
-                self.gamma * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
+                 epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
 
         # solve
@@ -104,7 +104,7 @@ class space_charge_electromagnetic(space_charge, object):
 
         Bx_prime = dAz_dx
         By_prime = -dAz_dy
-        Bz_prime = dAx_dy - dAy_dx
+        Bz_prime = self.gamma*(dAx_dy - dAy_dx)
 
         Ex_sc_n = self.gamma*(Ex_prime + self.beta*c*By_prime)
         Ey_sc_n = self.gamma*(Ey_prime - self.beta*c*Bx_prime)
