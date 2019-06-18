@@ -51,7 +51,6 @@
 
 import numpy as np
 from space_charge_class import space_charge
-
 from scipy.constants import c, epsilon_0, mu_0
 
 na = lambda x: np.array([x])
@@ -67,6 +66,7 @@ class space_charge_electromagnetic(space_charge, object):
 
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
+
         self.gamma = gamma
         self.beta = np.sqrt(1-1/(gamma*gamma))
 
@@ -93,7 +93,6 @@ class space_charge_electromagnetic(space_charge, object):
 
         _, dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-
         dphi_dx, dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
         Ex_prime = self.gamma*dphi_dx
@@ -102,8 +101,8 @@ class space_charge_electromagnetic(space_charge, object):
         dAz_dx = -self.gamma*self.beta*c*epsilon_0*mu_0*dphi_dx
         dAz_dy = -self.gamma*self.beta*c*epsilon_0*mu_0*dphi_dy
 
-        Bx_prime = dAz_dx
-        By_prime = -dAz_dy
+        Bx_prime = dAz_dy
+        By_prime = -dAz_dx
         Bz_prime = self.gamma*(dAx_dy - dAy_dx)
 
         Ex_sc_n = self.gamma*(Ex_prime + self.beta*c*By_prime)
