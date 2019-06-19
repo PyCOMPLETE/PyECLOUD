@@ -170,7 +170,9 @@ class BuildupSimulation(object):
 
             #!#! Either compute electromagnetic field or electrostatic
             if self.lorentz_boost:
-                Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_b_field(MP_e)
+                Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
+
+
             else:
                 ## Compute electron space charge electric field
                 Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
@@ -219,7 +221,6 @@ class BuildupSimulation(object):
 
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
-
             ## Evolve SEY module (e.g. charge decay for insulators
             impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
 

@@ -89,7 +89,7 @@ class space_charge_electromagnetic(space_charge, object):
             self.PyPICobj.solve_states([self.state_Ax, self.state_Ay])
 
 
-    def get_sc_b_field(self, MP_e):
+    def get_sc_em_field(self, MP_e):
 
         _, dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])

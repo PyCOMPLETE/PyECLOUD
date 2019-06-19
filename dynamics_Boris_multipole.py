@@ -83,9 +83,9 @@ class pusher_Boris_multipole():
         print "N_subst_init=%d" % self.N_sub_steps
 
     #@profile
-    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=[0.], By_n=[0.], Bz_n=[0.]):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=np.asarray([0.]), By_n=np.asarray([0.]), Bz_n=np.asarray([0.])):
 
-        if (Bx_n == [0.]).all() and (By_n == [0.]).all() and (Bz_n == [0.]).all():
+        if (Bx_n == np.asarray([0.])).all() and (By_n == np.asarray([0.])).all() and (Bz_n == np.asarray([0.])).all():
             custom_B = 0
         else:
             custom_B = 1
@@ -108,9 +108,9 @@ class pusher_Boris_multipole():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=[0.], By_n=[0.], Bz_n=[0.], Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=np.asarray([0.]), By_n=np.asarray([0.]), Bz_n=np.asarray([0.]), Dt_substep=None, N_sub_steps=None):
 
-        if Bx_n == [0.] and By_n == [0.] and Bz_n == [0.]:
+        if (Bx_n == np.asarray([0.])).all() and (By_n == np.asarray([0.])).all() and (Bz_n == np.asarray([0.])).all():
             custom_B = 0
         else:
             custom_B = 1
