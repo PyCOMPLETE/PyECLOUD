@@ -52,9 +52,9 @@
 import numpy as np
 from space_charge_class import space_charge
 from scipy.constants import c, epsilon_0, mu_0
+import int_field_for as iff
 
 na = lambda x: np.array([x])
-
 
 class space_charge_electromagnetic(space_charge, object):
 
@@ -66,6 +66,12 @@ class space_charge_electromagnetic(space_charge, object):
 
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
+
+        # Ax and Ay at previous steps for computation of dAx_dz and dAy_dz
+        self.Ax_old_grid = np.zeros((self.Nxg,self.Nyg))
+        self.Ay_old_grid = np.zeros((self.Nxg,self.Nyg))
+        self.dAx_grid_dt = np.zeros((self.Nxg,self.Nyg))
+        self.dAy_grid_dt = np.zeros((self.Nxg,self.Nyg))
 
         self.gamma = gamma
         self.beta = np.sqrt(1-1/(gamma*gamma))
@@ -80,7 +86,7 @@ class space_charge_electromagnetic(space_charge, object):
                 epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
         self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
-                 epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
+                epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
 
         # solve
@@ -88,23 +94,43 @@ class space_charge_electromagnetic(space_charge, object):
             self.PyPICobj.solve()
             self.PyPICobj.solve_states([self.state_Ax, self.state_Ay])
 
+        Ax_grid = self.state_Ax.phi
+        Ay_grid = self.state_Ax.phi
+
+        #compute time derivatives
+        self.dAx_grid_dt = (Ax_grid -  self.Ax_old_grid)/self.Dt_sc
+        self.dAy_grid_dt = (Ax_grid -  self.Ax_old_grid)/self.Dt_sc
+
+
+        self.Ax_old_grid = Ax_grid
+        self.Ay_old_grid = Ay_grid
 
     def get_sc_em_field(self, MP_e):
-
+        #compute un-primed potentials
         _, dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         dphi_dx, dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
-        Ex_prime = self.gamma*dphi_dx
-        Ey_prime = self.gamma*dphi_dy
+        #fix signs and make primed
+        dphi_prime_dx = -self.gamma*dphi_dx
+        dphi_prime_dy = -self.gamma*dphi_dy
+        dAx_prime_dy = -self.gamma*dAx_dy
+        dAy_prime_dx = -self.gamma*dAy_dx
+        #compute longitudinal magnetic potential
+        dAs_prime_dx = -self.beta/c*dphi_prime_dx
+        dAs_prime_dy = -self.beta/c*dphi_prime_dy
+        # interpolate time derivatives to the particle positions
+        dAx_dt, dAy_dt = iff.int_field(MP_e.x_mp,MP_e.y_mp,self.bias_x,self.bias_y,self.Dh,
+                                     self.Dh, self.dAx_grid_dt, self.dAy_grid_dt)
+        #compute E-field in  boosted frame
+        Ex_prime = dphi_prime_dx
+        Ey_prime = dphi_prime_dy
+        #compute E-field in  boosted frame
+        Bx_prime = -1/(self.beta*c)*dAx_dt[0:MP_e.N_mp] - dAs_prime_dy
+        By_prime = dAs_prime_dx + 1/(self.beta*c)*dAy_dt[0:MP_e.N_mp]
+        Bz_prime = dAx_prime_dy - dAy_prime_dx
 
-        dAz_dx = -self.gamma*self.beta*c*epsilon_0*mu_0*dphi_dx
-        dAz_dy = -self.gamma*self.beta*c*epsilon_0*mu_0*dphi_dy
-
-        Bx_prime = dAz_dy
-        By_prime = -dAz_dx
-        Bz_prime = self.gamma*(dAx_dy - dAy_dx)
-
+        #transform fields to lab frame
         Ex_sc_n = self.gamma*(Ex_prime + self.beta*c*By_prime)
         Ey_sc_n = self.gamma*(Ey_prime - self.beta*c*Bx_prime)
 

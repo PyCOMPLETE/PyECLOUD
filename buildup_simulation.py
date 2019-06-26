@@ -171,8 +171,6 @@ class BuildupSimulation(object):
             #!#! Either compute electromagnetic field or electrostatic
             if self.lorentz_boost:
                 Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
-
-
             else:
                 ## Compute electron space charge electric field
                 Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
