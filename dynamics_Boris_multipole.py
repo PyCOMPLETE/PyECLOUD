@@ -108,9 +108,9 @@ class pusher_Boris_multipole():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=np.asarray([0.]), By_n=np.asarray([0.]), Bz_n=np.asarray([0.]), Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0., Dt_substep=None, N_sub_steps=None):
 
-        if (Bx_n == np.asarray([0.])).all() and (By_n == np.asarray([0.])).all() and (Bz_n == np.asarray([0.])).all():
+        if  len(Bx_n) != 1 or len(By_n) != 1 or  len(Bz_n) != 1 or Bx_n != 0. or By_n != 0. or  Bz_n != 0.:
             custom_B = 0
         else:
             custom_B = 1
