@@ -76,7 +76,8 @@ import dynamics_strong_B_generalized as dyngen
 import dynamics_Boris_multipole as dynmul
 
 import MP_system as MPs
-import space_charge_class_electromagnetic as scc
+import space_charge_class_electromagnetic as scc_em
+import space_charge_class as scc
 import impact_management_class as imc
 import perfect_absorber_class as pac
 import pyecloud_saver as pysav
@@ -263,9 +264,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.sparse_solver == 'klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver = 'PyKLU'
-        spacech_ele_sim = scc.space_charge_electromagnetic(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
-                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
 
+        if cc.flag_em_tracking:
+            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
+        else:
+            spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                        f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
     for cloud_par in cloud_par_list:
@@ -519,5 +524,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             config_dict,
             flag_multiple_clouds,
             cloud_list,
-            cc.checkpoint_folder
+            cc.checkpoint_folder,
+            cc.flag_em_tracking
             )

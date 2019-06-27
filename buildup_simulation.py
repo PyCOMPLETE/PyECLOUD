@@ -61,11 +61,11 @@ import os
 class BuildupSimulation(object):
 
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
-                 skip_pyeclsaver=False, lorentz_boost = True, ignore_kwargs=[], spacech_ele=None, **kwargs):
+                 skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
         print 'PyECLOUD Version 7.7.1'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
-            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
+            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder, flag_em_tracking = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
                 skip_beam=skip_beam,
                 skip_pyeclsaver=skip_pyeclsaver,
@@ -84,9 +84,7 @@ class BuildupSimulation(object):
         self.cloud_list = cloud_list
         self.chamb = cloud_list[0].impact_man.chamb
         self.checkpoint_folder = checkpoint_folder
-
-        #!#!
-        self.lorentz_boost = lorentz_boost
+        self.flag_em_tracking = flag_em_tracking
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
@@ -169,7 +167,7 @@ class BuildupSimulation(object):
                     Ey_n_beam += Ey_n_secbeam
 
             #!#! Either compute electromagnetic field or electrostatic
-            if self.lorentz_boost:
+            if self.flag_em_tracking:
                 Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
             else:
                 ## Compute electron space charge electric field
@@ -244,7 +242,7 @@ class BuildupSimulation(object):
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
                 #!#! Needs to be modified
-                if self.lorentz_boost:
+                if self.flag_em_tracking:
                     spacech_ele.recompute_spchg_emfield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
                 else:
                     spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
