@@ -466,9 +466,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init electron tracker
         if cc.track_method == 'Boris':
+            if cc.flag_em_tracking = True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             dynamics = dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
                                          cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
+            if cc.flag_em_tracking = True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBdip tracking method is implemented only for electrons!')
@@ -478,6 +482,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 B = cc.B
             dynamics = dyndip.pusher_dipole_magnet(cc.Dt, B)
         elif cc.track_method == 'StrongBgen':
+            if cc.flag_em_tracking = True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
