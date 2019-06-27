@@ -64,6 +64,8 @@ class space_charge_electromagnetic(space_charge, object):
         super(space_charge_electromagnetic, self).__init__(chamb, Dh, Dt_sc, PyPICmode , sparse_solver,
                      f_telescope, target_grid, N_nodes_discard, N_min_Dh_main)
 
+        self.flag_em_tracking = True
+
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
 
@@ -143,4 +145,6 @@ class space_charge_electromagnetic(space_charge, object):
         By_sc_n = self.gamma*(By_prime + self.beta/c*Ex_prime)
         Bz_sc_n = Bz_prime
 
+        #print(np.mean(np.abs(Ex_sc_n)/np.abs(MP_e.vy_mp[0:MP_e.N_mp]*Bz_sc_n-MP_e.vz_mp[0:MP_e.N_mp]*By_sc_n)))
+        #print(np.mean(np.abs(Ex_sc_n)/(np.abs(c*Bz_sc_n-c*By_sc_n))))
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n

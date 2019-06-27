@@ -65,7 +65,7 @@ class BuildupSimulation(object):
 
         print 'PyECLOUD Version 7.7.1'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
-            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder, flag_em_tracking = init.read_input_files_and_init_components(\
+            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
                 skip_beam=skip_beam,
                 skip_pyeclsaver=skip_pyeclsaver,
@@ -84,7 +84,7 @@ class BuildupSimulation(object):
         self.cloud_list = cloud_list
         self.chamb = cloud_list[0].impact_man.chamb
         self.checkpoint_folder = checkpoint_folder
-        self.flag_em_tracking = flag_em_tracking
+        self.flag_em_tracking = spacech_ele.flag_em_tracking
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:

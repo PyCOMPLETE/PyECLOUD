@@ -122,6 +122,8 @@ class space_charge:
         self.flag_decimate = (self.Dt_sc is not None)
         self.last_recomputation_check = False
 
+        self.flag_em_tracking = False
+
         print 'Done space charge init.'
 
     @property
