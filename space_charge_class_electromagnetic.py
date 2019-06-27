@@ -67,6 +67,9 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
 
+        self.state_Ax_old = None
+        self.state_Ay_old = None
+
         # Ax and Ay at previous steps for computation of dAx_dz and dAy_dz
         self.Ax_old_grid = np.zeros((self.Nxg,self.Nyg))
         self.Ay_old_grid = np.zeros((self.Nxg,self.Nyg))
@@ -76,7 +79,7 @@ class space_charge_electromagnetic(space_charge, object):
         self.gamma = gamma
         self.beta = np.sqrt(1-1/(gamma*gamma))
 
-    def recompute_spchg_efield(self, MP_e, flag_solve=True, flag_reset=True):
+    def recompute_spchg_emfield(self, MP_e, flag_solve=True, flag_reset=True):
         # scatter rho
         self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
@@ -94,28 +97,30 @@ class space_charge_electromagnetic(space_charge, object):
             self.PyPICobj.solve()
             self.PyPICobj.solve_states([self.state_Ax, self.state_Ay])
 
-        Ax_grid = self.state_Ax.phi
-        Ay_grid = self.state_Ax.phi
+        #if not first passage compute derivatives
+        if self.state_Ax_old != None and self.state_Ax_old != None:
+            #compute time derivatives
+            self.dAx_grid_dt = (self.state_Ax.phi -  self.state_Ax_old.phi)/self.Dt_sc
+            self.dAy_grid_dt = (self.state_Ay.phi -  self.state_Ay_old.phi)/self.Dt_sc
+        #if first passage set derivatives to zero
+        else:
+            self.dAx_grid_dt = np.zeros((self.Nxg,self.Nyg))
+            self.dAy_grid_dt = np.zeros((self.Nxg,self.Nyg))
 
-        #compute time derivatives
-        self.dAx_grid_dt = (Ax_grid -  self.Ax_old_grid)/self.Dt_sc
-        self.dAy_grid_dt = (Ax_grid -  self.Ax_old_grid)/self.Dt_sc
-
-
-        self.Ax_old_grid = Ax_grid
-        self.Ay_old_grid = Ay_grid
+        self.state_Ax_old = self.state_Ax.get_state_object()
+        self.state_Ay_old = self.state_Ay.get_state_object()
 
     def get_sc_em_field(self, MP_e):
-        #compute un-primed potentials
-        _, dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-        dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-        dphi_dx, dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+        #compute un-primed potentials (with wrong sign)
+        _, m_dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+        m_dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+        m_dphi_dx, m_dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
         #fix signs and make primed
-        dphi_prime_dx = -self.gamma*dphi_dx
-        dphi_prime_dy = -self.gamma*dphi_dy
-        dAx_prime_dy = -self.gamma*dAx_dy
-        dAy_prime_dx = -self.gamma*dAy_dx
+        dphi_prime_dx = -self.gamma*m_dphi_dx
+        dphi_prime_dy = -self.gamma*m_dphi_dy
+        dAx_prime_dy = -m_dAx_dy
+        dAy_prime_dx = -m_dAy_dx
         #compute longitudinal magnetic potential
         dAs_prime_dx = -self.beta/c*dphi_prime_dx
         dAs_prime_dy = -self.beta/c*dphi_prime_dy
@@ -123,12 +128,12 @@ class space_charge_electromagnetic(space_charge, object):
         dAx_dt, dAy_dt = iff.int_field(MP_e.x_mp,MP_e.y_mp,self.bias_x,self.bias_y,self.Dh,
                                      self.Dh, self.dAx_grid_dt, self.dAy_grid_dt)
         #compute E-field in  boosted frame
-        Ex_prime = dphi_prime_dx
-        Ey_prime = dphi_prime_dy
+        Ex_prime = -dphi_prime_dx
+        Ey_prime = -dphi_prime_dy
         #compute E-field in  boosted frame
-        Bx_prime = -1/(self.beta*c)*dAx_dt[0:MP_e.N_mp] - dAs_prime_dy
-        By_prime = dAs_prime_dx + 1/(self.beta*c)*dAy_dt[0:MP_e.N_mp]
-        Bz_prime = dAx_prime_dy - dAy_prime_dx
+        Bx_prime = dAs_prime_dy + 1/(self.beta*c)*dAy_dt[0:MP_e.N_mp]
+        By_prime = -1/(self.beta*c)*dAx_dt[0:MP_e.N_mp] - dAs_prime_dx
+        Bz_prime = dAy_prime_dx - dAx_prime_dy
 
         #transform fields to lab frame
         Ex_sc_n = self.gamma*(Ex_prime + self.beta*c*By_prime)
