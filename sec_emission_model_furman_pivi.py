@@ -92,6 +92,7 @@ class SEY_model_furman_pivi():
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
         # General FP model parameters
+        self.use_modified_sigmaE = furman_pivi_surface['use_modified_sigmaE']
         self.use_ECLOUD_theta0_dependence = furman_pivi_surface['use_ECLOUD_theta0_dependence']
         self.use_ECLOUD_energy = furman_pivi_surface['use_ECLOUD_energy']
         self.conserve_energy = furman_pivi_surface['conserve_energy']
@@ -252,7 +253,16 @@ class SEY_model_furman_pivi():
         """
         sqrt2 = np.sqrt(2)
         uu = random.rand(len(E_0))
-        return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
+
+        if self.use_modified_sigmaE:
+            aa = 1.88
+            bb = 2.5
+            cc = 1e-2
+            dd = 1.5e2
+            sigmaE_modified = (self.sigmaE - aa) + bb * (1 + np.tanh(cc * (E_0 - dd)))
+            return E_0 + sqrt2 * sigmaE_modified * erfinv((uu - 1) * erf(E_0 / (sqrt2 * sigmaE_modified)))
+        else:
+            return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
 
     def get_energy_rediffused(self, E0):
         """
