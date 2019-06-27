@@ -17,6 +17,7 @@ alpha = 0.9
 M_cut = 10
 
 furman_pivi_surface_tweak = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': True,
@@ -51,6 +52,7 @@ furman_pivi_surface_tweak = {
     't4': 1.}
 
 furman_pivi_surface_LHC = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -97,6 +99,7 @@ sey_mod_initial = fp.SEY_model_furman_pivi(furman_pivi_surface_LHC,
 
 def make_it_easier(*args):
     furman_pivi_surface_LHC = {
+        'use_modified_sigmaE': False,
         'use_ECLOUD_theta0_dependence': False,
         'use_ECLOUD_energy': False,
         'conserve_energy': False,
