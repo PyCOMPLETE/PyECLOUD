@@ -58,8 +58,8 @@ na = lambda x: np.array([x])
 
 class space_charge_electromagnetic(space_charge, object):
 
-    def __init__(self, chamb, Dh, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
-                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None, gamma = 479.):
+    def __init__(self, chamb, Dh, gamma, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
+                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
 
         super(space_charge_electromagnetic, self).__init__(chamb, Dh, Dt_sc, PyPICmode , sparse_solver,
                      f_telescope, target_grid, N_nodes_discard, N_min_Dh_main)

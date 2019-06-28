@@ -53,6 +53,7 @@ from __future__ import division, print_function
 import os
 import numpy as np
 from scipy.constants import c, m_e, e as qe
+from scipy.constants import m_p
 
 import myloadmat_to_obj as mlm
 
@@ -266,11 +267,17 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             cc.sparse_solver = 'PyKLU'
 
         if cc.flag_em_tracking:
-            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+            if skip_beam:
+                raise ValueError("Beam must be included when using electromagnetic tracking!!")
+
+            E_0_proton_ev = m_p*c*c/qe
+            gamma = b_par.energy_eV/E_0_proton_ev
+            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, gamma, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                                            f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
         else:
             spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                                         f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
+
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
     for cloud_par in cloud_par_list:
