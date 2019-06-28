@@ -307,7 +307,14 @@ class BuildupSimulation(object):
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
+
+        if self.spacech_ele.flag_em_tracking:
+            print 'Restoring PyPIC Ax and Ay state objects...'
+            self.spacech_ele.state_Ax = self.spacech_ele.PyPICobj.get_state_object()
+            self.spacech_ele.state_Ay = self.spacech_ele.PyPICobj.get_state_object()
+
         print 'Done reload.'
+
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):

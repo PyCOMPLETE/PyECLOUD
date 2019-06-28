@@ -66,6 +66,7 @@ except ImportError:
     # No cPickle in python3
     import pickle
 
+from space_charge_class import space_charge
 
 class pyecloud_saver:
 
@@ -883,8 +884,19 @@ class pyecloud_saver:
         if self.flag_last_cloud:
 
             temp_luobj = spacech_ele.PyPICobj.luobj
+            temp_state_Ax = spacech_ele.state_Ax
+            temp_state_Ay = spacech_ele.state_Ay
+            temp_state_Ax_old = spacech_ele.state_Ax_old
+            temp_state_Ay_old = spacech_ele.state_Ay_old
+
             spacech_ele.luobj = None
-            spacech_ele.PyPICobj.luobj = None
+
+            if spacech_ele.flag_em_tracking:
+                spacech_ele.PyPICobj.luobj = None
+                spacech_ele.state_Ax = None
+                spacech_ele.state_Ay = None
+                spacech_ele.state_Ax_old = None
+                spacech_ele.state_Ay_old = None
 
             #~ dynamics.get_B=None
 
@@ -916,6 +928,12 @@ class pyecloud_saver:
                 cloud.pyeclsaver = saver
 
             spacech_ele.PyPICobj.luobj = temp_luobj
+
+            if spacech_ele.flag_em_tracking:
+                spacech_ele.state_Ax = temp_state_Ax
+                spacech_ele.state_Ay = temp_state_Ay
+                spacech_ele.state_Ax_old = temp_state_Ax_old
+                spacech_ele.state_Ay_old = temp_state_Ay_old
 
             print('Save simulation state in: ' + outfile)
 
@@ -1110,4 +1128,3 @@ class pyecloud_saver:
                 self.t_lifetime_hist.append(beamtim.tt_curr)
                 impact_man.reset_lifetime_hist_line()
                 self.t_last_lifetime_hist = beamtim.tt_curr
-
