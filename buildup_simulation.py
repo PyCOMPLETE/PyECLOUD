@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.0.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -63,7 +63,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 7.7.1'
+        print 'PyECLOUD Version 8.0.1'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
             config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
@@ -110,7 +110,7 @@ class BuildupSimulation(object):
 
         ## simulation
         while not beamtim.end_simulation():
-            
+
             if t_end_sim is not None and beamtim.tt_curr is not None:
                 if beamtim.tt_curr >= t_end_sim:
                     print 'Reached user defined t_end_sim --> Ending simulation'
@@ -126,7 +126,7 @@ class BuildupSimulation(object):
 
             if beamtim.flag_new_bunch_pass:
                 print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
-            
+
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
                       force_recompute_space_charge=False, skip_MP_cleaning=False, skip_MP_regen=False):
@@ -203,7 +203,7 @@ class BuildupSimulation(object):
                 MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
 
             ## Impacts: backtracking and secondary emission
-            MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e)
+            MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
 
             ## Evolve SEY module (e.g. charge decay for insulators
             impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
