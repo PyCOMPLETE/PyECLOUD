@@ -501,8 +501,17 @@ class SEY_model_furman_pivi():
     #  The following functions are not used in the simulation code but are     #
     #  provided here for use in tests and development.                         #
     ############################################################################
-    def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
+    def backscattered_energy_PDF(self, energy, E_0):
         """The PDF for backscattered electrons."""
+        if self.use_modified_sigmaE:
+            aa = 1.88
+            bb = 2.5
+            cc = 1e-2
+            dd = 1.5e2
+            sigmaE_modified = (self.sigmaE - aa) + bb * (1 + np.tanh(cc * (E_0 - dd)))
+            sigma_e = sigmaE_modified
+        else:
+            sigma_e = self.sigmaE
         ene = energy - E_0
         a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
         c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))
