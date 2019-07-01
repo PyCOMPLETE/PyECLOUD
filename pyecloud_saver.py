@@ -884,15 +884,13 @@ class pyecloud_saver:
         if self.flag_last_cloud:
 
             temp_luobj = spacech_ele.PyPICobj.luobj
-            temp_state_Ax = spacech_ele.state_Ax
-            temp_state_Ay = spacech_ele.state_Ay
-            temp_state_Ax_old = spacech_ele.state_Ax_old
-            temp_state_Ay_old = spacech_ele.state_Ay_old
-
-            spacech_ele.luobj = None
+            spacech_ele.PyPICobj.luobj = None
 
             if spacech_ele.flag_em_tracking:
-                spacech_ele.PyPICobj.luobj = None
+                temp_state_Ax = spacech_ele.state_Ax
+                temp_state_Ay = spacech_ele.state_Ay
+                temp_state_Ax_old = spacech_ele.state_Ax_old
+                temp_state_Ay_old = spacech_ele.state_Ay_old
                 spacech_ele.state_Ax = None
                 spacech_ele.state_Ay = None
                 spacech_ele.state_Ax_old = None
