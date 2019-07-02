@@ -206,10 +206,12 @@ plt.subplots_adjust(right=0.97, left=.09)
 
 plt.suptitle(r'Energy distribution extraction tests: Furman-Pivi model, $E_0 = %.1f eV$' % E_0_single, fontsize=30)
 
-plt.figure(2, figsize=(12, 9), facecolor='white')
+plt.figure(2, figsize=(12 * 1.1, 9 * 1.1), facecolor='white')
+N_plots = sey_mod.M_cut
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
+    colorcurr = ms.colorprog(M - 1, N_plots)
     prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts_prime, nn=M, E_0=E_0_single, energy=energy)
-    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid)
+    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid, color=colorcurr)
 plt.legend()
 plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
 plt.xlabel('Energy [eV]', fontsize=sz - 10)
