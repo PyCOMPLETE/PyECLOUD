@@ -53,7 +53,6 @@ import numpy as np
 from space_charge_class import space_charge
 from scipy.constants import c, epsilon_0, mu_0, e
 import int_field_for as iff
-import multiprocessing as mp
 
 na = lambda x: np.array([x])
 
@@ -144,10 +143,7 @@ class space_charge_electromagnetic(space_charge, object):
         dphi_2_prime_dy = -dAs_2_prime_dy*self.beta*c
         #apply the corrections
         dphi_prime_dx = dphi_1_prime_dx + dphi_2_prime_dx
-        dphi_prime_dy = dphi_1_prime_dy + dphi_2_prime_dyool.apply_async(target_1)
-pool.apply_async(target_2)
-pool.apply_async(target_3)
-pool.apply_async(target_4)
+        dphi_prime_dy = dphi_1_prime_dy + dphi_2_prime_dy
         dAs_prime_dx = dAs_1_prime_dx + dAs_2_prime_dx
         dAs_prime_dy = dAs_1_prime_dy + dAs_2_prime_dy
         #compute E-field in  boosted frame
