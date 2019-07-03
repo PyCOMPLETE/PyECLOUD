@@ -34,7 +34,11 @@ class Cross_Ionization(object):
 
         # Inspiration from sec_emission_model_from_file.py
 
+        print('Initializing cross ionization.')
+
         for projectile in self.cross_ion_definitions.keys():
+
+            print('Projectile %s' %(projectile))
 
             assert projectile in cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
 
