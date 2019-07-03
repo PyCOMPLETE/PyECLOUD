@@ -87,6 +87,7 @@ import parse_beam_file as pbf
 import parse_cloud_file as pcf
 import input_parameters_format_specification as inp_spec
 import cloud_manager as cman
+import cross_ionization as cion
 
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
@@ -268,6 +269,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
+    cloud_dict = {}
     for cloud_par in cloud_par_list:
         thiscloud = cloud_par.cc
 
@@ -510,6 +512,14 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                            resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
 
         cloud_list.append(cloud)
+        cloud_dict.update(thiscloud.cloud_name : cloud)
+
+        # Init cross-ionization
+        if cc.cross_ion_definitions is not None:
+            cross_ion = cion.Cross_Ionization(cc.cross_ion_definitions, cloud_dict)
+        else:
+            cross_ion = None
+
 
     return (beamtim,
             spacech_ele_sim,
@@ -519,5 +529,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             config_dict,
             flag_multiple_clouds,
             cloud_list,
-            cc.checkpoint_folder
+            cc.checkpoint_folder,
+            cloud_dict,
+            cross_ion
             )
