@@ -51,8 +51,9 @@
 
 import numpy as np
 from space_charge_class import space_charge
-from scipy.constants import c, epsilon_0, mu_0
+from scipy.constants import c, epsilon_0, mu_0, e
 import int_field_for as iff
+import multiprocessing as mp
 
 na = lambda x: np.array([x])
 
@@ -68,9 +69,11 @@ class space_charge_electromagnetic(space_charge, object):
 
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
+        self.state_As = self.PyPICobj.get_state_object()
 
         self.state_Ax_old = None
         self.state_Ay_old = None
+        self.state_As_old = None
 
         # Ax and Ay at previous steps for computation of dAx_dz and dAy_dz
         self.Ax_old_grid = np.zeros((self.Nxg,self.Nyg))
@@ -93,11 +96,14 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
                 epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
+        self.state_As.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
+                epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp],
+                charge=MP_e.charge, flag_add=not(flag_reset))
 
         # solve
         if flag_solve:
             self.PyPICobj.solve()
-            self.PyPICobj.solve_states([self.state_Ax, self.state_Ay])
+            self.PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_As])
 
         #if not first passage compute derivatives
         if self.state_Ax_old != None and self.state_Ax_old != None:
@@ -116,19 +122,34 @@ class space_charge_electromagnetic(space_charge, object):
         #compute un-primed potentials (with wrong sign)
         _, m_dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         m_dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-        m_dphi_dx, m_dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+        m_dAs_2_dx, m_dAs_2_dy = self.state_As.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+        m_dphi_1_dx, m_dphi_1_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
 
         #fix signs and make primed
-        dphi_prime_dx = -self.gamma*m_dphi_dx
-        dphi_prime_dy = -self.gamma*m_dphi_dy
+        dphi_1_prime_dx = -self.gamma*m_dphi_1_dx
+        dphi_1_prime_dy = -self.gamma*m_dphi_1_dy
         dAx_prime_dy = -m_dAx_dy
         dAy_prime_dx = -m_dAy_dx
         #compute longitudinal magnetic potential
-        dAs_prime_dx = -self.beta/c*dphi_prime_dx
-        dAs_prime_dy = -self.beta/c*dphi_prime_dy
+        dAs_1_prime_dx = -self.beta/c*dphi_1_prime_dx
+        dAs_1_prime_dy = -self.beta/c*dphi_1_prime_dy
         # interpolate time derivatives to the particle positions
         dAx_dt, dAy_dt = iff.int_field(MP_e.x_mp,MP_e.y_mp,self.bias_x,self.bias_y,self.Dh,
                                      self.Dh, self.dAx_grid_dt, self.dAy_grid_dt)
+        #correction of As prime
+        dAs_2_prime_dx = -self.gamma*m_dAs_2_dx
+        dAs_2_prime_dy = -self.gamma*m_dAs_2_dy
+        #correction of phi prime
+        dphi_2_prime_dx = -dAs_2_prime_dx*self.beta*c
+        dphi_2_prime_dy = -dAs_2_prime_dy*self.beta*c
+        #apply the corrections
+        dphi_prime_dx = dphi_1_prime_dx + dphi_2_prime_dx
+        dphi_prime_dy = dphi_1_prime_dy + dphi_2_prime_dyool.apply_async(target_1)
+pool.apply_async(target_2)
+pool.apply_async(target_3)
+pool.apply_async(target_4)
+        dAs_prime_dx = dAs_1_prime_dx + dAs_2_prime_dx
+        dAs_prime_dy = dAs_1_prime_dy + dAs_2_prime_dy
         #compute E-field in  boosted frame
         Ex_prime = -dphi_prime_dx
         Ey_prime = -dphi_prime_dy
@@ -145,6 +166,4 @@ class space_charge_electromagnetic(space_charge, object):
         By_sc_n = self.gamma*(By_prime + self.beta/c*Ex_prime)
         Bz_sc_n = Bz_prime
 
-        #print(np.mean(np.abs(Ex_sc_n)/np.abs(MP_e.vy_mp[0:MP_e.N_mp]*Bz_sc_n-MP_e.vz_mp[0:MP_e.N_mp]*By_sc_n)))
-        #print(np.mean(np.abs(Ex_sc_n)/(np.abs(c*Bz_sc_n-c*By_sc_n))))
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
