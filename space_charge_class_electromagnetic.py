@@ -72,7 +72,6 @@ class space_charge_electromagnetic(space_charge, object):
 
         self.state_Ax_old = None
         self.state_Ay_old = None
-        self.state_As_old = None
 
         # Ax and Ay at previous steps for computation of dAx_dz and dAy_dz
         self.Ax_old_grid = np.zeros((self.Nxg,self.Nyg))

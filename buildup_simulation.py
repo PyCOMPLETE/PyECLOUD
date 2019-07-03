@@ -309,9 +309,10 @@ class BuildupSimulation(object):
         self.spacech_ele.PyPICobj.build_sparse_solver()
 
         if self.spacech_ele.flag_em_tracking:
-            print 'Restoring PyPIC Ax and Ay state objects...'
+            print 'Restoring PyPIC Ax, Ay and As state objects...'
             self.spacech_ele.state_Ax = self.spacech_ele.PyPICobj.get_state_object()
             self.spacech_ele.state_Ay = self.spacech_ele.PyPICobj.get_state_object()
+            self.spacech_ele.state_As = self.spacech_ele.PyPICobj.get_state_object()
 
         print 'Done reload.'
 

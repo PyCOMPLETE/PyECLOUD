@@ -889,10 +889,12 @@ class pyecloud_saver:
             if spacech_ele.flag_em_tracking:
                 temp_state_Ax = spacech_ele.state_Ax
                 temp_state_Ay = spacech_ele.state_Ay
+                temp_state_As = spacech_ele.state_As
                 temp_state_Ax_old = spacech_ele.state_Ax_old
                 temp_state_Ay_old = spacech_ele.state_Ay_old
                 spacech_ele.state_Ax = None
                 spacech_ele.state_Ay = None
+                spacech_ele.state_As = None
                 spacech_ele.state_Ax_old = None
                 spacech_ele.state_Ay_old = None
 
@@ -930,6 +932,7 @@ class pyecloud_saver:
             if spacech_ele.flag_em_tracking:
                 spacech_ele.state_Ax = temp_state_Ax
                 spacech_ele.state_Ay = temp_state_Ay
+                spacech_ele.state_As = temp_state_As
                 spacech_ele.state_Ax_old = temp_state_Ax_old
                 spacech_ele.state_Ay_old = temp_state_Ay_old
 
