@@ -87,7 +87,7 @@ parameters_dict = {
             'x_max_hist_det': None,
             'y_max_hist_det': None,
             'Dx_hist_det': None,
-          'flag_lifetime_hist': False,
+            'flag_lifetime_hist': False,
             'Nbin_lifetime_hist': None,
             'lifetime_hist_max': None,
             'Dt_lifetime_hist':None,
@@ -117,6 +117,9 @@ parameters_dict = {
             'ene_dist_test_E_impact_eV': None,
             'Nbin_extract_ene': None,
             'factor_ene_dist_max': None,
+
+            # Cross-ionization
+            'cross_ion_definitions': None
 
         },
     },
@@ -418,7 +421,7 @@ parameters_dict = {
             'Dt_En_hist': (),
             'Nbin_En_hist': (),
             'En_hist_max': (),
-          'flag_lifetime_hist': (),
+            'flag_lifetime_hist': (),
             'Nbin_lifetime_hist': (),
             'lifetime_hist_max': (),
             'Dt_lifetime_hist': (),
