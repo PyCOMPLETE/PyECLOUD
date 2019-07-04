@@ -96,8 +96,7 @@ class space_charge_electromagnetic(space_charge, object):
             self.PyPICobj.solve()
             self.PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_As])
 
-        self.state_Ax_old = self.state_Ax.get_state_object()
-        self.state_Ay_old = self.state_Ay.get_state_object()
+
 
     def get_sc_em_field(self, MP_e):
         #compute un-primed potentials (with wrong sign)
@@ -139,6 +138,8 @@ class space_charge_electromagnetic(space_charge, object):
             dAx_dt = np.zeros(MP_e.N_mp)
             dAy_dt = np.zeros(MP_e.N_mp)
 
+        self.state_Ax_old = self.state_Ax.get_state_object()
+        self.state_Ay_old = self.state_Ay.get_state_object()
         #compute B-field in  boosted frame
         Bx_prime = dAs_prime_dy + 1/(self.beta*c)*dAy_dt
         By_prime = -1/(self.beta*c)*dAx_dt - dAs_prime_dx
