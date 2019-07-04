@@ -512,7 +512,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                            resgasion, thiscloud.t_ion, thiscloud.photoem_flag, phemiss, rho)
 
         cloud_list.append(cloud)
-        cloud_dict.update(thiscloud.cloud_name : cloud)
+        cloud_dict.update({thiscloud.cloud_name : cloud})
 
         # Init cross-ionization
         if cc.cross_ion_definitions is not None:
