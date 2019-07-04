@@ -69,8 +69,6 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
         self.state_As = self.PyPICobj.get_state_object()
-        self.dAx_dt = None
-        self.dAy_dt = None
         self.state_Ax_old = None
         self.state_Ay_old = None
 
@@ -97,16 +95,6 @@ class space_charge_electromagnetic(space_charge, object):
         if flag_solve:
             self.PyPICobj.solve()
             self.PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_As])
-
-        #if not first passage compute derivatives
-        if self.state_Ax_old != None and self.state_Ax_old != None:
-            #compute time derivatives
-            self.dAx_dt[0:MP_e.N_mp] = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
-            self.dAy_dt[0:MP_e.N_mp] = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
-        #if first passage set derivatives to zero
-        else:
-            self.dAx_dt = np.zeros(len(MP_e.x_mp))
-            self.dAy_dt = np.zeros(len(MP_e.x_mp))
 
         self.state_Ax_old = self.state_Ax.get_state_object()
         self.state_Ay_old = self.state_Ay.get_state_object()
@@ -140,14 +128,20 @@ class space_charge_electromagnetic(space_charge, object):
         #compute E-field in  boosted frame
         Ex_prime = -dphi_prime_dx
         Ey_prime = -dphi_prime_dy
-        #if time derivatives have not been computed yet, set to zero
-        if self.dAx_dt is None and self.dAy_dt is None:
-            self.dAx_dt = np.zeros(len(MP_e.x_mp))
-            self.dAy_dt = np.zeros(len(MP_e.x_mp))
-        
+
+        #if not first passage compute derivatives of Ax and Ay
+        if self.state_Ax_old != None and self.state_Ax_old != None:
+            #compute time derivatives
+            dAx_dt = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
+            dAy_dt = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
+        #if first passage set derivatives to zero
+        else:
+            dAx_dt = np.zeros(MP_e.N_mp)
+            dAy_dt = np.zeros(MP_e.N_mp)
+
         #compute B-field in  boosted frame
-        Bx_prime = dAs_prime_dy + 1/(self.beta*c)*self.dAy_dt[0:MP_e.N_mp]
-        By_prime = -1/(self.beta*c)*self.dAx_dt[0:MP_e.N_mp] - dAs_prime_dx
+        Bx_prime = dAs_prime_dy + 1/(self.beta*c)*dAy_dt
+        By_prime = -1/(self.beta*c)*dAx_dt - dAs_prime_dx
         Bz_prime = dAy_prime_dx - dAx_prime_dy
 
         #transform fields to lab frame
