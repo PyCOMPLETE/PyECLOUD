@@ -16,8 +16,6 @@ cross_ion_definitions = {
         }
     }
 
- 
-
 class Cross_Ionization(object):
 
     def __init__(self, cross_ion_definitions, cloud_dict):
@@ -35,26 +33,26 @@ class Cross_Ionization(object):
         # Inspiration from sec_emission_model_from_file.py
 
         print('Initializing cross ionization.')
-
         for projectile in self.cross_ion_definitions.keys():
 
             print('Projectile %s' %(projectile))
-
             assert projectile in cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
 
             cross_ion_def_projectile = self.cross_ion_definitions[projectile]
 
             for process in cross_ion_def_projectile.keys():
 
+                cross_ion_def_process = cross_ion_def_projectile[process]
+
                 # Warn if target density doesn't correspond to density of gas ionization class?
                 # dens = cross_ion_def_projectile[process]['target_density']
 
-                product_names = cross_ion_def_projectile[process]['products']
+                product_names = cross_ion_def_process['products']
                 for product in product_names:
                     assert product in cloud_dict.keys(), "Product name %s does not correspond to a defined cloud name."%(product)
 
                 # Read cross section file
-                cross_section_file = cross_ion_def_projectile[process]['cross_section']
+                cross_section_file = cross_ion_def_process['cross_section']
 
                 if os.path.isfile(pyecl_input_folder + '/' + cross_section_file):
                     cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm
@@ -67,18 +65,32 @@ class Cross_Ionization(object):
 
                 cross_section = sio.loadmat(cross_section_file_path)
 
-                energy_eV_sigma = cross_section['energy_eV'].squeeze()
+                energy_eV = cross_section['energy_eV'].squeeze()
                 sigma_cm2 = cross_section['cross_section_cm2'].squeeze()
 
-                cross_ion_def_projectile[process]['energy_eV_sigma'] = energy_eV_sigma
-                cross_ion_def_projectile[process]['sigma_cm2'] = sigma_cm2
+                flag_log = False
+                diff_e = np.diff(energy_eV)
+                delta_e = diff_e[0]
+                if np.any(diff_e != delta_e):
+                    # Check if logarithmic
+                    energy_eV = np.log10(energy_eV)
+                    diff_e = np.diff(energy_eV)
+                    delta_e = diff_e[0]
+                    if np.any(diff_e != delta_e):
+                        raise ValueError('Energy in cross section file must be equally spaced in linear or log scale.')
+                    else:
+                        flag_log = True
+
+                cross_ion_def_process['energy_eV_sigma'] = energy_eV
+                cross_ion_def_process['sigma_cm2'] = sigma_cm2
+                cross_ion_def_process['flag_log'] = flag_log
 
     def generate(self, cloud_dict, Dt):
         
         for projectile in self.cross_ion_definitions.keys():
             
-            this_cloud_proj = cloud_dict[projectile]
-            MP_e_proj = this_cloud_proj.MP_e
+            thiscloud_proj = cloud_dict[projectile]
+            MP_e_proj = thiscloud_proj.MP_e
             N_proj = MP_e_proj.N_mp
  
             if N_proj > 0:
@@ -104,22 +116,24 @@ class Cross_Ionization(object):
 
                 for process in cross_ion_def_projectile.keys():
 
-                    dens = cross_ion_def_projectile[process]['target_density']
-                    sigma_cm2 = cross_ion_def_projectile[process]['sigma_cm2']
-                    logE_sigma = cross_ion_def_projectile[process]['energy_eV_sigma']
-                    product_list = cross_ion_def_projectile[process]['products']
+                    cross_ion_def_process = cross_ion_def_projectile[process]
+
+                    dens = cross_ion_def_process['target_density']
+                    sigma_cm2 = cross_ion_def_process['sigma_cm2']
+                    energy_eV_sigma = cross_ion_def_process['energy_eV_sigma']
+                    product_list = cross_ion_def_process['products']
 
                     # Interpolate cross section
                     # Inspiration from sec_emission_model_from_file.py
                     
-                    sigma_proj_MPs = 
+                    sigma_proj_MPs = self.interp()
                     
-                    for cld_gen_name in generate_list:
-                        this_cloud_gen =  cloud_dict[cld_gen_name]
-                        MP_e_gen = this_cloud_gen.MP_e
+                    for product in product_list:
+                        thiscloud_product =  cloud_dict[product]
+                        MP_e_product = thiscloud_product.MP_e
                         
                         # Compute N_mp to add
-                        DN_per_proj = sigma_proj_MPs*dens*v_proj_MPs*Dt*MP_e_proj.nel_mp[:N_proj]
+                        DN_per_proj = sigma_proj_MPs * dens * v_proj_MPs * Dt * MP_e_proj.nel_mp[:N_proj]
 
                         N_mp_per_proj_float = DN_per_proj/MP_e_gen.nel_mp_ref
 
@@ -152,7 +166,17 @@ class Cross_Ionization(object):
 
 
 
+    def interp(self, energy_eV):
+        """
+        Linear interpolation of the energy - sigma curve.
+        """
 
+
+
+        index_float = (energy_eV - self.energy_eV_min) / self.delta_e
+        index_remainder, index_int = np.modf(index_float)
+        index_int = index_int.astype(int)
+        return self.sey_true[index_int] + index_remainder * self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder * self.sey_elast_diff[index_int]
 
 
 
