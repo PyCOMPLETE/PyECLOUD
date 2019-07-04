@@ -69,15 +69,10 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
         self.state_As = self.PyPICobj.get_state_object()
-
+        self.dAx_dt = None
+        self.dAy_dt = None
         self.state_Ax_old = None
         self.state_Ay_old = None
-
-        # Ax and Ay at previous steps for computation of dAx_dz and dAy_dz
-        self.Ax_old_grid = np.zeros((self.Nxg,self.Nyg))
-        self.Ay_old_grid = np.zeros((self.Nxg,self.Nyg))
-        self.dAx_grid_dt = np.zeros((self.Nxg,self.Nyg))
-        self.dAy_grid_dt = np.zeros((self.Nxg,self.Nyg))
 
         self.gamma = gamma
         self.beta = np.sqrt(1-1/(gamma*gamma))
@@ -106,12 +101,12 @@ class space_charge_electromagnetic(space_charge, object):
         #if not first passage compute derivatives
         if self.state_Ax_old != None and self.state_Ax_old != None:
             #compute time derivatives
-            self.dAx_grid_dt = (self.state_Ax.phi -  self.state_Ax_old.phi)/self.Dt_sc
-            self.dAy_grid_dt = (self.state_Ay.phi -  self.state_Ay_old.phi)/self.Dt_sc
+            self.dAx_dt[0:MP_e.N_mp] = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
+            self.dAy_dt[0:MP_e.N_mp] = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
         #if first passage set derivatives to zero
         else:
-            self.dAx_grid_dt = np.zeros((self.Nxg,self.Nyg))
-            self.dAy_grid_dt = np.zeros((self.Nxg,self.Nyg))
+            self.dAx_dt = np.zeros(len(MP_e.x_mp))
+            self.dAy_dt = np.zeros(len(MP_e.x_mp))
 
         self.state_Ax_old = self.state_Ax.get_state_object()
         self.state_Ay_old = self.state_Ay.get_state_object()
@@ -131,9 +126,6 @@ class space_charge_electromagnetic(space_charge, object):
         #compute longitudinal magnetic potential
         dAs_1_prime_dx = -self.beta/c*dphi_1_prime_dx
         dAs_1_prime_dy = -self.beta/c*dphi_1_prime_dy
-        # interpolate time derivatives to the particle positions
-        dAx_dt, dAy_dt = iff.int_field(MP_e.x_mp,MP_e.y_mp,self.bias_x,self.bias_y,self.Dh,
-                                     self.Dh, self.dAx_grid_dt, self.dAy_grid_dt)
         #correction of As prime
         dAs_2_prime_dx = -self.gamma*m_dAs_2_dx
         dAs_2_prime_dy = -self.gamma*m_dAs_2_dy
@@ -148,9 +140,14 @@ class space_charge_electromagnetic(space_charge, object):
         #compute E-field in  boosted frame
         Ex_prime = -dphi_prime_dx
         Ey_prime = -dphi_prime_dy
-        #compute E-field in  boosted frame
-        Bx_prime = dAs_prime_dy + 1/(self.beta*c)*dAy_dt[0:MP_e.N_mp]
-        By_prime = -1/(self.beta*c)*dAx_dt[0:MP_e.N_mp] - dAs_prime_dx
+        #if time derivatives have not been computed yet, set to zero
+        if self.dAx_dt is None and self.dAy_dt is None:
+            self.dAx_dt = np.zeros(len(MP_e.x_mp))
+            self.dAy_dt = np.zeros(len(MP_e.x_mp))
+        
+        #compute B-field in  boosted frame
+        Bx_prime = dAs_prime_dy + 1/(self.beta*c)*self.dAy_dt[0:MP_e.N_mp]
+        By_prime = -1/(self.beta*c)*self.dAx_dt[0:MP_e.N_mp] - dAs_prime_dx
         Bz_prime = dAy_prime_dx - dAx_prime_dy
 
         #transform fields to lab frame
