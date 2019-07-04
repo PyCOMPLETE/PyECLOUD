@@ -16,11 +16,92 @@ cross_ion_definitions = {
         }
     }
 
+class Ionization_Process(object):
+
+    def __init__(self, process_definitions, cloud_dict):
+
+        product_names = cross_ion_def_process['products']
+        for product in product_names:
+            assert product in cloud_dict.keys(), "Product name %s does not correspond to a defined cloud name."%(product)
+
+        self.products = product_names
+
+        # Read cross section file
+        cross_section_file = cross_ion_def_process['cross_section']
+
+        if os.path.isfile(pyecl_input_folder + '/' + cross_section_file):
+            cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm
+        elif os.path.isfile(pyecl_input_folder + '/' + cross_section_file + '.mat'):
+            cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm + '.mat'
+        else:
+            cross_section_file_path = cross_section_file
+
+        print('Cross-section from file %s' %cross_section_file_path)
+
+        cross_section = sio.loadmat(cross_section_file_path)
+
+        energy_eV = cross_section['energy_eV'].squeeze()
+        sigma_cm2 = cross_section['cross_section_cm2'].squeeze()
+
+        self.energy_eV = energy_eV
+        self.sigma_cm2 = sigma_cm2
+
+        flag_log = False
+
+        x_interp = energy_eV
+        diff_x = np.diff(x_interp)
+        delta_x = diff_x[0]
+        if np.any(diff_x != delta_x):
+            # Check if logarithmic step
+            x_interp = np.log10(energy_eV)
+            diff_x = np.diff(x_interp)
+            delta_x = diff_x[0]
+            if np.any(diff_x != delta_x):
+                raise ValueError('Energy in cross section file must be equally spaced in linear or log scale.')
+            else:
+                flag_log = True
+
+        self.delta_x = delta_x
+        self.flag_log = flag_log
+
+        # sey_diff is needed by the interp function
+        # A 0 is appended because this last element is never needed but the array must have the correct shape
+        self.sey_true_diff = np.append(np.diff(sey_true), 0.)
+
+        # Do I want to use energy_eV or x_interp??
+        self.energy_eV_min = self.energy_eV.min()
+        self.energy_eV_max = self.energy_eV.max()
+        # Warn if minimum energy is not 0??
+        # Handle log case
+
+
+    def interp(self, energy_eV_proj):
+        """
+        Linear interpolation of the energy - sigma curve.
+        """
+        if flag_log:
+            x_proj = np.log10(energy_eV_proj)
+        else:
+            x_proj = energy_eV_proj
+
+        # I think I want to check for the energy_eV min/max limits in here...
+
+        index_float = (x_proj - self.energy_eV_min) / self.delta_x
+        index_remainder, index_int = np.modf(index_float)
+        index_int = index_int.astype(int)
+        return self.sey_true[index_int] + index_remainder * self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder * self.sey_elast_diff[index_int]
+
+        return self.sey_true[index_int] + index_remainder * self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder * self.sey_elast_diff[index_int]
+
+
+
 class Cross_Ionization(object):
 
-    def __init__(self, cross_ion_definitions, cloud_dict):
+    def __init__(self, cross_ion_definitions, cloud_list):
         
         self.cross_ion_definitions = cross_ion_definitions
+
+        # Make cloud dict from list!!!
 
         # Read the files here
         # Assert and warn as much as wanted:
@@ -33,53 +114,64 @@ class Cross_Ionization(object):
         # Inspiration from sec_emission_model_from_file.py
 
         print('Initializing cross ionization.')
+
+        self.projectile_dict = {}
         for projectile in self.cross_ion_definitions.keys():
 
             print('Projectile %s' %(projectile))
             assert projectile in cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
 
+            self.projectile_dict.update({projectile : []})
+
             cross_ion_def_projectile = self.cross_ion_definitions[projectile]
 
-            for process in cross_ion_def_projectile.keys():
+            for process_name in cross_ion_def_projectile.keys():
 
-                cross_ion_def_process = cross_ion_def_projectile[process]
+                cross_ion_def_process = cross_ion_def_projectile[process_name]
+                process = Ionization_Process(cross_ion_def_process, cloud_dict)
+
+                self.projectile_dict[]
 
                 # Warn if target density doesn't correspond to density of gas ionization class?
-                # dens = cross_ion_def_projectile[process]['target_density']
+                # dens = cross_ion_def_projectile[process_name]['target_density']
 
-                product_names = cross_ion_def_process['products']
-                for product in product_names:
-                    assert product in cloud_dict.keys(), "Product name %s does not correspond to a defined cloud name."%(product)
+                ############### Moved to Process class ##################################
 
-                # Read cross section file
-                cross_section_file = cross_ion_def_process['cross_section']
+                # product_names = cross_ion_def_process['products']
+                # for product in product_names:
+                #     assert product in cloud_dict.keys(), "Product name %s does not correspond to a defined cloud name."%(product)
 
-                if os.path.isfile(pyecl_input_folder + '/' + cross_section_file):
-                    cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm
-                elif os.path.isfile(pyecl_input_folder + '/' + cross_section_file + '.mat'):
-                    cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm + '.mat'
-                else:
-                    cross_section_file_path = cross_section_file
+                # # Read cross section file
+                # cross_section_file = cross_ion_def_process['cross_section']
 
-                print('Cross-section from file %s' %cross_section_file_path)
+                # if os.path.isfile(pyecl_input_folder + '/' + cross_section_file):
+                #     cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm
+                # elif os.path.isfile(pyecl_input_folder + '/' + cross_section_file + '.mat'):
+                #     cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm + '.mat'
+                # else:
+                #     cross_section_file_path = cross_section_file
 
-                cross_section = sio.loadmat(cross_section_file_path)
+                # print('Cross-section from file %s' %cross_section_file_path)
 
-                energy_eV = cross_section['energy_eV'].squeeze()
-                sigma_cm2 = cross_section['cross_section_cm2'].squeeze()
+                # cross_section = sio.loadmat(cross_section_file_path)
 
-                flag_log = False
-                diff_e = np.diff(energy_eV)
-                delta_e = diff_e[0]
-                if np.any(diff_e != delta_e):
-                    # Check if logarithmic
-                    energy_eV = np.log10(energy_eV)
-                    diff_e = np.diff(energy_eV)
-                    delta_e = diff_e[0]
-                    if np.any(diff_e != delta_e):
-                        raise ValueError('Energy in cross section file must be equally spaced in linear or log scale.')
-                    else:
-                        flag_log = True
+                # energy_eV = cross_section['energy_eV'].squeeze()
+                # sigma_cm2 = cross_section['cross_section_cm2'].squeeze()
+
+                # flag_log = False
+                # diff_e = np.diff(energy_eV)
+                # delta_e = diff_e[0]
+                # if np.any(diff_e != delta_e):
+                #     # Check if logarithmic
+                #     energy_eV = np.log10(energy_eV)
+                #     diff_e = np.diff(energy_eV)
+                #     delta_e = diff_e[0]
+                #     if np.any(diff_e != delta_e):
+                #         raise ValueError('Energy in cross section file must be equally spaced in linear or log scale.')
+                #     else:
+                #         flag_log = True
+
+                ############### End moved to Process class ##################################
 
                 cross_ion_def_process['energy_eV_sigma'] = energy_eV
                 cross_ion_def_process['sigma_cm2'] = sigma_cm2
@@ -126,12 +218,12 @@ class Cross_Ionization(object):
                     # Interpolate cross section
                     # Inspiration from sec_emission_model_from_file.py
                     
-                    sigma_proj_MPs = self.interp()
-                    
+                    sigma_proj_MPs = process.interp(E_mp_proj_eV)
+
                     for product in product_list:
                         thiscloud_product =  cloud_dict[product]
                         MP_e_product = thiscloud_product.MP_e
-                        
+
                         # Compute N_mp to add
                         DN_per_proj = sigma_proj_MPs * dens * v_proj_MPs * Dt * MP_e_proj.nel_mp[:N_proj]
 
@@ -163,20 +255,6 @@ class Cross_Ionization(object):
                             MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs,
                                              z_new_MPs,vx_new_MPs, vy_new_MPs, vz_new_MPs)
 
-
-
-
-    def interp(self, energy_eV):
-        """
-        Linear interpolation of the energy - sigma curve.
-        """
-
-
-
-        index_float = (energy_eV - self.energy_eV_min) / self.delta_e
-        index_remainder, index_int = np.modf(index_float)
-        index_int = index_int.astype(int)
-        return self.sey_true[index_int] + index_remainder * self.sey_true_diff[index_int], self.sey_elast[index_int] + index_remainder * self.sey_elast_diff[index_int]
 
 
 
