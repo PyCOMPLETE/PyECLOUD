@@ -220,7 +220,7 @@ class impact_management(object):
                 vz_impact = vz_mp[flag_impact]
                 nel_impact = nel_mp[flag_impact]
 
-        # add to lifetime histogram
+                # add to lifetime histogram
                 if self.flag_lifetime_hist:
                     lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
                     if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
