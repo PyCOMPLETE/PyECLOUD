@@ -10,7 +10,7 @@ cross_ion_definitions = {
     'electrons': {
         'process e1': {'target_density': 1e10, 'products':['hydrogen', 'electrons'], 'cross_section':'hydrogen_from_electrons.mat', 'E_eV_init' : 0.1},
         'process e2': {'target_density': 1e10, 'products':['nitrogen', 'electrons'], 'cross_section':'nitrogen_from_electrons.mat', 'E_eV_init' : 0.1},
-        } 
+        }
     'nitrogen': {
         'process n1': {'target_density': 1e10, 'products':['hydrogen', 'electrons'], 'cross_section':'hydrogen_from_nitrogen.mat', 'E_eV_init' : 0.1},
         'process n2': {'target_density': 1e10, 'products':['nitrogen', 'electrons'], 'cross_section':'nitrogen_from_nitrogen.mat', 'E_eV_init' : 0.1},
@@ -272,9 +272,13 @@ class Cross_Ionization(object):
                             y_new_MPs = np.repeat(y_masked, N_mp_per_proj_int_masked)
                             z_new_MPs = np.repeat(z_masked, N_mp_per_proj_int_masked)
 
-                            vx_new_MPs = [ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5) # if you note a towards down polarization look here
-                            vy_new_MPs = [ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
-                            vz_new_MPs = [ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
+                            vx_new_MPs = np.zeros(N_new_MPs)
+                            vy_new_MPs = np.zeros(N_new_MPs)
+                            vz_new_MPs = np.zeros(N_new_MPs)
+
+                            vx_new_MPs = v0 * (rand(N_new_MPs) - 0.5) # if you note a towards down polarization look here
+                            vy_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
+                            vz_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
 
                             MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs,
                                              z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs)
