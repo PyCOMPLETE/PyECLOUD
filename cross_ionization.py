@@ -10,7 +10,7 @@ cross_ion_definitions = {
     'electrons': {
         'process e1': {'target_density': 1e10, 'products':['hydrogen', 'electrons'], 'cross_section':'hydrogen_from_electrons.mat', 'E_eV_init' : 0.1},
         'process e2': {'target_density': 1e10, 'products':['nitrogen', 'electrons'], 'cross_section':'nitrogen_from_electrons.mat', 'E_eV_init' : 0.1},
-        }
+        },
     'nitrogen': {
         'process n1': {'target_density': 1e10, 'products':['hydrogen', 'electrons'], 'cross_section':'hydrogen_from_nitrogen.mat', 'E_eV_init' : 0.1},
         'process n2': {'target_density': 1e10, 'products':['nitrogen', 'electrons'], 'cross_section':'nitrogen_from_nitrogen.mat', 'E_eV_init' : 0.1},
