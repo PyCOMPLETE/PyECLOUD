@@ -85,6 +85,7 @@ class BuildupSimulation(object):
         self.cloud_list = cloud_list
         self.chamb = cloud_list[0].impact_man.chamb
         self.checkpoint_folder = checkpoint_folder
+        self.cross_ion = cross_ion
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
@@ -143,6 +144,7 @@ class BuildupSimulation(object):
         sec_beams_list = self.sec_beams_list
         flag_multiple_clouds = self.flag_multiple_clouds
         cloud_list = self.cloud_list
+        cross_ion = self.cross_ion
 
         flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
 
@@ -226,7 +228,15 @@ class BuildupSimulation(object):
                         lam_curr_phem += sec_beam.lam_t_curr
                 phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
-            # Compute space charge field
+        # End loop over clouds
+
+        # Cross_ionization
+        if cross_ion is not None:
+           cross_ion.generate(beamtim.Dt_curr) 
+
+
+        # Compute space charge field
+        for cloud in cloud_list:
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
@@ -234,6 +244,7 @@ class BuildupSimulation(object):
 
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
+
 
         # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
