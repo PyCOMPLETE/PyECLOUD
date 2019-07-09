@@ -163,6 +163,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Parse additional cloud files
     flag_multiple_clouds = len(cc.additional_clouds_file_list) > 0
+    print('Simulation with multiple clouds!')
 
     cloud_par_list = []
     # Make parameter object for default cloud from config dict
@@ -512,11 +513,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         cloud_list.append(cloud)
 
-        # Init cross-ionization
-        if cc.cross_ion_definitions is not None:
-            cross_ion = cion.Cross_Ionization(cc.cross_ion_definitions, cloud_list)
-        else:
-            cross_ion = None
+    # Init cross-ionization
+    if cc.cross_ion_definitions is not None:
+        cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list)
+    else:
+        cross_ion = None
 
 
     return (beamtim,
