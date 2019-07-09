@@ -3,6 +3,7 @@
 # - We introduce a cloud_dict
 import scipy.io as sio
 import os
+import numpy as np
 from numpy.random import rand
 from scipy.constants import e as qe
 
@@ -19,7 +20,7 @@ cross_ion_definitions = {
 
 class Ionization_Process(object):
 
-    def __init__(self, process_name, process_definitions, cloud_dict):
+    def __init__(self, pyecl_input_folder, process_name, process_definitions, cloud_dict):
 
         # Warn if target density doesn't correspond to density of gas ionization class?
 
@@ -43,9 +44,9 @@ class Ionization_Process(object):
         cross_section_file = process_definitions['cross_section']
 
         if os.path.isfile(pyecl_input_folder + '/' + cross_section_file):
-            cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm
+            cross_section_file_path = pyecl_input_folder + '/' + cross_section_file
         elif os.path.isfile(pyecl_input_folder + '/' + cross_section_file + '.mat'):
-            cross_section_file_path = pyecl_input_folder + '/' + cc.filename_chm + '.mat'
+            cross_section_file_path = pyecl_input_folder + '/' + cross_section_file + '.mat'
         else:
             cross_section_file_path = cross_section_file
 
@@ -67,14 +68,14 @@ class Ionization_Process(object):
         flag_log = False
 
         # Check the energy step and define helpers for interp
-        x_interp = energy_eV
-        diff_x_interp = np.diff(x_interp)
+        x_interp = self.energy_eV
+        diff_x_interp = np.round(np.diff(x_interp), 3)
         delta_x_interp = diff_x_interp[0]
         x_interp_min = self.energy_eV_min
         if np.any(diff_x_interp != delta_x_interp):
             # Step not linear, check if logarithmic
-            x_interp = np.log10(energy_eV)
-            diff_x_interp = np.diff(x_interp)
+            x_interp = np.log10(self.energy_eV)
+            diff_x_interp = np.round(np.diff(x_interp), 3)
             delta_x_interp = diff_x_interp[0]
             x_interp_min = np.log10(self.energy_eV_min)
             if np.any(diff_x_interp != delta_x_interp):
@@ -98,20 +99,20 @@ class Ionization_Process(object):
 
         # For now we set sigma = 0. both below and above energies in file...
 
-        if flag_log:
+        if self.flag_log:
             x_interp_proj = np.log10(energy_eV_proj[mask_interp])
         else:
             x_interp_proj = energy_eV_proj[mask_interp]
 
         sigma_proj[mask_interp] = self._interp(x_interp_proj)
 
-        return sigma_proj
+        return sigma_proj * 1e-4 # Go from cm2 to m2
 
     def _interp(self, x_interp_proj):
         """
         Linear interpolation of the energy - sigma curve.
         """
-        index_float = (x_interp - self.x_interp_min) / self.delta_x_interp
+        index_float = (x_interp_proj - self.x_interp_min) / self.delta_x_interp
         index_remainder, index_int = np.modf(index_float)
         index_int = index_int.astype(int)
 
@@ -122,7 +123,7 @@ class Ionization_Process(object):
 
 class Cross_Ionization(object):
 
-    def __init__(self, cross_ion_definitions, cloud_list):
+    def __init__(self, pyecl_input_folder, cross_ion_definitions, cloud_list):
         
         # Assert and warn as much as wanted:
         #  - Check that projectile names and ionization product names correspond to existing clouds
@@ -139,14 +140,14 @@ class Cross_Ionization(object):
         self.projectiles_dict = {}
 
         for projectile in cross_ion_definitions.keys():
-            print('Projectile %s' %(projectile))
+            print('Projectile %s:' %(projectile))
             assert projectile in self.cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
 
             self.projectiles_dict.update({projectile : []})
 
             for process_name in cross_ion_definitions[projectile].keys():
                 process_definitions = cross_ion_definitions[projectile][process_name]
-                process = Ionization_Process(process_name, process_definitions, self.cloud_dict)
+                process = Ionization_Process(pyecl_input_folder, process_name, process_definitions, self.cloud_dict)
 
                 self.projectiles_dict[projectile].append(process)
 
@@ -220,7 +221,7 @@ class Cross_Ionization(object):
                 E_impact_eV = 0.5 * MP_e.mass / qe * v_impact_mod * v_impact_mod
                 """
 
-                for process in projectiles_dict[projectile]:
+                for process in self.projectiles_dict[projectile]:
 
                     # cross_ion_def_process = cross_ion_def_projectile[process]
 
@@ -232,7 +233,7 @@ class Cross_Ionization(object):
                     # Interpolate cross section
                     # Inspiration from sec_emission_model_from_file.py
                     
-                    sigma_proj_MPs = process.interp(E_eV_mp_proj)
+                    sigma_proj_MPs = process.get_sigma(E_eV_mp_proj)
 
                     # Compute N_mp to add
                     DN_per_proj = sigma_proj_MPs * process.target_dens * v_mp_proj * Dt * MP_e_proj.nel_mp[:N_proj]
@@ -256,6 +257,7 @@ class Cross_Ionization(object):
                         v0 = -np.sqrt(2 * (E_eV_init_gen / 3.) * qe / MP_e_gen.mass)
 
                         N_new_MPs = np.sum(N_mp_per_proj_int)
+                        print('Generating %d MPs in cloud %s' %(N_new_MPs, product))
                         if N_new_MPs > 0:
                             # Compute MP_size
                             mask_gen = N_mp_per_proj_int > 0
@@ -280,8 +282,9 @@ class Cross_Ionization(object):
                             vy_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
                             vz_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
 
-                            MP_e.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs,
-                                             z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs)
+                            t_last_impact = -1
+                            MP_e_gen.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs,
+                                                 z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, t_last_impact)
 
 
 
