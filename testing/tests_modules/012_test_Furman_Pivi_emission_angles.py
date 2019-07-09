@@ -14,6 +14,7 @@ linewid = 2
 me = 9.10938356e-31
 
 furman_pivi_surface_tweak = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -48,6 +49,7 @@ furman_pivi_surface_tweak = {
     't4': 1.}
 
 furman_pivi_surface_LHC = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -82,6 +84,7 @@ furman_pivi_surface_LHC = {
     't4': 1.}
 
 furman_pivi_surface = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
