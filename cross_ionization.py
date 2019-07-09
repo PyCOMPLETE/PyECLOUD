@@ -263,8 +263,10 @@ class Cross_Ionization(object):
                             mask_gen = N_mp_per_proj_int > 0
                             N_mp_per_proj_int_masked = N_mp_per_proj_int[mask_gen]
 
-                            nel_new_MPs = np.zeros(np.sum(mask_gen))
-                            nel_new_MPs = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
+                            nel_new_MPs_masked = np.zeros(np.sum(mask_gen))
+                            nel_new_MPs_masked = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
+
+                            nel_new_MPs = np.repeat(nel_new_MPs_masked, N_mp_per_proj_int_masked)
 
                             x_masked = MP_e_proj.x_mp[:N_proj][mask_gen]
                             y_masked = MP_e_proj.y_mp[:N_proj][mask_gen]
