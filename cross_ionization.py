@@ -156,7 +156,7 @@ class Cross_Ionization(object):
         n_rep = 100000
         Dt_test = 25e-10 #s?
         nel_mp_ref = 1.
-        energy_eV_test = np.array(list(np.arange(0, 999., 1.)) + list(np.arange(1000., 20100, 5)))
+        energy_eV_test = np.append(np.arange(0, 999., 1.), np.arange(1000., 20100, 5))
 
         self._extract_sigma(n_rep=n_rep, energy_eV=energy_eV_test, Dt=Dt_test, 
                             nel_mp_ref=nel_mp_ref, cloud_dict=cloud_dict)
