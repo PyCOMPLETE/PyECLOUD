@@ -431,6 +431,7 @@ parameters_dict = {
             'save_mp_state_time_file': (),
             'flag_detailed_MP_info': (),
             'flag_hist_impact_seg': (),
+            'flag_En_hist_seg':(),
             'flag_verbose_file': (),
             'flag_verbose_stdout': (),
             'dec_fac_secbeam_prof': (),

@@ -61,7 +61,7 @@ class impact_management(object):
         Dx_hist, scrub_en_th, Nbin_En_hist, 
         En_hist_max, Nbin_lifetime_hist = None,
         lifetime_hist_max = None, flag_lifetime_hist = False, 
-        flag_seg=False, flag_seg_ene_hist = False,
+        flag_seg=False, flag_En_hist_seg = False,
         cos_angle_width=0.05, flag_cos_angle_hist=True):
 
         print 'Start impact man. init.'
@@ -76,7 +76,7 @@ class impact_management(object):
         self.Nbin_En_hist = Nbin_En_hist
         self.En_hist_max = En_hist_max
         self.flag_seg = flag_seg
-        self.flag_seg_ene_hist = flag_seg_ene_hist
+        self.flag_En_hist_seg = flag_En_hist_seg
 
         xg_hist = np.arange(0, chamb.x_aper + 2. * Dx_hist, Dx_hist, float)
         xgr_hist = xg_hist[1:]
@@ -124,7 +124,7 @@ class impact_management(object):
             self.nel_hist_impact_seg = np.zeros(chamb.N_vert, float)
             self.nel_hist_emit_seg = np.zeros(chamb.N_vert, float)
             self.energ_eV_impact_seg = np.zeros(chamb.N_vert, float)
-            if flag_seg_ene_hist:
+            if flag_En_hist_seg:
                 self.seg_En_hist_lines = [
                         np.zeros(Nbin_En_hist, float) for _ in xrange(chamb.N_vert)]
 
@@ -258,13 +258,14 @@ class impact_management(object):
                     segi.update_seg_impact(i_found, nel_impact, self.nel_hist_impact_seg)  
                     segi.update_seg_impact(i_found, nel_impact * E_impact_eV, self.energ_eV_impact_seg)
                     
-                    if self.flag_seg_ene_hist:
+                    if self.flag_En_hist_seg:
                         for iseg in xrange(self.chamb.N_vert):
                             mask_this_seg = i_found == iseg
-                            En_imp_hist_this_seg = E_impact_eV[mask_this_seg]
-                            En_imp_hist_this_seg[En_imp_hist_this_seg > En_hist_max] = En_hist_max
-                            histf.compute_hist(En_imp_hist_this_seg, nel_impact[mask_this_seg], 0., DEn_hist, 
-                                    self.seg_En_hist_lines[iseg])
+                            if np.sum(mask_this_seg)>0:
+                                En_imp_hist_this_seg = E_impact_eV[mask_this_seg]
+                                En_imp_hist_this_seg[En_imp_hist_this_seg > En_hist_max] = En_hist_max
+                                histf.compute_hist(En_imp_hist_this_seg, nel_impact[mask_this_seg], 0., DEn_hist, 
+                                        self.seg_En_hist_lines[iseg])
 
                 En_imp_hist = E_impact_eV.copy()
                 En_imp_hist[En_imp_hist > En_hist_max] = En_hist_max
