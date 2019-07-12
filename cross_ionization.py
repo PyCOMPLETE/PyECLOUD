@@ -130,9 +130,9 @@ class Cross_Ionization(object):
         print('Initializing cross ionization.')
 
         # Make cloud dict from list
-        self.cloud_dict = {}
+        cloud_dict = {}
         for cloud in cloud_list:
-            self.cloud_dict.update({cloud.name : cloud})
+            cloud_dict.update({cloud.name : cloud})
 
         self.projectiles_dict = {}
 
@@ -141,14 +141,14 @@ class Cross_Ionization(object):
             print('Projectile %s:' %(projectile))
  
            # Check that projectile name corresponds to existing cloud
-            assert projectile in self.cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
+            assert projectile in cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
 
             self.projectiles_dict.update({projectile : []})
 
             # Init processes
             for process_name in cross_ion_definitions[projectile].keys():
                 process_definitions = cross_ion_definitions[projectile][process_name]
-                process = Ionization_Process(pyecl_input_folder, process_name, process_definitions, self.cloud_dict)
+                process = Ionization_Process(pyecl_input_folder, process_name, process_definitions, cloud_dict)
 
                 self.projectiles_dict[projectile].append(process)
 
@@ -158,19 +158,20 @@ class Cross_Ionization(object):
         nel_mp_ref = 1.
         energy_eV_test = np.array(list(np.arange(0, 999., 1.)) + list(np.arange(1000., 20100, 5)))
 
-        self._extract_sigma(n_rep=n_rep, energy_eV=energy_eV_test, Dt=Dt_test, nel_mp_ref=nel_mp_ref)
+        self._extract_sigma(n_rep=n_rep, energy_eV=energy_eV_test, Dt=Dt_test, 
+                            nel_mp_ref=nel_mp_ref, cloud_dict=cloud_dict)
 
 
     def generate(self, Dt, cloud_list):
         
         # Make cloud dict from list
-        self.cloud_dict = {}
+        cloud_dict = {}
         for cloud in cloud_list:
-            self.cloud_dict.update({cloud.name : cloud})
+            cloud_dict.update({cloud.name : cloud})
 
         for projectile in self.projectiles_dict.keys():
             
-            thiscloud_proj = self.cloud_dict[projectile]
+            thiscloud_proj = cloud_dict[projectile]
             MP_e_proj = thiscloud_proj.MP_e
             N_proj = MP_e_proj.N_mp
 
@@ -203,7 +204,7 @@ class Cross_Ionization(object):
 
                     for product in process.products:
 
-                        thiscloud_gen = self.cloud_dict[product]
+                        thiscloud_gen = cloud_dict[product]
                         MP_e_gen = thiscloud_gen.MP_e
                         nel_mp_ref_gen = MP_e_gen.nel_mp_ref
 
@@ -228,7 +229,7 @@ class Cross_Ionization(object):
                                                  vy_new_MPs, vz_new_MPs, t_last_impact)
 
 
-    def _extract_sigma(self, n_rep, energy_eV, Dt, nel_mp_ref):
+    def _extract_sigma(self, n_rep, energy_eV, Dt, nel_mp_ref, cloud_dict):
 
         nel_mp = np.ones(n_rep)
         v0 = 0.
@@ -236,7 +237,7 @@ class Cross_Ionization(object):
 
         for projectile in self.projectiles_dict.keys():
 
-            thiscloud_proj = self.cloud_dict[projectile]
+            thiscloud_proj = cloud_dict[projectile]
             MP_e_proj = thiscloud_proj.MP_e
             mass_proj = MP_e_proj.mass
 
