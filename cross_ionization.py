@@ -91,6 +91,83 @@ class Ionization_Process(object):
         self.flag_log = flag_log
 
 
+    def generate(self, Dt, cloud_dict, mass_proj, N_proj, nel_mp_proj,
+                 x_proj, y_proj, z_proj, v_mp_proj, flag_generate=True):
+
+        E_eV_mp_proj = 0.5 * mass_proj / qe * v_mp_proj * v_mp_proj
+
+        # Get sigma
+        sigma_mp_proj = self.get_sigma(energy_eV_proj=E_eV_mp_proj)
+
+        # Compute N_mp to add
+        DN_per_proj = sigma_mp_proj * self.target_dens * v_mp_proj * Dt * nel_mp_proj[:N_proj]
+
+        for product in self.products:
+
+            thiscloud_gen = cloud_dict[product]
+            MP_e_gen = thiscloud_gen.MP_e
+            nel_mp_ref_gen = MP_e_gen.nel_mp_ref
+            mass_gen = MP_e_gen.mass
+
+            # For now initialize generated MPs with velocity determined by input initial energy -
+            # similarly to gas ionization
+            v0_gen = np.sqrt(2 * (self.E_eV_init / 3.) * qe / mass_gen)
+
+            N_mp_per_proj_float = DN_per_proj / nel_mp_ref_gen
+            N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
+            rest = N_mp_per_proj_float - N_mp_per_proj_int
+            N_mp_per_proj_int = np.int_(N_mp_per_proj_int)
+            N_mp_per_proj_int += np.int_(rand(N_proj) < rest)
+
+            N_new_MPs = np.sum(N_mp_per_proj_int)
+
+            if N_new_MPs > 0:
+                mask_gen = N_mp_per_proj_int > 0
+                N_mp_per_proj_int_masked = N_mp_per_proj_int[mask_gen]
+
+                nel_new_MPs_masked = np.zeros(np.sum(mask_gen))
+                nel_new_MPs_masked = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
+
+                nel_new_MPs = np.repeat(nel_new_MPs_masked, N_mp_per_proj_int_masked)
+
+                x_masked = x_proj[mask_gen]
+                y_masked = y_proj[mask_gen]
+                z_masked = z_proj[mask_gen]
+
+                x_new_MPs = np.repeat(x_masked, N_mp_per_proj_int_masked)
+                y_new_MPs = np.repeat(y_masked, N_mp_per_proj_int_masked)
+                z_new_MPs = np.repeat(z_masked, N_mp_per_proj_int_masked)
+
+                vx_new_MPs = np.zeros(N_new_MPs)
+                vy_new_MPs = np.zeros(N_new_MPs)
+                vz_new_MPs = np.zeros(N_new_MPs)
+
+                vx_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+                vy_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+                vz_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+
+            else:
+                nel_new_MPs = np.array([])
+                x_new_MPs = np.array([])
+                y_new_MPs = np.array([])
+                z_new_MPs = np.array([])
+                vx_new_MPs = np.array([])
+                vy_new_MPs = np.array([])
+                vz_new_MPs = np.array([])
+
+            if flag_generate:
+                # Generate new MPs
+                print('Generating %d MPs in cloud %s' %(N_new_MPs, product))
+                t_last_impact = -1
+                MP_e_gen.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs,
+                                     y_new_MPs, z_new_MPs, vx_new_MPs,
+                                     vy_new_MPs, vz_new_MPs, t_last_impact)
+            else:
+                # We don't generate, just return numbers to generate
+                return N_new_MPs, nel_new_MPs
+
+
+
     def get_sigma(self, energy_eV_proj):
 
         sigma_cm2_proj = energy_eV_proj * 0.
@@ -153,13 +230,12 @@ class Cross_Ionization(object):
                 self.projectiles_dict[projectile].append(process)
 
         # Extract sigma curves for consistency checks
-        n_rep = 100000
-        Dt_test = 25e-10 #s?
-        nel_mp_ref = 1.
+        n_rep = 10000
+        Dt_test = 25e-8 #s?
         energy_eV_test = np.append(np.arange(0, 999., 1.), np.arange(1000., 20100, 5))
 
-        self._extract_sigma(n_rep=n_rep, energy_eV=energy_eV_test, Dt=Dt_test, 
-                            nel_mp_ref=nel_mp_ref, cloud_dict=cloud_dict)
+        self._extract_sigma(Dt=Dt_test, cloud_dict=cloud_dict,
+                            n_rep=n_rep, energy_eV=energy_eV_test)
 
 
     def generate(self, Dt, cloud_list):
@@ -171,81 +247,54 @@ class Cross_Ionization(object):
 
         for projectile in self.projectiles_dict.keys():
             
-            thiscloud_proj = cloud_dict[projectile]
-            MP_e_proj = thiscloud_proj.MP_e
-            N_proj = MP_e_proj.N_mp
+            thiscloud = cloud_dict[projectile]
+            MP_e = thiscloud.MP_e
+            N_mp = MP_e.N_mp
+            mass = MP_e.mass
 
-            if N_proj > 0:
+            if N_mp > 0:
 
-                x_proj = MP_e_proj.x_mp[:N_proj]
-                y_proj = MP_e_proj.y_mp[:N_proj]
-                z_proj = MP_e_proj.z_mp[:N_proj]
+                nel_mp = MP_e.nel_mp[:N_mp]
 
-                vx_mp_proj = MP_e_proj.vx_mp[:N_proj]
-                vy_mp_proj = MP_e_proj.vy_mp[:N_proj]
-                vz_mp_proj = MP_e_proj.vz_mp[:N_proj]
+                x_mp = MP_e.x_mp[:N_mp]
+                y_mp = MP_e.y_mp[:N_mp]
+                z_mp = MP_e.z_mp[:N_mp]
 
-                v_mp_proj = np.sqrt(vx_mp_proj * vx_mp_proj +
-                                    vy_mp_proj * vy_mp_proj +
-                                    vz_mp_proj * vz_mp_proj)
+                vx_mp = MP_e.vx_mp[:N_mp]
+                vy_mp = MP_e.vy_mp[:N_mp]
+                vz_mp = MP_e.vz_mp[:N_mp]
 
-                E_eV_mp_proj = 0.5 * MP_e_proj.mass / qe * v_mp_proj * v_mp_proj
-
+                v_mp = np.sqrt(vx_mp * vx_mp +
+                               vy_mp * vy_mp +
+                               vz_mp * vz_mp)
 
                 for process in self.projectiles_dict[projectile]:
 
-                    # Get sigma
-                    sigma_proj_MPs = process.get_sigma(energy_eV_proj=E_eV_mp_proj)
-
-                    # Compute N_mp to add
-                    DN_per_proj = sigma_proj_MPs * process.target_dens * v_mp_proj * Dt * MP_e_proj.nel_mp[:N_proj]
-
-                    E_eV_init_gen = process.E_eV_init
-
-                    for product in process.products:
-
-                        thiscloud_gen = cloud_dict[product]
-                        MP_e_gen = thiscloud_gen.MP_e
-                        nel_mp_ref_gen = MP_e_gen.nel_mp_ref
-
-                        # For now initialize generated MPs with velocity determined by input initial energy -
-                        # similarly to gas ionization
-                        v0_gen = -np.sqrt(2 * (E_eV_init_gen / 3.) * qe / MP_e_gen.mass)
-
-                        # Get new MP info
-                        (N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, 
-                         z_new_MPs, vx_new_MPs, vy_new_MPs,
-                         vz_new_MPs) = self._get_new_mps(DN_per_proj=DN_per_proj,
-                                                         x_proj=x_proj, y_proj=y_proj,
-                                                         z_proj=z_proj,
-                                                         nel_mp_ref=nel_mp_ref_gen,
-                                                         v0=v0_gen)
-
-                        if N_new_MPs > 0:
-                            print('Generating %d MPs in cloud %s' %(N_new_MPs, product))
-                            t_last_impact = -1
-                            MP_e_gen.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs,
-                                                 y_new_MPs, z_new_MPs, vx_new_MPs,
-                                                 vy_new_MPs, vz_new_MPs, t_last_impact)
+                    process.generate(Dt=Dt, cloud_dict=cloud_dict,
+                                     mass_proj=mass, N_proj=N_mp,
+                                     nel_mp_proj=nel_mp, x_proj=x_mp,
+                                     y_proj=y_mp, z_proj=z_mp, v_mp_proj=v_mp)
 
 
-    def _extract_sigma(self, n_rep, energy_eV, Dt, nel_mp_ref, cloud_dict):
+    def _extract_sigma(self, Dt, cloud_dict, n_rep, energy_eV):
 
-        nel_mp = np.ones(n_rep)
         v0 = 0.
         N_ene = len(energy_eV)
 
+        N_mp = n_rep
+        # nel_mp = np.ones(n_rep)
+
+        x_mp = np.zeros(n_rep)
+        y_mp = np.zeros(n_rep)
+        z_mp = np.zeros(n_rep)
+
         for projectile in self.projectiles_dict.keys():
 
-            thiscloud_proj = cloud_dict[projectile]
-            MP_e_proj = thiscloud_proj.MP_e
-            mass_proj = MP_e_proj.mass
+            thiscloud = cloud_dict[projectile]
+            mass = thiscloud.MP_e.mass
+            nel_mp = np.ones(n_rep) * thiscloud.MP_e.nel_mp_ref
 
-            x_proj = np.zeros(n_rep)
-            y_proj = np.zeros(n_rep)
-            z_proj = np.zeros(n_rep)
-
-            v_test = np.sqrt(2 * energy_eV * qe / mass_proj)
+            v_test = np.sqrt(2 * energy_eV * qe / mass)
 
             for process in self.projectiles_dict[projectile]:
 
@@ -263,80 +312,29 @@ class Cross_Ionization(object):
                         if np.mod(i_ene, N_ene / 10) == 0:
                             print ('Extracting sigma %.0f'%(float(i_ene) / float(N_ene) * 100) + """%""")
 
-                        sigma = process.get_sigma(np.array([energy]))
-                        save_dict['sigma_cm2_interp'][i_ene] = sigma * 1e4
+                        # Test process.get_sigma()
+                        sigma_m2 = process.get_sigma(np.array([energy]))
+                        save_dict['sigma_cm2_interp'][i_ene] = sigma_m2 * 1e4
+
                         v_ene = v_test[i_ene]
+                        v_mp = v_ene * np.ones(n_rep)
 
-                        # energy_array = energy * np.ones(n_rep)
-                        # v_ene_array = v_ene * np.ones(n_rep)
-                        # sigma_array = sigma * np.ones(n_rep)
-
-                        DN_per_proj = sigma * process.target_dens * v_ene * Dt * nel_mp
-
-                        (N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, 
-                         z_new_MPs, vx_new_MPs, vy_new_MPs,
-                         vz_new_MPs) = self._get_new_mps(DN_per_proj=DN_per_proj,
-                                                         x_proj=x_proj, y_proj=y_proj,
-                                                         z_proj=z_proj,
-                                                         nel_mp_ref=nel_mp_ref, v0=v0)
+                        # Test process.generate()
+                        N_new_MPs, nel_new_MPs \
+                            = process.generate(Dt, cloud_dict=cloud_dict,
+                                               mass_proj=mass, N_proj=N_mp,
+                                               nel_mp_proj=nel_mp, x_proj=x_mp,
+                                               y_proj=y_mp, z_proj=z_mp,
+                                               v_mp_proj=v_mp, flag_generate=False)
 
                         DN_gen = np.sum(nel_new_MPs) / np.sum(nel_mp)
                         if v_ene > 0:
-                            sigma_m2 = DN_gen / process.target_dens / v_ene / Dt
+                            sigma_m2_est = DN_gen / process.target_dens / v_ene / Dt
                         else:
-                            sigma_m2 = 0.
-                        save_dict['sigma_cm2_sampled'][i_ene] = sigma_m2 * 1e4
+                            sigma_m2_est = 0.
+                        save_dict['sigma_cm2_sampled'][i_ene] = sigma_m2_est * 1e4
 
                     sio.savemat(process.extract_sigma_path, save_dict, oned_as='row')
                     print('Saved extracted cross section as %s' %process.extract_sigma_path)
 
-    def _get_new_mps(self, DN_per_proj, x_proj, y_proj, z_proj, nel_mp_ref, v0):
 
-        N_proj = len(DN_per_proj)
-
-        N_mp_per_proj_float = DN_per_proj / nel_mp_ref
-        N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
-        rest = N_mp_per_proj_float - N_mp_per_proj_int
-        N_mp_per_proj_int = np.int_(N_mp_per_proj_int)
-        N_mp_per_proj_int += np.int_(rand(N_proj) < rest)
-
-        N_new_MPs = np.sum(N_mp_per_proj_int)
-
-        if N_new_MPs > 0:
-
-            mask_gen = N_mp_per_proj_int > 0
-            N_mp_per_proj_int_masked = N_mp_per_proj_int[mask_gen]
-
-            nel_new_MPs_masked = np.zeros(np.sum(mask_gen))
-            nel_new_MPs_masked = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
-
-            nel_new_MPs = np.repeat(nel_new_MPs_masked, N_mp_per_proj_int_masked)
-
-            x_masked = x_proj[mask_gen]
-            y_masked = y_proj[mask_gen]
-            z_masked = z_proj[mask_gen]
-
-            x_new_MPs = np.repeat(x_masked, N_mp_per_proj_int_masked)
-            y_new_MPs = np.repeat(y_masked, N_mp_per_proj_int_masked)
-            z_new_MPs = np.repeat(z_masked, N_mp_per_proj_int_masked)
-
-            vx_new_MPs = np.zeros(N_new_MPs)
-            vy_new_MPs = np.zeros(N_new_MPs)
-            vz_new_MPs = np.zeros(N_new_MPs)
-
-            vx_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
-            vy_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
-            vz_new_MPs = v0 * (rand(N_new_MPs) - 0.5)
-
-        else:
-
-            nel_new_MPs = np.array([])
-            x_new_MPs = np.array([])
-            y_new_MPs = np.array([])
-            z_new_MPs = np.array([])
-            vx_new_MPs = np.array([])
-            vy_new_MPs = np.array([])
-            vz_new_MPs = np.array([])
-
-        return N_new_MPs, nel_new_MPs, x_new_MPs, y_new_MPs, \
-               z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs
