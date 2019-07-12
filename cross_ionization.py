@@ -100,7 +100,9 @@ class Ionization_Process(object):
         sigma_mp_proj = self.get_sigma(energy_eV_proj=E_eV_mp_proj)
 
         # Compute N_mp to add
-        DN_per_proj = sigma_mp_proj * self.target_dens * v_mp_proj * Dt * nel_mp_proj[:N_proj]
+        DN_per_proj = sigma_mp_proj * self.target_dens * v_mp_proj * Dt * nel_mp_proj
+
+        N_proj = len(nel_mp_proj)
 
         for product in self.products:
 
@@ -125,10 +127,14 @@ class Ionization_Process(object):
                 mask_gen = N_mp_per_proj_int > 0
                 N_mp_per_proj_int_masked = N_mp_per_proj_int[mask_gen]
 
-                nel_new_MPs_masked = np.zeros(np.sum(mask_gen))
-                nel_new_MPs_masked = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
+                # nel_new_MPs_masked = np.zeros(np.sum(mask_gen))
+                # nel_new_MPs_masked = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
+                nel_new_MPs_masked = np.ones(np.sum(mask_gen)) * nel_mp_ref_gen  # alternative
 
                 nel_new_MPs = np.repeat(nel_new_MPs_masked, N_mp_per_proj_int_masked)
+
+                # print('Energy = %f, DN_per_proj = %f, nel_mp_ref = %f, N_mp_per_proj_float = %f, N_mp_per_proj_int = %.f, nel_new_mps = %f,  N_new_MPs = %d' \
+                #       %(E_eV_mp_proj[mask_gen][0], DN_per_proj[mask_gen][0], nel_mp_ref_gen, N_mp_per_proj_float[mask_gen][0], N_mp_per_proj_int[mask_gen][0], nel_new_MPs[0],  N_new_MPs))
 
                 x_masked = x_proj[mask_gen]
                 y_masked = y_proj[mask_gen]
@@ -155,7 +161,7 @@ class Ionization_Process(object):
                 vy_new_MPs = np.array([])
                 vz_new_MPs = np.array([])
 
-            if flag_generate:
+            if flag_generate and N_new_MPs > 0:
                 # Generate new MPs
                 print('Generating %d MPs in cloud %s' %(N_new_MPs, product))
                 t_last_impact = -1
@@ -230,9 +236,10 @@ class Cross_Ionization(object):
                 self.projectiles_dict[projectile].append(process)
 
         # Extract sigma curves for consistency checks
-        n_rep = 10000
-        Dt_test = 25e-8 #s?
-        energy_eV_test = np.append(np.arange(0, 999., 1.), np.arange(1000., 20100, 5))
+        n_rep = 100000
+        Dt_test = 25e-9 #s?
+        # energy_eV_test = np.append(np.arange(0, 999., 1.), np.arange(1000., 20100, 5))
+        energy_eV_test = np.logspace(np.log10(1.), np.log10(25000.), num=5000)
 
         self._extract_sigma(Dt=Dt_test, cloud_dict=cloud_dict,
                             n_rep=n_rep, energy_eV=energy_eV_test)
@@ -282,7 +289,6 @@ class Cross_Ionization(object):
         N_ene = len(energy_eV)
 
         N_mp = n_rep
-        # nel_mp = np.ones(n_rep)
 
         x_mp = np.zeros(n_rep)
         y_mp = np.zeros(n_rep)
@@ -316,10 +322,10 @@ class Cross_Ionization(object):
                         sigma_m2 = process.get_sigma(np.array([energy]))
                         save_dict['sigma_cm2_interp'][i_ene] = sigma_m2 * 1e4
 
+                        # Test process.generate()
                         v_ene = v_test[i_ene]
                         v_mp = v_ene * np.ones(n_rep)
 
-                        # Test process.generate()
                         N_new_MPs, nel_new_MPs \
                             = process.generate(Dt, cloud_dict=cloud_dict,
                                                mass_proj=mass, N_proj=N_mp,
@@ -327,9 +333,10 @@ class Cross_Ionization(object):
                                                y_proj=y_mp, z_proj=z_mp,
                                                v_mp_proj=v_mp, flag_generate=False)
 
-                        DN_gen = np.sum(nel_new_MPs) / np.sum(nel_mp)
+                        DN_gen = np.sum(nel_new_MPs)
                         if v_ene > 0:
-                            sigma_m2_est = DN_gen / process.target_dens / v_ene / Dt
+                            sigma_m2_est = DN_gen / process.target_dens / v_ene / Dt / np.sum(nel_mp)
+                            # print('DN_gen = %f, nel_mp = %f, sum(nel_mp) = %f' %(DN_gen, nel_mp[0], np.sum(nel_mp)))
                         else:
                             sigma_m2_est = 0.
                         save_dict['sigma_cm2_sampled'][i_ene] = sigma_m2_est * 1e4
