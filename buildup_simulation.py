@@ -232,7 +232,7 @@ class BuildupSimulation(object):
 
         # Cross_ionization
         if cross_ion is not None:
-           cross_ion.generate(beamtim.Dt_curr) 
+           cross_ion.generate(Dt=beamtim.Dt_curr, cloud_list=cloud_list)
 
 
         # Compute space charge field

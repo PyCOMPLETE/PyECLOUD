@@ -161,8 +161,13 @@ class Cross_Ionization(object):
         self._extract_sigma(n_rep=n_rep, energy_eV=energy_eV_test, Dt=Dt_test, nel_mp_ref=nel_mp_ref)
 
 
-    def generate(self, Dt):
+    def generate(self, Dt, cloud_list):
         
+        # Make cloud dict from list
+        self.cloud_dict = {}
+        for cloud in cloud_list:
+            self.cloud_dict.update({cloud.name : cloud})
+
         for projectile in self.projectiles_dict.keys():
             
             thiscloud_proj = self.cloud_dict[projectile]
