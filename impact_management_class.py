@@ -76,6 +76,7 @@ class impact_management(object):
         self.Nbin_En_hist = Nbin_En_hist
         self.En_hist_max = En_hist_max
         self.flag_seg = flag_seg
+        self.flag_seg_ene_hist = flag_seg_ene_hist
 
         xg_hist = np.arange(0, chamb.x_aper + 2. * Dx_hist, Dx_hist, float)
         xgr_hist = xg_hist[1:]
@@ -257,7 +258,7 @@ class impact_management(object):
                     segi.update_seg_impact(i_found, nel_impact, self.nel_hist_impact_seg)  
                     segi.update_seg_impact(i_found, nel_impact * E_impact_eV, self.energ_eV_impact_seg)
                     
-                    if flag_seg_ene_hist:
+                    if self.flag_seg_ene_hist:
                         for iseg in xrange(self.chamb.N_vert):
                             mask_this_seg = i_found == iseg
                             En_imp_hist_this_seg = E_impact_eV[mask_this_seg]
