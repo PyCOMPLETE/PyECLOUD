@@ -58,10 +58,11 @@ from scipy.constants import e as qe
 class impact_management(object):
     def __init__(
         self, chamb, sey_mod,
-        Dx_hist, scrub_en_th, Nbin_En_hist, En_hist_max, Nbin_lifetime_hist = None,
-        lifetime_hist_max = None, flag_lifetime_hist = False, flag_seg=False,
-        cos_angle_width=0.05, flag_cos_angle_hist=True
-    ):
+        Dx_hist, scrub_en_th, Nbin_En_hist, 
+        En_hist_max, Nbin_lifetime_hist = None,
+        lifetime_hist_max = None, flag_lifetime_hist = False, 
+        flag_seg=False, flag_seg_ene_hist = False,
+        cos_angle_width=0.05, flag_cos_angle_hist=True):
 
         print 'Start impact man. init.'
 
@@ -122,6 +123,9 @@ class impact_management(object):
             self.nel_hist_impact_seg = np.zeros(chamb.N_vert, float)
             self.nel_hist_emit_seg = np.zeros(chamb.N_vert, float)
             self.energ_eV_impact_seg = np.zeros(chamb.N_vert, float)
+            if flag_seg_ene_hist:
+                self.seg_En_hist_lines = [
+                        np.zeros(Nbin_En_hist, float) for _ in xrange(chamb.N_vert)]
 
         print 'Done impact man. init.'
 
@@ -136,6 +140,10 @@ class impact_management(object):
 
     def reset_En_hist_line(self):
         self.En_hist_line *= 0.
+    
+    def reset_seg_En_hist_line(self):
+        for ii in xrange(self.chamb.N_vert):
+            self.seg_En_hist_linei[ii] *= 0.
 
     def reset_hist_impact_seg(self):
         if self.flag_seg:
@@ -246,8 +254,16 @@ class impact_management(object):
                     histf.compute_hist(costheta_impact, nel_impact, 0., self.cos_angle_width, self.cos_angle_hist)
 
                 if flag_seg:
-                    segi.update_seg_impact(i_found, nel_impact, self.nel_hist_impact_seg)  # riga incriminata???
+                    segi.update_seg_impact(i_found, nel_impact, self.nel_hist_impact_seg)  
                     segi.update_seg_impact(i_found, nel_impact * E_impact_eV, self.energ_eV_impact_seg)
+                    
+                    if flag_seg_ene_hist:
+                        for iseg in xrange(self.chamb.N_vert):
+                            mask_this_seg = i_found == iseg
+                            En_imp_hist_this_seg = E_impact_eV[mask_this_seg]
+                            En_imp_hist_this_seg[En_imp_hist_this_seg > En_hist_max] = En_hist_max
+                            histf.compute_hist(En_imp_hist_this_seg, nel_impact[mask_this_seg], 0., DEn_hist, 
+                                    self.seg_En_hist_lines[iseg])
 
                 En_imp_hist = E_impact_eV.copy()
                 En_imp_hist[En_imp_hist > En_hist_max] = En_hist_max
