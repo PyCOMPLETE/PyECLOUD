@@ -142,9 +142,9 @@ class impact_management(object):
     def reset_En_hist_line(self):
         self.En_hist_line *= 0.
     
-    def reset_seg_En_hist_line(self):
+    def reset_seg_En_hist_lines(self):
         for ii in xrange(self.chamb.N_vert):
-            self.seg_En_hist_linei[ii] *= 0.
+            self.seg_En_hist_lines[ii] *= 0.
 
     def reset_hist_impact_seg(self):
         if self.flag_seg:
