@@ -425,6 +425,7 @@ class pyecloud_saver:
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
                     'En_g_hist': self.En_g_hist,
                     'En_hist': self.En_hist,
+                    'En_hist_seg': self.En_hist_seg,
                     'all_Ekin_hist': self.all_Ekin_hist,
                     't_En_hist': self.t_En_hist,
                     'b_spac': self.b_spac,
