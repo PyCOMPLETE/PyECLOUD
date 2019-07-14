@@ -20,4 +20,4 @@ sim = BuildupSimulation(pyecl_input_folder=sim_input_folder,
         En_hist_max= 2500.,  #eV 
         save_once_custom_observables=save_once_custom_observables)
 
-sim.run(t_end_sim=300e-9)
+sim.run(t_end_sim=None)
