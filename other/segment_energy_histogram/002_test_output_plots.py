@@ -22,6 +22,7 @@ for ii, xx in enumerate(x_spectrum):
     mask = np.abs(mid_x - xx) < Dx_plot # It is meant to overlap a bit
     spec = np.sum(np.sum(ob.En_hist_seg[mask, :, :], axis=0), axis=0)
     spec /= np.sum(spec)
+    spec /= (ob.En_g_hist[1] - ob.En_g_hist[0])
     spectra.append(spec)
 
 fig10 = plt.figure(10)
@@ -33,12 +34,19 @@ for ii, xx in enumerate(x_spectrum):
             color=col, linewidth=2., label='%.1f mm'%(xx*1e3))
 
 fig11 = plt.figure(11)
+fig11.set_facecolor('w')
 ax11 = fig11.add_subplot(1,1,1)
-ax11.semilogy(ob.xg_hist*1e3, np.sum(ob.nel_impact_hist_tot, axis=0),
-        linewidth=2.)
+hor_distr = np.sum(ob.nel_impact_hist_tot, axis=0)/(ob.xg_hist[1]-ob.xg_hist[0])
+ax11.plot(ob.xg_hist*1e3, hor_distr, linewidth=2.)
+ax11.grid(True)
+ax11.set_xlim(np.min(ob.xg_hist)*1e3+1, np.max(ob.xg_hist)*1e3-1)
+ax11.set_xlabel('x [mm]')
+ax11.set_ylabel('Normalized electron flux')
+
+fig11.subplots_adjust(bottom=.14)
 
 ax10.legend(prop={'size':16})
-ax10.set_ylim(bottom=1e-4)
+ax10.set_ylim(bottom=1e-5)
 ax10.grid(True)
 ax10.set_ylabel('Normalized energy spectrum')
 ax10.set_xlabel('Energy [eV]')
