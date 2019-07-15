@@ -127,9 +127,7 @@ class Ionization_Process(object):
                 mask_gen = N_mp_per_proj_int > 0
                 N_mp_per_proj_int_masked = N_mp_per_proj_int[mask_gen]
 
-                # nel_new_MPs_masked = np.zeros(np.sum(mask_gen))
-                # nel_new_MPs_masked = DN_per_proj[mask_gen] / np.float_(N_mp_per_proj_int_masked)
-                nel_new_MPs_masked = np.ones(np.sum(mask_gen)) * nel_mp_ref_gen  # alternative
+                nel_new_MPs_masked = np.ones(np.sum(mask_gen)) * nel_mp_ref_gen
 
                 nel_new_MPs = np.repeat(nel_new_MPs_masked, N_mp_per_proj_int_masked)
 
