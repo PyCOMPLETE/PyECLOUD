@@ -58,7 +58,6 @@ class Ionization_Process(object):
 
         self.energy_eV_min = self.energy_eV.min()
         self.energy_eV_max = self.energy_eV.max()
-        # Warn if minimum energy is not 0??
 
         # sey_diff is needed by the interp function
         # A 0 is appended because this last element is never needed but the array must have the correct shape
