@@ -228,14 +228,13 @@ class BuildupSimulation(object):
                         lam_curr_phem += sec_beam.lam_t_curr
                 phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
-        # End loop over clouds
 
-        # Cross_ionization
+        ## Cross_ionization
         if cross_ion is not None:
            cross_ion.generate(Dt=beamtim.Dt_curr, cloud_list=cloud_list)
 
 
-        # Compute space charge field
+        ## Compute space charge field
         for cloud in cloud_list:
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
@@ -245,11 +244,10 @@ class BuildupSimulation(object):
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
 
-
+        ## Saving output
         # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
         for cloud in cloud_list:
-
             if cloud.pyeclsaver is not None:
                 # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
                 #     raise ValueError('Saving with custom steps not implemented!')
@@ -258,19 +256,19 @@ class BuildupSimulation(object):
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
                                                             sec_beams_list, cloud_list, buildup_sim=self, rho_cloud=cloud.rho)
 
+        ## Cleaning and regeneration
+        for cloud in cloud_list:
             ## Every bunch passage
             if beamtim.flag_new_bunch_pass:
-
                 ## Clean
                 if not skip_MP_cleaning:
                     cloud.MP_e.clean_small_MPs()
-
                 if not skip_MP_regen:
                     ## Regeneration
                     cloud.MP_e.check_for_regeneration()
-
                     ## Soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
+
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
 
@@ -305,6 +303,7 @@ class BuildupSimulation(object):
         self.spacech_ele.PyPICobj.build_sparse_solver()
         print 'Done reload.'
         return dict_state
+
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):
         print('Reloading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint))
