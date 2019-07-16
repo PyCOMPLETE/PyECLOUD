@@ -89,6 +89,11 @@ class Ionization_Process(object):
         self.x_interp_min = x_interp_min
         self.flag_log = flag_log
 
+        # Initialize dictionary for quantities to save
+        save_data = {}
+        for product in self.products:
+            save_data[product] = {}
+
 
     def generate(self, Dt, cloud_dict, mass_proj, N_proj, nel_mp_proj,
                  x_proj, y_proj, z_proj, v_mp_proj, flag_generate=True):
@@ -103,7 +108,11 @@ class Ionization_Process(object):
 
         N_proj = len(nel_mp_proj)
 
+        new_mp_info = {}
+
         for product in self.products:
+
+            new_mp_info[product] = {}
 
             thiscloud_gen = cloud_dict[product]
             MP_e_gen = thiscloud_gen.MP_e
@@ -155,16 +164,28 @@ class Ionization_Process(object):
                 vy_new_MPs = np.array([])
                 vz_new_MPs = np.array([])
 
-            if flag_generate:
-                if N_new_MPs > 0:
-                    # Generate new MPs
-                    t_last_impact = -1
-                    MP_e_gen.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs,
-                                         y_new_MPs, z_new_MPs, vx_new_MPs,
-                                         vy_new_MPs, vz_new_MPs, t_last_impact)
-            else:
-                # No MPs generated, just return numbers to generate
-                return N_new_MPs, nel_new_MPs
+            mp_info_product = new_mp_info[product]
+            mp_info_product['N_new_MPs'] = N_new_MPs
+            mp_info_product['nel_new_MPs'] = nel_new_MPs
+            mp_info_product['x_new_MPs'] = x_new_MPs
+            mp_info_product['y_new_MPs'] = y_new_MPs
+            mp_info_product['z_new_MPs'] = z_new_MPs
+            mp_info_product['vx_new_MPs'] = vx_new_MPs
+            mp_info_product['vy_new_MPs'] = vy_new_MPs
+            mp_info_product['vz_new_MPs'] = vz_new_MPs
+
+        return new_mp_info
+
+            # if flag_generate:
+            #     if N_new_MPs > 0:
+            #         # Generate new MPs
+            #         t_last_impact = -1
+            #         MP_e_gen.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs,
+            #                              y_new_MPs, z_new_MPs, vx_new_MPs,
+            #                              vy_new_MPs, vz_new_MPs, t_last_impact)
+            # else:
+            #     # No MPs generated, just return numbers to generate
+            #     return N_new_MPs, nel_new_MPs
 
 
 
@@ -212,8 +233,9 @@ class Cross_Ionization(object):
             cloud_dict.update({cloud.name : cloud})
 
         self.projectiles_dict = {}
+        self.products = []
 
-        # Init projectiles
+        # Init projectiles and make list of products
         for projectile in cross_ion_definitions.keys():
             print('Projectile %s:' %(projectile))
  
@@ -228,6 +250,12 @@ class Cross_Ionization(object):
                 process = Ionization_Process(pyecl_input_folder, process_name, process_definitions, cloud_dict)
 
                 self.projectiles_dict[projectile].append(process)
+
+                for product in process.products:
+                    if product not in self.products:
+                        self.products.append(product)
+
+        # self.new_mps_dict = self._init_new_product_mp_dict(self.products)
 
         # Extract sigma curves for consistency checks
         n_rep = 10000
@@ -244,6 +272,8 @@ class Cross_Ionization(object):
         cloud_dict = {}
         for cloud in cloud_list:
             cloud_dict.update({cloud.name : cloud})
+
+        new_mps_to_gen = self._init_new_mp_dict(self.products)
 
         for projectile in self.projectiles_dict.keys():
             
@@ -270,10 +300,33 @@ class Cross_Ionization(object):
 
                 for process in self.projectiles_dict[projectile]:
 
-                    process.generate(Dt=Dt, cloud_dict=cloud_dict,
-                                     mass_proj=mass, N_proj=N_mp,
-                                     nel_mp_proj=nel_mp, x_proj=x_mp,
-                                     y_proj=y_mp, z_proj=z_mp, v_mp_proj=v_mp)
+                    mp_info_from_proc = process.generate(Dt=Dt, cloud_dict=cloud_dict,
+                                                         mass_proj=mass, N_proj=N_mp,
+                                                         nel_mp_proj=nel_mp,
+                                                         x_proj=x_mp, y_proj=y_mp,
+                                                         z_proj=z_mp, v_mp_proj=v_mp)
+
+
+                    for product in mp_info_from_proc.keys():
+                        self._add_to_mp_dict(new_mps_to_gen[product], mp_info_from_proc[product])
+                        # new_mps_to_gen[product] = self._add_to_mp_dict(new_mps_to_gen[product], mp_info_from_proc[product])
+
+        t_last_impact = -1
+        for thiscloud in cloud_list:
+            if thiscloud.name in self.products:
+                MP_e = thiscloud.MP_e
+                new_mps = new_mps_to_gen[thiscloud.name]
+
+                if new_mps['N_new_MPs'] > 0:
+                    MP_e.add_new_MPs(new_mps['N_new_MPs'],
+                                     new_mps['nel_new_MPs'],
+                                     new_mps['x_new_MPs'],
+                                     new_mps['y_new_MPs'],
+                                     new_mps['z_new_MPs'],
+                                     new_mps['vx_new_MPs'],
+                                     new_mps['vy_new_MPs'],
+                                     new_mps['vz_new_MPs'],
+                                     t_last_impact)
 
 
     def _extract_sigma(self, Dt, cloud_dict, n_rep, energy_eV):
@@ -304,7 +357,9 @@ class Cross_Ionization(object):
                     save_dict = {}
                     save_dict['energy_eV'] = energy_eV
                     save_dict['sigma_cm2_interp'] = np.zeros(len(energy_eV))
-                    save_dict['sigma_cm2_sampled'] = np.zeros(len(energy_eV))
+                    for product in process.products:
+                        this_sigma_name = 'sigma_cm2_sampled_%s' %(product)
+                        save_dict[this_sigma_name] = np.zeros(len(energy_eV))
 
                     for i_ene, energy in enumerate(energy_eV):
 
@@ -319,21 +374,67 @@ class Cross_Ionization(object):
                         v_ene = v_test[i_ene]
                         v_mp = v_ene * np.ones(n_rep)
 
-                        N_new_MPs, nel_new_MPs \
-                            = process.generate(Dt, cloud_dict=cloud_dict,
-                                               mass_proj=mass, N_proj=N_mp,
-                                               nel_mp_proj=nel_mp, x_proj=x_mp,
-                                               y_proj=y_mp, z_proj=z_mp,
-                                               v_mp_proj=v_mp, flag_generate=False)
+                        mp_info_from_proc = process.generate(Dt, cloud_dict=cloud_dict,
+                                                             mass_proj=mass, N_proj=N_mp,
+                                                             nel_mp_proj=nel_mp, x_proj=x_mp,
+                                                             y_proj=y_mp, z_proj=z_mp,
+                                                             v_mp_proj=v_mp, flag_generate=False)
 
-                        DN_gen = np.sum(nel_new_MPs)
-                        if v_ene > 0:
-                            sigma_m2_est = DN_gen / process.target_dens / v_ene / Dt / np.sum(nel_mp)
-                        else:
-                            sigma_m2_est = 0.
-                        save_dict['sigma_cm2_sampled'][i_ene] = sigma_m2_est * 1e4
+                        for product in mp_info_from_proc.keys():
+                            DN_gen = np.sum(mp_info_from_proc[product]['nel_new_MPs'])
+                            if v_ene > 0:
+                                sigma_m2_est = DN_gen / process.target_dens / v_ene / Dt / np.sum(nel_mp)
+                            else:
+                                sigma_m2_est = 0.
+                            this_sigma_name = 'sigma_cm2_sampled_%s' %(product)
+                            save_dict[this_sigma_name][i_ene] = sigma_m2_est * 1e4
 
                     sio.savemat(process.extract_sigma_path, save_dict, oned_as='row')
                     print('Saved extracted cross section as %s' %process.extract_sigma_path)
 
+
+    def _init_new_mp_dict(self, products):
+        # Init new MP dictionary for products
+        new_mp_dict = {}
+        mp_dict_keys = ['N_new_MPs', 'nel_new_MPs', 'x_new_MPs', 'y_new_MPs',
+                        'z_new_MPs', 'vx_new_MPs', 'vy_new_MPs', 'vz_new_MPs']
+        for product in products:
+            new_mp_dict[product] = {}
+            # mp_dict_prod = new_mp_dict[product]
+            for key in mp_dict_keys:
+                if key == 'N_new_MPs':
+                    new_mp_dict[product][key] = 0
+                else:
+                    new_mp_dict[product][key] =  np.array([])
+
+            # mp_dict_prod['N_new_MPs'] = 0
+            # mp_dict_prod['nel_new_MPs'] = np.array([])
+            # mp_dict_prod['x_new_MPs'] = np.array([])
+            # mp_dict_prod['y_new_MPs'] = np.array([])
+            # mp_dict_prod['z_new_MPs'] = np.array([])
+            # mp_dict_prod['vx_new_MPs'] = np.array([])
+            # mp_dict_prod['vy_new_MPs'] = np.array([])
+            # mp_dict_prod['vz_new_MPs'] = np.array([])
+
+        return new_mp_dict
+
+
+    def _add_to_mp_dict(self, mp_dict, dict_to_add):
+        #sum_dict = {}
+        for key in mp_dict.keys():
+            if key == 'N_new_MPs':
+                mp_dict[key] += dict_to_add['N_new_MPs']
+            else:
+                mp_dict[key] = np.append(mp_dict[key], dict_to_add[key])
+
+        # mp_dict['N_new_MPs'] = mp_dict['N_new_MPs'] + dict_to_add['N_new_MPs']
+        # mp_dict['nel_new_MPs'] =  np.append(mp_dict['nel_new_MPs'], dict_to_add['nel_new_MPs'])
+        # mp_dict['x_new_MPs'] =  np.append(mp_dict['x_new_MPs'], dict_to_add['x_new_MPs'])
+        # mp_dict['y_new_MPs'] =  np.append(mp_dict['y_new_MPs'], dict_to_add['y_new_MPs'])
+        # mp_dict['z_new_MPs'] =  np.append(mp_dict['z_new_MPs'], dict_to_add['z_new_MPs'])
+        # mp_dict['vx_new_MPs'] =  np.append(mp_dict['vx_new_MPs'], dict_to_add['vx_new_MPs'])
+        # mp_dict['vy_new_MPs'] =  np.append(mp_dict['vy_new_MPs'], dict_to_add['vy_new_MPs'])
+        # mp_dict['vz_new_MPs'] =  np.append(mp_dict['vz_new_MPs'], dict_to_add['vz_new_MPs'])
+
+        #return sum_dict
 
