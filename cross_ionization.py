@@ -89,11 +89,6 @@ class Ionization_Process(object):
         self.x_interp_min = x_interp_min
         self.flag_log = flag_log
 
-        # Initialize dictionary for quantities to save
-        save_data = {}
-        for product in self.products:
-            save_data[product] = {}
-
 
     def generate(self, Dt, cloud_dict, mass_proj, N_proj, nel_mp_proj,
                  x_proj, y_proj, z_proj, v_mp_proj, flag_generate=True):
@@ -164,29 +159,16 @@ class Ionization_Process(object):
                 vy_new_MPs = np.array([])
                 vz_new_MPs = np.array([])
 
-            mp_info_product = new_mp_info[product]
-            mp_info_product['N_new_MPs'] = N_new_MPs
-            mp_info_product['nel_new_MPs'] = nel_new_MPs
-            mp_info_product['x_new_MPs'] = x_new_MPs
-            mp_info_product['y_new_MPs'] = y_new_MPs
-            mp_info_product['z_new_MPs'] = z_new_MPs
-            mp_info_product['vx_new_MPs'] = vx_new_MPs
-            mp_info_product['vy_new_MPs'] = vy_new_MPs
-            mp_info_product['vz_new_MPs'] = vz_new_MPs
+            new_mp_info[product]['N_new_MPs'] = N_new_MPs
+            new_mp_info[product]['nel_new_MPs'] = nel_new_MPs
+            new_mp_info[product]['x_new_MPs'] = x_new_MPs
+            new_mp_info[product]['y_new_MPs'] = y_new_MPs
+            new_mp_info[product]['z_new_MPs'] = z_new_MPs
+            new_mp_info[product]['vx_new_MPs'] = vx_new_MPs
+            new_mp_info[product]['vy_new_MPs'] = vy_new_MPs
+            new_mp_info[product]['vz_new_MPs'] = vz_new_MPs
 
         return new_mp_info
-
-            # if flag_generate:
-            #     if N_new_MPs > 0:
-            #         # Generate new MPs
-            #         t_last_impact = -1
-            #         MP_e_gen.add_new_MPs(N_new_MPs, nel_new_MPs, x_new_MPs,
-            #                              y_new_MPs, z_new_MPs, vx_new_MPs,
-            #                              vy_new_MPs, vz_new_MPs, t_last_impact)
-            # else:
-            #     # No MPs generated, just return numbers to generate
-            #     return N_new_MPs, nel_new_MPs
-
 
 
     def get_sigma(self, energy_eV_proj):
@@ -255,8 +237,6 @@ class Cross_Ionization(object):
                     if product not in self.products:
                         self.products.append(product)
 
-        # self.new_mps_dict = self._init_new_product_mp_dict(self.products)
-
         # Extract sigma curves for consistency checks
         n_rep = 10000
         Dt_test = 25e-11
@@ -264,6 +244,13 @@ class Cross_Ionization(object):
 
         self._extract_sigma(Dt=Dt_test, cloud_dict=cloud_dict,
                             n_rep=n_rep, energy_eV=energy_eV_test)
+
+        # Initialize dictionary for quantities to save
+        self.save_data = {}
+        for product in self.products:
+            self.save_data[product] = {}
+            self.save_data[product]['N_mp'] = 0
+            self.save_data[product]['N_el'] = np.array([])
 
 
     def generate(self, Dt, cloud_list):
@@ -300,16 +287,19 @@ class Cross_Ionization(object):
 
                 for process in self.projectiles_dict[projectile]:
 
-                    mp_info_from_proc = process.generate(Dt=Dt, cloud_dict=cloud_dict,
-                                                         mass_proj=mass, N_proj=N_mp,
+                    mp_info_from_proc = process.generate(Dt=Dt,
+                                                         cloud_dict=cloud_dict,
+                                                         mass_proj=mass,
+                                                         N_proj=N_mp,
                                                          nel_mp_proj=nel_mp,
-                                                         x_proj=x_mp, y_proj=y_mp,
-                                                         z_proj=z_mp, v_mp_proj=v_mp)
+                                                         x_proj=x_mp,
+                                                         y_proj=y_mp,
+                                                         z_proj=z_mp,
+                                                         v_mp_proj=v_mp)
 
-
-                    for product in mp_info_from_proc.keys():
-                        self._add_to_mp_dict(new_mps_to_gen[product], mp_info_from_proc[product])
-                        # new_mps_to_gen[product] = self._add_to_mp_dict(new_mps_to_gen[product], mp_info_from_proc[product])
+                    for product in process.products:
+                        self._add_to_mp_dict(new_mps_to_gen[product],
+                                             mp_info_from_proc[product])
 
         t_last_impact = -1
         for thiscloud in cloud_list:
@@ -400,21 +390,11 @@ class Cross_Ionization(object):
                         'z_new_MPs', 'vx_new_MPs', 'vy_new_MPs', 'vz_new_MPs']
         for product in products:
             new_mp_dict[product] = {}
-            # mp_dict_prod = new_mp_dict[product]
             for key in mp_dict_keys:
                 if key == 'N_new_MPs':
                     new_mp_dict[product][key] = 0
                 else:
                     new_mp_dict[product][key] =  np.array([])
-
-            # mp_dict_prod['N_new_MPs'] = 0
-            # mp_dict_prod['nel_new_MPs'] = np.array([])
-            # mp_dict_prod['x_new_MPs'] = np.array([])
-            # mp_dict_prod['y_new_MPs'] = np.array([])
-            # mp_dict_prod['z_new_MPs'] = np.array([])
-            # mp_dict_prod['vx_new_MPs'] = np.array([])
-            # mp_dict_prod['vy_new_MPs'] = np.array([])
-            # mp_dict_prod['vz_new_MPs'] = np.array([])
 
         return new_mp_dict
 
@@ -426,15 +406,4 @@ class Cross_Ionization(object):
                 mp_dict[key] += dict_to_add['N_new_MPs']
             else:
                 mp_dict[key] = np.append(mp_dict[key], dict_to_add[key])
-
-        # mp_dict['N_new_MPs'] = mp_dict['N_new_MPs'] + dict_to_add['N_new_MPs']
-        # mp_dict['nel_new_MPs'] =  np.append(mp_dict['nel_new_MPs'], dict_to_add['nel_new_MPs'])
-        # mp_dict['x_new_MPs'] =  np.append(mp_dict['x_new_MPs'], dict_to_add['x_new_MPs'])
-        # mp_dict['y_new_MPs'] =  np.append(mp_dict['y_new_MPs'], dict_to_add['y_new_MPs'])
-        # mp_dict['z_new_MPs'] =  np.append(mp_dict['z_new_MPs'], dict_to_add['z_new_MPs'])
-        # mp_dict['vx_new_MPs'] =  np.append(mp_dict['vx_new_MPs'], dict_to_add['vx_new_MPs'])
-        # mp_dict['vy_new_MPs'] =  np.append(mp_dict['vy_new_MPs'], dict_to_add['vy_new_MPs'])
-        # mp_dict['vz_new_MPs'] =  np.append(mp_dict['vz_new_MPs'], dict_to_add['vz_new_MPs'])
-
-        #return sum_dict
 
