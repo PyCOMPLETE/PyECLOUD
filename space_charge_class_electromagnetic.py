@@ -73,7 +73,7 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ay = self.PyPICobj.get_state_object()
         self.state_As = self.PyPICobj.get_state_object()
         sys.stdout = sys.__stdout__
-        
+
         self.state_Ax_old = None
         self.state_Ay_old = None
 
@@ -81,7 +81,6 @@ class space_charge_electromagnetic(space_charge, object):
         self.beta = np.sqrt(1-1/(gamma*gamma))
 
     def recompute_spchg_emfield(self, MP_e, flag_solve=True, flag_reset=True):
-<<<<<<< HEAD
         #update the old states before scattering
         text_trap = StringIO()
         sys.stdout = text_trap
@@ -89,16 +88,6 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ay_old = self.state_Ay.get_state_object()
         sys.stdout = sys.__stdout__
 
-        # scatter rho
-=======
-        #update the old states before scattering 
-       	text_trap = StringIO()
-	sys.stdout = text_trap
-	self.state_Ax_old = self.state_Ax.get_state_object()
-        self.state_Ay_old = self.state_Ay.get_state_object()
-        sys.stdout = sys.__stdout__
-	# scatter rho
->>>>>>> 952f5b82c57ad297451af4465f4e0feb499ca513
         self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
 
