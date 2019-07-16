@@ -53,6 +53,8 @@ import numpy as np
 from space_charge_class import space_charge
 from scipy.constants import c, epsilon_0, mu_0, e
 import int_field_for as iff
+import sys
+from io import BytesIO as StringIO
 
 na = lambda x: np.array([x])
 
@@ -65,10 +67,13 @@ class space_charge_electromagnetic(space_charge, object):
                      f_telescope, target_grid, N_nodes_discard, N_min_Dh_main)
 
         self.flag_em_tracking = True
-
+        text_trap = StringIO()
+        sys.stdout = text_trap
         self.state_Ax = self.PyPICobj.get_state_object()
         self.state_Ay = self.PyPICobj.get_state_object()
         self.state_As = self.PyPICobj.get_state_object()
+        sys.stdout = sys.__stdout__
+        
         self.state_Ax_old = None
         self.state_Ay_old = None
 
@@ -76,9 +81,13 @@ class space_charge_electromagnetic(space_charge, object):
         self.beta = np.sqrt(1-1/(gamma*gamma))
 
     def recompute_spchg_emfield(self, MP_e, flag_solve=True, flag_reset=True):
-        #update the old states before scattering 
+        #update the old states before scattering
+        text_trap = StringIO()
+        sys.stdout = text_trap
         self.state_Ax_old = self.state_Ax.get_state_object()
         self.state_Ay_old = self.state_Ay.get_state_object()
+        sys.stdout = sys.__stdout__
+
         # scatter rho
         self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
