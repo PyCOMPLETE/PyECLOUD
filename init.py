@@ -268,6 +268,10 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                                            f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
 
+    flag_cross_ion = False
+    if cc.cross_ion_definitions is not None:
+        flag_cross_ion = True
+
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
     for cloud_par in cloud_par_list:
@@ -457,7 +461,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        extract_ene_dist=cc.extract_ene_dist,
                                        ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
                                        Nbin_extract_ene=cc.Nbin_extract_ene,
-                                       factor_ene_dist_max=cc.factor_ene_dist_max
+                                       factor_ene_dist_max=cc.factor_ene_dist_max,
+                                       flag_cross_ion=flag_cross_ion
                                        )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
@@ -514,7 +519,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         cloud_list.append(cloud)
 
     # Init cross-ionization
-    if cc.cross_ion_definitions is not None:
+    if flag_cross_ion:
         cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list)
     else:
         cross_ion = None

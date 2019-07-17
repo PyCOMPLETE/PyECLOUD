@@ -206,7 +206,7 @@ class Ionization_Process(object):
 class Cross_Ionization(object):
 
     def __init__(self, pyecl_input_folder, cross_ion_definitions, cloud_list,
-                 nel_rep_test=10000, Dt_test=25e-11,
+                 n_rep_test=10000, Dt_test=25e-11,
                  energy_eV_test=np.logspace(np.log10(1.), np.log10(25000.), num=5000)):
         
         print('Initializing cross ionization.')
@@ -244,11 +244,9 @@ class Cross_Ionization(object):
                             n_rep=n_rep_test, energy_eV=energy_eV_test)
 
         # Initialize dictionary for quantities to save
-        self.save_data = {}
-        for product in self.products:
-            self.save_data[product] = {}
-            self.save_data[product]['N_mp'] = 0
-            self.save_data[product]['N_el'] = np.array([])
+        self.nel_cross_ion = {}
+        for cloud in cloud_list:
+            self.nel_cross_ion[cloud.name] = 0.
 
 
     def generate(self, Dt, cloud_list):
@@ -315,6 +313,19 @@ class Cross_Ionization(object):
                                      new_mps['vy_new_MPs'],
                                      new_mps['vz_new_MPs'],
                                      t_last_impact)
+
+                # Add to saved data
+                self.nel_cross_ion[thiscloud.name] += np.sum(new_mps['nel_new_MPs'])
+            else:
+                self.nel_cross_ion[thiscloud.name] += 0.
+
+
+    def get_nel_cross_ion(self, cloud_name):
+
+        thiscloud_nel_cross_ion = self.nel_cross_ion[cloud_name]
+        self.nel_cross_ion[cloud_name] = 0.
+
+        return thiscloud_nel_cross_ion
 
 
     def _extract_sigma(self, Dt, cloud_dict, n_rep, energy_eV):
