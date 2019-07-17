@@ -205,7 +205,9 @@ class Ionization_Process(object):
 
 class Cross_Ionization(object):
 
-    def __init__(self, pyecl_input_folder, cross_ion_definitions, cloud_list):
+    def __init__(self, pyecl_input_folder, cross_ion_definitions, cloud_list,
+                 nel_rep_test=10000, Dt_test=25e-11,
+                 energy_eV_test=np.logspace(np.log10(1.), np.log10(25000.), num=5000)):
         
         print('Initializing cross ionization.')
 
@@ -238,12 +240,8 @@ class Cross_Ionization(object):
                         self.products.append(product)
 
         # Extract sigma curves for consistency checks
-        n_rep = 10000
-        Dt_test = 25e-11
-        energy_eV_test = np.logspace(np.log10(1.), np.log10(25000.), num=5000)
-
         self._extract_sigma(Dt=Dt_test, cloud_dict=cloud_dict,
-                            n_rep=n_rep, energy_eV=energy_eV_test)
+                            n_rep=n_rep_test, energy_eV=energy_eV_test)
 
         # Initialize dictionary for quantities to save
         self.save_data = {}
