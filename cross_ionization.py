@@ -1,6 +1,3 @@
-### Some thoughts:
-# - Input in the machine parameters
-# - We introduce a cloud_dict
 import scipy.io as sio
 import os
 import numpy as np
@@ -13,9 +10,6 @@ class Ionization_Process(object):
     def __init__(self, pyecl_input_folder, process_name, process_definitions, cloud_dict):
 
         # Warn if target density doesn't correspond to density of gas ionization class?
-
-        # Decide where to take into account the mass of the projectile (if not electrons, what do you need to do?)
-        # - Use actual mass of projectile here (i.e. make sure that cross sections contain scaling to electron mass if needed)
 
         self.name = process_name
         print('Init process %s' % self.name)
@@ -56,16 +50,15 @@ class Ionization_Process(object):
         self.energy_eV = cross_section['energy_eV'].squeeze()
         self.sigma_cm2 = cross_section['cross_section_cm2'].squeeze()
 
+        # Check the energy step and define helpers for interp
         self.energy_eV_min = self.energy_eV.min()
         self.energy_eV_max = self.energy_eV.max()
 
-        # sey_diff is needed by the interp function
-        # A 0 is appended because this last element is never needed but the array must have the correct shape
         self.sigma_cm2_diff = np.append(np.diff(self.sigma_cm2), 0.)
+        # A 0 is appended to give the array the correct shape
 
         flag_log = False
 
-        # Check the energy step and define helpers for interp
         ndec_round_x = 8
         x_interp = self.energy_eV
         diff_x_interp = np.round(np.diff(x_interp), ndec_round_x)
@@ -98,7 +91,6 @@ class Ionization_Process(object):
         # Get sigma
         sigma_mp_proj = self.get_sigma(energy_eV_proj=E_eV_mp_proj)
 
-        # Compute N_mp to add
         DN_per_proj = sigma_mp_proj * self.target_dens * v_mp_proj * Dt * nel_mp_proj
 
         N_proj = len(nel_mp_proj)
@@ -114,10 +106,10 @@ class Ionization_Process(object):
             nel_mp_ref_gen = MP_e_gen.nel_mp_ref
             mass_gen = MP_e_gen.mass
 
-            # For now initialize generated MPs with velocity determined by input initial energy -
-            # similarly to gas ionization
+            # Initialize generated MPs with energy defined by user 
             v0_gen = np.sqrt(2 * (self.E_eV_init / 3.) * qe / mass_gen)
 
+            # Compute N_mp to add
             N_mp_per_proj_float = DN_per_proj / nel_mp_ref_gen
             N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
             rest = N_mp_per_proj_float - N_mp_per_proj_int
@@ -258,8 +250,7 @@ class Cross_Ionization(object):
 
         new_mps_to_gen = self._init_new_mp_dict(self.products)
 
-        for projectile in self.projectiles_dict.keys():
-            
+        for projectile in self.projectiles_dict.keys():            
             thiscloud = cloud_dict[projectile]
             MP_e = thiscloud.MP_e
             N_mp = MP_e.N_mp
