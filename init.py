@@ -378,7 +378,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
         # Init impact management
-        flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+        flag_seg = (thiscloud.flag_hist_impact_seg == 1 or thiscloud.flag_hist_impact_seg is True)
 
         if flag_seg and cc.chamb_type == 'ellip':
             print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
@@ -397,7 +397,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         impact_man = impact_man_class(chamb, sey_mod,
                                       thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
                                       cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
-                                      flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
+                                      flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
+                                      cos_angle_width=cc.cos_angle_width,
                                       )
 
         # Init gas ionization and photoemission
