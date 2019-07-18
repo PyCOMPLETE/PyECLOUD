@@ -260,6 +260,9 @@ class BuildupSimulation(object):
                     ## Soft regeneration
                     cloud.MP_e.check_for_soft_regeneration()
 
+            cloud.MP_e.check_for_async_regeneration()
+
+
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
 
         with open(load_from_folder + filename_simulation_state, 'rb') as fid:

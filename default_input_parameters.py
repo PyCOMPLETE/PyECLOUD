@@ -62,6 +62,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
+            'N_mp_async_regen': None,
+            'N_mp_after_async_regen': None,
             'stopfile': 'stop',
 
             # Saving settings
@@ -342,6 +344,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': (),
             'N_mp_after_soft_regen': (),
+            'N_mp_async_regen': (),
+            'N_mp_after_async_regen': (),
 
             # Tracking and magnetic field
             'N_sub_steps': (),

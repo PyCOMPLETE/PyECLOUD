@@ -286,6 +286,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Dx_hist, thiscloud.Nx_regen, thiscloud.Ny_regen, thiscloud.Nvx_regen,
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
+                             N_mp_async_regen=thiscloud.N_mp_async_regen, N_mp_after_async_regen=thiscloud.N_mp_after_async_regen,
                              charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist)
 
         # Init secondary emission object
