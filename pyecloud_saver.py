@@ -324,14 +324,13 @@ class pyecloud_saver:
         self.nel_hist_impact_seg = -1
         self.nel_hist_emit_seg = -1
         self.energ_eV_impact_seg = -1
+        self.En_hist_seg = -1
         if impact_man.flag_seg:
             self.nel_hist_impact_seg = []
             self.nel_hist_emit_seg = []
             self.energ_eV_impact_seg = []
             if impact_man.flag_En_hist_seg:
                 self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
-            else:
-                self.En_hist_seg = -1
             
         # detailed hist
         self.flag_hist_det = False
