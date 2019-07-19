@@ -331,7 +331,7 @@ class pyecloud_saver:
             if impact_man.flag_En_hist_seg:
                 self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
             else:
-                self.En_hist_seg = []
+                self.En_hist_seg = -1
             
         # detailed hist
         self.flag_hist_det = False
