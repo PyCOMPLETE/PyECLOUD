@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.0.1
+#                   PyECLOUD Version 8.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -95,7 +95,7 @@ class pyecloud_saver:
 
         if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
-                flog.write('PyECLOUD Version 8.0.1\n')
+                flog.write('PyECLOUD Version 8.1.0\n')
                 flog.write('%s\n' % git_hash)
                 flog.write('%s\n' % git_branch)
                 flog.write('Simulation started on %s\n' % timestr)
@@ -327,14 +327,13 @@ class pyecloud_saver:
         self.nel_hist_impact_seg = -1
         self.nel_hist_emit_seg = -1
         self.energ_eV_impact_seg = -1
+        self.En_hist_seg = -1
         if impact_man.flag_seg:
             self.nel_hist_impact_seg = []
             self.nel_hist_emit_seg = []
             self.energ_eV_impact_seg = []
             if impact_man.flag_En_hist_seg:
                 self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
-            else:
-                self.En_hist_seg = []
             
         # detailed hist
         self.flag_hist_det = False
