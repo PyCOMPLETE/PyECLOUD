@@ -62,6 +62,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
+            'N_mp_async_regen': None,
+            'N_mp_after_async_regen': None,
             'stopfile': 'stop',
 
             # Saving settings
@@ -73,6 +75,7 @@ parameters_dict = {
             'save_mp_state_time_file': -1,
             'flag_detailed_MP_info': 0,
             'flag_hist_impact_seg': 1,
+            'flag_En_hist_seg': False,
             'flag_verbose_file': False,
             'flag_verbose_stdout': False,
             'dec_fac_secbeam_prof': 1,
@@ -345,6 +348,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': (),
             'N_mp_after_soft_regen': (),
+            'N_mp_async_regen': (),
+            'N_mp_after_async_regen': (),
 
             # Tracking and magnetic field
             'N_sub_steps': (),
@@ -433,6 +438,7 @@ parameters_dict = {
             'save_mp_state_time_file': (),
             'flag_detailed_MP_info': (),
             'flag_hist_impact_seg': (),
+            'flag_En_hist_seg':(),
             'flag_verbose_file': (),
             'flag_verbose_stdout': (),
             'dec_fac_secbeam_prof': (),

@@ -66,7 +66,9 @@ class MP_system:
     def __init__(self, N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                  N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                  Dx_hist_reg, Nx_reg, Ny_reg, Nvx_reg, Nvy_reg, Nvz_reg, regen_hist_cut, chamb,
-                 N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e, flag_lifetime_hist = False):
+                 N_mp_soft_regen=None, N_mp_after_soft_regen=None,
+                 N_mp_async_regen=None, N_mp_after_async_regen=None,
+                 charge=-e, mass=m_e, flag_lifetime_hist = False):
 
         N_mp_max = int(N_mp_max)
         self.x_mp = np.zeros(N_mp_max, float)
@@ -122,6 +124,12 @@ class MP_system:
             self.N_mp_soft_regen = N_mp_soft_regen
             self.N_mp_after_soft_regen = N_mp_after_soft_regen
 
+        self.flag_async_regen = False
+        if (N_mp_async_regen is not None) and (N_mp_after_async_regen is not None):
+            self.flag_async_regen = True
+            self.N_mp_async_regen = N_mp_async_regen
+            self.N_mp_after_async_regen = N_mp_after_async_regen
+
     def clean_small_MPs(self):
 
         print "Start clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
@@ -151,15 +159,13 @@ class MP_system:
         self.nel_mp_split = self.fact_split * val
         self.nel_mp_cl_th = self.fact_clean * val
 
-    def check_for_soft_regeneration(self):
+    def perform_soft_regeneration(self, target_N_mp):
 
-        if self.flag_soft_regen:
-
-            if self.N_mp > self.N_mp_soft_regen:
+            if self.N_mp > target_N_mp:
                 chrg = np.sum(self.nel_mp)
                 erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
 
-                new_nel_mp_ref = chrg / self.N_mp_after_soft_regen
+                new_nel_mp_ref = chrg / target_N_mp
                 if new_nel_mp_ref < self.nel_mp_ref_0:
                     new_nel_mp_ref = self.nel_mp_ref_0
 
@@ -168,7 +174,7 @@ class MP_system:
 
                 self.set_nel_mp_ref(new_nel_mp_ref)
 
-                death_prob = float(self.N_mp - self.N_mp_after_soft_regen) / float(self.N_mp)
+                death_prob = float(self.N_mp - target_N_mp) / float(self.N_mp)
 
                 flag_keep = np.array(len(self.x_mp) * [False])
                 flag_keep[:self.N_mp] = (rand(self.N_mp) > death_prob)
@@ -199,6 +205,19 @@ class MP_system:
                 chrg = np.sum(self.nel_mp)
                 erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
                 print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg)
+
+    def check_for_soft_regeneration(self):
+
+        if self.flag_soft_regen:
+            if self.N_mp > self.N_mp_soft_regen:
+                self.perform_soft_regeneration(target_N_mp=self.N_mp_after_soft_regen)
+
+    def check_for_async_regeneration(self):
+
+        if self.flag_async_regen:
+            if self.N_mp > self.N_mp_async_regen:
+                print('Asynchronous regeneration.')
+                self.perform_soft_regeneration(target_N_mp=self.N_mp_after_async_regen)
 
     def check_for_regeneration(self):
 

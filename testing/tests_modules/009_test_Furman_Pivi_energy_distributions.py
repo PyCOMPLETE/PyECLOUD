@@ -23,6 +23,7 @@ linewid = 2
 me = 9.10938356e-31
 
 furman_pivi_surface_tweak = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -57,6 +58,7 @@ furman_pivi_surface_tweak = {
     't4': 1.}
 
 furman_pivi_surface_LHC = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -91,6 +93,7 @@ furman_pivi_surface_LHC = {
     't4': 1.}
 
 furman_pivi_surface = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -204,13 +207,19 @@ plt.subplots_adjust(right=0.97, left=.09)
 plt.suptitle(r'Energy distribution extraction tests: Furman-Pivi model, $E_0 = %.1f eV$' % E_0_single, fontsize=30)
 
 plt.figure(2, figsize=(12, 9), facecolor='white')
+ms.mystyle(35)
+fontsz = 65
+N_plots = sey_mod.M_cut
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
+    colorcurr = ms.colorprog(M - 1, N_plots)
     prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts_prime, nn=M, E_0=E_0_single, energy=energy)
-    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid)
-plt.legend()
-plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
-plt.xlabel('Energy [eV]', fontsize=sz - 10)
-plt.ylabel('Normalised energy spectrum', fontsize=sz - 10)
+    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid, color=colorcurr)
+plt.legend(fontsize=sz - 8)
+# plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
+plt.xlabel('Energy [eV]', fontsize=sz)
+plt.ylabel('Normalised energy spectrum', fontsize=sz)
+plt.text(20, 0.25, r'$F_{n,ts}$', fontsize=fontsz)
 plt.grid(alpha=.5)
+plt.subplots_adjust(left=0.15, bottom=0.13, right=0.97, top=0.96)
 
 plt.show()
