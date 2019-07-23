@@ -151,6 +151,7 @@ class impact_management_perfect_absorber(impact_management):
                 vy_mp[self.flag_impact] = 0.
                 vz_mp[self.flag_impact] = 0.
                 nel_mp[self.flag_impact] = 0.
+                N_mp = N_mp_old - Nimpact
 
                 MP_e.x_mp = x_mp
                 MP_e.y_mp = y_mp
