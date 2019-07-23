@@ -394,7 +394,7 @@ class Cross_Ionization(object):
                 if key == 'N_new_MPs':
                     new_mp_dict[product][key] = 0
                 else:
-                    new_mp_dict[product][key] =  np.array([])
+                    new_mp_dict[product][key] = np.array([])
 
         return new_mp_dict
 
