@@ -229,7 +229,7 @@ class impact_management(object):
                 vz_impact = vz_mp[flag_impact]
                 nel_impact = nel_mp[flag_impact]
 
-        # add to lifetime histogram
+                # add to lifetime histogram
                 if self.flag_lifetime_hist:
                     lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
                     if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
@@ -274,10 +274,13 @@ class impact_management(object):
                 self.Nel_impact_last_step = np.sum(nel_impact)
                 self.En_imp_last_step_eV = np.sum(E_impact_eV * nel_impact)
 
-                nel_emit_tot_events, event_type, event_info,\
-                    nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
-                    nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs =\
-                    sey_mod.impacts_on_surface(
+                # Call secondary emission model
+                (nel_emit_tot_events, event_type, event_info,
+                    nel_replace, x_replace, y_replace, z_replace,
+                    vx_replace, vy_replace, vz_replace, i_seg_replace,
+                    nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs,
+                    vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs,
+                    ) = sey_mod.impacts_on_surface(
                         MP_e.mass, nel_impact, x_impact, y_impact, z_impact,
                         vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
                         v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg
