@@ -1097,13 +1097,12 @@ class pyecloud_saver:
                 impact_man.reset_cos_angle_hist()
 
             # Histogram of the kinetic energy of all the particles
-            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
-            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
-            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
-            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
             N_mp = MP_e.N_mp
+            v_mod_square = MP_e.vx_mp[:N_mp]**2 + MP_e.vy_mp[:N_mp]**2 + MP_e.vz_mp[:N_mp]**2
+            Ekin = 0.5 * MP_e.mass/qe * v_mod_square
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
             if N_mp > 0:
-                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+                histf.compute_hist(Ekin, MP_e.nel_mp[:N_mp], 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
             
             # Energy histogram per segment
