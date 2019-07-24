@@ -384,22 +384,16 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
             flag_seg = False
 
-
-        if thiscloud.switch_model == 'perfect_absorber':
-            impact_man_class = pac.impact_management_perfect_absorber
-        else:
-            impact_man_class = imc.impact_management
-
         if cc.flag_lifetime_hist:
             if cc.Nbin_lifetime_hist is None or cc.lifetime_hist_max is None or cc.Dt_lifetime_hist is None:
-                raise inp_spec.PyECLOUD_ConfigException('If flag_lifetime_hist is True then all the histogram parameters must be specified')
+                raise inp_spec.PyECLOUD_ConfigException(
+                        'If flag_lifetime_hist is True then all the histogram parameters must be specified')
 
-        impact_man = impact_man_class(chamb, sey_mod,
-                                      thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
-                                      cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
-                                      flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
-                                      cos_angle_width=cc.cos_angle_width,
-                                      )
+        impact_man = imc.impact_management(chamb, sey_mod,
+            thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
+            cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
+            flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
+            cos_angle_width=cc.cos_angle_width)
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag == 1:

@@ -107,8 +107,7 @@ class SEY_model_perfect_absorber(object):
         # extended_event_type keeps track of the event type for new MPs, it is
         # needed for the extraction of emission-energy distributions.
 
-        event_info = {'extended_event_type': 'absorbed',
-                      }
+        event_info = {'extended_event_type': event_type}
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
