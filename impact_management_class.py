@@ -1,4 +1,4 @@
-# -Begin-preamble-------------------------------------------------------
+#-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -47,7 +47,7 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-# -End-preamble---------------------------------------------------------
+#-End-preamble---------------------------------------------------------
 
 import numpy as np
 import hist_for as histf
