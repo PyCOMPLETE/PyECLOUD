@@ -184,7 +184,9 @@ class impact_management(object):
             vy_mp = MP_e.vy_mp
             vz_mp = MP_e.vz_mp
             nel_mp = MP_e.nel_mp
+            
             N_mp_old = MP_e.N_mp
+            
             nel_mp_th = MP_e.nel_mp_split
             chamb = self.chamb
             sey_mod = self.sey_mod
@@ -233,7 +235,9 @@ class impact_management(object):
                 if self.flag_lifetime_hist:
                     lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
                     if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
-                        histf.compute_hist(lifetime_impact[MP_e.t_last_impact[flag_impact] > 0], nel_impact[MP_e.t_last_impact[flag_impact] > 0], 0., Dt_lifetime_hist, self.lifetime_hist_line)
+                        histf.compute_hist(lifetime_impact[MP_e.t_last_impact[flag_impact] > 0],
+                                nel_impact[MP_e.t_last_impact[flag_impact] > 0], 
+                                0., Dt_lifetime_hist, self.lifetime_hist_line)
 
                     MP_e.t_last_impact[flag_impact] = tt_curr
 
