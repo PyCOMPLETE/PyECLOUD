@@ -69,6 +69,7 @@ from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
 from sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from sec_emission_model_perfect_absorber import SEY_model_perfect_absorber
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
@@ -78,7 +79,6 @@ import dynamics_Boris_multipole as dynmul
 import MP_system as MPs
 import space_charge_class as scc
 import impact_management_class as imc
-import perfect_absorber_class as pac
 import pyecloud_saver as pysav
 import gas_ionization_class as gic
 import gen_photoemission_class as gpc
@@ -291,7 +291,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
-            sey_mod = pac.Dummy_SEY()
+            sey_mod = SEY_model_perfect_absorber()
         else:
 
             kwargs_secem = {}
