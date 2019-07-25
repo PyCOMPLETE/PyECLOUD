@@ -263,14 +263,14 @@ class BuildupSimulation(object):
             if beamtim.flag_new_bunch_pass:
                 ## Clean
                 if not skip_MP_cleaning:
-                    cloud.MP_e.clean_small_MPs(cloud.name)
+                    cloud.MP_e.clean_small_MPs()
                 if not skip_MP_regen:
                     ## Regeneration
-                    cloud.MP_e.check_for_regeneration(cloud.name)
+                    cloud.MP_e.check_for_regeneration()
                     ## Soft regeneration
-                    cloud.MP_e.check_for_soft_regeneration(cloud.name)
+                    cloud.MP_e.check_for_soft_regeneration()
 
-            cloud.MP_e.check_for_async_regeneration(cloud.name)
+            cloud.MP_e.check_for_async_regeneration()
 
 
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
