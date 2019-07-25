@@ -584,6 +584,7 @@ class pyecloud_saver:
                                      't']
 
         saved_every_passage_list = ['En_hist',
+                                    'all_Ekin_hist',
                                     't_En_hist',
                                     'N_mp_corrected_pass',
                                     'N_mp_impact_pass',
