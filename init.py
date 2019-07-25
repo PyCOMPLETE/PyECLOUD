@@ -451,7 +451,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        extract_ene_dist=cc.extract_ene_dist,
                                        ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
                                        Nbin_extract_ene=cc.Nbin_extract_ene,
-                                       factor_ene_dist_max=cc.factor_ene_dist_max
+                                       factor_ene_dist_max=cc.factor_ene_dist_max,
+                                       save_only = thiscloud.save_only
                                        )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
