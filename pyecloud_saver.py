@@ -123,10 +123,13 @@ class pyecloud_saver:
                         ene_dist_test_E_impact_eV=None,
                         Nbin_extract_ene=None,
                         factor_ene_dist_max=None,
+                        save_only=None,
                         ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        self.save_only = save_only
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
@@ -484,6 +487,12 @@ class pyecloud_saver:
 
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
+
+        if self.save_only is not None:
+            old_dict = saved_dict
+            saved_dict = {}
+            for kk in self.save_only:
+                saved_dict[kk] = old_dict[kk]
 
         return saved_dict
 
