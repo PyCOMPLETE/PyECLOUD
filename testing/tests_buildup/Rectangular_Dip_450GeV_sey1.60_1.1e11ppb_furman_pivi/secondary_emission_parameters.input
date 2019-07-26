@@ -21,6 +21,7 @@ secondary_angle_distribution = 'cosine_3D'
 
 import numpy as np
 furman_pivi_surface = {
+'use_modified_sigmaE': False,
 'use_ECLOUD_theta0_dependence': False,
 'use_ECLOUD_energy': False,
 'conserve_energy': False,

@@ -13,6 +13,7 @@ me = 9.10938356e-31
 alpha = 0.9
 
 furman_pivi_surface_LHC = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,

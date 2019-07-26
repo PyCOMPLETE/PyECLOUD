@@ -58,8 +58,33 @@ from scipy.special import gammaincinv
 from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
-from scipy.misc import factorial
 import electron_emission as ee
+
+_factorial = np.array([1,
+                       1,
+                       2,
+                       6,
+                       24,
+                       120,
+                       720,
+                       5040,
+                       40320,
+                       362880,
+                       3628800,
+                       39916800,
+                       479001600,
+                       6227020800,
+                       87178291200,
+                       1307674368000,
+                       20922789888000,
+                       355687428096000,
+                       6402373705728000,
+                       121645100408832000,
+                       2432902008176640000])
+
+
+def factorial(n):
+    return _factorial[np.array(n)]
 
 
 class SEY_model_furman_pivi():
@@ -92,6 +117,7 @@ class SEY_model_furman_pivi():
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
         # General FP model parameters
+        self.use_modified_sigmaE = furman_pivi_surface['use_modified_sigmaE']
         self.use_ECLOUD_theta0_dependence = furman_pivi_surface['use_ECLOUD_theta0_dependence']
         self.use_ECLOUD_energy = furman_pivi_surface['use_ECLOUD_energy']
         self.conserve_energy = furman_pivi_surface['conserve_energy']
@@ -252,7 +278,16 @@ class SEY_model_furman_pivi():
         """
         sqrt2 = np.sqrt(2)
         uu = random.rand(len(E_0))
-        return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
+
+        if self.use_modified_sigmaE:
+            aa = 1.88
+            bb = 2.5
+            cc = 1e-2
+            dd = 1.5e2
+            sigmaE_modified = (self.sigmaE - aa) + bb * (1 + np.tanh(cc * (E_0 - dd)))
+            return E_0 + sqrt2 * sigmaE_modified * erfinv((uu - 1) * erf(E_0 / (sqrt2 * sigmaE_modified)))
+        else:
+            return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
 
     def get_energy_rediffused(self, E0):
         """
@@ -491,8 +526,17 @@ class SEY_model_furman_pivi():
     #  The following functions are not used in the simulation code but are     #
     #  provided here for use in tests and development.                         #
     ############################################################################
-    def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
+    def backscattered_energy_PDF(self, energy, E_0):
         """The PDF for backscattered electrons."""
+        if self.use_modified_sigmaE:
+            aa = 1.88
+            bb = 2.5
+            cc = 1e-2
+            dd = 1.5e2
+            sigmaE_modified = (self.sigmaE - aa) + bb * (1 + np.tanh(cc * (E_0 - dd)))
+            sigma_e = sigmaE_modified
+        else:
+            sigma_e = self.sigmaE
         ene = energy - E_0
         a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
         c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))
