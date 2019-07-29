@@ -124,10 +124,13 @@ class pyecloud_saver:
                         Nbin_extract_ene=None,
                         factor_ene_dist_max=None,
                         flag_cross_ion=False,
+                        save_only=None,
                         ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        self.save_only = save_only
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
@@ -488,6 +491,12 @@ class pyecloud_saver:
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
 
+        if self.save_only is not None:
+            old_dict = saved_dict
+            saved_dict = {}
+            for kk in self.save_only:
+                saved_dict[kk] = old_dict[kk]
+
         return saved_dict
 
     def _checkpoint_init(self, checkpoint_DT, checkpoint_folder):
@@ -588,6 +597,7 @@ class pyecloud_saver:
                                      't']
 
         saved_every_passage_list = ['En_hist',
+                                    'all_Ekin_hist',
                                     't_En_hist',
                                     'N_mp_corrected_pass',
                                     'N_mp_impact_pass',
@@ -1115,13 +1125,12 @@ class pyecloud_saver:
                 impact_man.reset_cos_angle_hist()
 
             # Histogram of the kinetic energy of all the particles
-            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
-            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
-            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
-            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
             N_mp = MP_e.N_mp
+            v_mod_square = MP_e.vx_mp[:N_mp]**2 + MP_e.vy_mp[:N_mp]**2 + MP_e.vz_mp[:N_mp]**2
+            Ekin = 0.5 * MP_e.mass/qe * v_mod_square
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
             if N_mp > 0:
-                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+                histf.compute_hist(Ekin, MP_e.nel_mp[:N_mp], 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
             
             # Energy histogram per segment

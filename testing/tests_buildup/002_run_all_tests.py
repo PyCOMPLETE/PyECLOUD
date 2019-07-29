@@ -42,11 +42,15 @@ else:
     dists = [args.angle_dist_func]
 
 for ctr, sim_folder in enumerate(all_sim_folders):
+    test_script = './000_run_simulation.py'
+    if sim_folder.endswith('checkpoint'):
+        test_script = './000b_run_test_checkpoint.py'
     for dist in dists:
         for cmd in [
-            'python ./000_run_simulation.py --folder %s --angle-dist-func %s' % (sim_folder, dist),
+            'python %s --folder %s --angle-dist-func %s' % (test_script, sim_folder, dist),
             'python ./001_comparison_against_reference.py --folder %s --angle-dist-func %s' % (sim_folder, dist)
         ]:
+            print(cmd)
             status = os.system(cmd)
             if status != 0:
                 raise SystemError('%s finished with status %i' % (cmd, status))

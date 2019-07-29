@@ -68,6 +68,7 @@ parameters_dict = {
 
             # Saving settings
             'filen_main_outp': 'Pyecltest.mat',
+            'save_only': None,
             'flag_movie': 0,
             'flag_sc_movie': 0,
             'flag_cos_angle_hist': True,
@@ -334,6 +335,8 @@ parameters_dict = {
         },
         'optional': {
 
+            'save_only': (),
+            
             # MP management settings
             'N_mp_max': (),
             'N_mp_regen': (),
