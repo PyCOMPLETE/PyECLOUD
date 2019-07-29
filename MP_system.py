@@ -218,6 +218,7 @@ class MP_system:
         if self.flag_async_regen:
             if self.N_mp > self.N_mp_async_regen:
                 print('Cloud %s: Asynchronous regeneration.' %self.name)
+                self.clean_small_MPs()
                 self.perform_soft_regeneration(target_N_mp=self.N_mp_after_async_regen)
 
     def check_for_regeneration(self):
