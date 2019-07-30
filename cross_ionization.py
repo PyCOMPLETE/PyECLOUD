@@ -7,13 +7,20 @@ from scipy.constants import e as qe
 
 class Ionization_Process(object):
 
-    def __init__(self, pyecl_input_folder, process_name, process_definitions, cloud_dict):
+    def __init__(self, pyecl_input_folder, process_name, process_definitions, cloud_dict, target_area):
 
         # Warn if target density doesn't correspond to density of gas ionization class?
 
         self.name = process_name
         print('Init process %s' % self.name)
+
         self.target_dens = process_definitions['target_density']
+        print('Target density = %.2e' %(self.target_dens))
+        self.last_reported_target_dens = self.target_dens
+
+        self.target_area = target_area
+        self.N_target = self.target_dens * target_area
+
         self.E_eV_init = process_definitions['E_eV_init']
 
         if 'extract_sigma' in process_definitions.keys():
@@ -94,6 +101,15 @@ class Ionization_Process(object):
         DN_per_proj = sigma_mp_proj * self.target_dens * v_mp_proj * Dt * nel_mp_proj
 
         N_proj = len(nel_mp_proj)
+
+        # Calculate remaining density
+        DN_target = np.sum(DN_per_proj)
+        self.N_target -=  DN_target
+        self.target_dens = self.N_target / self.target_area
+
+        if self.target_dens < 0.1 * self.last_reported_target_dens:
+            print('Cross-ionization process %s target density = %.2e' %(self.name, self.target_dens))
+            self.last_reported_target_dens = self.target_dens
 
         new_mp_info = {}
 
@@ -198,7 +214,7 @@ class Ionization_Process(object):
 class Cross_Ionization(object):
 
     def __init__(self, pyecl_input_folder, cross_ion_definitions, cloud_list,
-                 n_rep_test=10000, Dt_test=25e-11,
+                 chamber_area, n_rep_test=10000, Dt_test=25e-11,
                  energy_eV_test=np.logspace(np.log10(1.), np.log10(25000.), num=5000)):
         
         print('Initializing cross ionization.')
@@ -223,7 +239,8 @@ class Cross_Ionization(object):
             # Init processes
             for process_name in cross_ion_definitions[projectile].keys():
                 process_definitions = cross_ion_definitions[projectile][process_name]
-                process = Ionization_Process(pyecl_input_folder, process_name, process_definitions, cloud_dict)
+                process = Ionization_Process(pyecl_input_folder, process_name,
+                                             process_definitions, cloud_dict, chamber_area)
 
                 self.projectiles_dict[projectile].append(process)
 

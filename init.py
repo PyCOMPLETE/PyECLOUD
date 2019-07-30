@@ -518,7 +518,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     # Init cross-ionization
     if flag_cross_ion:
-        cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list)
+        cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list, chamb.area)
     else:
         cross_ion = None
 
