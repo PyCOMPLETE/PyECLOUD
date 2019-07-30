@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.0.1
+#                   PyECLOUD Version 8.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -95,7 +95,7 @@ class pyecloud_saver:
 
         if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
-                flog.write('PyECLOUD Version 8.0.1\n')
+                flog.write('PyECLOUD Version 8.1.0\n')
                 flog.write('%s\n' % git_hash)
                 flog.write('%s\n' % git_branch)
                 flog.write('Simulation started on %s\n' % timestr)
@@ -123,10 +123,13 @@ class pyecloud_saver:
                         ene_dist_test_E_impact_eV=None,
                         Nbin_extract_ene=None,
                         factor_ene_dist_max=None,
+                        save_only=None,
                         ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        self.save_only = save_only
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
@@ -321,15 +324,17 @@ class pyecloud_saver:
         self.N_mp_pass = []
         self.N_mp_ref_pass = []
 
+        self.nel_hist_impact_seg = -1
+        self.nel_hist_emit_seg = -1
+        self.energ_eV_impact_seg = -1
+        self.En_hist_seg = -1
         if impact_man.flag_seg:
-           self.nel_hist_impact_seg = []
-           self.nel_hist_emit_seg = []
-           self.energ_eV_impact_seg = []
-        else:
-           self.nel_hist_impact_seg = -1
-           self.nel_hist_emit_seg = -1
-           self.energ_eV_impact_seg = -1
-
+            self.nel_hist_impact_seg = []
+            self.nel_hist_emit_seg = []
+            self.energ_eV_impact_seg = []
+            if impact_man.flag_En_hist_seg:
+                self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
+            
         # detailed hist
         self.flag_hist_det = False
         self.xg_hist_det = -1
@@ -423,6 +428,7 @@ class pyecloud_saver:
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
                     'En_g_hist': self.En_g_hist,
                     'En_hist': self.En_hist,
+                    'En_hist_seg': self.En_hist_seg,
                     'all_Ekin_hist': self.all_Ekin_hist,
                     't_En_hist': self.t_En_hist,
                     'b_spac': self.b_spac,
@@ -481,6 +487,12 @@ class pyecloud_saver:
 
         for kk in saved_dict.keys():
             saved_dict[kk] = np.array(saved_dict[kk])
+
+        if self.save_only is not None:
+            old_dict = saved_dict
+            saved_dict = {}
+            for kk in self.save_only:
+                saved_dict[kk] = old_dict[kk]
 
         return saved_dict
 
@@ -581,6 +593,7 @@ class pyecloud_saver:
                                      't']
 
         saved_every_passage_list = ['En_hist',
+                                    'all_Ekin_hist',
                                     't_En_hist',
                                     'N_mp_corrected_pass',
                                     'N_mp_impact_pass',
@@ -1094,14 +1107,21 @@ class pyecloud_saver:
                 impact_man.reset_cos_angle_hist()
 
             # Histogram of the kinetic energy of all the particles
-            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
-            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
-            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
-            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
             N_mp = MP_e.N_mp
+            v_mod_square = MP_e.vx_mp[:N_mp]**2 + MP_e.vy_mp[:N_mp]**2 + MP_e.vz_mp[:N_mp]**2
+            Ekin = 0.5 * MP_e.mass/qe * v_mod_square
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
             if N_mp > 0:
-                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+                histf.compute_hist(Ekin, MP_e.nel_mp[:N_mp], 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
+            
+            # Energy histogram per segment
+            if impact_man.flag_seg:
+                if impact_man.flag_En_hist_seg:
+                    for iseg in xrange(impact_man.chamb.N_vert):
+                        self.En_hist_seg[iseg].append(impact_man.seg_En_hist_lines[iseg].copy())
+                    impact_man.reset_seg_En_hist_lines()
+
 
         # Lifetime histogram saver
         if self.flag_lifetime_hist:
@@ -1110,4 +1130,5 @@ class pyecloud_saver:
                 self.t_lifetime_hist.append(beamtim.tt_curr)
                 impact_man.reset_lifetime_hist_line()
                 self.t_last_lifetime_hist = beamtim.tt_curr
+
 

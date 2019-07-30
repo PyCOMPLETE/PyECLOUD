@@ -180,12 +180,16 @@ primary electrons are not generated and beam forces on the electrons are neglect
 \textbf{nel\_mp\_ref\_0}&	[e-/m] Initial MP size.\\ \hline
 \textbf{Nx\_regen, Ny\_regen, Nvx\_regen, Nvy\_regen, Nvz\_regen}&	Number of mesh points in each dimension for the generation of the uniform grid for the 5-D phase space used for the MP regeneration.\\ \hline
 \textbf{regen\_hist\_cut}&	Defines a threshold value for the phase space density, below which no electrons are generated.\\ \hline
-\textbf{N\_mp\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it)
+\textbf{N\_mp\_soft\_regen}&	(optional: by default soft regeneration is not applied, the presence of these inputs enables it)
 
 Soft regeneration threshold. The check is performed at each t=n*b\_spac with n an integer. N\_mp\_soft\_regen should be smaller than N\_mp\_regen.\\ \hline
-\textbf{N\_mp\_after\_soft\_regen}&	(optional: by default soft regen is not applied, the presence of these inputs enables it)
+\textbf{N\_mp\_after\_soft\_regen}&	(optional: by default soft regeneration is not applied, the presence of these inputs enables it)
 
 Target number of MPs obtained after a soft regeneration.\\
+\hline
+\textbf{N\_mp\_async\_regen, N\_mp\_after\_async\_regen}& (optional: by default asynchronous soft regeneration is not applied, the presence of these inputs enables it)
+
+Parameters for asynchronous soft regeneration (the simulation does not wait for the next bunch passage to regenerate). \\
 \hline
 \end{longtable}
 
@@ -227,12 +231,14 @@ Target number of MPs obtained after a soft regeneration.\\
 \textbf{Saving settings}
 }\\ \hline
     \textbf{filen\_main\_outp} & Main output filename or path. (optional - default 'Pyecltest.mat') \\ \hline
+    \textbf{save\_only} & Define subset of output variables to be saved, other variables are discarded. (optional - default None) \\ \hline
     \textbf{dec\_fact\_out} & Output is saved only for every nth time step. \\ \hline
 \textbf{Dx\_hist}& 	[m] Defines the binning for the saving of the horizontal histograms.\\ \hline
 \textbf{r\_center}&	[m] Radius of a circle around the (0, 0) point (center of the chamber) for the calculation of the local central density.\\ \hline
 \textbf{Dt\_En\_hist}&	[s] Time step used to store the energy spectrum  of the electrons impacting on the chamber.\\ \hline
 \textbf{Nbin\_En\_hist}&	Number of bins used for the energy histogram.\\ \hline
 \textbf{En\_hist\_max}& 	[eV] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the histogram.	\\ \hline
+\textbf{flag\_En\_hist\_seg}& (optional -- default False) If enabled, energy histograms per segment are saved.	\\ \hline
 \textbf{flag\_lifetime\_hist}&   If set to True enables lifetime histogram (optional -- default=False).\\ \hline
 \multicolumn{2}{p{.97\textwidth}}{If \textbf{flag\_lifetime\_hist} is set to True, the variables \textbf{Dt\_lifetime\_hist}, \textbf{Nbin\_lifetime\_hist} and \textbf{lifetime\_hist\_max} need to be set.}\\ \hline
 \textbf{Dt\_lifetime\_hist}&	[s] Time step used to store the histogram of the electrons lifetime.\\ \hline
@@ -699,6 +705,7 @@ Parameters for true secondaries. To be specified in furman\_pivi\_surface.
 \hline
 \end{longtable}
 
+\clearpage
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
