@@ -254,8 +254,10 @@ class Cross_Ionization(object):
 
         # Initialize dictionary for quantities to save
         self.nel_cross_ion = {}
+        self.N_mp_cross_ion = {}
         for cloud in cloud_list:
             self.nel_cross_ion[cloud.name] = 0.
+            self.N_mp_cross_ion[cloud.name] = 0
 
 
     def generate(self, Dt, cloud_list):
@@ -324,16 +326,20 @@ class Cross_Ionization(object):
 
                 # Add to saved data
                 self.nel_cross_ion[thiscloud.name] += np.sum(new_mps['nel_new_MPs'])
+                self.N_mp_cross_ion[thiscloud.name] += new_mps['N_new_MPs']
             else:
                 self.nel_cross_ion[thiscloud.name] += 0.
+                self.N_mp_cross_ion[thiscloud.name] += 0
 
 
-    def get_nel_cross_ion(self, cloud_name):
+    def save_cross_ion_data(self, cloud_name):
 
         thiscloud_nel_cross_ion = self.nel_cross_ion[cloud_name]
+        thiscloud_N_mp_cross_ion = self.N_mp_cross_ion[cloud_name]
         self.nel_cross_ion[cloud_name] = 0.
+        self.N_mp_cross_ion[cloud_name] = 0.
 
-        return thiscloud_nel_cross_ion
+        return thiscloud_nel_cross_ion, thiscloud_N_mp_cross_ion
 
 
     def _extract_sigma(self, Dt, cloud_dict, n_rep, energy_eV):

@@ -594,6 +594,7 @@ class pyecloud_saver:
                                      'lam_t_array',
                                      'N_mp_time',
                                      'Nel_cross_ion'
+                                     'N_mp_cross_ion'
                                      't']
 
         saved_every_passage_list = ['En_hist',
@@ -699,6 +700,7 @@ class pyecloud_saver:
 
             if self.flag_cross_ion:
                 list_members.append('Nel_cross_ion')
+                list_members.append('N_mp_cross_ion')
 
             for kk in self.sbs_custom_data.keys():
                 vv = self.sbs_custom_data[kk]
@@ -750,8 +752,10 @@ class pyecloud_saver:
 
         if self.flag_cross_ion:
             self.Nel_cross_ion = 0. * self.t
+            self.N_mp_cross_ion = 0 * self.t
         else:
             self.Nel_cross_ion = -1
+            self.N_mp_cross_ion = -1
 
         # initialize electron density probes
         self.flag_el_dens_probes = False
@@ -826,7 +830,7 @@ class pyecloud_saver:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
 
             if self.flag_cross_ion:
-                self.Nel_cross_ion[self.i_last_save] = cross_ion.get_nel_cross_ion(self.cloud_name)
+                self.Nel_cross_ion[self.i_last_save], self.N_mp_cross_ion[self.i_last_save] = cross_ion.save_cross_ion_data(self.cloud_name)
 
             if self.step_by_step_custom_observables is not None:
                 for kk in self.step_by_step_custom_observables.keys():
@@ -850,6 +854,7 @@ class pyecloud_saver:
 
         if self.flag_cross_ion:
             dict_sbs_data['Nel_cross_ion'] = self.Nel_cross_ion[:self.i_last_save + 1]
+            dict_sbs_data['N_mp_cross_ion'] = self.N_mp_cross_ion[:self.i_last_save + 1]
 
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
