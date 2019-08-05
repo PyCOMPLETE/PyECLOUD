@@ -100,9 +100,6 @@ class space_charge_electromagnetic(space_charge, object):
         self.state_Ay.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
                 epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp],
                 charge=MP_e.charge, flag_add=not(flag_reset))
-        self.state_As.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp],
-                epsilon_0 * mu_0 * MP_e.nel_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp],
-                charge=MP_e.charge, flag_add=not(flag_reset))
 
         # solve
         if flag_solve:
@@ -131,14 +128,17 @@ class space_charge_electromagnetic(space_charge, object):
             #compute time derivatives
             dAx_dt = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
             dAy_dt = (self.state_Ay.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ay_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
+
         #if first passage set derivatives to zero
         else:
             dAx_dt = np.zeros(MP_e.N_mp)
             dAy_dt = np.zeros(MP_e.N_mp)
 
+        dAx_prime_dt = dAx_dt
+        dAy_prime_dt = dAy_dt
         #compute B-field in  boosted frame
-        Bx_prime = dAs_prime_dy + 1/(self.beta*c)*dAy_dt
-        By_prime = -1/(self.beta*c)*dAx_dt - dAs_prime_dx
+        Bx_prime = dAs_prime_dy + 1/(self.gamma*self.beta*c)*dAx_prime_dt
+        By_prime = -1/(self.gamma*self.beta*c)*dAy_prime_dt - dAs_prime_dx
         Bz_prime = dAy_prime_dx - dAx_prime_dy
 
         #transform fields to lab frame
@@ -163,7 +163,7 @@ class space_charge_electromagnetic(space_charge, object):
         #plt.plot(-beta*c*By_sc_n,'r-')
         #plt.draw()
         #plt.pause(1e-5)
-        print('dAx_dt:%f'%(gamma*dAx_dt[100]))
-        print('-beta*c*By_sc_n:%f'%(-beta*c*By_sc_n[100]))
-        print('dphi_dx:%f'%(dphi_dx[100]))
-        print('err: %.16f'%(np.sqrt(np.mean(np.square(gamma*dAx_dt+beta*c*By_sc_n))/(max(abs(gamma*dAx_dt))))))
+        print('dAx_dt:%f'%(dAx_dt[10]))
+        print('-beta*c*By_sc_n:%f'%(-beta*c*By_sc_n[10]))
+        print('dphi_dx:%f'%(dphi_dx[10]))
+        print('err: %.16f'%(np.sqrt(np.mean(np.square(dAx_dt-beta*c*By_sc_n)))))
