@@ -56,6 +56,8 @@ import int_field_for as iff
 import sys
 from io import BytesIO as StringIO
 
+import matplotlib.pyplot as plt
+
 na = lambda x: np.array([x])
 
 class space_charge_electromagnetic(space_charge, object):
@@ -108,31 +110,18 @@ class space_charge_electromagnetic(space_charge, object):
             self.PyPICobj.solve_states([self.state_Ax, self.state_Ay, self.state_As])
 
     def get_sc_em_field(self, MP_e):
-        #compute un-primed potentials (with wrong sign)
+        #compute un-primed potentials (with wrong sign becase gather is meant to return E field..)
         _, m_dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         m_dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-        m_dAs_2_dx, m_dAs_2_dy = self.state_As.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-        m_dphi_1_dx, m_dphi_1_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-
+        m_dphi_dx, m_dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         #fix signs and make primed
-        dphi_1_prime_dx = -self.gamma*m_dphi_1_dx
-        dphi_1_prime_dy = -self.gamma*m_dphi_1_dy
+        dphi_prime_dx = -self.gamma*m_dphi_dx
+        dphi_prime_dy = -self.gamma*m_dphi_dy
         dAx_prime_dy = -m_dAx_dy
         dAy_prime_dx = -m_dAy_dx
         #compute longitudinal magnetic potential
-        dAs_1_prime_dx = -self.beta/c*dphi_1_prime_dx
-        dAs_1_prime_dy = -self.beta/c*dphi_1_prime_dy
-        #correction of As prime
-        dAs_2_prime_dx = -self.gamma*m_dAs_2_dx
-        dAs_2_prime_dy = -self.gamma*m_dAs_2_dy
-        #correction of phi prime
-        dphi_2_prime_dx = -dAs_2_prime_dx*self.beta*c
-        dphi_2_prime_dy = -dAs_2_prime_dy*self.beta*c
-        #apply the corrections
-        dphi_prime_dx = dphi_1_prime_dx + dphi_2_prime_dx
-        dphi_prime_dy = dphi_1_prime_dy + dphi_2_prime_dy
-        dAs_prime_dx = dAs_1_prime_dx + dAs_2_prime_dx
-        dAs_prime_dy = dAs_1_prime_dy + dAs_2_prime_dy
+        dAs_prime_dx = -self.beta/c*dphi_prime_dx
+        dAs_prime_dy = -self.beta/c*dphi_prime_dy
         #compute E-field in  boosted frame
         Ex_prime = -dphi_prime_dx
         Ey_prime = -dphi_prime_dy
@@ -141,7 +130,7 @@ class space_charge_electromagnetic(space_charge, object):
         if self.state_Ax_old != None and self.state_Ax_old != None:
             #compute time derivatives
             dAx_dt = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
-            dAy_dt = (self.state_Ax.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ax_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
+            dAy_dt = (self.state_Ay.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]) -  self.state_Ay_old.gather_phi(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp]))/self.Dt_sc
         #if first passage set derivatives to zero
         else:
             dAx_dt = np.zeros(MP_e.N_mp)
@@ -160,4 +149,21 @@ class space_charge_electromagnetic(space_charge, object):
         By_sc_n = self.gamma*(By_prime + self.beta/c*Ex_prime)
         Bz_sc_n = Bz_prime
 
+        ########################################################################
+        dphi_dx = -m_dphi_dx
+        dphi_dy = -m_dphi_dy
+        self.compare_terms(dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, self.beta, self.gamma)
+        ########################################################################
+
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
+
+    def compare_terms(self, dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, beta, gamma):
+        #plt.plot(dphi_dx,'b')
+        #plt.plot(dAx_dt,'r--')
+        #plt.plot(-beta*c*By_sc_n,'r-')
+        #plt.draw()
+        #plt.pause(1e-5)
+        print('dAx_dt:%f'%(gamma*dAx_dt[100]))
+        print('-beta*c*By_sc_n:%f'%(-beta*c*By_sc_n[100]))
+        print('dphi_dx:%f'%(dphi_dx[100]))
+        print('err: %.16f'%(np.sqrt(np.mean(np.square(gamma*dAx_dt+beta*c*By_sc_n))/(max(abs(gamma*dAx_dt))))))
