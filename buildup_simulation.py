@@ -235,7 +235,7 @@ class BuildupSimulation(object):
 
 
         ## Compute space charge field
-        for cloud in cloud_list:
+        for i_cloud, cloud in enumerate(cloud_list):
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
