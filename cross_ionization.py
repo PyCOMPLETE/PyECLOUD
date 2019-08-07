@@ -104,7 +104,7 @@ class Ionization_Process(object):
 
         # Calculate remaining density
         DN_target = np.sum(DN_per_proj)
-        self.N_target -=  DN_target
+        self.N_target =  np.round(self.N_target - DN_target, 3)
         self.target_dens = self.N_target / self.target_area
 
         if self.target_dens < 0.1 * self.last_reported_target_dens:
