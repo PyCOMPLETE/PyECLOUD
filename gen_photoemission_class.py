@@ -106,6 +106,7 @@ class photoemission(photoemission_base):
 
         if inv_CDF_refl_photoem_file == 'unif_no_file':
             self.flag_unif = True
+
         else:
             self.flag_unif = False
             dict_psi_inv_CDF = sio.loadmat(inv_CDF_refl_photoem_file)
@@ -137,6 +138,18 @@ class photoemission(photoemission_base):
             raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
 
         self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+
+        # Check that outer circle is correct
+        psi_gen = np.linspace(0, 2.*np.pi, 10000)
+        x_out = -2. * self.out_radius * np.cos(psi_gen) + self.x0_refl
+        y_out = 2. * self.out_radius * np.sin(psi_gen)
+        if np.any(~self.chamb.is_outside(x_out, y_out)):
+            raise ValueError('Photoemission circle points are inside the chamber, check your settings!')
+        psi_gen = np.linspace(0, 2.*np.pi, 10000)
+        x_out = self.out_radius * np.cos(psi_gen)
+        y_out = self.out_radius * np.sin(psi_gen)
+        if np.any(~self.chamb.is_outside(x_out, y_out)):
+            raise ValueError('Photoemission circle points are inside the chamber, check your settings!')
 
         print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 
