@@ -86,7 +86,7 @@ class space_charge_electromagnetic(space_charge, object):
 
         self.gamma = gamma
         self.beta = np.sqrt(1-1/(gamma*gamma))
-
+        self.ii = 0
 
         plt.figure(figsize=(14,7))
 
@@ -119,18 +119,9 @@ class space_charge_electromagnetic(space_charge, object):
         _, m_dAx_dy = self.state_Ax.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         m_dAy_dx, _ = self.state_Ay.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         m_dphi_dx, m_dphi_dy = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
-        #fix signs and make primed
-        dphi_prime_dx = -self.gamma*m_dphi_dx
-        dphi_prime_dy = -self.gamma*m_dphi_dy
-        dAx_prime_dy = -m_dAx_dy
-        dAy_prime_dx = -m_dAy_dx
-
-        #compute longitudinal magnetic potential
-        dAs_prime_dx = -self.beta/c_light*dphi_prime_dx
-        dAs_prime_dy = -self.beta/c_light*dphi_prime_dy
-        #compute E-field in  boosted frame
-        Ex_prime = -dphi_prime_dx
-        Ey_prime = -dphi_prime_dy
+        #fix signs
+        dAx_dy = -m_dAx_dy
+        dAy_dx = -m_dAy_dx
 
         #if not first passage compute derivatives of Ax and Ay
         if self.state_Ax_old != None and self.state_Ax_old != None:
@@ -141,30 +132,24 @@ class space_charge_electromagnetic(space_charge, object):
         #if first passage set derivatives to zero
         else:
             dAx_dt = np.zeros(MP_e.N_mp)
-
             dAy_dt = np.zeros(MP_e.N_mp)
 
-        dAx_prime_dt = dAx_dt
-        dAy_prime_dt = dAy_dt
+        #compute E-field in  boosted frame
+        Ex_sc_n = m_dphi_dx - dAx_dt
+        Ey_sc_n = m_dphi_dy - dAy_dt
+
         #compute B-field in  boosted frame
-        Bx_prime = dAs_prime_dy + 1/(self.gamma*self.beta*c_light)*dAy_prime_dt
-        By_prime = -1/(self.gamma*self.beta*c_light)*dAx_prime_dt - dAs_prime_dx
-        Bz_prime = dAy_prime_dx - dAx_prime_dy
+        Bx_sc_n = 1/(self.beta*c_light)*dAy_dt
+        By_sc_n = -1/(self.beta*c_light)*dAx_dt
+        Bz_sc_n = dAy_dx - dAx_dy
 
-        #transform fields to lab frame
-        Ex_sc_n = self.gamma*(Ex_prime + self.beta*c_light*By_prime)
-        Ey_sc_n = self.gamma*(Ey_prime - self.beta*c_light*Bx_prime)
-
-        Bx_sc_n = self.gamma*(Bx_prime - self.beta/c_light*Ey_prime)
-        By_sc_n = self.gamma*(By_prime + self.beta/c_light*Ex_prime)
-        Bz_sc_n = Bz_prime
-
-        ########################################################################
-        dphi_dx = -m_dphi_dx
-        dphi_dy = -m_dphi_dy
-        self.compare_terms(dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, self.beta, self.gamma, MP_e)
-        ########################################################################
-
+        if self.ii%50 == 0:
+            ########################################################################
+            dphi_dx = -m_dphi_dx
+            dphi_dy = -m_dphi_dy
+            self.compare_terms(dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, self.beta, self.gamma, MP_e)
+            ########################################################################
+        self.ii = self.ii+1
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
 
     def compare_terms(self, dphi_dx_mp, dphi_dy_mp, dAx_dt_mp, dAy_dt_mp, Bx_sc_n_mp, By_sc_n_mp, beta, gamma, MP_e):
@@ -182,48 +167,52 @@ class space_charge_electromagnetic(space_charge, object):
         fontsz = 15
         mpl.rc('xtick', labelsize=fontsz)
         mpl.rc('ytick', labelsize=fontsz)
+        fontsz = 20
 
         plt.subplot(2,3,3)
-        plt.imshow(dphi_dx, cmap=None, norm=None, aspect='auto', interpolation=None,
+        plt.imshow(dphi_dx.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
-        plt.colorbar(format='%.0e')
-
-        plt.title(r'$\frac{\partial \phi}{\partial x}$')
+        clb = plt.colorbar(format='%.0e')
+        clb.set_label(r'$\left[\frac{V}{m}\right]$',fontsize = fontsz)
+        plt.title(r'$\frac{\partial \phi}{\partial x}$',fontsize = fontsz)
         plt.subplot(2,3,6)
-        plt.imshow(dphi_dy, cmap=None, norm=None, aspect='auto', interpolation=None,
+        plt.imshow(dphi_dy.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
-        plt.title(r'$\frac{\partial \phi}{\partial y}$')
-        plt.colorbar(format='%.0e')
+        plt.title(r'$\frac{\partial \phi}{\partial y}$',fontsize = fontsz)
+        clb = plt.colorbar(format='%.0e')
 
+        clb.set_label(r'$\left[\frac{V}{m}\right]$',fontsize = fontsz)
         plt.subplot(2,3,1)
         ax = plt.gca()
-        plt.imshow(dAx_dt, cmap=None, norm=None, aspect='auto', interpolation=None,
+        plt.imshow(dAx_dt.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                 alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
-        plt.title(r'$\frac{\partial A_x}{\partial t}$')
-        plt.colorbar(format='%.0e')
-
+        plt.title(r'$\frac{\partial A_x}{\partial t}$',fontsize = fontsz)
+        clb = plt.colorbar(format='%.0e')
+        clb.set_label(r'$\left[\frac{V}{m}\right]$',fontsize = fontsz)
         plt.subplot(2,3,2)
-        plt.imshow(-beta*c_light*By_sc_n, cmap=None, norm=None, aspect='auto', interpolation=None,
+        plt.imshow(-beta*c_light*By_sc_n.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
-        plt.title(r'$-\beta*c*B_y$')
-        plt.colorbar(format='%.0e')
-
+        plt.title(r'$-\beta*c*B_y$',fontsize = fontsz-5)
+        clb = plt.colorbar(format='%.0e')
+        clb.set_label(r'$\left[\frac{V}{m}\right]$',fontsize = fontsz)
         plt.subplot(2,3,4)
-        plt.imshow(dAy_dt, cmap=None, norm=None, aspect='auto', interpolation=None,
+        plt.imshow(dAy_dt.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
-        plt.title(r'$\frac{\partial A_y}{\partial t}$')
-        plt.colorbar(format='%.0e')
-
+        plt.title(r'$\frac{\partial A_y}{\partial t}$',fontsize = fontsz)
+        clb = plt.colorbar(format='%.0e')
+        clb.set_label(r'$\left[\frac{V}{m}\right]$',fontsize = fontsz)
         plt.subplot(2,3,5)
-        plt.imshow(beta*c_light*Bx_sc_n, cmap=None, norm=None, aspect='auto', interpolation=None,
+        plt.imshow(beta*c_light*Bx_sc_n.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
-        plt.title(r'$\beta*c*B_x$')
-        plt.colorbar(format='%.0e')
-
+        plt.title(r'$\beta*c*B_x$',fontsize = fontsz-5)
+        clb = plt.colorbar(format='%.0e')
+        clb.set_label(r'$\left[\frac{V}{m}\right]$',fontsize = fontsz)
         #plt.ylim(min(dAx_dt),max(dAx_dt))
-        plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
-        plt.draw()
-        plt.pause(1e-5)
+        plt.subplots_adjust(bottom=0.1, right=0.9, left = 0.05, top=0.9, hspace=0.5, wspace=0.8)
+        #plt.draw()
+        #plt.pause(1e-5)
+        filename = str('comparison/%05d' % (self.ii)) + '.png'
+        plt.savefig(filename, dpi=150)
         plt.clf()
         #print('dAx_dt:%f'%(dAx_dt[10]))
         #print('-beta*c*By_sc_n:%f'%(-beta*c_light*By_sc_n[10]))
