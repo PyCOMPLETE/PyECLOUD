@@ -166,7 +166,7 @@ class BuildupSimulation(object):
                     Ex_n_beam += Ex_n_secbeam
                     Ey_n_beam += Ey_n_secbeam
 
-            #!#! Either compute electromagnetic field or electrostatic
+            ## Either compute electromagnetic field or electrostatic
             if self.flag_em_tracking:
                 Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
             else:
@@ -194,7 +194,6 @@ class BuildupSimulation(object):
             old_pos = MP_e.get_positions()
 
             ## Motion
-            #!#! Needs to be modified to swallow the magnetic field from here
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
                 # Standard simulation mode
                 Ez_n = 0
@@ -241,7 +240,7 @@ class BuildupSimulation(object):
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
-                #!#! Needs to be modified
+                ## Either compute electromagnetic field or electrostatic
                 if self.flag_em_tracking:
                     spacech_ele.recompute_spchg_emfield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
                 else:
