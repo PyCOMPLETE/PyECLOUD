@@ -51,12 +51,17 @@
 
 import numpy as np
 from space_charge_class import space_charge
-from scipy.constants import c, epsilon_0, mu_0, e
+from scipy.constants import epsilon_0, mu_0
+from scipy.constants import c  as c_light
+
 import int_field_for as iff
 import sys
 from io import BytesIO as StringIO
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+import rhocompute as rhocom
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 na = lambda x: np.array([x])
 
@@ -81,6 +86,9 @@ class space_charge_electromagnetic(space_charge, object):
 
         self.gamma = gamma
         self.beta = np.sqrt(1-1/(gamma*gamma))
+
+
+        plt.figure(figsize=(14,7))
 
     def recompute_spchg_emfield(self, MP_e, flag_solve=True, flag_reset=True):
         #update the old states before scattering
@@ -116,9 +124,10 @@ class space_charge_electromagnetic(space_charge, object):
         dphi_prime_dy = -self.gamma*m_dphi_dy
         dAx_prime_dy = -m_dAx_dy
         dAy_prime_dx = -m_dAy_dx
+
         #compute longitudinal magnetic potential
-        dAs_prime_dx = -self.beta/c*dphi_prime_dx
-        dAs_prime_dy = -self.beta/c*dphi_prime_dy
+        dAs_prime_dx = -self.beta/c_light*dphi_prime_dx
+        dAs_prime_dy = -self.beta/c_light*dphi_prime_dy
         #compute E-field in  boosted frame
         Ex_prime = -dphi_prime_dx
         Ey_prime = -dphi_prime_dy
@@ -132,38 +141,128 @@ class space_charge_electromagnetic(space_charge, object):
         #if first passage set derivatives to zero
         else:
             dAx_dt = np.zeros(MP_e.N_mp)
+
             dAy_dt = np.zeros(MP_e.N_mp)
 
         dAx_prime_dt = dAx_dt
         dAy_prime_dt = dAy_dt
         #compute B-field in  boosted frame
-        Bx_prime = dAs_prime_dy + 1/(self.gamma*self.beta*c)*dAx_prime_dt
-        By_prime = -1/(self.gamma*self.beta*c)*dAy_prime_dt - dAs_prime_dx
+        Bx_prime = dAs_prime_dy + 1/(self.gamma*self.beta*c_light)*dAy_prime_dt
+        By_prime = -1/(self.gamma*self.beta*c_light)*dAx_prime_dt - dAs_prime_dx
         Bz_prime = dAy_prime_dx - dAx_prime_dy
 
         #transform fields to lab frame
-        Ex_sc_n = self.gamma*(Ex_prime + self.beta*c*By_prime)
-        Ey_sc_n = self.gamma*(Ey_prime - self.beta*c*Bx_prime)
+        Ex_sc_n = self.gamma*(Ex_prime + self.beta*c_light*By_prime)
+        Ey_sc_n = self.gamma*(Ey_prime - self.beta*c_light*Bx_prime)
 
-        Bx_sc_n = self.gamma*(Bx_prime - self.beta/c*Ey_prime)
-        By_sc_n = self.gamma*(By_prime + self.beta/c*Ex_prime)
+        Bx_sc_n = self.gamma*(Bx_prime - self.beta/c_light*Ey_prime)
+        By_sc_n = self.gamma*(By_prime + self.beta/c_light*Ex_prime)
         Bz_sc_n = Bz_prime
 
         ########################################################################
         dphi_dx = -m_dphi_dx
         dphi_dy = -m_dphi_dy
-        self.compare_terms(dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, self.beta, self.gamma)
+        self.compare_terms(dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, self.beta, self.gamma, MP_e)
         ########################################################################
 
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
 
+    def compare_terms(self, dphi_dx_mp, dphi_dy_mp, dAx_dt_mp, dAy_dt_mp, Bx_sc_n_mp, By_sc_n_mp, beta, gamma, MP_e):
+        xmin = np.min(self.xg)
+        xmax = np.max(self.xg)
+        ymin = np.min(self.yg)
+        ymax = np.max(self.yg)
+        dphi_dx = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],dphi_dx_mp,self.bias_x,self.bias_y,self.Dh,self.Nxg,self.Nyg)
+        dphi_dy = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],dphi_dy_mp,self.bias_x,self.bias_y,self.Dh,self.Nxg,self.Nyg)
+        dAx_dt = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],dAx_dt_mp,self.bias_x,self.bias_y,self.Dh,self.Nxg,self.Nyg)
+        dAy_dt = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],dAy_dt_mp,self.bias_x,self.bias_y,self.Dh,self.Nxg,self.Nyg)
+        Bx_sc_n = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Bx_sc_n_mp,self.bias_x,self.bias_y,self.Dh,self.Nxg,self.Nyg)
+        By_sc_n = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],By_sc_n_mp,self.bias_x,self.bias_y,self.Dh,self.Nxg,self.Nyg)
+        #plt.plot(dphi_dx[inds],'b')
+        fontsz = 15
+        mpl.rc('xtick', labelsize=fontsz)
+        mpl.rc('ytick', labelsize=fontsz)
+
+        plt.subplot(2,3,3)
+        plt.imshow(dphi_dx, cmap=None, norm=None, aspect='auto', interpolation=None,
+                 alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+        plt.colorbar(format='%.0e')
+
+        plt.title(r'$\frac{\partial \phi}{\partial x}$')
+        plt.subplot(2,3,6)
+        plt.imshow(dphi_dy, cmap=None, norm=None, aspect='auto', interpolation=None,
+                 alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+        plt.title(r'$\frac{\partial \phi}{\partial y}$')
+        plt.colorbar(format='%.0e')
+
+        plt.subplot(2,3,1)
+        ax = plt.gca()
+        plt.imshow(dAx_dt, cmap=None, norm=None, aspect='auto', interpolation=None,
+                alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+        plt.title(r'$\frac{\partial A_x}{\partial t}$')
+        plt.colorbar(format='%.0e')
+
+        plt.subplot(2,3,2)
+        plt.imshow(-beta*c_light*By_sc_n, cmap=None, norm=None, aspect='auto', interpolation=None,
+                 alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+        plt.title(r'$-\beta*c*B_y$')
+        plt.colorbar(format='%.0e')
+
+        plt.subplot(2,3,4)
+        plt.imshow(dAy_dt, cmap=None, norm=None, aspect='auto', interpolation=None,
+                 alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+        plt.title(r'$\frac{\partial A_y}{\partial t}$')
+        plt.colorbar(format='%.0e')
+
+        plt.subplot(2,3,5)
+        plt.imshow(beta*c_light*Bx_sc_n, cmap=None, norm=None, aspect='auto', interpolation=None,
+                 alpha=None, origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+        plt.title(r'$\beta*c*B_x$')
+        plt.colorbar(format='%.0e')
+
+        #plt.ylim(min(dAx_dt),max(dAx_dt))
+        plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
+        plt.draw()
+        plt.pause(1e-5)
+        plt.clf()
+        #print('dAx_dt:%f'%(dAx_dt[10]))
+        #print('-beta*c*By_sc_n:%f'%(-beta*c_light*By_sc_n[10]))
+        #print('dphi_dx:%f'%(dphi_dx[10]))
+        #print('err: %.16f'%(np.sqrt(np.mean(np.square(dAx_dt+beta*c_light*By_sc_n)))))
+
+    '''
     def compare_terms(self, dphi_dx, dphi_dy, dAx_dt, dAy_dt, Bx_sc_n, By_sc_n, beta, gamma):
-        #plt.plot(dphi_dx,'b')
-        #plt.plot(dAx_dt,'r--')
-        #plt.plot(-beta*c*By_sc_n,'r-')
-        #plt.draw()
-        #plt.pause(1e-5)
-        print('dAx_dt:%f'%(dAx_dt[10]))
-        print('-beta*c*By_sc_n:%f'%(-beta*c*By_sc_n[10]))
-        print('dphi_dx:%f'%(dphi_dx[10]))
-        print('err: %.16f'%(np.sqrt(np.mean(np.square(dAx_dt-beta*c*By_sc_n)))))
+        indsx = sorted(range(len(dAx_dt)), key=lambda k: dAx_dt[k])
+        indsy = sorted(range(len(dAy_dt)), key=lambda k: dAy_dt[k])
+        indsphix = sorted(range(len(dphi_dx)), key=lambda k: dphi_dx[k])
+        indsphiy = sorted(range(len(dphi_dy)), key=lambda k: dphi_dy[k])
+
+        #plt.plot(dphi_dx[inds],'b')
+        fontsz = 15
+        mpl.rc('xtick', labelsize=fontsz)
+        mpl.rc('ytick', labelsize=fontsz)
+        plt.subplot(1,2,1)
+        plt.plot(dAx_dt[indsx],'rx',label=r'$\frac{\partial A_x}{\partial t}$')
+        plt.plot(-beta*c_light*By_sc_n[indsx],'b',label= r'$-\beta*c*B_y$')
+        plt.plot(dAy_dt[indsy],'gx',label=r'$\frac{\partial A_y}{\partial t}$')
+        plt.plot(beta*c_light*Bx_sc_n[indsy],'m',label= r'$\beta*c*B_x$')
+        plt.xlabel('MP id', fontsize = fontsz)
+        plt.ylabel(r'$[\frac{V}{m}]$', fontsize = fontsz)
+        plt.legend(fontsize = fontsz)
+        plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0), fontsize = fontsz)
+        plt.subplot(1,2,2)
+        plt.plot(dphi_dx[indsphix],'k',label= r'$\frac{\partial \phi}{\partial x}$')
+        plt.plot(dphi_dy[indsphiy],'b',label= r'$\frac{\partial \phi}{\partial y}$')
+        plt.xlabel('MP id', fontsize = fontsz)
+        plt.ylabel(r'$[\frac{V}{m}]$', fontsize = fontsz)
+        plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0), fontsize = fontsz)
+        #plt.ylim(min(dAx_dt),max(dAx_dt))
+        plt.legend(fontsize = fontsz)
+        plt.draw()
+        plt.pause(1e-5)
+        plt.clf()
+        #print('dAx_dt:%f'%(dAx_dt[10]))
+        #print('-beta*c*By_sc_n:%f'%(-beta*c_light*By_sc_n[10]))
+        #print('dphi_dx:%f'%(dphi_dx[10]))
+        #print('err: %.16f'%(np.sqrt(np.mean(np.square(dAx_dt+beta*c_light*By_sc_n)))))
+    '''
