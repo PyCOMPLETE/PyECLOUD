@@ -96,6 +96,7 @@ parameters_dict = {
             'lifetime_hist_max': None,
             'Dt_lifetime_hist':None,
 
+            'Dh_electric_energy': None, 
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
 
