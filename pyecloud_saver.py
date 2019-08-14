@@ -124,12 +124,15 @@ class pyecloud_saver:
                         Nbin_extract_ene=None,
                         factor_ene_dist_max=None,
                         save_only=None,
+                        flag_electric_energy=False
                         ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
 
         self.save_only = save_only
+
+        self.flag_electric_energy = flag_electric_energy
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
@@ -590,6 +593,7 @@ class pyecloud_saver:
                                      'cen_density',
                                      'lam_t_array',
                                      'N_mp_time',
+                                     'En_electric_eV_time',
                                      't']
 
         saved_every_passage_list = ['En_hist',
@@ -693,6 +697,9 @@ class pyecloud_saver:
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
 
+            if self.flag_electric_energy:
+                list_members.append('En_electric_eV_time')
+
             for kk in self.sbs_custom_data.keys():
                 vv = self.sbs_custom_data[kk]
                 self.sbs_custom_data[kk] = np.concatenate((vv, 0 * vv))
@@ -740,6 +747,12 @@ class pyecloud_saver:
             self.N_mp_time = 0. * self.t
         else:
             self.N_mp_time = -1
+        
+        if self.flag_electric_energy:
+            self.En_electric_eV_time = 0. * self.t
+        else:
+            self.En_electric_eV_time = -1
+
 
         # initialize electron density probes
         self.flag_el_dens_probes = False
@@ -800,6 +813,9 @@ class pyecloud_saver:
             self.Nel_timep[self.i_last_save] = np.sum(MP_e.nel_mp[0:MP_e.N_mp])
             self.En_kin_eV_time[self.i_last_save] = np.sum(0.5 * MP_e.mass / qe * MP_e.nel_mp[0:MP_e.N_mp] * (MP_e.vx_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp] + MP_e.vy_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp] + MP_e.vz_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp]))
 
+            if self.flag_electric_energy:
+                self.En_electric_eV_time[self.i_last_save] = buildup_sim.spacech_ele.get_potential_electric_energy()
+
             flag_center = ((MP_e.x_mp**2 + MP_e.y_mp**2) < self.r_center**2)
             flag_center[MP_e.N_mp:] = False
             self.cen_density[self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_center * self.r_center)
@@ -832,6 +848,9 @@ class pyecloud_saver:
 
         if self.flag_detailed_MP_info == 1:
             dict_sbs_data['N_mp_time'] = self.N_mp_time[:self.i_last_save + 1]
+
+        if self.flag_electric_energy:
+            dict_sbs_data['En_electric_eV_time'] = self.En_electric_eV_time[:self.i_last_save + 1]
 
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]

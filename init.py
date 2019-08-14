@@ -264,7 +264,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver = 'PyKLU'
         spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
-                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
+                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
+                                           Dh_U_eV=cc.Dh_electric_energy)
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -452,7 +453,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
                                        Nbin_extract_ene=cc.Nbin_extract_ene,
                                        factor_ene_dist_max=cc.factor_ene_dist_max,
-                                       save_only = thiscloud.save_only
+                                       save_only = thiscloud.save_only,
+                                       flag_electric_energy=(cc.Dh_electric_energy is not None)
                                        )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
@@ -482,19 +484,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Initial electron density
         if thiscloud.init_unif_flag == 1:
-            print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
+            print("Adding initial %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
             MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif,
                                         thiscloud.x_max_init_unif, thiscloud.x_min_init_unif,
                                         thiscloud.y_max_init_unif, thiscloud.y_min_init_unif)
 
         if thiscloud.init_unif_edens_flag == 1:
-            print("Adding inital %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
+            print("Adding initial %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
             MP_e.add_uniform_ele_density(n_ele=thiscloud.init_unif_edens, E_init=thiscloud.E_init_unif_edens,
                                          x_max=thiscloud.x_max_init_unif_edens, x_min=thiscloud.x_min_init_unif_edens,
                                          y_max=thiscloud.y_max_init_unif_edens, y_min=thiscloud.y_min_init_unif_edens)
 
         if thiscloud.filename_init_MP_state != -1 and thiscloud.filename_init_MP_state is not None:
-            print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
+            print("Adding initial electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud
