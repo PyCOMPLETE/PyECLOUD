@@ -419,7 +419,7 @@ parameters_dict = {
             'Dt_En_hist': (),
             'Nbin_En_hist': (),
             'En_hist_max': (),
-          'flag_lifetime_hist': (),
+            'flag_lifetime_hist': (),
             'Nbin_lifetime_hist': (),
             'lifetime_hist_max': (),
             'Dt_lifetime_hist': (),

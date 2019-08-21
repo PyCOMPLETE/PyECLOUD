@@ -324,13 +324,13 @@ class pyecloud_saver:
         self.N_mp_ref_pass = []
 
         if impact_man.flag_seg:
-           self.nel_hist_impact_seg = []
-           self.nel_hist_emit_seg = []
-           self.energ_eV_impact_seg = []
+            self.nel_hist_impact_seg = []
+            self.nel_hist_emit_seg = []
+            self.energ_eV_impact_seg = []
         else:
-           self.nel_hist_impact_seg = -1
-           self.nel_hist_emit_seg = -1
-           self.energ_eV_impact_seg = -1
+            self.nel_hist_impact_seg = -1
+            self.nel_hist_emit_seg = -1
+            self.energ_eV_impact_seg = -1
 
         # detailed hist
         self.flag_hist_det = False
@@ -1036,8 +1036,8 @@ class pyecloud_saver:
                 Fbfy = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fbfy_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
                 Fbfz = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fbfz_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
                 #save sc forces video
-                if not os.path.exists(self.folder_outp + '/efield_video'):
-                    os.makedirs(self.folder_outp + '/efield_video')
+                if not os.path.exists(self.folder_outp + '/sc_forces_video'):
+                    os.makedirs(self.folder_outp + '/sc_forces_video')
                 if self.Fefx_video is None:
                     self.Fefx_video = []
                     self.Fefy_video = []
