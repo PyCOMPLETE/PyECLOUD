@@ -181,7 +181,7 @@ class pusher_Boris():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0, By_n=0, Bz_n=0, Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0., Dt_substep=None, N_sub_steps=None):
 
         if MP_e.N_mp > 0:
 
