@@ -66,9 +66,6 @@ except ImportError:
     # No cPickle in python3
     import pickle
 
-from space_charge_class import space_charge
-import rhocompute as rhocom
-
 class pyecloud_saver:
 
     def __init__(self, logfile_path):
