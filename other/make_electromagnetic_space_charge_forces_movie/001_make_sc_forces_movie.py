@@ -17,11 +17,12 @@ fontsz = 12
 
 bunch_spacing = 25e-9
 
-first_passage = 28
-num_passage = 2
+first_passage = 1
+num_passage = 10
 
 # Please run the "LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver" before using this script
-folder_sim = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver/'
+folder_sim = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_em_tracking/'
+folder_imgs = 'maps/'
 main_outp_filename = 'Pyecltest_angle3D.mat'
 
 passlist = range(first_passage, first_passage + num_passage)
@@ -70,8 +71,8 @@ cendens = np.squeeze(obout.cen_density)
 #every bunch passage
 for pass_ind in passlist:
 
-    filename_rho = folder_sim + '/rho_video/rho_pass%d.mat'%pass_ind
-    filename_sc_forces = folder_sim + '/sc_forces_video/sc_forces_pass%d.mat'%pass_ind
+    filename_rho = 'rho_video/rho_pass%d.mat'%pass_ind
+    filename_sc_forces = 'sc_forces/sc_forces_pass%d.mat'%pass_ind
     #new code
 
     obout_ecl_video = mlo.myloadmat_to_obj(filename_rho)
@@ -91,22 +92,25 @@ for pass_ind in passlist:
     rho_video = -obout_ecl_video.rho_video / qe
     sc_Fe_norm_video = np.sqrt(np.multiply(obout_sc_forces.Fefx_video,obout_sc_forces.Fefx_video)+np.multiply(obout_sc_forces.Fefy_video,obout_sc_forces.Fefy_video))
     sc_Fb_norm_video = np.sqrt(np.multiply(obout_sc_forces.Fbfx_video,obout_sc_forces.Fbfx_video)+np.multiply(obout_sc_forces.Fbfy_video,obout_sc_forces.Fbfy_video)+np.multiply(obout_sc_forces.Fbfz_video,obout_sc_forces.Fbfz_video))
-    t_video = np.squeeze(obout_ecl_video.t_video.real)
+    t_video_old = np.squeeze(obout_ecl_video.t_video.real)
+    t_video = np.squeeze(obout_sc_forces.t_efield_video_new.real)
     b_spac = np.squeeze(obout.b_spac.real)
 
-    (nphotog, _, _) = rho_video.shape
+    (nphotog, _, _) = sc_Fe_norm_video.shape
+    (nphotog_big, _, _) = rho_video.shape
 
     for ii in xrange(0, nphotog, N_dec):
-
 		fig = pl.figure(1, figsize=(9, 3))  # ,figsize=(4.5,6)
 		t_curr = t_video[ii]
+		ii2, = np.where( t_video_old == t_curr)
+		t_curr_old = t_video_old[ii2]
 		cendens_curr = np.interp(t_curr, t, cendens)
 		lam_b1_curr = np.interp(t_curr, t, lam_b1)
 		cendens_curr = np.interp(t_curr, t, cendens)
 
 		print 'Pass %d %d/%d'%(pass_ind, ii, nphotog)
 
-		imm = np.squeeze(rho_video[ii, :, :])
+		imm = np.squeeze(rho_video[ii2, :, :])
 		imm_Fe_norm = np.squeeze(sc_Fe_norm_video[ii, :, :])
 		imm_Fb_norm = np.squeeze(sc_Fb_norm_video[ii, :, :])
 		immlin = imm.copy()
