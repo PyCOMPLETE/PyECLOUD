@@ -1012,8 +1012,8 @@ class pyecloud_saver:
         self.t_efield_video = None
 
     def _sc_video_save(self, spacech_ele, beamtim):
+        #save efield video
         if self.flag_sc_video:
-            #save efield video
             if not os.path.exists(self.folder_outp + '/efield_video'):
                 os.makedirs(self.folder_outp + '/efield_video')
             if self.efx_video is None:
