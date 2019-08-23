@@ -261,7 +261,7 @@ class pyecloud_saver:
         self._rho_video_save(spacech_ele, beamtim, rho_cloud)
 
         # Check for save video electric field
-        self._sc_video_save(spacech_ele, beamtim, MP_e)
+        self._sc_video_save(spacech_ele, beamtim)
 
         # Check for energy and cos angle hist update
         self._energy_cos_and_lifetime_angle_hist_save(beamtim, impact_man, MP_e)
@@ -1011,7 +1011,7 @@ class pyecloud_saver:
         self.efy_video = None
         self.t_efield_video = None
 
-    def _sc_video_save(self, spacech_ele, beamtim, MP_e):
+    def _sc_video_save(self, spacech_ele, beamtim):
         if self.flag_sc_video:
             #save efield video
             if not os.path.exists(self.folder_outp + '/efield_video'):
