@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -50,6 +50,8 @@
 #-End-preamble---------------------------------------------------------
 
 import numpy as np
+from scipy.constants import epsilon_0
+from scipy.constants import e as qe
 
 na = lambda x: np.array([x])
 
@@ -58,7 +60,7 @@ class space_charge:
     #@profile
 
     def __init__(self, chamb, Dh, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
-                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
+                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None, Dh_U_eV=None):
 
         print 'Start space charge init.'
 
@@ -104,7 +106,7 @@ class space_charge:
             self.xn = None  # not implemented in this mode (for now)
             self.yn = None  # not implemented in this mode (for now)
         else:
-            raise ValueError('PyPICmode not racognized')
+            raise ValueError('PyPICmode not recognized')
 
         self.Dh = self.PyPICobj.Dh
         self.xg = self.PyPICobj.xg
@@ -123,6 +125,17 @@ class space_charge:
         self.last_recomputation_check = False
 
         self.flag_em_tracking = False
+        if Dh_U_eV is not None:
+            self.evaluate_U_eV = True
+            self.Dh_U_eV = Dh_U_eV
+            self.xn_U_eV, self.yn_U_eV=np.meshgrid(
+                    np.arange(-chamb.x_aper*1.01, chamb.x_aper*1.01, Dh_U_eV),
+                    np.arange(-chamb.y_aper*1.01, chamb.y_aper*1.01, Dh_U_eV))
+
+            self.xn_U_eV = self.xn_U_eV.T.flatten()
+            self.yn_U_eV = self.yn_U_eV.T.flatten()
+        else:
+            self.evaluate_U_eV = False
 
         print 'Done space charge init.'
 
@@ -170,3 +183,12 @@ class space_charge:
     def get_sc_eletric_field(self, MP_e):
         Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         return Ex_sc_n, Ey_sc_n
+
+    def get_potential_electric_energy(self):
+        if not self.evaluate_U_eV:
+            raise ValueError('Cannot compute potential energy, please provide Dh_U_eV!')
+        Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(self.xn_U_eV, self.yn_U_eV)
+
+        U_eV = 0.5 * np.sum(Ex_sc_n[:]**2 + Ey_sc_n[:]**2) * self.Dh_U_eV**2 * epsilon_0 / qe
+
+        return U_eV

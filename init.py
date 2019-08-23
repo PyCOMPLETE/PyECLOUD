@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -70,6 +70,7 @@ from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
 from sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from sec_emission_model_perfect_absorber import SEY_model_perfect_absorber
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
@@ -80,7 +81,6 @@ import MP_system as MPs
 import space_charge_class_electromagnetic as scc_em
 import space_charge_class as scc
 import impact_management_class as imc
-import perfect_absorber_class as pac
 import pyecloud_saver as pysav
 import gas_ionization_class as gic
 import gen_photoemission_class as gpc
@@ -298,11 +298,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Dx_hist, thiscloud.Nx_regen, thiscloud.Ny_regen, thiscloud.Nvx_regen,
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
+                             N_mp_async_regen=thiscloud.N_mp_async_regen, N_mp_after_async_regen=thiscloud.N_mp_after_async_regen,
                              charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
-            sey_mod = pac.Dummy_SEY()
+            sey_mod = SEY_model_perfect_absorber()
         else:
 
             kwargs_secem = {}
@@ -389,27 +390,22 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
         # Init impact management
-        flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+        flag_seg = (thiscloud.flag_hist_impact_seg == 1 or thiscloud.flag_hist_impact_seg is True)
 
         if flag_seg and cc.chamb_type == 'ellip':
             print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
             flag_seg = False
 
-
-        if thiscloud.switch_model == 'perfect_absorber':
-            impact_man_class = pac.impact_management_perfect_absorber
-        else:
-            impact_man_class = imc.impact_management
-
         if cc.flag_lifetime_hist:
             if cc.Nbin_lifetime_hist is None or cc.lifetime_hist_max is None or cc.Dt_lifetime_hist is None:
-                raise inp_spec.PyECLOUD_ConfigException('If flag_lifetime_hist is True then all the histogram parameters must be specified')
+                raise inp_spec.PyECLOUD_ConfigException(
+                        'If flag_lifetime_hist is True then all the histogram parameters must be specified')
 
-        impact_man = impact_man_class(chamb, sey_mod,
-                                      thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
-                                      cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
-                                      flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
-                                      )
+        impact_man = imc.impact_management(chamb, sey_mod,
+            thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
+            cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
+            flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
+            cos_angle_width=cc.cos_angle_width)
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag == 1:
@@ -467,7 +463,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        extract_ene_dist=cc.extract_ene_dist,
                                        ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
                                        Nbin_extract_ene=cc.Nbin_extract_ene,
-                                       factor_ene_dist_max=cc.factor_ene_dist_max
+                                       factor_ene_dist_max=cc.factor_ene_dist_max,
+                                       save_only = thiscloud.save_only,
+                                       flag_electric_energy=(cc.Dh_electric_energy is not None)
                                        )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
@@ -503,19 +501,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Initial electron density
         if thiscloud.init_unif_flag == 1:
-            print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
+            print("Adding initial %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
             MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif,
                                         thiscloud.x_max_init_unif, thiscloud.x_min_init_unif,
                                         thiscloud.y_max_init_unif, thiscloud.y_min_init_unif)
 
         if thiscloud.init_unif_edens_flag == 1:
-            print("Adding inital %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
+            print("Adding initial %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
             MP_e.add_uniform_ele_density(n_ele=thiscloud.init_unif_edens, E_init=thiscloud.E_init_unif_edens,
                                          x_max=thiscloud.x_max_init_unif_edens, x_min=thiscloud.x_min_init_unif_edens,
                                          y_max=thiscloud.y_max_init_unif_edens, y_min=thiscloud.y_min_init_unif_edens)
 
         if thiscloud.filename_init_MP_state != -1 and thiscloud.filename_init_MP_state is not None:
-            print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
+            print("Adding initial electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud

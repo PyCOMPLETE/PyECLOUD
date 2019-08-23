@@ -13,6 +13,9 @@ from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/'
 # check if user provided folder as command line argument
+
+os.system('rm -r %s/checkpoints'%sim_folder)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation_folder')
 parser.add_argument('--angle-dist-func',

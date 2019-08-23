@@ -62,10 +62,13 @@ parameters_dict = {
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
+            'N_mp_async_regen': None,
+            'N_mp_after_async_regen': None,
             'stopfile': 'stop',
 
             # Saving settings
             'filen_main_outp': 'Pyecltest.mat',
+            'save_only': None,
             'flag_movie': 0,
             'flag_sc_movie': 0,
             'flag_cos_angle_hist': True,
@@ -73,6 +76,7 @@ parameters_dict = {
             'save_mp_state_time_file': -1,
             'flag_detailed_MP_info': 0,
             'flag_hist_impact_seg': 1,
+            'flag_En_hist_seg': False,
             'flag_verbose_file': False,
             'flag_verbose_stdout': False,
             'dec_fac_secbeam_prof': 1,
@@ -87,11 +91,12 @@ parameters_dict = {
             'x_max_hist_det': None,
             'y_max_hist_det': None,
             'Dx_hist_det': None,
-          'flag_lifetime_hist': False,
+            'flag_lifetime_hist': False,
             'Nbin_lifetime_hist': None,
             'lifetime_hist_max': None,
             'Dt_lifetime_hist':None,
 
+            'Dh_electric_energy': None, 
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
 
@@ -329,6 +334,8 @@ parameters_dict = {
         },
         'optional': {
 
+            'save_only': (),
+            
             # MP management settings
             'N_mp_max': (),
             'N_mp_regen': (),
@@ -343,6 +350,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': (),
             'N_mp_after_soft_regen': (),
+            'N_mp_async_regen': (),
+            'N_mp_after_async_regen': (),
 
             # Tracking and magnetic field
             'N_sub_steps': (),
@@ -431,6 +440,7 @@ parameters_dict = {
             'save_mp_state_time_file': (),
             'flag_detailed_MP_info': (),
             'flag_hist_impact_seg': (),
+            'flag_En_hist_seg':(),
             'flag_verbose_file': (),
             'flag_verbose_stdout': (),
             'dec_fac_secbeam_prof': (),
