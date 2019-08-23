@@ -15,6 +15,8 @@ import PyECLOUD.rhocompute as rhocom
 def _forces_movie_init(sim,sim_input_folder):
     sim.cloud_list[0].pyeclsaver.Fefx_video = None
     sim.cloud_list[0].pyeclsaver.Fefy_video = None
+    sim.cloud_list[0].pyeclsaver.Fesfx_video = None
+    sim.cloud_list[0].pyeclsaver.Fesfy_video = None
     sim.cloud_list[0].pyeclsaver.Fbfx_video = None
     sim.cloud_list[0].pyeclsaver.Fbfy_video = None
     sim.cloud_list[0].pyeclsaver.Fbfz_video = None
@@ -32,15 +34,20 @@ def _forces_movie_save(sim):
     pyeclsaver = sim.cloud_list[0].pyeclsaver
     #get the fields (on the particles)
     efx, efy, bfx, bfy, bfz = spacech_ele.get_sc_em_field(MP_e)
+    esfx, esfy = spacech_ele.get_sc_eletric_field(MP_e)
     #compute the forces (on the macro-particles)
     Fefx_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],efx)
     Fefy_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],efy)
+    Fesfx_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],esfx)
+    Fesfy_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],esfy)
     Fbfx_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],np.multiply(MP_e.vy_mp[0:MP_e.N_mp],bfz)-qe*np.multiply(MP_e.vz_mp[0:MP_e.N_mp],bfy))
     Fbfy_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],np.multiply(MP_e.vz_mp[0:MP_e.N_mp],bfx)-qe*np.multiply(MP_e.vx_mp[0:MP_e.N_mp],bfz))
     Fbfz_mp = qe*np.multiply(MP_e.nel_mp[0:MP_e.N_mp],np.multiply(MP_e.vx_mp[0:MP_e.N_mp],bfy)-qe*np.multiply(MP_e.vy_mp[0:MP_e.N_mp],bfx))
     #interpolate the forces to the mesh nodes
     Fefx = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fefx_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
     Fefy = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fefy_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
+    Fesfx = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fesfx_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
+    Fesfy = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fesfy_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
     Fbfx = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fbfx_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
     Fbfy = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fbfy_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
     Fbfz = rhocom.compute_sc_rho(MP_e.x_mp[0:MP_e.N_mp],MP_e.y_mp[0:MP_e.N_mp],Fbfz_mp,spacech_ele.bias_x,spacech_ele.bias_y,spacech_ele.Dh,spacech_ele.Nxg,spacech_ele.Nyg)
@@ -50,6 +57,8 @@ def _forces_movie_save(sim):
     if pyeclsaver.Fefx_video is None:
         pyeclsaver.Fefx_video = []
         pyeclsaver.Fefy_video = []
+        pyeclsaver.Fesfx_video = []
+        pyeclsaver.Fesfy_video = []
         pyeclsaver.Fbfx_video = []
         pyeclsaver.Fbfy_video = []
         pyeclsaver.Fbfz_video = []
@@ -57,6 +66,8 @@ def _forces_movie_save(sim):
     if spacech_ele.last_recomputation_check:
         pyeclsaver.Fefx_video.append(Fefx)
         pyeclsaver.Fefy_video.append(Fefy)
+        pyeclsaver.Fesfx_video.append(Fesfx)
+        pyeclsaver.Fesfy_video.append(Fesfy)
         pyeclsaver.Fbfx_video.append(Fbfx)
         pyeclsaver.Fbfy_video.append(Fbfy)
         pyeclsaver.Fbfz_video.append(Fbfz)
@@ -64,6 +75,8 @@ def _forces_movie_save(sim):
     if beamtim.flag_new_bunch_pass:
         pyeclsaver.Fefx_video = np.array(pyeclsaver.Fefx_video)
         pyeclsaver.Fefy_video = np.array(pyeclsaver.Fefy_video)
+        pyeclsaver.Fesfx_video = np.array(pyeclsaver.Fesfx_video)
+        pyeclsaver.Fesfy_video = np.array(pyeclsaver.Fesfy_video)
         pyeclsaver.Fbfx_video = np.array(pyeclsaver.Fbfx_video)
         pyeclsaver.Fbfy_video = np.array(pyeclsaver.Fbfy_video)
         pyeclsaver.Fbfz_video = np.array(pyeclsaver.Fbfz_video)
@@ -71,11 +84,14 @@ def _forces_movie_save(sim):
         filename_sc_forces = pyeclsaver.folder_outp + '/sc_forces/sc_forces_pass%d.mat'%(beamtim.pass_numb - 1)
         print('Saving %s'%filename_sc_forces)
         sio.savemat(filename_sc_forces, {'xg_sc': spacech_ele.xg, 'yg_sc': spacech_ele.yg, 't_efield_video_new': pyeclsaver.t_efield_video_new,
-                                  'Fefx_video': pyeclsaver.Fefx_video, 'Fefy_video': pyeclsaver.Fefy_video, 'Fbfx_video': pyeclsaver.Fbfx_video,
+                                  'Fefx_video': pyeclsaver.Fefx_video, 'Fefy_video': pyeclsaver.Fefy_video,
+                                  'Fesfx_video': pyeclsaver.Fesfx_video, 'Fesfy_video': pyeclsaver.Fesfy_video, 'Fbfx_video': pyeclsaver.Fbfx_video,
                                   'Fbfy_video': pyeclsaver.Fbfy_video, 'Fbfz_video': pyeclsaver.Fbfz_video}, oned_as='row')
         print('Done')
         pyeclsaver.Fefx_video = []
         pyeclsaver.Fefy_video = []
+        pyeclsaver.Fesfx_video = []
+        pyeclsaver.Fesfy_video = []
         pyeclsaver.Fbfx_video = []
         pyeclsaver.Fbfy_video = []
         pyeclsaver.Fbfz_video = []

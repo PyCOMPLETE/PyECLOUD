@@ -91,6 +91,7 @@ for pass_ind in passlist:
 
     rho_video = -obout_ecl_video.rho_video / qe
     sc_Fe_norm_video = np.sqrt(np.multiply(obout_sc_forces.Fefx_video,obout_sc_forces.Fefx_video)+np.multiply(obout_sc_forces.Fefy_video,obout_sc_forces.Fefy_video))
+    sc_Fes_norm_video = np.sqrt(np.multiply(obout_sc_forces.Fesfx_video,obout_sc_forces.Fesfx_video)+np.multiply(obout_sc_forces.Fesfy_video,obout_sc_forces.Fesfy_video))
     sc_Fb_norm_video = np.sqrt(np.multiply(obout_sc_forces.Fbfx_video,obout_sc_forces.Fbfx_video)+np.multiply(obout_sc_forces.Fbfy_video,obout_sc_forces.Fbfy_video)+np.multiply(obout_sc_forces.Fbfz_video,obout_sc_forces.Fbfz_video))
     t_video_old = np.squeeze(obout_ecl_video.t_video.real)
     t_video = np.squeeze(obout_sc_forces.t_efield_video_new.real)
@@ -100,7 +101,7 @@ for pass_ind in passlist:
     (nphotog_big, _, _) = rho_video.shape
 
     for ii in xrange(0, nphotog, N_dec):
-		fig = pl.figure(1, figsize=(9, 3))  # ,figsize=(4.5,6)
+		fig = pl.figure(1, figsize=(9, 9))  # ,figsize=(4.5,6)
 		t_curr = t_video[ii]
 		ii2, = np.where( t_video_old == t_curr)
 		t_curr_old = t_video_old[ii2]
@@ -112,6 +113,7 @@ for pass_ind in passlist:
 
 		imm = np.squeeze(rho_video[ii2, :, :])
 		imm_Fe_norm = np.squeeze(sc_Fe_norm_video[ii, :, :])
+		imm_Fes_norm = np.squeeze(sc_Fes_norm_video[ii, :, :])
 		imm_Fb_norm = np.squeeze(sc_Fb_norm_video[ii, :, :])
 		immlin = imm.copy()
 
@@ -120,7 +122,7 @@ for pass_ind in passlist:
 			imm = np.log10((imm))
 			imm[immlin < 10**lim_dens[0]] = lim_dens[0]
 
-		pl.subplot(1, 3, 1)
+		pl.subplot(2, 2, 1)
 		ax = pl.gca()
 		im = ax.imshow(imm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, vmin=lim_dens[0], vmax=lim_dens[1], origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
@@ -137,7 +139,7 @@ for pass_ind in passlist:
 		clb = pl.colorbar(im, cax=cax)
 		clb.set_label('log10(e- dens.)')
 
-		pl.subplot(1, 3, 2)
+		pl.subplot(2, 2, 2)
 		ax = pl.gca()
 		im = ax.imshow(imm_Fe_norm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, vmax=0.8*max(map(max, imm_Fe_norm)), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
@@ -152,7 +154,7 @@ for pass_ind in passlist:
 		clb = pl.colorbar(im, cax=cax)
 		clb.set_label('||Fe||   [N]')
 
-		pl.subplot(1, 3, 3)
+		pl.subplot(2, 2, 3)
 		ax = pl.gca()
 		im = ax.imshow(imm_Fb_norm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
                  alpha=None, vmax=0.8*max(map(max, imm_Fb_norm)), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
@@ -166,6 +168,21 @@ for pass_ind in passlist:
 		cax = divider.append_axes("right", size="5%", pad=0.02)
 		clb = pl.colorbar(im, cax=cax)
 		clb.set_label('||Fb||  [N]')
+
+		pl.subplot(2, 2, 4)
+		ax = pl.gca()
+		im = ax.imshow(imm_Fes_norm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
+                 alpha=None, vmax=0.8*max(map(max, imm_Fes_norm)), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+
+		pl.plot(Vx * 1e3, Vy * 1e3, 'y', linewidth=1.5)
+		pl.axis('equal')
+		pl.xlim(np.min(Vx * 1e3) - np.max(Vx * 1e3) / 10, np.max(Vx * 1e3) + np.max(Vx * 1e3) / 10)
+		pl.ylim(np.min(Vy * 1e3) - np.max(Vy * 1e3) / 10, np.max(Vy * 1e3) + np.max(Vy * 1e3) / 10)
+
+		divider = make_axes_locatable(ax)
+		cax = divider.append_axes("right", size="5%", pad=0.02)
+		clb = pl.colorbar(im, cax=cax)
+		clb.set_label('||Fe||  [N]  (electrostatic)')
 
 		pl.subplots_adjust(top=0.95, right=0.9, left=0.07, hspace=0.1, wspace=0.7)
 		filename = str('maps/Pass%05d_%05d' % (pass_ind, ii)) + '.png'
