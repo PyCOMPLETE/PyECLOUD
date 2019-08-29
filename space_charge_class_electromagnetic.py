@@ -70,10 +70,10 @@ na = lambda x: np.array([x])
 class space_charge_electromagnetic(space_charge, object):
 
     def __init__(self, chamb, Dh, gamma, Dt_sc=None, PyPICmode='FiniteDifferences_ShortleyWeller' , sparse_solver='scipy_slu',
-                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None):
+                 f_telescope=None, target_grid=None, N_nodes_discard=None, N_min_Dh_main=None, Dh_U_eV=None):
 
         super(space_charge_electromagnetic, self).__init__(chamb, Dh, Dt_sc, PyPICmode , sparse_solver,
-                     f_telescope, target_grid, N_nodes_discard, N_min_Dh_main)
+                     f_telescope, target_grid, N_nodes_discard, N_min_Dh_main, Dh_U_eV)
 
         self.flag_em_tracking = True
         # Initialize additional states for vector potential
