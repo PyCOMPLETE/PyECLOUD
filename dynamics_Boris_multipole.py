@@ -98,7 +98,6 @@ class pusher_Boris_multipole():
             vxn1 = MP_e.vx_mp[0:MP_e.N_mp]
             vyn1 = MP_e.vy_mp[0:MP_e.N_mp]
             vzn1 = MP_e.vz_mp[0:MP_e.N_mp]
-
             if Ez_n != 0.:
                 raise ValueError('Oooops! Not implemented....')
 
@@ -108,9 +107,9 @@ class pusher_Boris_multipole():
 
         return MP_e
 
-    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0., Dt_substep=None, N_sub_steps=None):
+    def stepcustomDt(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=np.asarray([0.]), By_n=np.asarray([0.]), Bz_n=np.asarray([0.]), Dt_substep=None, N_sub_steps=None):
 
-        if  len(Bx_n) != 1 or len(By_n) != 1 or  len(Bz_n) != 1 or Bx_n != 0. or By_n != 0. or  Bz_n != 0.:
+        if (Bx_n == np.asarray([0.])).all() and (By_n == np.asarray([0.])).all() and (Bz_n == np.asarray([0.])).all():
             custom_B = 0
         else:
             custom_B = 1
