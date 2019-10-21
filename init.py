@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -68,6 +68,8 @@ from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
 from sec_emission_model_cos_low_ener import SEY_model_cos_le
 from sec_emission_model_flat_low_ener import SEY_model_flat_le
 from sec_emission_model_from_file import SEY_model_from_file
+from sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from sec_emission_model_perfect_absorber import SEY_model_perfect_absorber
 
 import dynamics_dipole as dyndip
 import dynamics_Boris_f2py as dynB
@@ -77,7 +79,6 @@ import dynamics_Boris_multipole as dynmul
 import MP_system as MPs
 import space_charge_class as scc
 import impact_management_class as imc
-import perfect_absorber_class as pac
 import pyecloud_saver as pysav
 import gas_ionization_class as gic
 import gen_photoemission_class as gpc
@@ -106,7 +107,6 @@ def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     # Update input_parameters object with parameters from other files
     inp_spec.update_module(input_parameters, machine_parameters)
     inp_spec.update_module(input_parameters, secondary_emission_parameters)
-
     # Check validity of input files
     inp_spec.assert_module_has_parameters(input_parameters, 'combined_simulations_secondaryEmission_machine_parameters')
 
@@ -128,7 +128,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                          ignore_kwargs=(), **kwargs):
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
-
     # Override config values with kwargs
     for attr, value in kwargs.items():
         if attr in ignore_kwargs:
@@ -287,11 +286,12 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Dx_hist, thiscloud.Nx_regen, thiscloud.Ny_regen, thiscloud.Nvx_regen,
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
-                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass)
+                             N_mp_async_regen=thiscloud.N_mp_async_regen, N_mp_after_async_regen=thiscloud.N_mp_after_async_regen,
+                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
-            sey_mod = pac.Dummy_SEY()
+            sey_mod = SEY_model_perfect_absorber()
         else:
 
             kwargs_secem = {}
@@ -364,31 +364,41 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                               thresh_low_energy=thiscloud.thresh_low_energy,
                                               secondary_angle_distribution=thiscloud.secondary_angle_distribution,
                                               **kwargs_secem)
+            elif(thiscloud.switch_model == 'furman_pivi'):
+                kwargs_secem['flag_costheta_delta_scale'] = thiscloud.flag_costheta_delta_scale
+                kwargs_secem['flag_costheta_Emax_shift'] = thiscloud.flag_costheta_Emax_shift
+                sey_mod = SEY_model_furman_pivi(E_th=thiscloud.E_th, sigmafit=thiscloud.sigmafit, mufit=thiscloud.mufit,
+                                                switch_no_increase_energy=thiscloud.switch_no_increase_energy,
+                                                thresh_low_energy=thiscloud.thresh_low_energy,
+                                                secondary_angle_distribution=thiscloud.secondary_angle_distribution,
+                                                furman_pivi_surface=thiscloud.furman_pivi_surface,
+                                                **kwargs_secem)
+
             else:
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
         # Init impact management
-        flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+        flag_seg = (thiscloud.flag_hist_impact_seg == 1 or thiscloud.flag_hist_impact_seg is True)
 
         if flag_seg and cc.chamb_type == 'ellip':
             print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
             flag_seg = False
 
+        if cc.flag_lifetime_hist:
+            if cc.Nbin_lifetime_hist is None or cc.lifetime_hist_max is None or cc.Dt_lifetime_hist is None:
+                raise inp_spec.PyECLOUD_ConfigException(
+                        'If flag_lifetime_hist is True then all the histogram parameters must be specified')
 
-        if thiscloud.switch_model == 'perfect_absorber':
-            impact_man_class = pac.impact_management_perfect_absorber
-        else:
-            impact_man_class = imc.impact_management
-
-        impact_man = impact_man_class(chamb, sey_mod,
-                                      thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
-                                      flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
-                                      )
+        impact_man = imc.impact_management(chamb, sey_mod,
+            thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
+            cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
+            flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
+            cos_angle_width=cc.cos_angle_width)
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag == 1:
             resgasion = gic.residual_gas_ionization(thiscloud.unif_frac, thiscloud.P_nTorr, thiscloud.sigma_ion_MBarn,
-                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion)
+                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion, thiscloud.flag_lifetime_hist)
         else:
             resgasion = None
 
@@ -434,9 +444,16 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
-                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables, 
-                                       save_once_custom_observables=cc.save_once_custom_observables)
-
+                                       pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
+                                       save_once_custom_observables=cc.save_once_custom_observables, 
+                                       flag_lifetime_hist = thiscloud.flag_lifetime_hist,
+                                       Dt_lifetime_hist = thiscloud.Dt_lifetime_hist,
+                                       extract_ene_dist=cc.extract_ene_dist,
+                                       ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
+                                       Nbin_extract_ene=cc.Nbin_extract_ene,
+                                       factor_ene_dist_max=cc.factor_ene_dist_max,
+                                       save_only = thiscloud.save_only
+                                       )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker

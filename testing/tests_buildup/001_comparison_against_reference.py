@@ -13,7 +13,7 @@ import PyECLOUD.mystyle as ms
 
 pl.close('all')
 
-#sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
+sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_change_s_and_E0'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multigrid'
@@ -35,7 +35,8 @@ pl.close('all')
 #sim_folder = 'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver'
 #sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime'
-sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/'
+#sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/'
+#sim_folder = 'Rectangular_Dip_450GeV_sey1.60_1.1e11ppb_furman_pivi'
 
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
@@ -224,5 +225,3 @@ print folder_plot
 print 'In ipython, you may call EOG() to view the results if EOG is installed.'
 EOG = lambda : os.system('eog %s/*%s* &' % (folder_plot, args.angle_dist_func))
         #~ #pl.show()
-
-

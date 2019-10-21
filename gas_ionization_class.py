@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.1.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -58,7 +58,7 @@ from scipy.constants import c, k, e
 
 class residual_gas_ionization:
 
-    def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion):
+    def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion, flag_lifetime_hist = False):
 
         print 'Start res. gas ioniz. init.'
         self.unif_frac = unif_frac
@@ -72,6 +72,8 @@ class residual_gas_ionization:
 
 #         self.x_beam_pos = x_beam_pos
 #         self.y_beam_pos = y_beam_pos
+
+        self.flag_lifetime_hist = flag_lifetime_hist
 
         print 'Done res. gas ioniz. init.'
 
@@ -88,7 +90,6 @@ class residual_gas_ionization:
         n_gas = P_Pa / (k * self.Temp_K)
 
         k_ion = n_gas * sigma_ion_mq * c
-
         DNel = k_ion * lambda_t * Dt
 
         N_new_MP = DNel / MP_e.nel_mp_ref
@@ -120,8 +121,10 @@ class residual_gas_ionization:
             MP_e.vy_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             MP_e.vz_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             MP_e.nel_mp[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = MP_e.nel_mp_ref
+        
+            if self.flag_lifetime_hist:
+                MP_e.t_last_impact[ MP_e.N_mp: MP_e.N_mp + Nint_new_MP] = -1
 
             MP_e.N_mp = int(MP_e.N_mp + Nint_new_MP)
 
         return MP_e
-

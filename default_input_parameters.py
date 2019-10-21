@@ -62,10 +62,13 @@ parameters_dict = {
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
+            'N_mp_async_regen': None,
+            'N_mp_after_async_regen': None,
             'stopfile': 'stop',
 
             # Saving settings
             'filen_main_outp': 'Pyecltest.mat',
+            'save_only': None,
             'flag_movie': 0,
             'flag_sc_movie': 0,
             'flag_cos_angle_hist': True,
@@ -73,6 +76,7 @@ parameters_dict = {
             'save_mp_state_time_file': -1,
             'flag_detailed_MP_info': 0,
             'flag_hist_impact_seg': 1,
+            'flag_En_hist_seg': False,
             'flag_verbose_file': False,
             'flag_verbose_stdout': False,
             'dec_fac_secbeam_prof': 1,
@@ -87,6 +91,10 @@ parameters_dict = {
             'x_max_hist_det': None,
             'y_max_hist_det': None,
             'Dx_hist_det': None,
+            'flag_lifetime_hist': False,
+            'Nbin_lifetime_hist': None,
+            'lifetime_hist_max': None,
+            'Dt_lifetime_hist':None,
 
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
@@ -106,7 +114,13 @@ parameters_dict = {
 
             'step_by_step_custom_observables': None,
             'pass_by_pass_custom_observables': None,
-            'save_once_custom_observables': None
+            'save_once_custom_observables': None,
+
+            # Energy extraction parameters
+            'extract_ene_dist': False,
+            'ene_dist_test_E_impact_eV': None,
+            'Nbin_extract_ene': None,
+            'factor_ene_dist_max': None,
 
         },
     },
@@ -284,6 +298,10 @@ parameters_dict = {
             'sey_file': None,
             'flag_costheta_Emax_shift': True,
             'flag_costheta_delta_scale': True,
+
+            # Furman-Pivi Model
+            'furman_pivi_surface': None
+
         },
     },
     'combined_simulations_secondaryEmission_machine_parameters': {
@@ -314,6 +332,8 @@ parameters_dict = {
         },
         'optional': {
 
+            'save_only': (),
+            
             # MP management settings
             'N_mp_max': (),
             'N_mp_regen': (),
@@ -328,6 +348,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': (),
             'N_mp_after_soft_regen': (),
+            'N_mp_async_regen': (),
+            'N_mp_after_async_regen': (),
 
             # Tracking and magnetic field
             'N_sub_steps': (),
@@ -395,12 +417,19 @@ parameters_dict = {
             'flag_costheta_Emax_shift': (),
             'flag_costheta_delta_scale': (),
 
+            # Furman-Pivi model of SEY
+            'furman_pivi_surface': (),
+
             # Saving settings
             'Dx_hist': (),
             'r_center': (),
             'Dt_En_hist': (),
             'Nbin_En_hist': (),
             'En_hist_max': (),
+            'flag_lifetime_hist': (),
+            'Nbin_lifetime_hist': (),
+            'lifetime_hist_max': (),
+            'Dt_lifetime_hist': (),
 
             'flag_movie': (),
             'flag_sc_movie': (),
@@ -409,6 +438,7 @@ parameters_dict = {
             'save_mp_state_time_file': (),
             'flag_detailed_MP_info': (),
             'flag_hist_impact_seg': (),
+            'flag_En_hist_seg':(),
             'flag_verbose_file': (),
             'flag_verbose_stdout': (),
             'dec_fac_secbeam_prof': (),
