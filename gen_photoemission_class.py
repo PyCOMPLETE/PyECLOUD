@@ -137,9 +137,11 @@ class photoemission(photoemission_base):
             elif x0_refl == 'right':
                 xout = self.out_radius
             x_int, _, _, _, _, _ = self.chamb.impact_point_and_normal(
-                np.array([0.]), np.array([0.]), np.array([0.]), 
+                np.array([0.]), np.array([0.]), np.array([0.]),
                 3.*np.array([xout]), np.array([0.]), np.array([0.]),resc_fac=0.99999)
             self.x0_refl = x_int[0]
+        else:
+            self.x0_refl = x0_refl
 
         x0_refl_np_arr = np.array([self.x0_refl])
         y0_refl_np_arr = np.array([self.y0_refl])

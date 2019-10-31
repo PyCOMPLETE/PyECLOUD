@@ -103,13 +103,14 @@ class Ionization_Process(object):
         N_proj = len(nel_mp_proj)
 
         # Calculate remaining density
-        DN_target = np.sum(DN_per_proj)
-        self.N_target -=  DN_target
-        self.target_dens = self.N_target / self.target_area
+        if flag_generate:
+            DN_target = np.sum(DN_per_proj)
+            self.N_target =  np.round(self.N_target - DN_target, 3)
+            self.target_dens = self.N_target / self.target_area
 
-        if self.target_dens < 0.1 * self.last_reported_target_dens:
-            print('Cross-ionization process %s target density = %.2e' %(self.name, self.target_dens))
-            self.last_reported_target_dens = self.target_dens
+            if self.target_dens < 0.1 * self.last_reported_target_dens:
+                print('Cross-ionization process %s target density = %.2e' %(self.name, self.target_dens))
+                self.last_reported_target_dens = self.target_dens
 
         new_mp_info = {}
 
@@ -129,8 +130,8 @@ class Ionization_Process(object):
             N_mp_per_proj_float = DN_per_proj / nel_mp_ref_gen
             N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
             rest = N_mp_per_proj_float - N_mp_per_proj_int
-            N_mp_per_proj_int = np.int_(N_mp_per_proj_int)
-            N_mp_per_proj_int += np.int_(rand(N_proj) < rest)
+            N_mp_per_proj_int = np.atleast_1d(np.int_(N_mp_per_proj_int))
+            N_mp_per_proj_int += np.atleast_1d(np.int_(rand(N_proj) < rest))
 
             N_new_MPs = np.sum(N_mp_per_proj_int)
 
