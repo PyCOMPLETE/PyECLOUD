@@ -176,7 +176,7 @@ class Ionization_Process(object):
             new_mp_info[product]['vy_new_MPs'] = vy_new_MPs
             new_mp_info[product]['vz_new_MPs'] = vz_new_MPs
 
-        return new_mp_info
+        return new_mp_info, np.sum(DN_per_proj)
 
 
     def get_sigma(self, energy_eV_proj):
@@ -255,9 +255,11 @@ class Cross_Ionization(object):
         # Initialize dictionary for quantities to save
         self.nel_cross_ion = {}
         self.N_mp_cross_ion = {}
+        self.DN_proj = {}
         for cloud in cloud_list:
             self.nel_cross_ion[cloud.name] = 0.
             self.N_mp_cross_ion[cloud.name] = 0
+            self.DN_proj[cloud.name] = 0.
 
 
     def generate(self, Dt, cloud_list):
@@ -269,7 +271,7 @@ class Cross_Ionization(object):
 
         new_mps_to_gen = self._init_new_mp_dict(self.products)
 
-        for projectile in self.projectiles_dict.keys():            
+        for projectile in self.projectiles_dict.keys():
             thiscloud = cloud_dict[projectile]
             MP_e = thiscloud.MP_e
             N_mp = MP_e.N_mp
@@ -293,7 +295,7 @@ class Cross_Ionization(object):
 
                 for process in self.projectiles_dict[projectile]:
 
-                    mp_info_from_proc = process.generate(Dt=Dt,
+                    mp_info_from_proc, DN_proj = process.generate(Dt=Dt,
                                                          cloud_dict=cloud_dict,
                                                          mass_proj=mass,
                                                          N_proj=N_mp,
@@ -306,6 +308,7 @@ class Cross_Ionization(object):
                     for product in process.products:
                         self._add_to_mp_dict(new_mps_to_gen[product],
                                              mp_info_from_proc[product])
+                        self.DN_proj[product] += DN_proj
 
         t_last_impact = -1
         for thiscloud in cloud_list:
@@ -336,10 +339,12 @@ class Cross_Ionization(object):
 
         thiscloud_nel_cross_ion = self.nel_cross_ion[cloud_name]
         thiscloud_N_mp_cross_ion = self.N_mp_cross_ion[cloud_name]
+        thiscloud_DN_proj = self.DN_proj[cloud_name]
         self.nel_cross_ion[cloud_name] = 0.
         self.N_mp_cross_ion[cloud_name] = 0.
+        self.DN_proj[cloud_name] = 0.
 
-        return thiscloud_nel_cross_ion, thiscloud_N_mp_cross_ion
+        return thiscloud_nel_cross_ion, thiscloud_N_mp_cross_ion, thiscloud_DN_proj
 
 
     def _extract_sigma(self, Dt, cloud_dict, n_rep, energy_eV):
@@ -387,7 +392,7 @@ class Cross_Ionization(object):
                         v_ene = v_test[i_ene]
                         v_mp = v_ene * np.ones(n_rep)
 
-                        mp_info_from_proc = process.generate(Dt, cloud_dict=cloud_dict,
+                        mp_info_from_proc, _ = process.generate(Dt, cloud_dict=cloud_dict,
                                                              mass_proj=mass, N_proj=N_mp,
                                                              nel_mp_proj=nel_mp, x_proj=x_mp,
                                                              y_proj=y_mp, z_proj=z_mp,
