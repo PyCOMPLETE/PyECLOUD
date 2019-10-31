@@ -155,6 +155,10 @@ class MP_system:
 
         print "Cloud %s: Done clean. N_mp=%d Nel=%e"%(self.name, self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
 
+        if self.N_mp == 0:
+            self.set_nel_mp_ref(self.nel_mp_ref_0)
+            print('Cloud %s: nel_mp_ref set to nel_mp_ref_0'%self.name)
+
     def set_nel_mp_ref(self, val):
         self.nel_mp_ref = val
         self.nel_mp_split = self.fact_split * val
