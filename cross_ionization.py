@@ -130,8 +130,8 @@ class Ionization_Process(object):
             N_mp_per_proj_float = DN_per_proj / nel_mp_ref_gen
             N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
             rest = N_mp_per_proj_float - N_mp_per_proj_int
-            N_mp_per_proj_int = np.int_(N_mp_per_proj_int)
-            N_mp_per_proj_int += np.int_(rand(N_proj) < rest)
+            N_mp_per_proj_int = np.atleast_1d(np.int_(N_mp_per_proj_int))
+            N_mp_per_proj_int += np.atleast_1d(np.int_(rand(N_proj) < rest))
 
             N_new_MPs = np.sum(N_mp_per_proj_int)
 
