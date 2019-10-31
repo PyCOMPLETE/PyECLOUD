@@ -136,6 +136,8 @@ class space_charge:
         else:
             self.evaluate_U_eV = False
 
+
+        self.comm = None
         print 'Done space charge init.'
 
     @property
@@ -173,6 +175,25 @@ class space_charge:
         self.PyPICobj.scatter(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp], MP_e.nel_mp[0:MP_e.N_mp], charge=MP_e.charge, flag_add=not(flag_reset))
         # solve
         if flag_solve:
+
+            if self.comm is not None:
+                n_sims = self.comm.Get_size()
+                myid = self.comm.Get_rank()
+
+                sendbuf = self.PyPICobj.rho.flatten()
+                recvbuf = np.zeros((len(sendbuf)*n_sims))
+                self.comm.Gather(sendbuf, recvbuf) # assumes root is 0
+
+                if myid == 0:
+                    avgrho = np.mean(
+                        recvbuf.reshape(n_sims, len(sendbuf)),
+                        axis = 0)
+                else:
+                    avgrho = 0 * sendbuf # prepare buffer for receive
+                
+                self.comm.Bcast(avgrho)
+                self.PyPICobj.rho = avgrho.reshape(self.PyPICobj.rho.shape)
+
             self.PyPICobj.solve()
 
     #@profile
