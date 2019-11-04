@@ -114,20 +114,29 @@ class Ionization_Process(object):
 
         new_mp_info = {}
 
+        # Calculate average product nel_mp_ref
+        nel_mp_ref_products = 0.
+        N_products = len(self.products)
+        for product in self.products:
+
+            thiscloud_gen = cloud_dict[product]
+            MP_e_gen = thiscloud_gen.MP_e
+            nel_mp_ref_gen = MP_e_gen.nel_mp_ref
+            nel_mp_ref_products += nel_mp_ref_gen / N_products
+
         for product in self.products:
 
             new_mp_info[product] = {}
 
             thiscloud_gen = cloud_dict[product]
             MP_e_gen = thiscloud_gen.MP_e
-            nel_mp_ref_gen = MP_e_gen.nel_mp_ref
             mass_gen = MP_e_gen.mass
 
             # Initialize generated MPs with energy defined by user 
             v0_gen = np.sqrt(2 * (self.E_eV_init / 3.) * qe / mass_gen)
 
             # Compute N_mp to add
-            N_mp_per_proj_float = DN_per_proj / nel_mp_ref_gen
+            N_mp_per_proj_float = DN_per_proj / nel_mp_ref_products
             N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
             rest = N_mp_per_proj_float - N_mp_per_proj_int
             N_mp_per_proj_int = np.atleast_1d(np.int_(N_mp_per_proj_int))
@@ -139,7 +148,7 @@ class Ionization_Process(object):
                 mask_gen = N_mp_per_proj_int > 0
                 N_mp_per_proj_int_masked = N_mp_per_proj_int[mask_gen]
 
-                nel_new_MPs_masked = np.ones(np.sum(mask_gen)) * nel_mp_ref_gen
+                nel_new_MPs_masked = np.ones(np.sum(mask_gen)) * nel_mp_ref_products
 
                 nel_new_MPs = np.repeat(nel_new_MPs_masked, N_mp_per_proj_int_masked)
 
