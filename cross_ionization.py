@@ -124,6 +124,15 @@ class Ionization_Process(object):
             nel_mp_ref_gen = MP_e_gen.nel_mp_ref
             nel_mp_ref_products += nel_mp_ref_gen / N_products
 
+        # Compute N_mp to add
+        N_mp_per_proj_float = DN_per_proj / nel_mp_ref_products
+        N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
+        rest = N_mp_per_proj_float - N_mp_per_proj_int
+        N_mp_per_proj_int = np.atleast_1d(np.int_(N_mp_per_proj_int))
+        N_mp_per_proj_int += np.atleast_1d(np.int_(rand(N_proj) < rest))
+
+        N_new_MPs = np.sum(N_mp_per_proj_int)
+
         for product in self.products:
 
             new_mp_info[product] = {}
@@ -134,15 +143,6 @@ class Ionization_Process(object):
 
             # Initialize generated MPs with energy defined by user 
             v0_gen = np.sqrt(2 * (self.E_eV_init / 3.) * qe / mass_gen)
-
-            # Compute N_mp to add
-            N_mp_per_proj_float = DN_per_proj / nel_mp_ref_products
-            N_mp_per_proj_int = np.floor(N_mp_per_proj_float)
-            rest = N_mp_per_proj_float - N_mp_per_proj_int
-            N_mp_per_proj_int = np.atleast_1d(np.int_(N_mp_per_proj_int))
-            N_mp_per_proj_int += np.atleast_1d(np.int_(rand(N_proj) < rest))
-
-            N_new_MPs = np.sum(N_mp_per_proj_int)
 
             if N_new_MPs > 0:
                 mask_gen = N_mp_per_proj_int > 0
