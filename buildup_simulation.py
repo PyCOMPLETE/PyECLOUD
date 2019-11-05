@@ -84,6 +84,7 @@ class BuildupSimulation(object):
         self.cloud_list = cloud_list
         self.chamb = cloud_list[0].impact_man.chamb
         self.checkpoint_folder = checkpoint_folder
+        self.flag_em_tracking = spacech_ele.flag_em_tracking
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
@@ -165,8 +166,16 @@ class BuildupSimulation(object):
                     Ex_n_beam += Ex_n_secbeam
                     Ey_n_beam += Ey_n_secbeam
 
-            ## Compute electron space charge electric field
-            Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+            ## Either compute electromagnetic field or electrostatic
+            if self.flag_em_tracking:
+                Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
+            else:
+                ## Compute electron space charge electric field
+                Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+                Bx_sc_n = np.asarray([0.])
+                By_sc_n = np.asarray([0.])
+                Bz_sc_n = np.asarray([0.])
+
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
@@ -187,7 +196,7 @@ class BuildupSimulation(object):
             ## Motion
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
                 # Standard simulation mode
-                MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
+                MP_e = dynamics.step(MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n)
             elif Dt_substep_custom is None and N_sub_steps_custom is None and not(beamtim.flag_unif_Dt):
                 # Dt from non-uniform beam profile
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
@@ -195,16 +204,15 @@ class BuildupSimulation(object):
                 Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
                 N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
                 Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
-                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
             else:
                 # Custom steps and substeps provided as arguments of sim_time_step
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
                     raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
-                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
 
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
-
             ## Evolve SEY module (e.g. charge decay for insulators
             impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
 
@@ -229,7 +237,11 @@ class BuildupSimulation(object):
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
-                spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+                ## Either compute electromagnetic field or electrostatic
+                if self.flag_em_tracking:
+                    spacech_ele.recompute_spchg_emfield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+                else:
+                    spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
 
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
@@ -294,7 +306,15 @@ class BuildupSimulation(object):
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
+
+        if self.spacech_ele.flag_em_tracking:
+            print 'Restoring PyPIC Ax, Ay and As state objects...'
+            self.spacech_ele.state_Ax = self.spacech_ele.PyPICobj.get_state_object()
+            self.spacech_ele.state_Ay = self.spacech_ele.PyPICobj.get_state_object()
+            self.spacech_ele.state_As = self.spacech_ele.PyPICobj.get_state_object()
+
         print 'Done reload.'
+
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):

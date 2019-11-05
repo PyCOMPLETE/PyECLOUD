@@ -53,6 +53,7 @@ from __future__ import division, print_function
 import os
 import numpy as np
 from scipy.constants import c, m_e, e as qe
+from scipy.constants import m_p
 
 import myloadmat_to_obj as mlm
 
@@ -77,6 +78,7 @@ import dynamics_strong_B_generalized as dyngen
 import dynamics_Boris_multipole as dynmul
 
 import MP_system as MPs
+import space_charge_class_electromagnetic as scc_em
 import space_charge_class as scc
 import impact_management_class as imc
 import pyecloud_saver as pysav
@@ -263,9 +265,20 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.sparse_solver == 'klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver = 'PyKLU'
-        spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+
+        if cc.flag_em_tracking:
+            if skip_beam:
+                raise ValueError("Beam must be included when using electromagnetic tracking!!")
+
+            E_0_proton_ev = m_p*c*c/qe
+            gamma = b_par.energy_eV/E_0_proton_ev
+            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, gamma, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                                            f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
                                            Dh_U_eV=cc.Dh_electric_energy)
+        else:
+            spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                        f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
+                                        Dh_U_eV=cc.Dh_electric_energy)
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -446,7 +459,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
-                                       save_once_custom_observables=cc.save_once_custom_observables, 
+                                       save_once_custom_observables=cc.save_once_custom_observables,
                                        flag_lifetime_hist = thiscloud.flag_lifetime_hist,
                                        Dt_lifetime_hist = thiscloud.Dt_lifetime_hist,
                                        extract_ene_dist=cc.extract_ene_dist,
@@ -460,9 +473,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Init electron tracker
         if cc.track_method == 'Boris':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             dynamics = dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
                                          cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBdip tracking method is implemented only for electrons!')
@@ -472,6 +489,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 B = cc.B
             dynamics = dyndip.pusher_dipole_magnet(cc.Dt, B)
         elif cc.track_method == 'StrongBgen':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
@@ -518,5 +537,5 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             config_dict,
             flag_multiple_clouds,
             cloud_list,
-            cc.checkpoint_folder
+            cc.checkpoint_folder,
             )

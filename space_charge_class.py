@@ -124,13 +124,14 @@ class space_charge:
         self.flag_decimate = (self.Dt_sc is not None)
         self.last_recomputation_check = False
 
+        self.flag_em_tracking = False
         if Dh_U_eV is not None:
             self.evaluate_U_eV = True
             self.Dh_U_eV = Dh_U_eV
             self.xn_U_eV, self.yn_U_eV=np.meshgrid(
                     np.arange(-chamb.x_aper*1.01, chamb.x_aper*1.01, Dh_U_eV),
                     np.arange(-chamb.y_aper*1.01, chamb.y_aper*1.01, Dh_U_eV))
-        
+
             self.xn_U_eV = self.xn_U_eV.T.flatten()
             self.yn_U_eV = self.yn_U_eV.T.flatten()
         else:
@@ -182,7 +183,7 @@ class space_charge:
     def get_sc_eletric_field(self, MP_e):
         Ex_sc_n, Ey_sc_n = self.PyPICobj.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
         return Ex_sc_n, Ey_sc_n
-    
+
     def get_potential_electric_energy(self):
         if not self.evaluate_U_eV:
             raise ValueError('Cannot compute potential energy, please provide Dh_U_eV!')

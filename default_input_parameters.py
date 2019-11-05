@@ -123,6 +123,7 @@ parameters_dict = {
             'Nbin_extract_ene': None,
             'factor_ene_dist_max': None,
 
+            'flag_em_tracking' : False,
         },
     },
     'machine_parameters': {

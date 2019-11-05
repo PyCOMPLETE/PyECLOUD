@@ -337,7 +337,7 @@ class pyecloud_saver:
             self.energ_eV_impact_seg = []
             if impact_man.flag_En_hist_seg:
                 self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
-            
+
         # detailed hist
         self.flag_hist_det = False
         self.xg_hist_det = -1
@@ -747,7 +747,7 @@ class pyecloud_saver:
             self.N_mp_time = 0. * self.t
         else:
             self.N_mp_time = -1
-        
+
         if self.flag_electric_energy:
             self.En_electric_eV_time = 0. * self.t
         else:
@@ -915,8 +915,19 @@ class pyecloud_saver:
         if self.flag_last_cloud:
 
             temp_luobj = spacech_ele.PyPICobj.luobj
-            spacech_ele.luobj = None
             spacech_ele.PyPICobj.luobj = None
+
+            if spacech_ele.flag_em_tracking:
+                temp_state_Ax = spacech_ele.state_Ax
+                temp_state_Ay = spacech_ele.state_Ay
+                temp_state_As = spacech_ele.state_As
+                temp_state_Ax_old = spacech_ele.state_Ax_old
+                temp_state_Ay_old = spacech_ele.state_Ay_old
+                spacech_ele.state_Ax = None
+                spacech_ele.state_Ay = None
+                spacech_ele.state_As = None
+                spacech_ele.state_Ax_old = None
+                spacech_ele.state_Ay_old = None
 
             #~ dynamics.get_B=None
 
@@ -948,6 +959,13 @@ class pyecloud_saver:
                 cloud.pyeclsaver = saver
 
             spacech_ele.PyPICobj.luobj = temp_luobj
+
+            if spacech_ele.flag_em_tracking:
+                spacech_ele.state_Ax = temp_state_Ax
+                spacech_ele.state_Ay = temp_state_Ay
+                spacech_ele.state_As = temp_state_As
+                spacech_ele.state_Ax_old = temp_state_Ax_old
+                spacech_ele.state_Ay_old = temp_state_Ay_old
 
             print('Save simulation state in: ' + outfile)
 
@@ -1133,7 +1151,7 @@ class pyecloud_saver:
             if N_mp > 0:
                 histf.compute_hist(Ekin, MP_e.nel_mp[:N_mp], 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
-            
+
             # Energy histogram per segment
             if impact_man.flag_seg:
                 if impact_man.flag_En_hist_seg:
@@ -1149,5 +1167,3 @@ class pyecloud_saver:
                 self.t_lifetime_hist.append(beamtim.tt_curr)
                 impact_man.reset_lifetime_hist_line()
                 self.t_last_lifetime_hist = beamtim.tt_curr
-
-
