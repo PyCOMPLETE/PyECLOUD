@@ -270,9 +270,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             if skip_beam:
                 raise ValueError("Beam must be included when using electromagnetic tracking!!")
 
-            E_0_proton_ev = m_p*c*c/qe
-            gamma = b_par.energy_eV/E_0_proton_ev
-            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, gamma, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, b_par.gamma_rel, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
                                            f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
                                            Dh_U_eV=cc.Dh_electric_energy)
         else:
