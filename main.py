@@ -1,5 +1,3 @@
-#!/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/python
-
 #-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
