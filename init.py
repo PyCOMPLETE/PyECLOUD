@@ -80,6 +80,7 @@ import dynamics_Boris_multipole as dynmul
 
 import MP_system as MPs
 import space_charge_class as scc
+import space_charge_class_electromagnetic as scc_em
 import impact_management_class as imc
 import pyecloud_saver as pysav
 import gas_ionization_class as gic
