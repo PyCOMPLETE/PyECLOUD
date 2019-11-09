@@ -253,7 +253,8 @@ class pyecloud_saver:
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
-                t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams, sec_beams_list,
+                t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams,
+                sec_beams_list,
                 cloud_list, buildup_sim, cross_ion, rho_cloud=None):
 
         ####################################################
