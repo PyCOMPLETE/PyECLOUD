@@ -124,6 +124,10 @@ parameters_dict = {
             'factor_ene_dist_max': None,
 
             'flag_em_tracking' : False,
+
+            # Cross-ionization
+            'cross_ion_definitions': None
+
         },
     },
     'machine_parameters': {

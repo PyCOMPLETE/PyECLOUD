@@ -123,6 +123,7 @@ class pyecloud_saver:
                         ene_dist_test_E_impact_eV=None,
                         Nbin_extract_ene=None,
                         factor_ene_dist_max=None,
+                        flag_cross_ion=False,
                         save_only=None,
                         flag_electric_energy=False
                         ):
@@ -155,6 +156,8 @@ class pyecloud_saver:
             self.fname_only_main_outp = self.filen_main_outp
 
         self.flag_detailed_MP_info = flag_detailed_MP_info
+
+        self.flag_cross_ion = flag_cross_ion
 
         # cloud info
         self.flag_multiple_clouds = flag_multiple_clouds
@@ -250,7 +253,7 @@ class pyecloud_saver:
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
                 t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams, sec_beams_list,
-                cloud_list, buildup_sim, rho_cloud=None):
+                cloud_list, buildup_sim, cross_ion, rho_cloud=None):
 
         ####################################################
         # Quantities saved at custom times provided by user #
@@ -280,7 +283,7 @@ class pyecloud_saver:
         #########################
         # Step-by-step saveings #
         #########################
-        self._stepbystep_data_save(impact_man, MP_e, beamtim, buildup_sim)
+        self._stepbystep_data_save(impact_man, MP_e, beamtim, buildup_sim, cross_ion)
 
         ##########################################################
         # Quantities saved at each bunch passage and dump to file #
@@ -337,7 +340,7 @@ class pyecloud_saver:
             self.energ_eV_impact_seg = []
             if impact_man.flag_En_hist_seg:
                 self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
-
+            
         # detailed hist
         self.flag_hist_det = False
         self.xg_hist_det = -1
@@ -593,6 +596,10 @@ class pyecloud_saver:
                                      'cen_density',
                                      'lam_t_array',
                                      'N_mp_time',
+                                     'nel_mp_ref_time',
+                                     'Nel_cross_ion',
+                                     'N_mp_cross_ion',
+                                     'DN_cross_ion',
                                      'En_electric_eV_time',
                                      't']
 
@@ -696,6 +703,12 @@ class pyecloud_saver:
             ]
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
+                list_members.append('nel_mp_ref_time')
+
+            if self.flag_cross_ion:
+                list_members.append('Nel_cross_ion')
+                list_members.append('N_mp_cross_ion')
+                list_members.append('DN_cross_ion')
 
             if self.flag_electric_energy:
                 list_members.append('En_electric_eV_time')
@@ -745,8 +758,19 @@ class pyecloud_saver:
 
         if self.flag_detailed_MP_info == 1:
             self.N_mp_time = 0. * self.t
+            self.nel_mp_ref_time = 0. * self.t
         else:
             self.N_mp_time = -1
+            self.nel_mp_ref_time = -1
+
+        if self.flag_cross_ion:
+            self.Nel_cross_ion = 0. * self.t
+            self.N_mp_cross_ion = 0 * self.t
+            self.DN_cross_ion = 0 * self.t
+        else:
+            self.Nel_cross_ion = -1
+            self.N_mp_cross_ion = -1
+            self.DN_cross_ion = -1
 
         if self.flag_electric_energy:
             self.En_electric_eV_time = 0. * self.t
@@ -781,7 +805,7 @@ class pyecloud_saver:
             for kk in step_by_step_custom_observables.keys():
                 self.sbs_custom_data[kk] = 0 * self.t
 
-    def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim):
+    def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim, cross_ion):
         #save step by step data
         # Vars to be accumulated
         self.Nel_impact_last_step_group += impact_man.Nel_impact_last_step
@@ -828,6 +852,12 @@ class pyecloud_saver:
 
             if self.flag_detailed_MP_info == 1:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
+                self.nel_mp_ref_time[self.i_last_save] = MP_e.nel_mp_ref
+
+            if self.flag_cross_ion:
+                (self.Nel_cross_ion[self.i_last_save],
+                    self.N_mp_cross_ion[self.i_last_save],
+                    self.DN_cross_ion[self.i_last_save]) = cross_ion.save_cross_ion_data(self.cloud_name)
 
             if self.step_by_step_custom_observables is not None:
                 for kk in self.step_by_step_custom_observables.keys():
@@ -848,6 +878,12 @@ class pyecloud_saver:
 
         if self.flag_detailed_MP_info == 1:
             dict_sbs_data['N_mp_time'] = self.N_mp_time[:self.i_last_save + 1]
+            dict_sbs_data['nel_mp_ref_time'] = self.nel_mp_ref_time[:self.i_last_save + 1]
+
+        if self.flag_cross_ion:
+            dict_sbs_data['Nel_cross_ion'] = self.Nel_cross_ion[:self.i_last_save + 1]
+            dict_sbs_data['N_mp_cross_ion'] = self.N_mp_cross_ion[:self.i_last_save + 1]
+            dict_sbs_data['DN_cross_ion'] = self.DN_cross_ion[:self.i_last_save + 1]
 
         if self.flag_electric_energy:
             dict_sbs_data['En_electric_eV_time'] = self.En_electric_eV_time[:self.i_last_save + 1]
@@ -915,6 +951,7 @@ class pyecloud_saver:
         if self.flag_last_cloud:
 
             temp_luobj = spacech_ele.PyPICobj.luobj
+            spacech_ele.luobj = None
             spacech_ele.PyPICobj.luobj = None
 
             if spacech_ele.flag_em_tracking:
@@ -929,7 +966,6 @@ class pyecloud_saver:
                 spacech_ele.state_Ax_old = None
                 spacech_ele.state_Ay_old = None
 
-            #~ dynamics.get_B=None
 
             # remove savers
             temp_saver_list = []

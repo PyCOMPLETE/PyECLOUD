@@ -65,7 +65,8 @@ class BuildupSimulation(object):
 
         print 'PyECLOUD Version 8.1.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
-            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
+            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder, \
+            cross_ion = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
                 skip_beam=skip_beam,
                 skip_pyeclsaver=skip_pyeclsaver,
@@ -85,6 +86,7 @@ class BuildupSimulation(object):
         self.chamb = cloud_list[0].impact_man.chamb
         self.checkpoint_folder = checkpoint_folder
         self.flag_em_tracking = spacech_ele.flag_em_tracking
+        self.cross_ion = cross_ion
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
@@ -143,6 +145,7 @@ class BuildupSimulation(object):
         sec_beams_list = self.sec_beams_list
         flag_multiple_clouds = self.flag_multiple_clouds
         cloud_list = self.cloud_list
+        cross_ion = self.cross_ion
 
         flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
 
@@ -166,7 +169,7 @@ class BuildupSimulation(object):
                     Ex_n_beam += Ex_n_secbeam
                     Ey_n_beam += Ey_n_secbeam
 
-            ## Either compute electromagnetic field or electrostatic
+            ## Either compute electromagnetic or electrostatic fields
             if self.flag_em_tracking:
                 Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
             else:
@@ -213,6 +216,7 @@ class BuildupSimulation(object):
 
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
+
             ## Evolve SEY module (e.g. charge decay for insulators
             impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
 
@@ -233,7 +237,14 @@ class BuildupSimulation(object):
                         lam_curr_phem += sec_beam.lam_t_curr
                 phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
-            # Compute space charge field
+
+        ## Cross_ionization
+        if cross_ion is not None:
+           cross_ion.generate(Dt=beamtim.Dt_curr, cloud_list=cloud_list)
+
+
+        ## Compute space charge field
+        for i_cloud, cloud in enumerate(cloud_list):
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
@@ -246,6 +257,7 @@ class BuildupSimulation(object):
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
 
+        ## Saving output
         # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
         for cloud in cloud_list:
@@ -258,6 +270,8 @@ class BuildupSimulation(object):
                                                             cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
                                                             sec_beams_list, cloud_list, buildup_sim=self, rho_cloud=cloud.rho)
 
+        ## Cleaning and regeneration
+        for cloud in cloud_list:
             ## Every bunch passage
             if beamtim.flag_new_bunch_pass:
 
@@ -314,7 +328,6 @@ class BuildupSimulation(object):
             self.spacech_ele.state_As = self.spacech_ele.PyPICobj.get_state_object()
 
         print 'Done reload.'
-
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):

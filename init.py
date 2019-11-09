@@ -78,7 +78,6 @@ import dynamics_strong_B_generalized as dyngen
 import dynamics_Boris_multipole as dynmul
 
 import MP_system as MPs
-import space_charge_class_electromagnetic as scc_em
 import space_charge_class as scc
 import impact_management_class as imc
 import pyecloud_saver as pysav
@@ -280,6 +279,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                         f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
                                         Dh_U_eV=cc.Dh_electric_energy)
 
+    # Init cross-ionization
+    flag_cross_ion = False
+    if cc.cross_ion_definitions is not None:
+        flag_cross_ion = True
+
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
     for cloud_par in cloud_par_list:
@@ -301,7 +305,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
                              N_mp_async_regen=thiscloud.N_mp_async_regen, N_mp_after_async_regen=thiscloud.N_mp_after_async_regen,
-                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist)
+                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist,
+                             name=thiscloud.cloud_name)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
@@ -459,13 +464,14 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
-                                       save_once_custom_observables=cc.save_once_custom_observables,
+                                       save_once_custom_observables=cc.save_once_custom_observables, 
                                        flag_lifetime_hist = thiscloud.flag_lifetime_hist,
                                        Dt_lifetime_hist = thiscloud.Dt_lifetime_hist,
                                        extract_ene_dist=cc.extract_ene_dist,
                                        ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
                                        Nbin_extract_ene=cc.Nbin_extract_ene,
                                        factor_ene_dist_max=cc.factor_ene_dist_max,
+                                       flag_cross_ion=flag_cross_ion,
                                        save_only = thiscloud.save_only,
                                        flag_electric_energy=(cc.Dh_electric_energy is not None)
                                        )
@@ -529,6 +535,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         cloud_list.append(cloud)
 
+    # Init cross-ionization object
+    if flag_cross_ion:
+        cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list, chamb.area)
+    else:
+        cross_ion = None
+
+
     return (beamtim,
             spacech_ele_sim,
             cc.t_sc_ON,
@@ -538,4 +551,5 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             flag_multiple_clouds,
             cloud_list,
             cc.checkpoint_folder,
+            cross_ion
             )
