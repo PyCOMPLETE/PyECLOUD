@@ -119,7 +119,7 @@ class Ionization_Process(object):
 
         new_mp_info = {}
 
-        if generate_equally:
+        if self.generate_equally:
             # Calculate average product nel_mp_ref
             nel_mp_ref_products = 0.
             N_products = len(self.products)
@@ -149,7 +149,7 @@ class Ionization_Process(object):
             # Initialize generated MPs with energy defined by user 
             v0_gen = np.sqrt(2 * (self.E_eV_init / 3.) * qe / mass_gen)
 
-            if generate_equally:
+            if self.generate_equally:
                 nel_mp_ref_gen = nel_mp_ref_products
             else:
                 nel_mp_ref_gen = MP_e_gen.nel_mp_ref
