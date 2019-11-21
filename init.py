@@ -90,7 +90,7 @@ import parse_beam_file as pbf
 import parse_cloud_file as pcf
 import input_parameters_format_specification as inp_spec
 import cloud_manager as cman
-
+import cross_ionization as cion
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
