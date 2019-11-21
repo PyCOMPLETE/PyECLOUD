@@ -251,9 +251,9 @@ class BuildupSimulation(object):
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
                 ## Either compute electromagnetic field or electrostatic
                 if self.flag_em_tracking:
-                    spacech_ele.recompute_spchg_emfield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+                    spacech_ele.recompute_spchg_emfield(cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
                 else:
-                    spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+                    spacech_ele.recompute_spchg_efield(cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
 
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
