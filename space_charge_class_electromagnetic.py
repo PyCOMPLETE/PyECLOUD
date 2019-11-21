@@ -57,7 +57,10 @@ from scipy.constants import c  as c_light
 
 import int_field_for as iff
 import sys
-from io import BytesIO as StringIO
+if sys.version_info.major>2:
+    from io import StringIO
+else:
+    from io import BytesIO as StringIO
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
