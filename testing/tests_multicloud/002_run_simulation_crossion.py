@@ -9,7 +9,7 @@ if BIN not in sys.path:
 
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
-sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multispecies'
+sim_folder = 'LHC_ArcDriftReal_450GeV_electron_n2_sey1.75_P3.125e+06'
 
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()
