@@ -740,7 +740,7 @@ The more accurate is the 3D cosine distribution which takes into account the sur
 \subsection{Simulations with multiple clouds}
 \label{sec:multicloud}
 
-The code provides the option of including more than one cloud in the simulation. Each cloud is influenced by the other clouds only through their space charge. This option is switched on by providing a list of names of additional cloud files  in the standard input, as follows.
+The code provides the option of including more than one cloud in the simulation. Each cloud is influenced by the other clouds through their space charge. Cross-ionization processes between different clouds can be defined. These options can be enabled by providing the following additional information.
 
 \begin{longtable}{p{0.42\textwidth}p{0.53\textwidth}}
 \hline\endfirsthead\hline\endhead\rowcolor{Gray}
@@ -748,6 +748,8 @@ The code provides the option of including more than one cloud in the simulation.
 In the \textbf{simulation\_parameters.input} file:}\\ \hline
 \textbf{additional\_clouds\_file\_list} &  (optional -- default=[]) \newline
 List of names of additional cloud files.\\ \hline
+\textbf{cross\_ion\_definitions} &  (optional -- default=\{ \}) \newline
+Dictionary that describes the desired cross-ionization processes (more details can be found in \url{https://indico.cern.ch/event/835473/contributions/3525107/}).\\ \hline
 \end{longtable}
 
 Each cloud file should contain a subset of the input parameters specified in the main input files, as listed below. The following parameters are required in the cloud input file.
