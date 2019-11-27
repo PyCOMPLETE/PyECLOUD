@@ -64,7 +64,7 @@ class ellip_cham_geom_object:
 
         self.area = pi * self.x_aper * self.y_aper
 
-        print("The area of the chamber is %.3e m^2"%self.area)
+        print(("The area of the chamber is %.3e m^2"%self.area))
 
         self.N_mp_impact = 0
         self.N_mp_corrected = 0
@@ -111,7 +111,7 @@ class ellip_cham_geom_object:
                 x_nan = x_in[mask_nan]
                 y_nan = y_in[mask_nan]
                 fbckt = open('bcktr_errors.txt', 'a')
-                for ii_bk in xrange(len(y_nan)):
+                for ii_bk in range(len(y_nan)):
                     fbckt.write('%e\t%e\tnan\n'%(x_nan[ii_bk], y_nan[ii_bk]))
                 fbckt.close()
 
@@ -123,7 +123,7 @@ class ellip_cham_geom_object:
         t0[flag_ident] = 0
 
         if sum(abs(t0.imag)) > 0:
-            print 'imag detected'
+            print('imag detected')
             raise ValueError('Backtracking: complex t0!!!!')
 
         x_int = t0 * x_out + (1 - t0) * x_in
@@ -153,7 +153,7 @@ class ellip_cham_geom_object:
 
                 if self.flag_verbose_file:
                     fbckt = open('bcktr_errors.txt', 'a')
-                    for ii_bk in xrange(len(x_int_pat)):
+                    for ii_bk in range(len(x_int_pat)):
                         fbckt.write('%e\t%e\n'%(x_int_pat[ii_bk], y_int_pat[ii_bk]))
 
                     fbckt.close()
@@ -171,7 +171,7 @@ class ellip_cham_geom_object:
 
             flag_impact = (((x_int / a)**2 + (y_int / b)**2) >= 1)
             if sum(flag_impact) > 0:
-                print 'err inside'
+                print('err inside')
                 raise ValueError('Outside after backtracking!!!!')
 
         par_cross = arctan2(a * y_int, b * x_int)

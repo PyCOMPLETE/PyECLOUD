@@ -59,7 +59,7 @@ from scipy.special import gammaincinv
 from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
-import electron_emission as ee
+from . import electron_emission as ee
 
 _factorial = np.array([1,
                        1,
@@ -162,9 +162,9 @@ class SEY_model_furman_pivi():
             self.t4 = furman_pivi_surface['t4']
 
         if self.exclude_rediffused:
-            print('Secondary emission model: Furman-Pivi excluding rediffused, s=%.4f' % (self.s))
+            print(('Secondary emission model: Furman-Pivi excluding rediffused, s=%.4f' % (self.s)))
         else:
-            print('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s))
+            print(('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s)))
 
     def SEY_model_evol(self, Dt):
         pass

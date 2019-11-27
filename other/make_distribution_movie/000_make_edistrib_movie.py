@@ -24,7 +24,7 @@ num_passage = 2
 folder_sim = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver/'
 main_outp_filename = 'Pyecltest_angle3D.mat'
 
-passlist = range(first_passage, first_passage + num_passage)
+passlist = list(range(first_passage, first_passage + num_passage))
 
 x_beam_pos = 0.
 y_beam_pos = 0.
@@ -96,7 +96,7 @@ for pass_ind in passlist:
 
     (nphotog, _, _) = rho_video.shape
 
-    for ii in xrange(0, nphotog, N_dec):
+    for ii in range(0, nphotog, N_dec):
 
 		fig = pl.figure(1, figsize=(4.5, 6))  # ,figsize=(4.5,6)
 		t_curr = t_video[ii]
@@ -104,7 +104,7 @@ for pass_ind in passlist:
 		lam_b1_curr = np.interp(t_curr, t, lam_b1)
 		cendens_curr = np.interp(t_curr, t, cendens)
 
-		print 'Pass %d %d/%d'%(pass_ind, ii, nphotog)
+		print('Pass %d %d/%d'%(pass_ind, ii, nphotog))
 
 		imm = np.squeeze(rho_video[ii, :, :])
 		imm_ex = np.squeeze(ex_video[ii, :, :])

@@ -50,7 +50,7 @@
 #
 #-End-preamble---------------------------------------------------------
 
-import sincc_cosincc_cubsincc as cs
+from . import sincc_cosincc_cubsincc as cs
 
 
 me = 9.10938291e-31
@@ -61,7 +61,7 @@ qm = qe / me
 class pusher_dipole_magnet():
     def __init__(self, Dt, B):
 
-        print "Tracker: Dipole - strong B"
+        print("Tracker: Dipole - strong B")
         omegac = B * qm
         self.sincc_v = cs.sincc(omegac * Dt)
         self.cosincc_v = cs.cosincc(omegac * Dt)

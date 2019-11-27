@@ -73,12 +73,12 @@ bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=30000, intensity=1.1
 
 
 t_start_slice = time.mktime(time.localtime())
-for ii in xrange(N_turns):
+for ii in range(N_turns):
 	slices_list = bunch.extract_slices(slicer)
 
 	for slice_obj in slices_list[::-1]:
 		machine.track(slice_obj)  # , verbose = True)
-	print 'Turn', ii
+	print('Turn', ii)
 
 	bunch = sum(slices_list)
 
@@ -87,7 +87,7 @@ for ii in xrange(N_turns):
 	for ec in ecloud_list:
 		ec.finalize_and_reinitialize()
 t_end_slice = time.mktime(time.localtime())
-print 'Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns))
+print('Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns)))
 
 # Simulate bunch mode
 machine_whole_bunch = SPS(n_segments=N_kicks, machine_configuration='Q20-injection', accQ_x=20., accQ_y=20.)
@@ -105,11 +105,11 @@ ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / N_kicks, slicer=slice
 machine_whole_bunch.install_after_each_transverse_segment(ecloud)
 
 t_start_bunch = time.mktime(time.localtime())
-for ii in xrange(N_turns):
-	print 'Turn', ii
+for ii in range(N_turns):
+	print('Turn', ii)
 	machine_whole_bunch.track(bunch)
 t_end_bunch = time.mktime(time.localtime())
 
-print '\n\n'
-print 'Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns))
-print 'Full bunch %.2e s per turn'%((t_end_bunch - t_start_bunch) / float(N_turns))
+print('\n\n')
+print('Sliced %.2e s per turn'%((t_end_slice - t_start_slice) / float(N_turns)))
+print('Full bunch %.2e s per turn'%((t_end_bunch - t_start_bunch) / float(N_turns)))

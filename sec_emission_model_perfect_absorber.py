@@ -51,13 +51,13 @@
 #-End-preamble---------------------------------------------------------
 
 
-from __future__ import division, print_function
+
 import os
 
 import numpy as np
 import scipy.io as sio
 from numpy.random import rand
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
+from .sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 
 class SEY_model_perfect_absorber(object):

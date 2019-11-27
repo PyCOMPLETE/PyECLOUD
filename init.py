@@ -50,47 +50,47 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from __future__ import division, print_function
+
 import os
 import numpy as np
 from scipy.constants import c, m_e, e as qe
 from scipy.constants import m_p
 
-import myloadmat_to_obj as mlm
+from . import myloadmat_to_obj as mlm
 
-import beam_and_timing as beatim
-from geom_impact_ellip import ellip_cham_geom_object
-import geom_impact_poly_fast_impact as gipfi
-import geom_impact_rect_fast_impact as girfi
+from . import beam_and_timing as beatim
+from .geom_impact_ellip import ellip_cham_geom_object
+from . import geom_impact_poly_fast_impact as gipfi
+from . import geom_impact_rect_fast_impact as girfi
 
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
-from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
-from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
-from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
-from sec_emission_model_cos_low_ener import SEY_model_cos_le
-from sec_emission_model_flat_low_ener import SEY_model_flat_le
-from sec_emission_model_from_file import SEY_model_from_file
-from sec_emission_model_furman_pivi import SEY_model_furman_pivi
-from sec_emission_model_perfect_absorber import SEY_model_perfect_absorber
+from .sec_emission_model_ECLOUD import SEY_model_ECLOUD
+from .sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
+from .sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
+from .sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
+from .sec_emission_model_cos_low_ener import SEY_model_cos_le
+from .sec_emission_model_flat_low_ener import SEY_model_flat_le
+from .sec_emission_model_from_file import SEY_model_from_file
+from .sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from .sec_emission_model_perfect_absorber import SEY_model_perfect_absorber
 
-import dynamics_dipole as dyndip
-import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
-import dynamics_Boris_multipole as dynmul
+from . import dynamics_dipole as dyndip
+from . import dynamics_Boris_f2py as dynB
+from . import dynamics_strong_B_generalized as dyngen
+from . import dynamics_Boris_multipole as dynmul
 
-import MP_system as MPs
-import space_charge_class as scc
-import space_charge_class_electromagnetic as scc_em
-import impact_management_class as imc
-import pyecloud_saver as pysav
-import gas_ionization_class as gic
-import gen_photoemission_class as gpc
+from . import MP_system as MPs
+from . import space_charge_class as scc
+from . import space_charge_class_electromagnetic as scc_em
+from . import impact_management_class as imc
+from . import pyecloud_saver as pysav
+from . import gas_ionization_class as gic
+from . import gen_photoemission_class as gpc
 
-import parse_beam_file as pbf
-import parse_cloud_file as pcf
-import input_parameters_format_specification as inp_spec
-import cloud_manager as cman
-import cross_ionization as cion
+from . import parse_beam_file as pbf
+from . import parse_cloud_file as pcf
+from . import input_parameters_format_specification as inp_spec
+from . import cloud_manager as cman
+from . import cross_ionization as cion
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
@@ -132,7 +132,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
     # Override config values with kwargs
-    for attr, value in kwargs.items():
+    for attr, value in list(kwargs.items()):
         if attr in ignore_kwargs:
             continue
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
@@ -230,7 +230,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         sec_beams_list = []
         if flag_presence_sec_beams:
             N_sec_beams = len(sec_b_par_list)
-            for ii in xrange(N_sec_beams):
+            for ii in range(N_sec_beams):
                 print('Initialize secondary beam %d/%d' % (ii + 1, N_sec_beams))
                 sb_par = sec_b_par_list[ii]
 

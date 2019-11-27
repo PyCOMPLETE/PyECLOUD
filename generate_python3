@@ -3,4 +3,4 @@ rm -rf ../python3/PyECLOUD
 cp -r ../PyECLOUD ../python3/PyECLOUD
 rm ../python3/PyECLOUD/*.so
 2to3 --output-dir=../python3/PyECLOUD -W -n ../PyECLOUD
-rm -rf ../python3/PyECLOUD/.git
+#rm -rf ../python3/PyECLOUD/.git

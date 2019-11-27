@@ -5,7 +5,7 @@ import os
 if sys.version_info.major != 2:
     raw_input = input
 
-if raw_input('Continue replace all reference files? y/n ') not in ('y', 'yes'):
+if input('Continue replace all reference files? y/n ') not in ('y', 'yes'):
     sys.exit()
 
 all_sim_folders = [
@@ -42,7 +42,7 @@ for folder in all_sim_folders:
         if os.path.isfile(ref_file):
             os.remove(ref_file)
         shutil.copy(mat_file, ref_file)
-        print('%s replaced by %s' % (ref_file, mat_file))
+        print(('%s replaced by %s' % (ref_file, mat_file)))
 
 # OLD STUFF:
 #for folder in all_sim_folders:

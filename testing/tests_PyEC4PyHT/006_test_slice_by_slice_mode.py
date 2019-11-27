@@ -112,12 +112,12 @@ rms_err_y_list = []
 # pl.show()
 
 
-for ii in xrange(N_turns - 1):
+for ii in range(N_turns - 1):
 	slices_list = bunch.extract_slices(slicer)
 
 	for slice_obj in slices_list[::-1]:
 		machine.track(slice_obj)  # , verbose = True)
-	print 'Turn', ii
+	print('Turn', ii)
 
 	bunch = sum(slices_list)
 

@@ -31,8 +31,8 @@ N_tests = 100
 
 hist_list = []
 
-for irep in xrange(N_tests):
-    print 'Test %d/%d'%(irep + 1, N_tests)
+for irep in range(N_tests):
+    print('Test %d/%d'%(irep + 1, N_tests))
     # Build MP object
     MPe = mps.MP_system(
         N_mp_max=N_mp_test,

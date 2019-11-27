@@ -51,11 +51,11 @@
 #-End-preamble---------------------------------------------------------
 
 import numpy as np
-from space_charge_class import space_charge
+from .space_charge_class import space_charge
 from scipy.constants import epsilon_0, mu_0
 from scipy.constants import c  as c_light
 
-import int_field_for as iff
+from . import int_field_for as iff
 import sys
 if sys.version_info.major>2:
     from io import StringIO
@@ -64,10 +64,10 @@ else:
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import rhocompute as rhocom
+from . import rhocompute as rhocom
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import colors
-import int_field_for as iff
+from . import int_field_for as iff
 
 na = lambda x: np.array([x])
 

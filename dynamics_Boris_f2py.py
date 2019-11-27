@@ -52,8 +52,8 @@
 
 from numpy import array, cross, sum, squeeze
 import scipy.io as sio
-import int_field_for as iff
-from boris_step import boris_step
+from . import int_field_for as iff
+from .boris_step import boris_step
 
 
 def crprod(bx, by, bz, cx, cy, cz):
@@ -98,7 +98,7 @@ class B_quad():
 class B_file():
 
     def __init__(self, B0x, B0y, B0z, fact_Bmap, B_map_file):
-        print 'Loading B map'
+        print('Loading B map')
         dict_Bmap = sio.loadmat(B_map_file)
 
         self.Bmap_x = fact_Bmap * squeeze(dict_Bmap['Bx'].real)
@@ -129,7 +129,7 @@ class pusher_Boris():
     def __init__(self, Dt, B0x, B0y, B0z, \
                  B_map_file, fact_Bmap, Bz_map_file, N_sub_steps=1):
 
-        print "Tracker: Boris"
+        print("Tracker: Boris")
 
         self.N_sub_steps = N_sub_steps
         self.Dtt = Dt / float(N_sub_steps)
@@ -142,13 +142,13 @@ class pusher_Boris():
             self.B_ob = B_none(B0x, B0y, B0z)
 
         elif B_map_file is 'analytic_qaudrupole_unit_grad':
-            print "B map analytic quadrupole"
+            print("B map analytic quadrupole")
             self.B_ob = B_quad(B0x, B0y, B0z, fact_Bmap)
 
         else:
             self.B_ob = B_file(B0x, B0y, B0z, fact_Bmap, B_map_file)
 
-        print "N_subst_init=%d" % self.N_sub_steps
+        print("N_subst_init=%d" % self.N_sub_steps)
 
     #@profile
     def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0.):

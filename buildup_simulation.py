@@ -53,8 +53,8 @@
 #-End-preamble---------------------------------------------------------
 
 
-import init as init
-import cPickle
+from . import init as init
+import pickle
 import numpy as np
 import os
 
@@ -64,7 +64,7 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 8.2.0'
+        print('PyECLOUD Version 8.2.0')
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
             config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder, \
             cross_ion = init.read_input_files_and_init_components(\
@@ -110,14 +110,14 @@ class BuildupSimulation(object):
         flag_presence_sec_beams = self.flag_presence_sec_beams
         sec_beams_list = self.sec_beams_list
 
-        print 'Start timestep iter'
+        print('Start timestep iter')
 
         ## simulation
         while not beamtim.end_simulation():
 
             if t_end_sim is not None and beamtim.tt_curr is not None:
                 if beamtim.tt_curr >= t_end_sim:
-                    print 'Reached user defined t_end_sim --> Ending simulation'
+                    print('Reached user defined t_end_sim --> Ending simulation')
                     break
 
             beamtim.next_time_step()
@@ -129,7 +129,7 @@ class BuildupSimulation(object):
             self.sim_time_step()
 
             if beamtim.flag_new_bunch_pass:
-                print '**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot)
+                print('**** Done pass_numb = %d/%d\n'%(beamtim.pass_numb, beamtim.N_pass_tot))
 
 
     def sim_time_step(self, beamtim_obj=None, Dt_substep_custom=None, N_sub_steps_custom=None, kick_mode_for_beam_field=False,
@@ -295,7 +295,7 @@ class BuildupSimulation(object):
     def load_state(self, filename_simulation_state, force_disable_save_simulation_state=True, filen_main_outp='Pyecltest_restarted', load_from_folder='./'):  # , reset_pyeclsaver = True):
 
         with open(load_from_folder + filename_simulation_state, 'rb') as fid:
-            dict_state = cPickle.load(fid)
+            dict_state = pickle.load(fid)
 
         self.beamtim = dict_state['beamtim']
         self.spacech_ele = dict_state['spacech_ele']
@@ -321,20 +321,20 @@ class BuildupSimulation(object):
                 filen_outp_root = cloud.pyeclsaver.filen_main_outp.split('.mat')[0]
                 cloud.pyeclsaver.filen_main_outp = filen_outp_root + filen_outp_ext + '.mat'
 
-        print 'Restoring PyPIC LU object...'
+        print('Restoring PyPIC LU object...')
         self.spacech_ele.PyPICobj.build_sparse_solver()
 
         if self.spacech_ele.flag_em_tracking:
-            print 'Restoring PyPIC Ax, Ay and As state objects...'
+            print('Restoring PyPIC Ax, Ay and As state objects...')
             self.spacech_ele.state_Ax = self.spacech_ele.PyPICobj.get_state_object()
             self.spacech_ele.state_Ay = self.spacech_ele.PyPICobj.get_state_object()
             self.spacech_ele.state_As = self.spacech_ele.PyPICobj.get_state_object()
 
-        print 'Done reload.'
+        print('Done reload.')
         return dict_state
 
     def load_checkpoint(self, filename_simulation_checkpoint, load_from_folder='./'):
-        print('Reloading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint))
+        print(('Reloading from checkpoint: %s...' % (load_from_folder + filename_simulation_checkpoint)))
 
         i_checkp = int(filename_simulation_checkpoint.split('.pkl')[0].split('_')[-1])
         dict_state = self.load_state(filename_simulation_checkpoint, force_disable_save_simulation_state=False, filen_main_outp=None, load_from_folder=load_from_folder)

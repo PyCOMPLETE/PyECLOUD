@@ -51,7 +51,7 @@ class SPS(BasicSynchrotron):
         
         
         if pp.optics_mode=='smooth':
-            if 's' in kwargs.keys(): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
+            if 's' in list(kwargs.keys()): raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
             
             pp.n_segments = kwargs['n_segments']
             pp.circumference = 1100*2*np.pi
@@ -64,7 +64,7 @@ class SPS(BasicSynchrotron):
             pp.s = None
             
         elif pp.optics_mode=='non-smooth':
-            if 'n_segments' in kwargs.keys(): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
+            if 'n_segments' in list(kwargs.keys()): raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
             pp.n_segments = None
             pp.circumference = None
             
@@ -101,7 +101,7 @@ class SPS(BasicSynchrotron):
         
       
         
-        for attr in kwargs.keys():
+        for attr in list(kwargs.keys()):
             if kwargs[attr] is not None:
                 if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
                     str2print = '[%s ...]'%repr(kwargs[attr][0])

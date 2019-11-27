@@ -4,7 +4,7 @@ files = os.listdir('.')
 
 for filename in files:
     if filename[-3:] == '.py':
-        print filename
+        print(filename)
         os.system('cp %s %s'%(filename, filename + 'old'))
         with open(filename) as fid:
             content = fid.read()

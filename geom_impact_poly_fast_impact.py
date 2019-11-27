@@ -51,13 +51,13 @@
 #-End-preamble---------------------------------------------------------
 
 
-from __future__ import division, print_function
+
 from numpy import sum, arctan2, sin, cos
 import scipy.io as sio
 import numpy as np
 import numpy.random as random
 
-import geom_impact_poly_cython as gipc
+from . import geom_impact_poly_cython as gipc
 
 
 class PyECLOUD_ChamberException(ValueError):
@@ -89,7 +89,7 @@ class polyg_cham_geom_object(object):
             self.R0_segments = np.squeeze(dict_chm['R0_segments'])
             self.Emax_segments = np.squeeze(dict_chm['Emax_segments'])
 
-            if 'flag_charging' in dict_chm.keys():
+            if 'flag_charging' in list(dict_chm.keys()):
                 self.flag_charging = np.squeeze(dict_chm['flag_charging'])
                 self.Q_max_segments = np.squeeze(dict_chm['Q_max_segments'])
                 self.EQ_segments = np.squeeze(dict_chm['EQ_segments'])
@@ -208,14 +208,14 @@ class polyg_cham_geom_object(object):
             if self.flag_verbose_stdout:
                 print('Reporting backtrack error of kind 1: no impact found')
                 print('x_in, y_in, x_out, y_out')
-                for i_err in xrange(N_errors):
+                for i_err in range(N_errors):
                     lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                     print(lcurr)
                 print('End reporting backtrack error of kind 1')
 
             if self.flag_verbose_file:
                 with open('bcktr_errors.txt', 'a') as fbckt:
-                    for i_err in xrange(N_errors):
+                    for i_err in range(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         fbckt.write('1,' + lcurr + '\n')
 
@@ -234,14 +234,14 @@ class polyg_cham_geom_object(object):
                 if self.flag_verbose_stdout:
                     print('Reporting backtrack error of kind 2: outside after backtracking')
                     print('x_in, y_in, x_out, y_out')
-                    for i_err in xrange(N_errors):
+                    for i_err in range(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         print(lcurr)
                     print('End reporting backtrack error of kind 2')
 
                 if self.flag_verbose_file:
                     with open('bcktr_errors.txt', 'a') as fbckt:
-                        for i_err in xrange(N_errors):
+                        for i_err in range(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('2,' + lcurr + '\n')
 
@@ -267,14 +267,14 @@ class polyg_cham_geom_object(object):
                 if self.flag_verbose_stdout:
                     print('Reporting backtrack error of kind 3: outside after correction')
                     print('x_in, y_in, x_out, y_out')
-                    for i_err in xrange(N_errors):
+                    for i_err in range(N_errors):
                         lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                         print(lcurr)
                     print('End reporting backtrack error of kind 3')
 
                 if self.flag_verbose_file:
                     with open('bcktr_errors.txt', 'a') as fbckt:
-                        for i_err in xrange(N_errors):
+                        for i_err in range(N_errors):
                             lcurr = '%.10e,%.10e,%.10e,%.10e' % (x_in_error[i_err], y_in_error[i_err], x_out_error[i_err], y_out_error[i_err])
                             fbckt.write('3,' + lcurr + '\n')
 
@@ -295,7 +295,7 @@ class polyg_cham_geom_object(object):
             got_negative = False
             got_positive = False
             num_points = self.N_edg
-            for A in xrange(num_points):
+            for A in range(num_points):
 
                 B = np.mod((A + 1), num_points)
                 C = np.mod((B + 1), num_points)

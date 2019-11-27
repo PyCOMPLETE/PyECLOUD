@@ -43,7 +43,7 @@ class LHC(Synchrotron):
             raise ValueError('machine_configuration not recognized!')
 
         if pp.optics_mode == 'smooth':
-            if 's' in kwargs.keys():
+            if 's' in list(kwargs.keys()):
                 raise ValueError('s vector cannot be provided if optics_mode = "smooth"')
 
             pp.n_segments = kwargs['n_segments']
@@ -62,7 +62,7 @@ class LHC(Synchrotron):
             pp.s = None
 
         elif pp.optics_mode == 'non-smooth':
-            if 'n_segments' in kwargs.keys():
+            if 'n_segments' in list(kwargs.keys()):
                 raise ValueError('n_segments cannot be provided if optics_mode = "non-smooth"')
             pp.n_segments = None
             pp.circumference = None
@@ -97,7 +97,7 @@ class LHC(Synchrotron):
         pp.app_y       = 0
         pp.app_xy      = 0
 
-        for attr in kwargs.keys():
+        for attr in list(kwargs.keys()):
             if kwargs[attr] is not None:
                 if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
                     str2print = '[%s ...]'%repr(kwargs[attr][0])

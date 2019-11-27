@@ -57,9 +57,9 @@ import time
 import numpy as np
 from scipy.constants import c, e, m_e
 
-import myloadmat_to_obj as mlm
-import init
-import buildup_simulation as bsim
+from . import myloadmat_to_obj as mlm
+from . import init
+from . import buildup_simulation as bsim
 
 
 class Empty(object):
@@ -105,7 +105,7 @@ class Ecloud(object):
                  beam_monitor=None, verbose=False, save_pyecl_outp_as=None,
                  **kwargs):
 
-        print 'PyECLOUD Version 8.2.0'
+        print('PyECLOUD Version 8.2.0')
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) + '/.git'
@@ -125,8 +125,8 @@ class Ecloud(object):
             print(e)
         print(git_branch)
 
-        print 'PyHEADTAIL module'
-        print 'Initializing ecloud from folder: ' + pyecl_input_folder
+        print('PyHEADTAIL module')
+        print('Initializing ecloud from folder: ' + pyecl_input_folder)
         self.slicer = slicer
         self.Dt_ref = Dt_ref
         self.L_ecloud = L_ecloud
@@ -173,13 +173,13 @@ class Ecloud(object):
         self.y_probes = -1
         self.Ex_ele_last_track_at_probes = -1
         self.Ey_ele_last_track_at_probes = -1
-        if 'probes_position' in kwargs.keys():
+        if 'probes_position' in list(kwargs.keys()):
             self.save_ele_field_probes = True
             self.probes_position = kwargs['probes_position']
             self.N_probes = len(self.probes_position)
             self.x_probes = []
             self.y_probes = []
-            for ii_probe in xrange(self.N_probes):
+            for ii_probe in range(self.N_probes):
                 self.x_probes.append(self.probes_position[ii_probe]['x'])
                 self.y_probes.append(self.probes_position[ii_probe]['y'])
 
@@ -236,7 +236,7 @@ class Ecloud(object):
 
         if self.track_only_first_time:
             if self.N_tracks > 0:
-                print 'Warning: Track skipped because track_only_first_time is True.'
+                print('Warning: Track skipped because track_only_first_time is True.')
                 return
 
         if self.verbose:
@@ -252,9 +252,9 @@ class Ecloud(object):
 
         slices = beam.get_slices(self.slicer)
 
-        for i in xrange(slices.n_slices - 1, -1, -1):
+        for i in range(slices.n_slices - 1, -1, -1):
             if self.verbose:
-                print('Slice %d/%d'%(i, slices.n_slices))
+                print(('Slice %d/%d'%(i, slices.n_slices)))
 
             # select particles in the slice
             ix = slices.particle_indices_of_slice(i)
@@ -272,18 +272,18 @@ class Ecloud(object):
 
         if self.verbose:
             stop_time = time.mktime(time.localtime())
-            print 'Done track %d in %.1f s'%(self.N_tracks, stop_time - start_time)
+            print('Done track %d in %.1f s'%(self.N_tracks, stop_time - start_time))
 
         self.N_tracks += 1
 
     def replace_with_recorded_field_map(self, delete_ecloud_data=True):
 
         if self.track_only_first_time:
-            print 'Warning: replace_with_recorded_field_map resets track_only_first_time = False'
+            print('Warning: replace_with_recorded_field_map resets track_only_first_time = False')
             self.track_only_first_time = False
 
         if not hasattr(self, 'efieldmap'):
-            from Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
+            from .Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
             self.efieldmap = Transverse_Efield_map(xg=self.spacech_ele.xg, yg=self.spacech_ele.yg,
                                                    Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud,
                                                    slicer=self.slicer,
@@ -301,7 +301,7 @@ class Ecloud(object):
                 self.cloudsim = None
 
         else:
-            print 'Warning: efieldmap already exists. I do nothing.'
+            print('Warning: efieldmap already exists. I do nothing.')
 
     def track_once_and_replace_with_recorded_field_map(self, bunch, delete_ecloud_data=True):
         self.save_ele_field = True
@@ -325,7 +325,7 @@ class Ecloud(object):
 
         # Check if the slice interacts with the beam
         if hasattr(slic, 'slice_info'):
-            if 'interact_with_EC' in slic.slice_info.keys():
+            if 'interact_with_EC' in list(slic.slice_info.keys()):
                 interact_with_EC = slic.slice_info['interact_with_EC']
             else:
                 interact_with_EC = True
@@ -351,7 +351,7 @@ class Ecloud(object):
 
         # Acquire bunch passage information
         if hasattr(slic, 'slice_info'):
-            if 'info_parent_bunch' in slic.slice_info.keys():
+            if 'info_parent_bunch' in list(slic.slice_info.keys()):
 
                 # check if first slice of first bunch
                 if slic.slice_info['info_parent_bunch']['i_bunch'] == 0 and slic.slice_info['i_slice'] == 0:

@@ -26,7 +26,7 @@ zp = np.reshape(appo[:,6], (-1, n_part_per_turn))[::n_segments,:]
 
 rms_err_x_list = []
 rms_err_y_list = []
-for i_turn in xrange(N_turns-1):
+for i_turn in range(N_turns-1):
 	
 	ob = mfm.object_with_arrays_and_scalar_from_h5('particles_at_turn_%d.h5'%i_turn) 
 

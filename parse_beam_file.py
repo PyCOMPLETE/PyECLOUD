@@ -9,7 +9,7 @@ class beam_descr_from_fil:
     def __init__(self, beamfilename, betafx_from_mach_parms_file, Dx_from_mach_parms_file,
                  betafy_from_mach_parms_file, Dy_from_mach_parms_file):
 
-        print('Parsing beam file: %s' % beamfilename)
+        print(('Parsing beam file: %s' % beamfilename))
 
         # Parse beam input file
         beam_beam = inp_spec.import_module_from_file('beam_beam', beamfilename)

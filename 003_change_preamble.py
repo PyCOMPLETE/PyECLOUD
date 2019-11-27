@@ -109,5 +109,5 @@ for dirpath, _, filenames in os.walk('.'):
 
         with open(path, 'w') as f:
             f.writelines(new_lines)
-        print('Modified %s' % path)
+        print(('Modified %s' % path))
 
