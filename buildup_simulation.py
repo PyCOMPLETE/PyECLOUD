@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.1.0
+#                   PyECLOUD Version 8.2.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -21,6 +21,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -63,9 +64,10 @@ class BuildupSimulation(object):
     def __init__(self, pyecl_input_folder='./', skip_beam=False, skip_spacech_ele=False,
                  skip_pyeclsaver=False, ignore_kwargs=[], spacech_ele=None, **kwargs):
 
-        print 'PyECLOUD Version 8.1.0'
+        print 'PyECLOUD Version 8.2.0'
         beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams, sec_beams_list, \
-            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder = init.read_input_files_and_init_components(\
+            config_dict, flag_multiple_clouds, cloud_list, checkpoint_folder, \
+            cross_ion = init.read_input_files_and_init_components(\
                 pyecl_input_folder=pyecl_input_folder,
                 skip_beam=skip_beam,
                 skip_pyeclsaver=skip_pyeclsaver,
@@ -84,6 +86,8 @@ class BuildupSimulation(object):
         self.cloud_list = cloud_list
         self.chamb = cloud_list[0].impact_man.chamb
         self.checkpoint_folder = checkpoint_folder
+        self.flag_em_tracking = spacech_ele.flag_em_tracking
+        self.cross_ion = cross_ion
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
@@ -142,6 +146,7 @@ class BuildupSimulation(object):
         sec_beams_list = self.sec_beams_list
         flag_multiple_clouds = self.flag_multiple_clouds
         cloud_list = self.cloud_list
+        cross_ion = self.cross_ion
 
         flag_recompute_space_charge = spacech_ele.check_for_recomputation(t_curr=beamtim.tt_curr)
 
@@ -165,8 +170,16 @@ class BuildupSimulation(object):
                     Ex_n_beam += Ex_n_secbeam
                     Ey_n_beam += Ey_n_secbeam
 
-            ## Compute electron space charge electric field
-            Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+            ## Either compute electromagnetic or electrostatic fields
+            if self.flag_em_tracking:
+                Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n = spacech_ele.get_sc_em_field(MP_e)
+            else:
+                ## Compute electron space charge electric field
+                Ex_sc_n, Ey_sc_n = spacech_ele.get_sc_eletric_field(MP_e)
+                Bx_sc_n = np.asarray([0.])
+                By_sc_n = np.asarray([0.])
+                Bz_sc_n = np.asarray([0.])
+
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
@@ -187,7 +200,7 @@ class BuildupSimulation(object):
             ## Motion
             if Dt_substep_custom is None and N_sub_steps_custom is None and beamtim.flag_unif_Dt:
                 # Standard simulation mode
-                MP_e = dynamics.step(MP_e, Ex_n, Ey_n)
+                MP_e = dynamics.step(MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n)
             elif Dt_substep_custom is None and N_sub_steps_custom is None and not(beamtim.flag_unif_Dt):
                 # Dt from non-uniform beam profile
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
@@ -195,12 +208,12 @@ class BuildupSimulation(object):
                 Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
                 N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
                 Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
-                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n, Dt_substep=Dt_substep_curr, N_sub_steps=N_substeps_curr)
             else:
                 # Custom steps and substeps provided as arguments of sim_time_step
                 if self.config_dict['track_method'] not in ['Boris', 'BorisMultipole']:
                     raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!""")
-                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
+                MP_e = dynamics.stepcustomDt(MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n, Dt_substep=Dt_substep_custom, N_sub_steps=N_sub_steps_custom)
 
             ## Impacts: backtracking and secondary emission
             MP_e = impact_man.backtrack_and_second_emiss(old_pos, MP_e, beamtim.tt_curr)
@@ -225,15 +238,27 @@ class BuildupSimulation(object):
                         lam_curr_phem += sec_beam.lam_t_curr
                 phemiss.generate(MP_e, lam_curr_phem, beamtim.Dt_curr)
 
-            # Compute space charge field
+
+        ## Cross_ionization
+        if cross_ion is not None:
+           cross_ion.generate(Dt=beamtim.Dt_curr, cloud_list=cloud_list)
+
+
+        ## Compute space charge field
+        for i_cloud, cloud in enumerate(cloud_list):
             if ((beamtim.tt_curr > t_sc_ON) and flag_recompute_space_charge) or force_recompute_space_charge:
                 flag_reset = cloud is cloud_list[0] # The first cloud resets the distribution
                 flag_solve = cloud is cloud_list[-1] # The last cloud computes the fields
-                spacech_ele.recompute_spchg_efield(MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+                ## Either compute electromagnetic field or electrostatic
+                if self.flag_em_tracking:
+                    spacech_ele.recompute_spchg_emfield(cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
+                else:
+                    spacech_ele.recompute_spchg_efield(cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset)
 
                 # Copy rho to cloud
                 cloud.rho = spacech_ele.rho - sum([cl.rho for cl in cloud_list[:i_cloud]])
 
+        ## Saving output
         # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
         for cloud in cloud_list:
@@ -241,11 +266,15 @@ class BuildupSimulation(object):
             if cloud.pyeclsaver is not None:
                 # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
                 #     raise ValueError('Saving with custom steps not implemented!')
-                cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e, beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
-                                                            cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
-                                                            cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
-                                                            sec_beams_list, cloud_list, buildup_sim=self, rho_cloud=cloud.rho)
+                cloud.impact_man = cloud.pyeclsaver.witness(cloud.MP_e,
+                        beamtim, spacech_ele, cloud.impact_man, cloud.dynamics,
+                        cloud.gas_ion_flag, cloud.resgasion, cloud.t_ion, t_sc_ON,
+                        cloud.photoem_flag, cloud.phemiss, flag_presence_sec_beams,
+                        sec_beams_list, cloud_list, buildup_sim=self,
+                        cross_ion=self.cross_ion, rho_cloud=cloud.rho)
 
+        ## Cleaning and regeneration
+        for cloud in cloud_list:
             ## Every bunch passage
             if beamtim.flag_new_bunch_pass:
 
@@ -294,6 +323,13 @@ class BuildupSimulation(object):
 
         print 'Restoring PyPIC LU object...'
         self.spacech_ele.PyPICobj.build_sparse_solver()
+
+        if self.spacech_ele.flag_em_tracking:
+            print 'Restoring PyPIC Ax, Ay and As state objects...'
+            self.spacech_ele.state_Ax = self.spacech_ele.PyPICobj.get_state_object()
+            self.spacech_ele.state_Ay = self.spacech_ele.PyPICobj.get_state_object()
+            self.spacech_ele.state_As = self.spacech_ele.PyPICobj.get_state_object()
+
         print 'Done reload.'
         return dict_state
 

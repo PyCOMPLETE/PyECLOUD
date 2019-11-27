@@ -1,0 +1,76 @@
+# SIMULATION PARAMETERS
+
+machine_param_file = 'machine_parameters.input'
+secondary_emission_parameters_file = 'secondary_emission_parameters.input'
+beam_parameters_file = 'beam.beam'
+
+secondary_beams_file_list = []
+additional_clouds_file_list = ['n2.cloud']
+cloud_name = 'electron'
+
+logfile_path = './logfile.txt'
+progress_path = './progress.txt'
+stopfile = 'stop'
+
+Dt = 2.500000e-11
+t_end = 1e-9       #s (no effect if log. profile is imported from file)
+
+import numpy as np
+dec_fact_out = int(np.round(5 * 25e-12/Dt))
+dec_fac_secbeam_prof = dec_fact_out
+
+lam_th = 1.e2        #e-/m
+Dx_hist = 1.e-3      #m
+r_center = 1.e-3     #m
+
+
+Dt_En_hist = 25e-9
+Nbin_En_hist = 250
+En_hist_max = 5000.  #eV
+
+t_ion = 100.        #s
+
+N_mp_max = 1000000   #size of allocated vectors
+
+#Regen parameters
+
+N_mp_regen = 2000000
+N_mp_regen_low = -1
+N_mp_after_regen = 20000
+t_ON_regen_low = 10.
+fact_split = 1.5
+fact_clean = 1e-8
+regen_hist_cut = 1.e-4
+
+N_mp_soft_regen = 100000
+N_mp_after_soft_regen = 50000
+N_mp_async_regen = 150000
+N_mp_after_async_regen = 75000
+
+nel_mp_ref_0 = 5.e11 * 3.12e+08/7.5e8 / (0.5*N_mp_soft_regen) 
+
+
+# Number of bins
+Nx_regen = 51   #it must be odd!
+Ny_regen = 51   #it must be odd!
+Nvx_regen = 51  #it must be odd!
+Nvy_regen = 101 #it must be odd!
+Nvz_regen = 51  #it must be odd!
+
+
+#Sp_ch params
+Dt_sc = 0.5e-10
+Dh_sc = 0.3e-02 #3
+t_sc_ON = 0e-9		#s
+sparse_solver = 'klu'
+
+flag_movie = 0             #1/0
+flag_sc_movie = 0          #1/0
+
+cross_ion_definitions = {'electron': {'electron-n2': {'target_density': 1e22, 
+                                                      'products': ['n2', 'electron'], 
+                                                      'cross_section': 'cross_section_n2_15.59_20000.00_N1000_log.mat',
+                                                      'E_eV_init': 0.}}}
+
+
+extract_sey = False

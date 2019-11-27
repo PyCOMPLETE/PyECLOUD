@@ -4,15 +4,18 @@ void boris_c(int N_sub_steps, double Dtt,
 		double* B_field, double* B_skew,
 		double* xn1, double* yn1,  double* zn1,
 		double* vxn1, double* vyn1, double* vzn1,
-		double* Ex_n, double* Ey_n, int N_mp, int N_multipoles,
+		double* Ex_n, double* Ey_n, 
+		double* Bx_n_custom, double* By_n_custom, double* Bz_n_custom,
+		int custom_B,
+		int N_mp, int N_multipoles,
 		double charge, double mass)
 {
 	int p, isub, order;
 	double Ex_np, Ey_np;
-	double Bx_n, By_n;
+	double Bx_n, By_n, Bz_n;
 	double rexy, imxy, rexy_0;
-	double tBx, tBy, tBsq;
-	double sBx, sBy;
+	double tBx, tBy, tBz, tBsq;
+	double sBx, sBy, sBz;
 	double vx_prime, vy_prime, vz_prime;
 	double vx_min, vy_min, vz_min;
 	double vx_plus, vy_plus, vz_plus;
@@ -39,6 +42,7 @@ void boris_c(int N_sub_steps, double Dtt,
 			imxy = 0.;
 			By_n = B_field[0];
 			Bx_n = B_skew[0];
+			Bz_n = 0.;
 
 			for(order = 1; order < N_multipoles; order++)
 			{
@@ -54,27 +58,35 @@ void boris_c(int N_sub_steps, double Dtt,
 				By_n += (B_field[order]*rexy - B_skew[order]*imxy);
 				Bx_n += (B_field[order]*imxy + B_skew[order]*rexy);
 			}
+			
+			if (custom_B){
+				Bx_n += Bx_n_custom[p];
+				By_n += By_n_custom[p]; 
+				Bz_n += Bz_n_custom[p]; 
+			}
 
 			tBx = 0.5*qm*Dtt*Bx_n;
 			tBy = 0.5*qm*Dtt*By_n;
-			tBsq = tBx*tBx + tBy*tBy;
+			tBz = 0.5*qm*Dtt*Bz_n;
+			tBsq = tBx*tBx + tBy*tBy + tBz*tBz;
 
 			sBx = 2.*tBx/(1.+tBsq);
 			sBy = 2.*tBy/(1.+tBsq);
+			sBz = 2.*tBz/(1.+tBsq);
 
 			vx_min = vxn1p + 0.5*qm*Ex_np*Dtt;
 			vy_min = vyn1p + 0.5*qm*Ey_np*Dtt;
 			vz_min = vzn1p;
 
 			//v_prime = v_min + cross(v_min, tB)
-			vx_prime = -vz_min*tBy + vx_min;
-			vy_prime = vz_min*tBx + vy_min;
-			vz_prime = vx_min*tBy-vy_min*tBx + vz_min;
+			vx_prime = vy_min*tBz - vz_min*tBy + vx_min;
+			vy_prime = vz_min*tBx - vx_min*tBz + vy_min;
+			vz_prime = vx_min*tBy - vy_min*tBx + vz_min;
 
 			//v_plus = v_min + cross(v_prime, sB)
-			vx_plus = -vz_prime*sBy + vx_min;
-			vy_plus = vz_prime*sBx + vy_min;
-			vz_plus = vx_prime*sBy-vy_prime*sBx + vz_min;
+			vx_plus = vy_prime*sBz - vz_prime*sBy + vx_min;
+			vy_plus = vz_prime*sBx - vx_prime*sBz+ vy_min;
+			vz_plus = vx_prime*sBy - vy_prime*sBx + vz_min;
 
 			vxn1p = vx_plus + 0.5*qm*Ex_np*Dtt;
 			vyn1p = vy_plus + 0.5*qm*Ey_np*Dtt;

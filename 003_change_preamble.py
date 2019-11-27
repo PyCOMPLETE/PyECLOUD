@@ -20,7 +20,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.1.0
+#                   PyECLOUD Version 8.2.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -32,6 +32,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo

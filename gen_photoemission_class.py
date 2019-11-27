@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.1.0
+#                   PyECLOUD Version 8.2.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -106,6 +107,7 @@ class photoemission(photoemission_base):
 
         if inv_CDF_refl_photoem_file == 'unif_no_file':
             self.flag_unif = True
+
         else:
             self.flag_unif = False
             dict_psi_inv_CDF = sio.loadmat(inv_CDF_refl_photoem_file)
@@ -117,7 +119,6 @@ class photoemission(photoemission_base):
         self.e_pe_sigma = e_pe_sigma
         self.e_pe_max = e_pe_max
         self.alimit = alimit
-        self.x0_refl = x0_refl
         self.y0_refl = y0_refl
         self.out_radius = out_radius
         self.chamb = chamb
@@ -131,12 +132,36 @@ class photoemission(photoemission_base):
         if y0_refl != 0.:
             raise PyECLOUD_PhotoemissionException('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
 
-        x0_refl_np_arr = np.array([x0_refl])
-        y0_refl_np_arr = np.array([y0_refl])
+        if x0_refl == 'left' or x0_refl=='right':
+            if x0_refl == 'left':
+                xout = -self.out_radius
+            elif x0_refl == 'right':
+                xout = self.out_radius
+            x_int, _, _, _, _, _ = self.chamb.impact_point_and_normal(
+                np.array([0.]), np.array([0.]), np.array([0.]),
+                3.*np.array([xout]), np.array([0.]), np.array([0.]),resc_fac=0.99999)
+            self.x0_refl = x_int[0]
+        else:
+            self.x0_refl = x0_refl
+
+        x0_refl_np_arr = np.array([self.x0_refl])
+        y0_refl_np_arr = np.array([self.y0_refl])
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
             raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
 
         self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+
+        # Check that outer circle is correct
+        psi_gen = np.linspace(0, 2.*np.pi, 10000)
+        x_out = -2. * self.out_radius * np.cos(psi_gen) + self.x0_refl
+        y_out = 2. * self.out_radius * np.sin(psi_gen)
+        if np.any(~self.chamb.is_outside(x_out, y_out)):
+            raise ValueError('Photoemission circle points are inside the chamber, check your settings!')
+        psi_gen = np.linspace(0, 2.*np.pi, 10000)
+        x_out = self.out_radius * np.cos(psi_gen)
+        y_out = self.out_radius * np.sin(psi_gen)
+        if np.any(~self.chamb.is_outside(x_out, y_out)):
+            raise ValueError('Photoemission circle points are inside the chamber, check your settings!')
 
         print('Done photoemission init. Energy distribution: %s' % energy_distribution)
 

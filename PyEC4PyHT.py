@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.1.0
+#                   PyECLOUD Version 8.2.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -104,7 +105,7 @@ class Ecloud(object):
                  beam_monitor=None, verbose=False, save_pyecl_outp_as=None,
                  **kwargs):
 
-        print 'PyECLOUD Version 8.1.0'
+        print 'PyECLOUD Version 8.2.0'
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) + '/.git'

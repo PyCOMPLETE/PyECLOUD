@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.1.0
+#                   PyECLOUD Version 8.2.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -53,6 +54,7 @@ from __future__ import division, print_function
 import os
 import numpy as np
 from scipy.constants import c, m_e, e as qe
+from scipy.constants import m_p
 
 import myloadmat_to_obj as mlm
 
@@ -78,6 +80,7 @@ import dynamics_Boris_multipole as dynmul
 
 import MP_system as MPs
 import space_charge_class as scc
+import space_charge_class_electromagnetic as scc_em
 import impact_management_class as imc
 import pyecloud_saver as pysav
 import gas_ionization_class as gic
@@ -87,7 +90,7 @@ import parse_beam_file as pbf
 import parse_cloud_file as pcf
 import input_parameters_format_specification as inp_spec
 import cloud_manager as cman
-
+import cross_ionization as cion
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
@@ -263,8 +266,23 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.sparse_solver == 'klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver = 'PyKLU'
-        spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
-                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
+
+        if cc.flag_em_tracking:
+            if skip_beam:
+                raise ValueError("Beam must be included when using electromagnetic tracking!!")
+
+            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, b_par.gamma_rel, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
+                                           Dh_U_eV=cc.Dh_electric_energy)
+        else:
+            spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                        f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
+                                        Dh_U_eV=cc.Dh_electric_energy)
+
+    # Init cross-ionization
+    flag_cross_ion = False
+    if cc.cross_ion_definitions is not None:
+        flag_cross_ion = True
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -287,7 +305,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
                              N_mp_async_regen=thiscloud.N_mp_async_regen, N_mp_after_async_regen=thiscloud.N_mp_after_async_regen,
-                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist)
+                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist,
+                             name=thiscloud.cloud_name)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
@@ -452,15 +471,21 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
                                        Nbin_extract_ene=cc.Nbin_extract_ene,
                                        factor_ene_dist_max=cc.factor_ene_dist_max,
-                                       save_only = thiscloud.save_only
+                                       flag_cross_ion=flag_cross_ion,
+                                       save_only = thiscloud.save_only,
+                                       flag_electric_energy=(cc.Dh_electric_energy is not None)
                                        )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker
         if cc.track_method == 'Boris':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             dynamics = dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
                                          cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBdip tracking method is implemented only for electrons!')
@@ -470,6 +495,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 B = cc.B
             dynamics = dyndip.pusher_dipole_magnet(cc.Dt, B)
         elif cc.track_method == 'StrongBgen':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
@@ -482,19 +509,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         # Initial electron density
         if thiscloud.init_unif_flag == 1:
-            print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
+            print("Adding initial %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
             MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif,
                                         thiscloud.x_max_init_unif, thiscloud.x_min_init_unif,
                                         thiscloud.y_max_init_unif, thiscloud.y_min_init_unif)
 
         if thiscloud.init_unif_edens_flag == 1:
-            print("Adding inital %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
+            print("Adding initial %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
             MP_e.add_uniform_ele_density(n_ele=thiscloud.init_unif_edens, E_init=thiscloud.E_init_unif_edens,
                                          x_max=thiscloud.x_max_init_unif_edens, x_min=thiscloud.x_min_init_unif_edens,
                                          y_max=thiscloud.y_max_init_unif_edens, y_min=thiscloud.y_min_init_unif_edens)
 
         if thiscloud.filename_init_MP_state != -1 and thiscloud.filename_init_MP_state is not None:
-            print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
+            print("Adding initial electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud
@@ -508,6 +535,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         cloud_list.append(cloud)
 
+    # Init cross-ionization object
+    if flag_cross_ion:
+        cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list, chamb.area)
+    else:
+        cross_ion = None
+
+
     return (beamtim,
             spacech_ele_sim,
             cc.t_sc_ON,
@@ -516,5 +550,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             config_dict,
             flag_multiple_clouds,
             cloud_list,
-            cc.checkpoint_folder
+            cc.checkpoint_folder,
+            cross_ion
             )

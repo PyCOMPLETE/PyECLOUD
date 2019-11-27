@@ -96,6 +96,7 @@ parameters_dict = {
             'lifetime_hist_max': None,
             'Dt_lifetime_hist':None,
 
+            'Dh_electric_energy': None, 
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
 
@@ -121,6 +122,11 @@ parameters_dict = {
             'ene_dist_test_E_impact_eV': None,
             'Nbin_extract_ene': None,
             'factor_ene_dist_max': None,
+
+            'flag_em_tracking' : False,
+
+            # Cross-ionization
+            'cross_ion_definitions': None
 
         },
     },

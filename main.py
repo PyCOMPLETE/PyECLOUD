@@ -1,5 +1,3 @@
-#!/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/python
-
 #-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
@@ -9,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.1.0
+#                   PyECLOUD Version 8.2.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -21,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo

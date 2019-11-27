@@ -63,6 +63,7 @@ class beam_descr_from_fil:
         self.m0_part = cc.m0_part
         self.energy_eV = cc.energy_eV
         self.energy_J = energy_J
+        self.gamma_rel = gamma_rel
         self.beta_rel = beta_rel
         self.Dp_p = cc.Dp_p
         self.nemittx = cc.nemittx

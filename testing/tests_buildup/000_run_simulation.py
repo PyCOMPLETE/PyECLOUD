@@ -40,7 +40,7 @@ parser.add_argument('--folder', help='Simulation_folder')
 parser.add_argument('--angle-dist-func',
                     help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.',
                     choices=('2D', '3D'), default='3D')
-
+parser.add_argument('--skip_sey_extraction', help='No SEY extraction', action='store_true')
 
 args = parser.parse_args()
 if args.folder:
@@ -49,10 +49,10 @@ if args.folder:
 angle_distribution = 'cosine_%s' % args.angle_dist_func
 filen_main_outp = sim_folder + '/Pyecltest_angle%s.mat' % args.angle_dist_func
 
-
 time_0 = time.time()
 sim = BuildupSimulation(pyecl_input_folder=sim_folder, filen_main_outp=filen_main_outp,
-                        secondary_angle_distribution=angle_distribution, photoelectron_angle_distribution=angle_distribution)
+                        secondary_angle_distribution=angle_distribution, photoelectron_angle_distribution=angle_distribution,
+                        extract_sey=not(args.skip_sey_extraction))
 time_1 = time.time()
 sim.run()
 time_2 = time.time()

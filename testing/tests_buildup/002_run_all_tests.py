@@ -33,8 +33,9 @@ all_sim_folders = [
     'FCC_Dipole_25ns_50.00TeV_sey1.9_segment_photoemission',
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime',
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint',
-    'Rectangular_Dip_450GeV_sey1.60_1.1e11ppb_furman_pivi'
-]
+    'Rectangular_Dip_450GeV_sey1.60_1.1e11ppb_furman_pivi',
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_em_tracking'
+    ]
 
 if args.all:
     dists = all_dists
