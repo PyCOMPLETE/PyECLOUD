@@ -9,12 +9,12 @@ import Simulation_parameters as pp
 
 plt.close('all')
 
-n_mp_slice = 2500
+n_mp_slice = 25000
 intensity = 1.2e11
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 sigma_z = 9.7e-2
-n_slices = 150
+n_slices = 100
 n_mp_bunch = n_mp_slice*n_slices
 long_unif = True
 
@@ -94,10 +94,11 @@ ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
     nel_mp_ref_0=nel_mp_ref_0,
     B_multip=[0.],
     enable_kick_x = pp.enable_kick_x,
-    enable_kick_y = pp.enable_kick_y)
+    enable_kick_y = pp.enable_kick_y,
+    kick_mode_for_beam_field=False)
 
 mpe = ecloud.cloudsim.cloud_list[0].MP_e
-mpe.x_mp[0] = 1e-3 
+mpe.x_mp[0] = .1e-3 
 mpe.vx_mp[0] = 0.
 mpe.y_mp[0] = 0.
 mpe.vy_mp[0] = 0.
@@ -111,7 +112,7 @@ x_record = np.array(x_record[::-1])
 
 fig2 = plt.figure(2)
 axx = fig2.add_subplot(111)
-axx.plot(z_slices, x_record)
+axx.plot(z_slices, x_record, '.-')
 axx.grid(True)
 plt.show()
 
