@@ -41,7 +41,8 @@ slicer = UniformBinSlicer(
 #########
 
 slices = bunch.extract_slices(slicer)
-
+z_slices = np.array([
+    ss.slice_info['z_bin_center'] for ss in slices])
 
 ##################
 # Make an ecloud #
