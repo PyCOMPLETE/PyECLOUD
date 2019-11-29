@@ -97,7 +97,7 @@ chamb_type = 'polyg'
 x_aper = 2.300000e-02
 y_aper = 1.800000e-02
 filename_chm = 'LHC_chm_ver.mat'
-Dt_ref = 25e-12
+Dt_ref = 5e-12
 pyecl_input_folder = './pyecloud_config'
 sey = 1.30
 
@@ -108,7 +108,7 @@ Dh_sc_ext = .8e-3
 f_telescope = 0.3
 N_nodes_discard = 5.
 target_size_internal_grid_sigma = 10.
-target_Dh_internal_grid_sigma = 0.5
+target_Dh_internal_grid_sigma = 0.2
 custom_target_grid_arcs = None
 
 # # Uncomment for custom grid
