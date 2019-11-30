@@ -78,7 +78,9 @@ nel_mp_ref_0 = pp.init_unif_edens_dip*4*pp.x_aper*pp.y_aper/pp.N_MP_ele_init_dip
 
 ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
     L_ecloud=1., slicer=None,
-    Dt_ref=pp.Dt_ref, pyecl_input_folder=pp.pyecl_input_folder,
+    Dt_ref=1.,
+    #Dt_ref=pp.Dt_ref,
+    pyecl_input_folder=pp.pyecl_input_folder,
     chamb_type = pp.chamb_type,
     x_aper=pp.x_aper, y_aper=pp.y_aper,
     filename_chm=pp.filename_chm,
@@ -97,6 +99,10 @@ ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
     enable_kick_y = pp.enable_kick_y,
     kick_mode_for_beam_field=False)
 
+sc = ecloud.beam_PyPIC_state.pic_internal
+i_y0 = np.argmin(np.abs(sc.yg))
+
+
 mpe = ecloud.cloudsim.cloud_list[0].MP_e
 mpe.x_mp[0] = .1e-3 
 mpe.vx_mp[0] = 0.
@@ -105,8 +111,11 @@ mpe.vy_mp[0] = 0.
 mpe.z_mp[0] = 0.
 N_track = 1
 x_record = []
+field_record = []
 for ss in slices[::-1]:
+    #ecloud.track(slices[int(n_slices/2)])
     ecloud.track(ss)
+    field_record.append(sc.efx[:, i_y0].copy())
     x_record.append(mpe.x_mp[:N_track].copy())
 x_record = np.array(x_record[::-1])
 
