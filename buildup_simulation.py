@@ -83,6 +83,7 @@ class BuildupSimulation(object):
             cloud_list,
             checkpoint_folder,
             cross_ion,
+            flag_reinterp_fields_at_substeps 
         ) = init.read_input_files_and_init_components(
             pyecl_input_folder=pyecl_input_folder,
             skip_beam=skip_beam,
