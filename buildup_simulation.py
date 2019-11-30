@@ -106,6 +106,8 @@ class BuildupSimulation(object):
         self.flag_em_tracking = spacech_ele.flag_em_tracking
         self.cross_ion = cross_ion
 
+        self.flag_reinterp_fields_at_substeps = False
+
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
             if os.path.isdir(self.checkpoint_folder):
@@ -162,6 +164,7 @@ class BuildupSimulation(object):
         N_sub_steps_custom=None,
         kick_mode_for_beam_field=False,
         force_recompute_space_charge=False,
+        force_reinterp_fields_at_substeps = False,
         skip_MP_cleaning=False,
         skip_MP_regen=False,
     ):
@@ -187,11 +190,11 @@ class BuildupSimulation(object):
             ## into account)
             self._cloud_motion(
                 cloud,
-                beamtim_obj,
+                beamtim,
                 Dt_substep_custom,
                 N_sub_steps_custom,
                 kick_mode_for_beam_field,
-                force_field_reinterpolation,
+                force_reinterp_fields_at_substeps,
                 )
 
             ## Impacts: backtracking and secondary emission
@@ -345,11 +348,11 @@ class BuildupSimulation(object):
 
     def _cloud_motion(
         self, cloud,
-        beamtim_obj,
+        beamtim,
         Dt_substep_custom,
         N_sub_steps_custom,
         kick_mode_for_beam_field,
-        force_field_reinterpolation,
+        force_reinterp_fields_at_substeps,
     ):
 
         flag_substeps = False
@@ -394,7 +397,7 @@ class BuildupSimulation(object):
                 )
             
             Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
-                cloud.MP_e, beamtim_obj)
+                cloud.MP_e, beamtim)
 
             self._apply_instantaneous_kick(
                 cloud.MP_e,
@@ -404,7 +407,7 @@ class BuildupSimulation(object):
             )
 
         # Decide number of substeps internal and external
-        if self.flag_reinterp_fields_at_substeps or force_field_reinterpolation:
+        if self.flag_reinterp_fields_at_substeps or force_reinterp_fields_at_substeps:
             if not flag_substeps:
                 raise ValueError('No substeps set!')
             N_substeps_external = N_substeps_curr
@@ -414,7 +417,7 @@ class BuildupSimulation(object):
             N_substeps_internal = N_substeps_curr
 
        
-        for isbtp in N_substeps_external:
+        for isbtp in range(N_substeps_external):
             ## Interpolate fields from clouds at particles
             (
                 Ex_n,
@@ -427,7 +430,7 @@ class BuildupSimulation(object):
             ## Interpolate field from beam
             if not kick_mode_for_beam_field:
                 Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
-                    cloud.MP_e, beamtim_obj)
+                    cloud.MP_e, beamtim)
                 Ex_n += Ex_n_beam
                 Ey_n += Ey_n_beam
 
