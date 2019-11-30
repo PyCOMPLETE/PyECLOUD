@@ -198,7 +198,9 @@ class BuildupSimulation(object):
 
             if self.flag_presence_sec_beams:
                 for sec_beam in self.sec_beams_list:
-                    Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(cloud.MP_e)
+                    Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(
+                        cloud.MP_e
+                    )
                     Ex_n_beam += Ex_n_secbeam
                     Ey_n_beam += Ey_n_secbeam
 
@@ -254,7 +256,13 @@ class BuildupSimulation(object):
             ):
                 # Standard simulation mode
                 cloud.MP_e = dynamics.step(
-                    cloud.MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_sc_n, By_n=By_sc_n, Bz_n=Bz_sc_n
+                    cloud.MP_e,
+                    Ex_n,
+                    Ey_n,
+                    Ez_n=0,
+                    Bx_n=Bx_sc_n,
+                    By_n=By_sc_n,
+                    Bz_n=Bz_sc_n,
                 )
             elif (
                 Dt_substep_custom is None
@@ -299,7 +307,9 @@ class BuildupSimulation(object):
                 )
 
             ## Impacts: backtracking and secondary emission
-            cloud.MP_e = impact_man.backtrack_and_second_emiss(old_pos, cloud.MP_e, beamtim.tt_curr)
+            cloud.MP_e = impact_man.backtrack_and_second_emiss(
+                old_pos, cloud.MP_e, beamtim.tt_curr
+            )
 
             ## Evolve SEY module (e.g. charge decay for insulators
             impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
