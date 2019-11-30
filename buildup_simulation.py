@@ -83,7 +83,7 @@ class BuildupSimulation(object):
             cloud_list,
             checkpoint_folder,
             cross_ion,
-            flag_reinterp_fields_at_substeps
+            flag_reinterp_fields_at_substeps,
         ) = init.read_input_files_and_init_components(
             pyecl_input_folder=pyecl_input_folder,
             skip_beam=skip_beam,
@@ -165,7 +165,7 @@ class BuildupSimulation(object):
         N_sub_steps_custom=None,
         kick_mode_for_beam_field=False,
         force_recompute_space_charge=False,
-        force_reinterp_fields_at_substeps = False,
+        force_reinterp_fields_at_substeps=False,
         skip_MP_cleaning=False,
         skip_MP_regen=False,
     ):
@@ -182,12 +182,11 @@ class BuildupSimulation(object):
         # Loop over clouds: gather fields, move, generate new MPs
         for i_cloud, cloud in enumerate(self.cloud_list):
 
-
             ## Save position before motion step
             old_pos = cloud.MP_e.get_positions()
 
             ## Motion
-            ## (external B field, beam and cloud fields are taken 
+            ## (external B field, beam and cloud fields are taken
             ## into account)
             self._cloud_motion(
                 cloud,
@@ -196,7 +195,7 @@ class BuildupSimulation(object):
                 N_sub_steps_custom,
                 kick_mode_for_beam_field,
                 force_reinterp_fields_at_substeps,
-                )
+            )
 
             ## Impacts: backtracking and secondary emission
             cloud.MP_e = cloud.impact_man.backtrack_and_second_emiss(
@@ -348,7 +347,8 @@ class BuildupSimulation(object):
         MP_e.vy_mp[: MP_e.N_mp] += Ey_n_kick * Dt_kick * MP_e.charge / MP_e.mass
 
     def _cloud_motion(
-        self, cloud,
+        self,
+        cloud,
         beamtim,
         Dt_substep_custom,
         N_sub_steps_custom,
@@ -389,7 +389,6 @@ class BuildupSimulation(object):
                 N_substeps_curr = cloud.dynamics.N_sub_steps
                 Dt_substep_curr = cloud.dynamics.Dt / N_substeps_curr
 
-
         # Beam kick applided here if kick-mode (mainly used in fast-ion mode)
         if kick_mode_for_beam_field:
             if not flag_substeps:
@@ -398,7 +397,8 @@ class BuildupSimulation(object):
                 )
 
             Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
-                cloud.MP_e, beamtim)
+                cloud.MP_e, beamtim
+            )
 
             self._apply_instantaneous_kick(
                 cloud.MP_e,
@@ -410,43 +410,33 @@ class BuildupSimulation(object):
         # Decide number of substeps internal and external
         if self.flag_reinterp_fields_at_substeps or force_reinterp_fields_at_substeps:
             if not flag_substeps:
-                raise ValueError('No substeps set!')
+                raise ValueError("No substeps set!")
             N_substeps_external = N_substeps_curr
             N_substeps_internal = 1
         else:
             N_substeps_external = 1
             N_substeps_internal = N_substeps_curr
 
-        #print(f'external {N_substeps_external}')
-        #print(f'internal {N_substeps_internal}')
+        # print(f'external {N_substeps_external}')
+        # print(f'internal {N_substeps_internal}')
         for isbtp in range(N_substeps_external):
             ## Interpolate fields from clouds at particles
-            (
-                Ex_n,
-                Ey_n,
-                Bx_n,
-                By_n,
-                Bz_n,
-            ) = self._get_field_from_clouds_at_particles(cloud.MP_e)
+            (Ex_n, Ey_n, Bx_n, By_n, Bz_n,) = self._get_field_from_clouds_at_particles(
+                cloud.MP_e
+            )
 
             ## Interpolate field from beam
             if not kick_mode_for_beam_field:
                 Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
-                    cloud.MP_e, beamtim)
+                    cloud.MP_e, beamtim
+                )
                 Ex_n += Ex_n_beam
                 Ey_n += Ey_n_beam
-
 
             if not flag_substeps:
                 # Standard simulation mode
                 cloud.MP_e = cloud.dynamics.step(
-                    cloud.MP_e,
-                    Ex_n,
-                    Ey_n,
-                    Ez_n=0,
-                    Bx_n=Bx_n,
-                    By_n=By_n,
-                    Bz_n=Bz_n,
+                    cloud.MP_e, Ex_n, Ey_n, Ez_n=0, Bx_n=Bx_n, By_n=By_n, Bz_n=Bz_n,
                 )
             else:
                 # Substep mode
