@@ -171,27 +171,12 @@ class BuildupSimulation(object):
         else:
             beamtim = self.beamtim
 
-        self.spacech_ele = self.spacech_ele
-        self.t_sc_ON = self.t_sc_ON
-        self.flag_presence_sec_beams = self.flag_presence_sec_beams
-        self.sec_beams_list = self.sec_beams_list
-        self.cloud_list = self.cloud_list
-        self.cross_ion = self.cross_ion
-
         flag_recompute_space_charge = self.spacech_ele.check_for_recomputation(
             t_curr=beamtim.tt_curr
         )
 
         # Loop over clouds: gather fields, move, generate new MPs
         for i_cloud, cloud in enumerate(self.cloud_list):
-            cloud.MP_e = cloud.MP_e
-            dynamics = cloud.dynamics
-            impact_man = cloud.impact_man
-            gas_ion_flag = cloud.gas_ion_flag
-            resgasion = cloud.resgasion
-            t_ion = cloud.t_ion
-            photoem_flag = cloud.photoem_flag
-            phemiss = cloud.phemiss
 
             ## Compute beam electric field (main and secondary beams)
             Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(cloud.MP_e)
@@ -255,7 +240,7 @@ class BuildupSimulation(object):
                 and beamtim.flag_unif_Dt
             ):
                 # Standard simulation mode
-                cloud.MP_e = dynamics.step(
+                cloud.MP_e = cloud.dynamics.step(
                     cloud.MP_e,
                     Ex_n,
                     Ey_n,
@@ -277,7 +262,7 @@ class BuildupSimulation(object):
                 Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
                 N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
                 Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
-                cloud.MP_e = dynamics.stepcustomDt(
+                cloud.MP_e = cloud.dynamics.stepcustomDt(
                     cloud.MP_e,
                     Ex_n,
                     Ey_n,
@@ -294,7 +279,7 @@ class BuildupSimulation(object):
                     raise ValueError(
                         """track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!"""
                     )
-                cloud.MP_e = dynamics.stepcustomDt(
+                cloud.MP_e = cloud.dynamics.stepcustomDt(
                     cloud.MP_e,
                     Ex_n,
                     Ey_n,
@@ -307,16 +292,16 @@ class BuildupSimulation(object):
                 )
 
             ## Impacts: backtracking and secondary emission
-            cloud.MP_e = impact_man.backtrack_and_second_emiss(
+            cloud.MP_e = cloud.impact_man.backtrack_and_second_emiss(
                 old_pos, cloud.MP_e, beamtim.tt_curr
             )
 
             ## Evolve SEY module (e.g. charge decay for insulators
-            impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
+            cloud.impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
 
             ## Gas ionization (main and secondary beams)
-            if beamtim.tt_curr < t_ion and gas_ion_flag == 1:
-                cloud.MP_e = resgasion.generate(
+            if beamtim.tt_curr < cloud.t_ion and cloud.gas_ion_flag == 1:
+                cloud.MP_e = cloud.resgasion.generate(
                     cloud.MP_e,
                     beamtim.lam_t_curr,
                     beamtim.Dt_curr,
@@ -327,7 +312,7 @@ class BuildupSimulation(object):
                 )
                 if self.flag_presence_sec_beams:
                     for sec_beam in self.sec_beams_list:
-                        cloud.MP_e = resgasion.generate(
+                        cloud.MP_e = cloud.resgasion.generate(
                             cloud.MP_e,
                             sec_beam.lam_t_curr,
                             sec_beam.Dt_curr,
@@ -338,12 +323,12 @@ class BuildupSimulation(object):
                         )
 
             ## Photoemission (main and secondary beams)
-            if photoem_flag != 0:
+            if cloud.photoem_flag != 0:
                 lam_curr_phem = beamtim.lam_t_curr
                 if self.flag_presence_sec_beams:
                     for sec_beam in self.sec_beams_list:
                         lam_curr_phem += sec_beam.lam_t_curr
-                phemiss.generate(cloud.MP_e, lam_curr_phem, beamtim.Dt_curr)
+                cloud.phemiss.generate(cloud.MP_e, lam_curr_phem, beamtim.Dt_curr)
 
         ## Cross_ionization
         if self.cross_ion is not None:
