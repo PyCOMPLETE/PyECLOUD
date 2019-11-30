@@ -183,61 +183,15 @@ class BuildupSimulation(object):
             old_pos = cloud.MP_e.get_positions()
 
             ## Motion
-            if (
-                Dt_substep_custom is None
-                and N_sub_steps_custom is None
-                and beamtim.flag_unif_Dt
-            ):
-                # Standard simulation mode
-                cloud.MP_e = cloud.dynamics.step(
-                    cloud.MP_e,
-                    Ex_n,
-                    Ey_n,
-                    Ez_n=0,
-                    Bx_n=Bx_sc_n,
-                    By_n=By_sc_n,
-                    Bz_n=Bz_sc_n,
-                )
-            elif (
-                Dt_substep_custom is None
-                and N_sub_steps_custom is None
-                and not (beamtim.flag_unif_Dt)
-            ):
-                # Dt from non-uniform beam profile
-                if self.config_dict["track_method"] not in ["Boris", "BorisMultipole"]:
-                    raise ValueError(
-                        """track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!"""
-                    )
-                Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
-                N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
-                Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
-                cloud.MP_e = cloud.dynamics.stepcustomDt(
-                    cloud.MP_e,
-                    Ex_n,
-                    Ey_n,
-                    Ez_n=0,
-                    Bx_n=Bx_sc_n,
-                    By_n=By_sc_n,
-                    Bz_n=Bz_sc_n,
-                    Dt_substep=Dt_substep_curr,
-                    N_sub_steps=N_substeps_curr,
-                )
-            else:
-                # Custom steps and substeps provided as arguments of sim_time_step
-                if self.config_dict["track_method"] not in ["Boris", "BorisMultipole"]:
-                    raise ValueError(
-                        """track_method should be 'Boris' or 'BorisMultipole' to use custom substeps!"""
-                    )
-                cloud.MP_e = cloud.dynamics.stepcustomDt(
-                    cloud.MP_e,
-                    Ex_n,
-                    Ey_n,
-                    Ez_n=0,
-                    Bx_n=Bx_sc_n,
-                    By_n=By_sc_n,
-                    Bz_n=Bz_sc_n,
-                    Dt_substep=Dt_substep_custom,
-                    N_sub_steps=N_sub_steps_custom,
+            ## (external B field, beam and cloud fields are taken 
+            ## into account)
+            self._cloud_motion(
+                cloud,
+                beamtim_obj,
+                Dt_substep_custom,
+                N_sub_steps_custom,
+                kick_mode_for_beam_field,
+                force_field_reinterpolation,
                 )
 
             ## Impacts: backtracking and secondary emission
@@ -390,7 +344,7 @@ class BuildupSimulation(object):
         MP_e.vy_mp[: MP_e.N_mp] += Ey_n_kick * Dt_kick * MP_e.charge / MP_e.mass
 
     def _cloud_motion(
-        self,
+        self, cloud,
         beamtim_obj,
         Dt_substep_custom,
         N_sub_steps_custom,
