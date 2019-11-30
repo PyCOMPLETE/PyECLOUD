@@ -83,7 +83,7 @@ class BuildupSimulation(object):
             cloud_list,
             checkpoint_folder,
             cross_ion,
-            flag_reinterp_fields_at_substeps 
+            flag_reinterp_fields_at_substeps
         ) = init.read_input_files_and_init_components(
             pyecl_input_folder=pyecl_input_folder,
             skip_beam=skip_beam,
@@ -107,7 +107,7 @@ class BuildupSimulation(object):
         self.flag_em_tracking = spacech_ele.flag_em_tracking
         self.cross_ion = cross_ion
 
-        self.flag_reinterp_fields_at_substeps = False
+        self.flag_reinterp_fields_at_substeps = flag_reinterp_fields_at_substeps
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:
@@ -396,7 +396,7 @@ class BuildupSimulation(object):
                 raise ValueError(
                     """Kick mode can be used only with custom time steps!"""
                 )
-            
+
             Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
                 cloud.MP_e, beamtim)
 
@@ -417,7 +417,8 @@ class BuildupSimulation(object):
             N_substeps_external = 1
             N_substeps_internal = N_substeps_curr
 
-       
+        #print(f'external {N_substeps_external}')
+        #print(f'internal {N_substeps_internal}')
         for isbtp in range(N_substeps_external):
             ## Interpolate fields from clouds at particles
             (
