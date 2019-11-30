@@ -179,15 +179,8 @@ class BuildupSimulation(object):
         for i_cloud, cloud in enumerate(self.cloud_list):
 
             ## Compute beam electric field (main and secondary beams)
-            Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(cloud.MP_e)
-
-            if self.flag_presence_sec_beams:
-                for sec_beam in self.sec_beams_list:
-                    Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(
-                        cloud.MP_e
-                    )
-                    Ex_n_beam += Ex_n_secbeam
-                    Ey_n_beam += Ey_n_secbeam
+            Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
+                    cloud.MP_e, beamtim)
 
             ## Either compute electromagnetic or electrostatic fields
             if self.flag_em_tracking:
@@ -405,6 +398,17 @@ class BuildupSimulation(object):
                     cloud.MP_e.check_for_soft_regeneration()
 
             cloud.MP_e.check_for_async_regeneration()
+
+
+    def _get_field_from_beams_at_particles(self, MP_e, beamtim):
+        Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
+
+        if self.flag_presence_sec_beams:
+            for sec_beam in self.sec_beams_list:
+                Ex_n_secbeam, Ey_n_secbeam = sec_beam.get_beam_eletric_field(MP_e)
+                Ex_n_beam += Ex_n_secbeam
+                Ey_n_beam += Ey_n_secbeam
+        return Ex_n_beam, Ey_n_beam
 
     def load_state(
         self,
