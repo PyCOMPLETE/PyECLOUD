@@ -181,30 +181,31 @@ class BuildupSimulation(object):
             ## Compute beam electric field (main and secondary beams)
             ## at particles
             Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
-                    cloud.MP_e, beamtim)
+                cloud.MP_e, beamtim
+            )
 
-
-            ## Compute electric field from cloud at particles
-            (Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
-                    ) = self._get_field_from_clouds_at_particles(cloud.MP_e)
+            ## Compute electric field from clouds at particles
+            (
+                Ex_sc_n,
+                Ey_sc_n,
+                Bx_sc_n,
+                By_sc_n,
+                Bz_sc_n,
+            ) = self._get_field_from_clouds_at_particles(cloud.MP_e)
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
                     raise ValueError(
                         """Kick mode can be used only with custom time steps!"""
                     )
-                cloud.MP_e.vx_mp[: cloud.MP_e.N_mp] += (
-                    Ex_n_beam
-                    * (Dt_substep_custom * N_sub_steps_custom)
-                    * cloud.MP_e.charge
-                    / cloud.MP_e.mass
+
+                self._apply_instantaneous_kick(
+                    cloud.MP_e,
+                    Ex_n_beam,
+                    Ey_n_bea,
+                    Dt_kick=Dt_substep_custom * N_sub_steps_custom,
                 )
-                cloud.MP_e.vy_mp[: cloud.MP_e.N_mp] += (
-                    Ey_n_beam
-                    * (Dt_substep_custom * N_sub_steps_custom)
-                    * cloud.MP_e.charge
-                    / cloud.MP_e.mass
-                )
+
                 # Electric field for dynamics step
                 Ex_n = Ex_sc_n
                 Ey_n = Ey_sc_n
@@ -389,7 +390,6 @@ class BuildupSimulation(object):
 
             cloud.MP_e.check_for_async_regeneration()
 
-
     def _get_field_from_beams_at_particles(self, MP_e, beamtim):
         Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
 
@@ -419,6 +419,10 @@ class BuildupSimulation(object):
 
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
 
+    def _apply_instantaneous_kick(self, MP_e, Ex_n_kick, Ey_n_kick, Dt_kick):
+
+        MP_e.vx_mp[: MP_e.N_mp] += Ex_n_kick * Dt_kick * MP_e.charge / MP_e.mass
+        MP_e.vy_mp[: MP_e.N_mp] += Ey_n_kick * Dt_kick * MP_e.charge / MP_e.mass
 
     def load_state(
         self,
