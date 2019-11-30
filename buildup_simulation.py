@@ -179,24 +179,14 @@ class BuildupSimulation(object):
         for i_cloud, cloud in enumerate(self.cloud_list):
 
             ## Compute beam electric field (main and secondary beams)
+            ## at particles
             Ex_n_beam, Ey_n_beam = self._get_field_from_beams_at_particles(
                     cloud.MP_e, beamtim)
 
-            ## Either compute electromagnetic or electrostatic fields
-            if self.flag_em_tracking:
-                (
-                    Ex_sc_n,
-                    Ey_sc_n,
-                    Bx_sc_n,
-                    By_sc_n,
-                    Bz_sc_n,
-                ) = self.spacech_ele.get_sc_em_field(cloud.MP_e)
-            else:
-                ## Compute electron space charge electric field
-                Ex_sc_n, Ey_sc_n = self.spacech_ele.get_sc_eletric_field(cloud.MP_e)
-                Bx_sc_n = np.asarray([0.0])
-                By_sc_n = np.asarray([0.0])
-                Bz_sc_n = np.asarray([0.0])
+
+            ## Compute electric field from cloud at particles
+            (Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
+                    ) = self._get_field_from_clouds_at_particles(cloud.MP_e)
 
             if kick_mode_for_beam_field:
                 if Dt_substep_custom is None or N_sub_steps_custom is None:
@@ -409,6 +399,26 @@ class BuildupSimulation(object):
                 Ex_n_beam += Ex_n_secbeam
                 Ey_n_beam += Ey_n_secbeam
         return Ex_n_beam, Ey_n_beam
+
+    def _get_field_from_clouds_at_particles(self, MP_e):
+        ## Either compute electromagnetic or electrostatic fields
+        if self.flag_em_tracking:
+            (
+                Ex_sc_n,
+                Ey_sc_n,
+                Bx_sc_n,
+                By_sc_n,
+                Bz_sc_n,
+            ) = self.spacech_ele.get_sc_em_field(MP_e)
+        else:
+            ## Compute electron space charge electric field
+            Ex_sc_n, Ey_sc_n = self.spacech_ele.get_sc_eletric_field(MP_e)
+            Bx_sc_n = np.asarray([0.0])
+            By_sc_n = np.asarray([0.0])
+            Bz_sc_n = np.asarray([0.0])
+
+        return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
+
 
     def load_state(
         self,
