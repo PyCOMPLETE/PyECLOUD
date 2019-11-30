@@ -379,7 +379,7 @@ class BuildupSimulation(object):
             # Non-uniform beam-profile
             flag_substeps = True
             Dt_substep_target = cloud.dynamics.Dt / cloud.dynamics.N_sub_steps
-            N_substeps_curr = np.round(beamtim.Dt_curr / Dt_substep_target)
+            N_substeps_curr = int(np.round(beamtim.Dt_curr / Dt_substep_target))
             Dt_substep_curr = beamtim.Dt_curr / N_substeps_curr
 
         elif hasattr(cloud.dynamics, "N_sub_steps"):
