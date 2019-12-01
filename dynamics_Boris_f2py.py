@@ -131,6 +131,7 @@ class pusher_Boris():
 
         print("Tracker: Boris")
 
+        self.Dt = Dt
         self.N_sub_steps = N_sub_steps
         self.Dtt = Dt / float(N_sub_steps)
         self.B0x = B0x
