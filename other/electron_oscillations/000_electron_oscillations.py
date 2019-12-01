@@ -78,9 +78,7 @@ nel_mp_ref_0 = pp.init_unif_edens_dip*4*pp.x_aper*pp.y_aper/pp.N_MP_ele_init_dip
 
 ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
     L_ecloud=1., slicer=None,
-#    flag_reinterp_fields_at_substeps=False,
-    force_interp_at_substeps_interacting_slices=False,
-    #Dt_ref=1.,
+    force_interp_at_substeps_interacting_slices=True,
     Dt_ref=pp.Dt_ref,
     pyecl_input_folder=pp.pyecl_input_folder,
     chamb_type = pp.chamb_type,
