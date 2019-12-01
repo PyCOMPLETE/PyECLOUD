@@ -506,7 +506,7 @@ class Ecloud(object):
                 skip_MP_cleaning=skip_MP_cleaning,
                 skip_MP_regen=skip_MP_regen,
                 force_reinterp_fields_at_substeps=(interact_with_EC
-                    and force_interp_at_substeps_interacting_slices)
+                    and self.force_interp_at_substeps_interacting_slices)
             )
 
             if interact_with_EC:

@@ -14,7 +14,7 @@ intensity = 1.2e11
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 sigma_z = 9.7e-2
-n_slices = 100
+n_slices = 150
 n_mp_bunch = n_mp_slice*n_slices
 long_unif = True
 
@@ -78,7 +78,8 @@ nel_mp_ref_0 = pp.init_unif_edens_dip*4*pp.x_aper*pp.y_aper/pp.N_MP_ele_init_dip
 
 ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
     L_ecloud=1., slicer=None,
-    flag_reinterp_fields_at_substeps=True,
+#    flag_reinterp_fields_at_substeps=False,
+    force_interp_at_substeps_interacting_slices=False,
     #Dt_ref=1.,
     Dt_ref=pp.Dt_ref,
     pyecl_input_folder=pp.pyecl_input_folder,
