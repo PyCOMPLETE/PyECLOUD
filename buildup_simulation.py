@@ -213,30 +213,15 @@ class BuildupSimulation(object):
             self.cross_ion.generate(Dt=beamtim.Dt_curr, cloud_list=self.cloud_list)
 
         ## Compute space charge field (PIC: scatter and solve)
-        self._recompute_cloud_spacecharge(beamtim,
-            flag_recompute_space_charge, force_recompute_space_charge
+        self._recompute_cloud_spacecharge(
+            beamtim, flag_recompute_space_charge, force_recompute_space_charge
         )
 
         ## Saving output
         self._save_output_data(beamtim)
 
         ## Cleaning and regeneration
-        for cloud in self.cloud_list:
-            ## Every bunch passage
-            if beamtim.flag_new_bunch_pass:
-
-                ## Clean
-                if not skip_MP_cleaning:
-                    cloud.MP_e.clean_small_MPs()
-
-                if not skip_MP_regen:
-                    ## Regeneration
-                    cloud.MP_e.check_for_regeneration()
-
-                    ## Soft regeneration
-                    cloud.MP_e.check_for_soft_regeneration()
-
-            cloud.MP_e.check_for_async_regeneration()
+        self._MP_cleaning_and_regenerations(beamtim, skip_MP_cleaning, skip_MP_regen)
 
     def _get_field_from_beams_at_particles(self, MP_e, beamtim):
         Ex_n_beam, Ey_n_beam = beamtim.get_beam_eletric_field(MP_e)
@@ -440,7 +425,6 @@ class BuildupSimulation(object):
                     lam_curr_phem += sec_beam.lam_t_curr
             cloud.phemiss.generate(cloud.MP_e, lam_curr_phem, beamtim.Dt_curr)
 
-
     def _save_output_data(self, beamtim):
         # We want to save and clean MP only after iteration on all clouds is completed
         # (e.g. to have consistent space charge state)
@@ -469,7 +453,24 @@ class BuildupSimulation(object):
                     rho_cloud=cloud.rho,
                 )
 
+    def _MP_cleaning_and_regenerations(self, beamtim, skip_MP_cleaning, skip_MP_regen):
 
+        for cloud in self.cloud_list:
+            ## Every bunch passage
+            if beamtim.flag_new_bunch_pass:
+
+                ## Clean
+                if not skip_MP_cleaning:
+                    cloud.MP_e.clean_small_MPs()
+
+                if not skip_MP_regen:
+                    ## Regeneration
+                    cloud.MP_e.check_for_regeneration()
+
+                    ## Soft regeneration
+                    cloud.MP_e.check_for_soft_regeneration()
+
+            cloud.MP_e.check_for_async_regeneration()
 
     def load_state(
         self,
