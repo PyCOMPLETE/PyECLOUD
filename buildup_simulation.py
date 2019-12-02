@@ -332,7 +332,7 @@ class BuildupSimulation(object):
 
         # Beam kick applided here if kick-mode (mainly used in fast-ion mode)
         if kick_mode_for_beam_field:
-            if not flag_substeps:
+            if N_sub_steps_custom is None:
                 raise ValueError(
                     """Kick mode can be used only with custom time steps!"""
                 )
