@@ -551,5 +551,6 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             flag_multiple_clouds,
             cloud_list,
             cc.checkpoint_folder,
-            cross_ion
+            cross_ion,
+            cc.flag_reinterp_fields_at_substeps 
             )
