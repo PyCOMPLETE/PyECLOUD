@@ -108,6 +108,7 @@ class BuildupSimulation(object):
         self.cross_ion = cross_ion
 
         self.flag_reinterp_fields_at_substeps = flag_reinterp_fields_at_substeps
+        print(f"Reinterp fields at substeps: {self.flag_reinterp_fields_at_substeps}")
 
         # Checking if there are saved checkpoints
         if self.checkpoint_folder is not None:

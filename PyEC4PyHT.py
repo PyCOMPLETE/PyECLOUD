@@ -134,7 +134,7 @@ class Ecloud(object):
         beam_monitor=None,
         verbose=False,
         save_pyecl_outp_as=None,
-        force_interp_at_substeps_interacting_slices=None,
+        force_interp_at_substeps_interacting_slices=False,
         **kwargs
     ):
 
@@ -174,6 +174,8 @@ class Ecloud(object):
         self.force_interp_at_substeps_interacting_slices = (
             force_interp_at_substeps_interacting_slices
         )
+
+        print(f"Reinterp fields at substeps for interacting slices: {self.force_interp_at_substeps_interacting_slices}")
 
         self.cloudsim = bsim.BuildupSimulation(
             pyecl_input_folder=pyecl_input_folder,
