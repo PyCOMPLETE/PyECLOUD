@@ -212,59 +212,13 @@ class BuildupSimulation(object):
         if self.cross_ion is not None:
             self.cross_ion.generate(Dt=beamtim.Dt_curr, cloud_list=self.cloud_list)
 
-        ## Compute space charge field
-        for i_cloud, cloud in enumerate(self.cloud_list):
-            if (
-                (beamtim.tt_curr > self.t_sc_ON) and flag_recompute_space_charge
-            ) or force_recompute_space_charge:
-                flag_reset = (
-                    cloud is self.cloud_list[0]
-                )  # The first cloud resets the distribution
-                flag_solve = (
-                    cloud is self.cloud_list[-1]
-                )  # The last cloud computes the fields
-                ## Either compute electromagnetic field or electrostatic
-                if self.flag_em_tracking:
-                    self.spacech_ele.recompute_spchg_emfield(
-                        cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset
-                    )
-                else:
-                    self.spacech_ele.recompute_spchg_efield(
-                        cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset
-                    )
-
-                # Copy rho to cloud
-                cloud.rho = self.spacech_ele.rho - sum(
-                    [cl.rho for cl in self.cloud_list[:i_cloud]]
-                )
+        ## Compute space charge field (PIC: scatter and solve)
+        self._recompute_cloud_spacecharge(beamtim,
+            flag_recompute_space_charge, force_recompute_space_charge
+        )
 
         ## Saving output
-        # We want to save and clean MP only after iteration on all clouds is completed
-        # (e.g. to have consistent space charge state)
-        for cloud in self.cloud_list:
-
-            if cloud.pyeclsaver is not None:
-                # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
-                #     raise ValueError('Saving with custom steps not implemented!')
-                cloud.impact_man = cloud.pyeclsaver.witness(
-                    cloud.MP_e,
-                    beamtim,
-                    self.spacech_ele,
-                    cloud.impact_man,
-                    cloud.dynamics,
-                    cloud.gas_ion_flag,
-                    cloud.resgasion,
-                    cloud.t_ion,
-                    self.t_sc_ON,
-                    cloud.photoem_flag,
-                    cloud.phemiss,
-                    self.flag_presence_sec_beams,
-                    self.sec_beams_list,
-                    self.cloud_list,
-                    buildup_sim=self,
-                    cross_ion=self.cross_ion,
-                    rho_cloud=cloud.rho,
-                )
+        self._save_output_data(beamtim)
 
         ## Cleaning and regeneration
         for cloud in self.cloud_list:
@@ -317,6 +271,35 @@ class BuildupSimulation(object):
 
         MP_e.vx_mp[: MP_e.N_mp] += Ex_n_kick * Dt_kick * MP_e.charge / MP_e.mass
         MP_e.vy_mp[: MP_e.N_mp] += Ey_n_kick * Dt_kick * MP_e.charge / MP_e.mass
+
+    def _recompute_cloud_spacecharge(
+        self, beamtim, flag_recompute_space_charge, force_recompute_space_charge
+    ):
+
+        for i_cloud, cloud in enumerate(self.cloud_list):
+            if (
+                (beamtim.tt_curr > self.t_sc_ON) and flag_recompute_space_charge
+            ) or force_recompute_space_charge:
+                flag_reset = (
+                    cloud is self.cloud_list[0]
+                )  # The first cloud resets the distribution
+                flag_solve = (
+                    cloud is self.cloud_list[-1]
+                )  # The last cloud computes the fields
+                ## Either compute electromagnetic field or electrostatic
+                if self.flag_em_tracking:
+                    self.spacech_ele.recompute_spchg_emfield(
+                        cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset
+                    )
+                else:
+                    self.spacech_ele.recompute_spchg_efield(
+                        cloud.MP_e, flag_solve=flag_solve, flag_reset=flag_reset
+                    )
+
+                # Copy rho to cloud
+                cloud.rho = self.spacech_ele.rho - sum(
+                    [cl.rho for cl in self.cloud_list[:i_cloud]]
+                )
 
     def _cloud_motion(
         self,
@@ -457,6 +440,34 @@ class BuildupSimulation(object):
                     lam_curr_phem += sec_beam.lam_t_curr
             cloud.phemiss.generate(cloud.MP_e, lam_curr_phem, beamtim.Dt_curr)
 
+
+    def _save_output_data(self, beamtim):
+        # We want to save and clean MP only after iteration on all clouds is completed
+        # (e.g. to have consistent space charge state)
+        for cloud in self.cloud_list:
+
+            if cloud.pyeclsaver is not None:
+                # if Dt_substep_custom is not None or N_sub_steps_custom is not None:
+                #     raise ValueError('Saving with custom steps not implemented!')
+                cloud.impact_man = cloud.pyeclsaver.witness(
+                    cloud.MP_e,
+                    beamtim,
+                    self.spacech_ele,
+                    cloud.impact_man,
+                    cloud.dynamics,
+                    cloud.gas_ion_flag,
+                    cloud.resgasion,
+                    cloud.t_ion,
+                    self.t_sc_ON,
+                    cloud.photoem_flag,
+                    cloud.phemiss,
+                    self.flag_presence_sec_beams,
+                    self.sec_beams_list,
+                    self.cloud_list,
+                    buildup_sim=self,
+                    cross_ion=self.cross_ion,
+                    rho_cloud=cloud.rho,
+                )
 
 
 
