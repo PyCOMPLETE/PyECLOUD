@@ -360,7 +360,7 @@ class BuildupSimulation(object):
 
         # print(f'external {N_substeps_external}')
         # print(f'internal {N_substeps_internal}')
-        for isbtp in range(N_substeps_external):
+        for i_substep in range(N_substeps_external):
             ## Interpolate fields from clouds at particles
             (Ex_n, Ey_n, Bx_n, By_n, Bz_n,) = self._get_field_from_clouds_at_particles(
                 cloud.MP_e
