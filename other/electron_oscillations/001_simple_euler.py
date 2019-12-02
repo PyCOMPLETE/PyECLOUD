@@ -11,10 +11,16 @@ vx = 0.
 
 x_record = []
 
+#for ii in range(N_steps):
+#    E = k_field*x
+#    vx += E*Dt
+#    x += vx*Dt
+#    x_record.append(x)
+
 for ii in range(N_steps):
     E = k_field*x
     for ssn in range(N_substeps):
-        vx += E*Dt/N_substeps 
+        vx += E*Dt/N_substeps
         x += vx*Dt/N_substeps
     x_record.append(x)
 

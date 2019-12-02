@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 from scipy.constants import e as qe
 import matplotlib.pyplot as plt
@@ -74,6 +76,7 @@ target_grid_arcs = {
     'y_max_target':pp.target_size_internal_grid_sigma*sigma_y_smooth,
     'Dh_target':pp.target_Dh_internal_grid_sigma*sigma_x_smooth}
 
+pp.N_mp_max_dip = 500000
 nel_mp_ref_0 = pp.init_unif_edens_dip*4*pp.x_aper*pp.y_aper/pp.N_MP_ele_init_dip
 
 ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
@@ -104,7 +107,7 @@ i_y0 = np.argmin(np.abs(sc.yg))
 
 
 mpe = ecloud.cloudsim.cloud_list[0].MP_e
-mpe.x_mp[0] = .1e-3 
+mpe.x_mp[0] = .1e-3
 mpe.vx_mp[0] = 0.
 mpe.y_mp[0] = 0.
 mpe.vy_mp[0] = 0.
@@ -112,12 +115,16 @@ mpe.z_mp[0] = 0.
 N_track = 1
 x_record = []
 field_record = []
+
+t_start = time.mktime(time.localtime())
 for ss in slices[::-1]:
     #ecloud.track(slices[int(n_slices/2)])
     ecloud.track(ss)
     field_record.append(sc.efx[:, i_y0].copy())
     x_record.append(mpe.x_mp[:N_track].copy())
 x_record = np.array(x_record[::-1])
+t_end = time.mktime(time.localtime())
+print(f'Elapsed time {(t_end - t_start)}')
 
 fig2 = plt.figure(2)
 axx = fig2.add_subplot(111)
