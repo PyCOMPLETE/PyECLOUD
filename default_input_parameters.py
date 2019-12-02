@@ -96,9 +96,10 @@ parameters_dict = {
             'lifetime_hist_max': None,
             'Dt_lifetime_hist':None,
 
-            'Dh_electric_energy': None, 
+            'Dh_electric_energy': None,
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
+            'flag_reinterp_fields_at_substeps': False,
 
             # Multigrid parameters
             'f_telescope': None,
