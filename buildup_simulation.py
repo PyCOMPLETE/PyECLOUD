@@ -205,36 +205,8 @@ class BuildupSimulation(object):
             ## Evolve SEY module (e.g. charge decay for insulators
             cloud.impact_man.sey_mod.SEY_model_evol(Dt=beamtim.Dt_curr)
 
-            ## Gas ionization (main and secondary beams)
-            if beamtim.tt_curr < cloud.t_ion and cloud.gas_ion_flag == 1:
-                cloud.MP_e = cloud.resgasion.generate(
-                    cloud.MP_e,
-                    beamtim.lam_t_curr,
-                    beamtim.Dt_curr,
-                    beamtim.sigmax,
-                    beamtim.sigmay,
-                    x_beam_pos=beamtim.x_beam_pos,
-                    y_beam_pos=beamtim.y_beam_pos,
-                )
-                if self.flag_presence_sec_beams:
-                    for sec_beam in self.sec_beams_list:
-                        cloud.MP_e = cloud.resgasion.generate(
-                            cloud.MP_e,
-                            sec_beam.lam_t_curr,
-                            sec_beam.Dt_curr,
-                            sec_beam.sigmax,
-                            sec_beam.sigmay,
-                            x_beam_pos=sec_beam.x_beam_pos,
-                            y_beam_pos=sec_beam.y_beam_pos,
-                        )
-
-            ## Photoemission (main and secondary beams)
-            if cloud.photoem_flag != 0:
-                lam_curr_phem = beamtim.lam_t_curr
-                if self.flag_presence_sec_beams:
-                    for sec_beam in self.sec_beams_list:
-                        lam_curr_phem += sec_beam.lam_t_curr
-                cloud.phemiss.generate(cloud.MP_e, lam_curr_phem, beamtim.Dt_curr)
+            ## Beam-gas ionization and photoemission
+            self._primary_generation(cloud, beamtim)
 
         ## Cross_ionization
         if self.cross_ion is not None:
@@ -451,6 +423,42 @@ class BuildupSimulation(object):
                     Dt_substep=Dt_substep_curr,
                     N_sub_steps=N_substeps_internal,
                 )
+
+    def _primary_generation(self, cloud, beamtim):
+
+        ## Gas ionization (main and secondary beams)
+        if beamtim.tt_curr < cloud.t_ion and cloud.gas_ion_flag == 1:
+            cloud.MP_e = cloud.resgasion.generate(
+                cloud.MP_e,
+                beamtim.lam_t_curr,
+                beamtim.Dt_curr,
+                beamtim.sigmax,
+                beamtim.sigmay,
+                x_beam_pos=beamtim.x_beam_pos,
+                y_beam_pos=beamtim.y_beam_pos,
+            )
+            if self.flag_presence_sec_beams:
+                for sec_beam in self.sec_beams_list:
+                    cloud.MP_e = cloud.resgasion.generate(
+                        cloud.MP_e,
+                        sec_beam.lam_t_curr,
+                        sec_beam.Dt_curr,
+                        sec_beam.sigmax,
+                        sec_beam.sigmay,
+                        x_beam_pos=sec_beam.x_beam_pos,
+                        y_beam_pos=sec_beam.y_beam_pos,
+                    )
+
+        ## Photoemission (main and secondary beams)
+        if cloud.photoem_flag != 0:
+            lam_curr_phem = beamtim.lam_t_curr
+            if self.flag_presence_sec_beams:
+                for sec_beam in self.sec_beams_list:
+                    lam_curr_phem += sec_beam.lam_t_curr
+            cloud.phemiss.generate(cloud.MP_e, lam_curr_phem, beamtim.Dt_curr)
+
+
+
 
     def load_state(
         self,
