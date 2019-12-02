@@ -55,10 +55,9 @@ import subprocess
 import time
 
 import numpy as np
-from scipy.constants import c, e, m_e
+from scipy.constants import c
 
 from . import myloadmat_to_obj as mlm
-from . import init
 from . import buildup_simulation as bsim
 
 
