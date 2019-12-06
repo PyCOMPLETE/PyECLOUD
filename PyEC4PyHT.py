@@ -213,6 +213,29 @@ class Ecloud(object):
             Any input parameter of PyECLOUD can be passes as a keyword arguments.
             Parameters definded in the input files are overridden by those passas as
             keyword arguments.
+
+        Additional information
+        ----------------------
+        After building the object, the following members can be set to true to record
+        additional information (which is then attached as a member to the ecloud object
+        itself. After setting any of these ot true the [ecloud]._reinitialize
+        function needs to be called to prepare the data storage, which also resets cloud
+        state.
+
+        [ecloud].save_ele_distributions_last_track
+        [ecloud].save_ele_potential_and_field
+        [ecloud].save_ele_potential
+        [ecloud].save_ele_field
+        [ecloud].save_ele_MP_position
+        [ecloud].save_ele_MP_velocity
+        [ecloud].save_ele_MP_size
+
+        [ecloud].save_beam_distributions_last_track
+        [ecloud].save_beam_potential_and_field
+        [ecloud].save_beam_potential
+        [ecloud].save_beam_field
+
+
         """
 
         print("PyECLOUD Version 8.3.0")
