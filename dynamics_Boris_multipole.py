@@ -106,22 +106,21 @@ class pusher_Boris_multipole():
         if self.B0x is not None:
             Bx_arr += self.B0x
             custom_B = 1
-        if self.Bx_n is not None:
-            Bx_arr += self.Bx_n
-            custom_B = 1
-
         if self.B0y is not None:
             By_arr += self.B0y
             custom_B = 1
-        if self.By_n is not None:
-            By_arr += self.By_n
-            custom_B = 1
-
         if self.B0z is not None:
             Bz_arr += self.B0z
             custom_B = 1
-        if self.Bz_n is not None:
-            Bz_arr += self.Bz_n
+
+        if Bx_n is not None:
+            Bx_arr += Bx_n
+            custom_B = 1
+        if By_n is not None:
+            By_arr += By_n
+            custom_B = 1
+        if Bz_n is not None:
+            Bz_arr += Bz_n
             custom_B = 1
 
         if MP_e.N_mp > 0:
@@ -138,6 +137,6 @@ class pusher_Boris_multipole():
 
             boris_step_multipole(N_sub_steps, Dt_substep, self.B_field, self.B_field_skew,
                          xn1, yn1, zn1, vxn1, vyn1, vzn1,
-                         Ex_n, Ey_n, Bx_n, By_n, Bz_n, custom_B, MP_e.charge, MP_e.mass)
+                         Ex_n, Ey_n, Bx_arr, By_arr, Bz_arr, custom_B, MP_e.charge, MP_e.mass)
 
         return MP_e
