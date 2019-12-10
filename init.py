@@ -464,7 +464,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
-                                       save_once_custom_observables=cc.save_once_custom_observables, 
+                                       save_once_custom_observables=cc.save_once_custom_observables,
                                        flag_lifetime_hist = thiscloud.flag_lifetime_hist,
                                        Dt_lifetime_hist = thiscloud.Dt_lifetime_hist,
                                        extract_ene_dist=cc.extract_ene_dist,
@@ -481,7 +481,11 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.track_method == 'Boris':
             if cc.flag_em_tracking == True:
                 raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
-            dynamics = dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
+            temp_B0x = {True: 0., False: cc.B0x}[cc.B0x is None]
+            temp_B0y = {True: 0., False: cc.B0y}[cc.B0y is None]
+            temp_B0z = {True: 0., False: cc.B0z}[cc.B0z is None]
+
+            dynamics = dynB.pusher_Boris(cc.Dt, temp_B0x, temp_B0y, temp_B0z,
                                          cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
             if cc.flag_em_tracking == True:
@@ -503,7 +507,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             dynamics = dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
                                                           cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
         elif cc.track_method == 'BorisMultipole':
-            dynamics = dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
+            dynamics = dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew,
+                        B0x=cc.B0x, B0y=cc.B0y, B0z=cc.B0z)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
 
