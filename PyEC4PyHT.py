@@ -66,6 +66,8 @@ class Empty(object):
 
 
 class DummyBeamTim(object):
+    """Dummy beam-timing class to interface with buildup simulation"""
+
     def __init__(self, PyPIC_state):
         self.PyPIC_state = PyPIC_state
 
@@ -100,6 +102,8 @@ extra_allowed_kwargs = {
 
 class Ecloud(object):
     def generate_twin_ecloud_with_shared_space_charge(self):
+        """Generate an identical Ecloud objet with shared space-charge member."""
+
         if hasattr(self, "efieldmap"):
             raise ValueError(
                 "Ecloud has been replaced with field map. I cannot generate a twin ecloud!"
@@ -136,6 +140,103 @@ class Ecloud(object):
         force_interp_at_substeps_interacting_slices=False,
         **kwargs
     ):
+        """
+        Construct an e-cloud object that can be inserted in a PyHEADTAIL machine
+
+        Parameters
+        ---------
+
+        L_ecloud : m
+            Length of the e-cloud interaction
+
+        slicer :
+            PyHEADTAIL slicer object, used to define slices for e-cloud insteraction.
+            Needs to be provided only if slice_by_slice_mode is False.
+
+        Dt_ref : s
+            Target duration of the sub-steps perfomed in each slice.
+
+        pyecl_input_folder : path
+            Folder containing the PyECLOUD input files defining the e-cloud.
+
+        flag_clean_slices : {True, False}
+            If True, slicing is redone before the e-cloud interation.
+            This flag has no effect is slice_by_slice_mode is True.
+
+        slice_by_slice_mode : {True, False}
+
+            - If False, the e-cloud receives a full bunch, slicing is done interally,
+              the cloud is automatically re-initialized after each interaction.
+            - If True, the e-cloud receives one slice at a time (the slice object
+              should have metadata in a member called slice_info. The reinitialization
+              of the cloud is done based on the meta-data or esplicitly by the user.
+
+        space_charge_obj :
+
+            - If None a space-charge object (Particle In Cell) is constructed for
+              the e-cloud
+            - If not None the provided space-charge objeci is used
+
+        kick_mode_for_beam_field : {True, False}
+            If True, the force of the beam on the electrons is applied as a
+            discrete kick (used mainly for fast beam-ion simulations).
+
+        beam_monitor :
+            PyHEADTAIL beam-monitor, used sometimes for debug purposes.
+
+        verbose : {True, False}
+
+        save_pyecl_outp_as : path
+            File in which cloud evolution is stored.
+
+        force_reinterp_at_substeps_interacting_slices : {True, False}
+            Fields from beams and clouds are re-interpolated at each subsstep.
+
+        x_beam_offset : m
+            Horizontal position of the PyHEADTAIL reference trajectoy in
+            the PyECLOUD referece system.
+
+        y_beam_offset: m
+            Vertical position of the PyHEADTAIL reference trajectoy in
+            the PyECLOUD referece system.
+
+        probes_position : dict
+            Positions at which electron density and field can be measured.
+
+        enable_kick_x :
+            Enable horizontal kick from the cloud on the beam.
+
+        enable_kick_y :
+            Enable vertical kick from the cloud on the beam.
+
+        **kwargs :
+            Any input parameter of PyECLOUD can be passes as a keyword arguments.
+            Parameters definded in the input files are overridden by those passas as
+            keyword arguments.
+
+        Additional information
+        ----------------------
+        After building the object, the following members can be set to true to record
+        additional information (which is then attached as a member to the ecloud object
+        itself. After setting any of these ot true the [ecloud]._reinitialize
+        function needs to be called to prepare the data storage, which also resets cloud
+        state.
+
+        [ecloud].save_ele_distributions_last_track
+        [ecloud].save_ele_potential_and_field
+        [ecloud].save_ele_potential
+        [ecloud].save_ele_field
+        [ecloud].save_ele_MP_position
+        [ecloud].save_ele_MP_velocity
+        [ecloud].save_ele_MP_size
+
+        [ecloud].save_beam_distributions_last_track
+        [ecloud].save_beam_potential_and_field
+        [ecloud].save_beam_potential
+        [ecloud].save_beam_field
+
+
+        """
 
         print("PyECLOUD Version 8.3.0")
 
@@ -264,6 +365,7 @@ class Ecloud(object):
 
         self.slice_by_slice_mode = slice_by_slice_mode
         if self.slice_by_slice_mode:
+            assert(slicer is None)
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
 
