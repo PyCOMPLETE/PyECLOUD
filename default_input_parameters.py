@@ -149,9 +149,9 @@ parameters_dict = {
             'B_map_file': None,
             'Bz_map_file': None, # documented?
             'fact_Bmap': 1.,
-            'B0x': 0.,
-            'B0y': 0.,
-            'B0z': 0.,
+            'B0x': None,
+            'B0y': None,
+            'B0z': None,
             'B_zero_thrhld': None,
             'N_sub_steps': 1,
             'B_multip': [],
