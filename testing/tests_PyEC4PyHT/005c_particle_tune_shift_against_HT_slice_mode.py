@@ -86,7 +86,7 @@ for ele in machine.one_turn_map:
     if ele in machine.transverse_map:
         new_ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
                                       L_ecloud=machine.circumference / machine.transverse_map.n_segments,
-                                      slicer=slicer,
+                                      slicer=None,
                                       Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
                                       x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
                                       init_unif_edens_flag=init_unif_edens_flag,
