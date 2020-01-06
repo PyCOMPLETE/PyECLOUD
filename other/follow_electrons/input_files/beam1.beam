@@ -1,0 +1,29 @@
+# BEAM PARAMETERS 
+energy_eV= 26.0e9   #eV
+
+sigmax = 1.981165e-03
+sigmay = 1.981165e-03
+
+
+x_beam_pos = -1.746894e-05
+y_beam_pos = -1.746894e-05
+
+beam_field_file =-1
+Dh_beam_field=0.2e-3
+
+b_spac   = 25e-9     #s (to be specified also if you load the profile from file - 
+                     #   it is used as period for clean and save)
+fact_beam = 25.0000e+10
+coast_dens = 0 #protons per meter
+
+flag_bunched_beam = 1 # 1: bunched beam 0:load profile from file  
+
+# to be filled in case of bunched beam
+sigmaz = 0.23
+t_offs = 2.5e-9
+filling_pattern_file = 4*(72*[1.]+8*[0.])
+
+# to be filled in case of longitudinal profile from file
+beam_long_prof_file = -1
+
+

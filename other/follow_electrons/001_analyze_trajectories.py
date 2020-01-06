@@ -3,19 +3,19 @@ import matplotlib.pyplot as plt
 
 import PyECLOUD.myfilemanager as mfm
 
-ob = mfm.myloadmat_to_obj('followed_electrons.mat')
+obfol = mfm.myloadmat_to_obj('followed_electrons.mat')
 
 i_obs = 1
 
 Dz_all = []
 
-nele_no_nan = ob.nel.copy()
-nele_no_nan[np.isnan(ob.nel)] = 0.
+nele_no_nan = obfol.nel.copy()
+nele_no_nan[np.isnan(obfol.nel)] = 0.
 
-for i_ele in range(ob.nel.shape[1]):
+for i_ele in range(obfol.nel.shape[1]):
 
     nel_ele = nele_no_nan[:, i_ele]
-    z_ele = ob.z[:, i_ele]
+    z_ele = obfol.z[:, i_ele]
 
     i_changes = np.where(np.abs(np.diff(nel_ele)) > 0.)[0]
 
