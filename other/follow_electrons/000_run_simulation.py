@@ -3,10 +3,10 @@ import numpy as np
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
-sim_input_folder = '/eos/project/m/mte/data/ECloud/e-cloud2/simulations/Quad/normal/simulations/sim001_mux0.000_bx104.259'
-t_stop_list = [500e-9]
+sim_input_folder = 'input_files'
+t_stop_list = [1800e-9]
 
-i_observe = range(0, 20000, 100)
+i_observe = range(0, 60000, 100)
 
 def observe_electrons(sim):
 
