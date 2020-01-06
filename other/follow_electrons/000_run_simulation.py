@@ -4,9 +4,9 @@ from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim_input_folder = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
 sim_input_folder = '/eos/project/m/mte/data/ECloud/e-cloud2/simulations/Quad/normal/simulations/sim001_mux0.000_bx104.259'
-t_stop_list = [50e-9]
+t_stop_list = [500e-9]
 
-i_observe = range(0, 20000, 100)
+i_observe = range(0, 20000, 1000)
 
 def observe_electrons(sim):
 
@@ -57,6 +57,7 @@ sim = BuildupSimulation(pyecl_input_folder=sim_input_folder,
         progress_path='progress.txt',
         filen_main_outp='./Pyecltest.mat',
         secondary_angle_distribution = 'cosine_3D',
+        fact_clean = 0.,  # cleanings would move electrons around
         extract_sey=False,
         step_by_step_custom_observables = step_by_step_custom_observables,
         pass_by_pass_custom_observables = pass_by_pass_custom_observables,
