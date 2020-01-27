@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -53,7 +53,7 @@
 
 from numpy import sqrt, sin, cos, squeeze, sum
 import scipy.io as sio
-import int_field_for as iff
+from . import int_field_for as iff
 
 me = 9.10938291e-31
 qe = 1.602176565e-19
@@ -65,7 +65,7 @@ class pusher_strong_B_generalized():
     def __init__(self, Dt, B0x, B0y, \
                  B_map_file, fact_Bmap, B_zero_thrhld):
 
-        print "Tracker: Generalized strong B"
+        print("Tracker: Generalized strong B")
 
         self.Dt = Dt
         self.B0x = B0x
@@ -75,14 +75,14 @@ class pusher_strong_B_generalized():
             self.flag_B_map = False
             self.analyt_quad_grad1 = False
         elif B_map_file is 'analytic_qaudrupole_unit_grad':
-            print "B map analytic quadrupole"
+            print("B map analytic quadrupole")
             self.flag_B_map = False
             self.analyt_quad_grad1 = True
             self.fact_Bmap = fact_Bmap
         else:
             self.flag_B_map = True
             self.analyt_quad_grad1 = False
-            print 'Loading B map'
+            print('Loading B map')
             dict_Bmap = sio.loadmat(B_map_file)
 
             self.Bmap_x = fact_Bmap * squeeze(dict_Bmap['Bx'].real)

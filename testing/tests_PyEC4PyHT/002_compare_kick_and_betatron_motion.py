@@ -94,8 +94,8 @@ yp_after = bunch.yp[bunch.id <= n_part_per_turn]
 
 rms_err_x_list = []
 rms_err_y_list = []
-for ii in xrange(N_turns - 1):
-	print 'Turn', ii
+for ii in range(N_turns - 1):
+	print('Turn', ii)
 	# track
 
 	# id and momenta after track

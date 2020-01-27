@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -50,19 +50,19 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from __future__ import print_function
+
 import scipy.io as sio
 import numpy as np
 import os
 import subprocess
-import hist_for as histf
+from . import hist_for as histf
 import time
 from scipy.constants import e as qe
-import myloadmat_to_obj as mlm
+from . import myloadmat_to_obj as mlm
 import shutil
 try:
     # cPickle is faster in python2
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     # No cPickle in python3
     import pickle
@@ -96,7 +96,7 @@ class pyecloud_saver:
 
         if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
-                flog.write('PyECLOUD Version 8.2.0\n')
+                flog.write('PyECLOUD Version 8.4.0\n')
                 flog.write('%s\n' % git_hash)
                 flog.write('%s\n' % git_branch)
                 flog.write('Simulation started on %s\n' % timestr)
@@ -341,7 +341,7 @@ class pyecloud_saver:
             self.nel_hist_emit_seg = []
             self.energ_eV_impact_seg = []
             if impact_man.flag_En_hist_seg:
-                self.En_hist_seg = [ [] for _ in xrange(impact_man.chamb.N_vert)]
+                self.En_hist_seg = [ [] for _ in range(impact_man.chamb.N_vert)]
             
         # detailed hist
         self.flag_hist_det = False
@@ -368,7 +368,7 @@ class pyecloud_saver:
         # Custom data
         self.pbp_custom_data = {}
         if self.pass_by_pass_custom_observables is not None:
-            for kk in self.pass_by_pass_custom_observables.keys():
+            for kk in list(self.pass_by_pass_custom_observables.keys()):
                 self.pbp_custom_data[kk] = []
 
 
@@ -422,7 +422,7 @@ class pyecloud_saver:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
         if self.pass_by_pass_custom_observables is not None:
-            for kk in self.pass_by_pass_custom_observables.keys():
+            for kk in list(self.pass_by_pass_custom_observables.keys()):
                self.pbp_custom_data[kk].append(
                        self.pass_by_pass_custom_observables[kk](buildup_sim))
 
@@ -471,7 +471,7 @@ class pyecloud_saver:
         # Extracted sey
         saved_dict['sey_test_E_impact_eV'] = self.sey_test_E_impact_eV,
         saved_dict['sey_test_cos_theta'] = self.sey_test_cos_theta
-        for etypn in self.sey_test_deltas.keys():
+        for etypn in list(self.sey_test_deltas.keys()):
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
         # Extracted energy distributions
@@ -479,7 +479,7 @@ class pyecloud_saver:
             saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
             saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
             saved_dict['emit_ene_g_hist'] = self.emit_ene_dist_test['emit_ene_g_hist']
-            for etypn in self.emit_ene_dist_test.keys():
+            for etypn in list(self.emit_ene_dist_test.keys()):
                 if 'hist' not in etypn:
                     saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
 
@@ -490,10 +490,10 @@ class pyecloud_saver:
 
         # custom once
         if self.save_once_custom_observables is not None:
-            for kk in self.save_once_custom_observables.keys():
+            for kk in list(self.save_once_custom_observables.keys()):
                 saved_dict[kk] = self.save_once_custom_observables[kk](buildup_sim)
 
-        for kk in saved_dict.keys():
+        for kk in list(saved_dict.keys()):
             saved_dict[kk] = np.array(saved_dict[kk])
 
         if self.save_only is not None:
@@ -660,7 +660,7 @@ class pyecloud_saver:
 
         dict_restored = {}
         for var in saved_every_timestep_list:
-            if var in dict_history.keys():
+            if var in list(dict_history.keys()):
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var]
                 else:
@@ -668,25 +668,25 @@ class pyecloud_saver:
         self.i_last_save = len(dict_restored['Nel_timep']) - 1
 
         for var in saved_every_passage_list:
-            if var in dict_history.keys():
+            if var in list(dict_history.keys()):
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
                     dict_restored[var] = dict_history[var][: idx_t_hist + 1].tolist()
 
         for var in not_time_dependent_list:
-            if var in dict_history.keys():
+            if var in list(dict_history.keys()):
                 if var in should_be_list_list:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
                     dict_restored[var] = dict_history[var]
 
         # Treating t_sc_video separately because of different indicies
-        if 't_sc_video' in dict_history.keys():
+        if 't_sc_video' in list(dict_history.keys()):
             dict_restored['t_sc_video'] = dict_history['t_sc_video'][: idx_t_sc_video + 1].tolist()
 
         # Restore this pyecloud_saver object with values from dict_restored
-        for var in dict_restored.keys():
+        for var in list(dict_restored.keys()):
             setattr(self, var, dict_restored[var])
 
     def _stepbystep_check_for_data_resize(self):
@@ -715,7 +715,7 @@ class pyecloud_saver:
             if self.flag_electric_energy:
                 list_members.append('En_electric_eV_time')
 
-            for kk in self.sbs_custom_data.keys():
+            for kk in list(self.sbs_custom_data.keys()):
                 vv = self.sbs_custom_data[kk]
                 self.sbs_custom_data[kk] = np.concatenate((vv, 0 * vv))
 
@@ -793,7 +793,7 @@ class pyecloud_saver:
             self.x_el_dens_probes = []
             self.y_el_dens_probes = []
             self.r_el_dens_probes = []
-            for ii in xrange(self.N_el_dens_probes):
+            for ii in range(self.N_el_dens_probes):
                 self.x_el_dens_probes.append(el_density_probes[ii]['x'])
                 self.y_el_dens_probes.append(el_density_probes[ii]['y'])
                 self.r_el_dens_probes.append(el_density_probes[ii]['r_obs'])
@@ -804,7 +804,7 @@ class pyecloud_saver:
 
         self.sbs_custom_data = {}
         if step_by_step_custom_observables is not None:
-            for kk in step_by_step_custom_observables.keys():
+            for kk in list(step_by_step_custom_observables.keys()):
                 self.sbs_custom_data[kk] = 0 * self.t
 
     def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim, cross_ion):
@@ -847,7 +847,7 @@ class pyecloud_saver:
             self.cen_density[self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_center * self.r_center)
 
             if self.flag_el_dens_probes:
-                for ii in xrange(self.N_el_dens_probes):
+                for ii in range(self.N_el_dens_probes):
                     flag_center = ((MP_e.x_mp - self.x_el_dens_probes[ii])**2 + (MP_e.y_mp - self.y_el_dens_probes[ii])**2) < self.r_el_dens_probes[ii]**2
                     flag_center[MP_e.N_mp:] = False
                     self.el_dens_at_probes[ii, self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_el_dens_probes[ii]**2)
@@ -862,7 +862,7 @@ class pyecloud_saver:
                     self.DN_cross_ion[self.i_last_save]) = cross_ion.save_cross_ion_data(self.cloud_name)
 
             if self.step_by_step_custom_observables is not None:
-                for kk in self.step_by_step_custom_observables.keys():
+                for kk in list(self.step_by_step_custom_observables.keys()):
                     self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
 
     def _stepbystep_get_dict(self):
@@ -893,7 +893,7 @@ class pyecloud_saver:
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
 
-        for kk in self.sbs_custom_data.keys():
+        for kk in list(self.sbs_custom_data.keys()):
             dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
 
         return dict_sbs_data
@@ -1193,7 +1193,7 @@ class pyecloud_saver:
             # Energy histogram per segment
             if impact_man.flag_seg:
                 if impact_man.flag_En_hist_seg:
-                    for iseg in xrange(impact_man.chamb.N_vert):
+                    for iseg in range(impact_man.chamb.N_vert):
                         self.En_hist_seg[iseg].append(impact_man.seg_En_hist_lines[iseg].copy())
                     impact_man.reset_seg_En_hist_lines()
 

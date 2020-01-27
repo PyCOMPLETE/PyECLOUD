@@ -76,14 +76,14 @@ yp_i = np.empty((n_record, n_turns))
 for i in range(n_turns):
     machine.track(bunch)  # , verbose=True)
 
-    print 'Turn', i
+    print('Turn', i)
     sys.stdout.flush()
 
     x_i[:, i] = bunch.x[:n_record]
     xp_i[:, i] = bunch.xp[:n_record]
     y_i[:, i] = bunch.y[:n_record]
     yp_i[:, i] = bunch.yp[:n_record]
-print '\nDONE'
+print('\nDONE')
 
 from tune_analysis import tune_analysis
 qx_i, qy_i, qx_centroid, qy_centroid = tune_analysis(x_i, xp_i, y_i, yp_i)

@@ -96,9 +96,10 @@ parameters_dict = {
             'lifetime_hist_max': None,
             'Dt_lifetime_hist':None,
 
-            'Dh_electric_energy': None, 
+            'Dh_electric_energy': None,
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
+            'flag_reinterp_fields_at_substeps': False,
 
             # Multigrid parameters
             'f_telescope': None,
@@ -148,9 +149,9 @@ parameters_dict = {
             'B_map_file': None,
             'Bz_map_file': None, # documented?
             'fact_Bmap': 1.,
-            'B0x': 0.,
-            'B0y': 0.,
-            'B0z': 0.,
+            'B0x': None,
+            'B0y': None,
+            'B0z': None,
             'B_zero_thrhld': None,
             'N_sub_steps': 1,
             'B_multip': [],

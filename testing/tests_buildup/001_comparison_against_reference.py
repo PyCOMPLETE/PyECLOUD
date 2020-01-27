@@ -57,8 +57,8 @@ folder_plot = sim_folder + '/comparison_plots'
 try:
     os.mkdir(folder_plot)
 except OSError as err:
-    print 'Folder not created due to exception:'
-    print err
+    print('Folder not created due to exception:')
+    print(err)
 
 
 myfontsz = 10
@@ -68,8 +68,8 @@ dict_ref = mlm.myloadmat(ref_folder + '/Pyecltest_angle%s_ref.mat' % args.angle_
 dict_curr = mlm.myloadmat(curr_folder + '/Pyecltest_angle%s.mat' % args.angle_dist_func)   # load dictionary of the current simulation
 
 
-out_var_ref = dict_ref.keys()       # returns the list of keys
-out_var_curr = dict_curr.keys()
+out_var_ref = list(dict_ref.keys())       # returns the list of keys
+out_var_curr = list(dict_curr.keys())
 
 out_var_ref.sort()         # sort the keys in alphabetical order
 out_var_curr.sort()
@@ -77,14 +77,14 @@ out_var_curr.sort()
 n_pass = 5  # reference passage
 
 
-print'Curr Variables are:'
+print('Curr Variables are:')
 for variab in out_var_curr:
-    print variab, dict_curr[variab].shape
+    print(variab, dict_curr[variab].shape)
 
 
 for ii, k in enumerate(out_var_curr):
     if '__' in k or k == 'el_dens_at_probes':
-        print('Skipped %s' % k)
+        print(('Skipped %s' % k))
         continue
 
     if len(dict_curr[k].shape) == 1:  # var is a vector!
@@ -95,16 +95,16 @@ for ii, k in enumerate(out_var_curr):
         pl.title(out_var_curr[ii], fontsize=myfontsz)
 
         pl.plot(dict_curr[k], 'b', label='curr_sim')
-        print ii, k, 'curr_sim'
+        print(ii, k, 'curr_sim')
 
         if (k in out_var_ref) and (dict_ref[k].shape != ()):
 
             #Plot vector for the reference simulation
             pl.plot(dict_ref[k], '--r', label='ref_sim')
-            print ii, k, 'ref_sim'
+            print(ii, k, 'ref_sim')
 
         else:
-            print '%s not  in reference'%k
+            print('%s not  in reference'%k)
 
         pl.legend(prop={'size': myfontsz}, bbox_to_anchor=(1, 1), loc='best')
         ms.sciy()
@@ -129,7 +129,7 @@ for ii, k in enumerate(out_var_curr):
         cbar.formatter.set_powerlimits((0, 0))
         cbar.update_ticks()
         ms.sciy()
-        print ii, k, 'curr_sim'
+        print(ii, k, 'curr_sim')
 
         try:
             ind_in_mat = n_pass
@@ -163,9 +163,9 @@ for ii, k in enumerate(out_var_curr):
             gs2.tight_layout(fig, rect=[0.45, 0, 1, 1], pad=1.08, h_pad=0.5)
 
         except IOError as goterror:
-                    print 'Skipped. Got:', goterror
+                    print('Skipped. Got:', goterror)
         except IndexError as goterror:
-            print 'Skipped. Got:', goterror
+            print('Skipped. Got:', goterror)
 
         if (k in out_var_ref) and (dict_ref[k].shape != ()):
 
@@ -179,7 +179,7 @@ for ii, k in enumerate(out_var_curr):
             cbar.update_ticks()
             sp2.tick_params(labelsize=10)
             ms.sciy()
-            print ii, k, 'ref_sim'
+            print(ii, k, 'ref_sim')
 
             try:
                 ind_in_mat = n_pass
@@ -204,10 +204,10 @@ for ii, k in enumerate(out_var_curr):
                 gs2.tight_layout(fig, rect=[0.45, 0, 1, 1], pad=1.08, h_pad=1.5)
 
             except IOError as goterror:
-                    print 'Skipped. Got:', goterror
+                    print('Skipped. Got:', goterror)
 
         else:
-            print '%s not  in reference'%k
+            print('%s not  in reference'%k)
 
         gs1.tight_layout(fig, rect=[0, 0, 0.45, 1], pad=1.08)
         top = 0.9
@@ -219,9 +219,9 @@ for ii, k in enumerate(out_var_curr):
         pl.suptitle(sim_folder + '\n' + k)
         pl.savefig(folder_plot + '/angle%s_%s'%(args.angle_dist_func, k), dpi=300)
 
-print 'Saved comparison plots in:'
-print folder_plot
+print('Saved comparison plots in:')
+print(folder_plot)
 
-print 'In ipython, you may call EOG() to view the results if EOG is installed.'
+print('In ipython, you may call EOG() to view the results if EOG is installed.')
 EOG = lambda : os.system('eog %s/*%s* &' % (folder_plot, args.angle_dist_func))
         #~ #pl.show()

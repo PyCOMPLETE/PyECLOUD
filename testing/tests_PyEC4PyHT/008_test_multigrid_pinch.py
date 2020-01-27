@@ -96,21 +96,21 @@ ecloud_multigrid = PyEC4PyHT.Ecloud(
 # Singlegrid tracking time
 import time
 N_rep_test = 1
-print 'Ecloud track %d times'%N_rep_test
+print('Ecloud track %d times'%N_rep_test)
 t_start_sw = time.mktime(time.localtime())
-for _ in xrange(N_rep_test):
+for _ in range(N_rep_test):
     ecloud_singlegrid.track(bunch)
 t_stop_sw = time.mktime(time.localtime())
 t_sw_single = t_stop_sw - t_start_sw
-print 'Singlegrid tracking time ', t_sw_single / N_rep_test
+print('Singlegrid tracking time ', t_sw_single / N_rep_test)
 # Multigrid tracking time
-print 'Ecloud track %d times'%N_rep_test
+print('Ecloud track %d times'%N_rep_test)
 t_start_sw = time.mktime(time.localtime())
-for _ in xrange(N_rep_test):
+for _ in range(N_rep_test):
     ecloud_multigrid.track(bunch)
 t_stop_sw = time.mktime(time.localtime())
 t_sw_single = t_stop_sw - t_start_sw
-print 'Multigrid tracking time ', t_sw_single / N_rep_test
+print('Multigrid tracking time ', t_sw_single / N_rep_test)
 
 
 slices = bunch.get_slices(ecloud_singlegrid.slicer)
@@ -134,7 +134,7 @@ obcham = mlm.myloadmat_to_obj( 'LHC_chm_ver.mat')
 sp1.plot(obcham.Vx * 1e3, obcham.Vy * 1e3, 'b')
 sp1.plot(ecloud_singlegrid.x_probes * 1e3, ecloud_singlegrid.y_probes * 1e3, 'or', markersize=3)
 sp1.plot(x_beam_offset, y_beam_offset, '*k', markersize=4)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx * 1e3, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy * 1e3, '.-k')
 sp1.set_ylabel('y [mm]')
 sp1.set_xlabel('x [mm]')
@@ -208,7 +208,7 @@ pl.subplots_adjust(hspace=0.5, wspace=0.3, left=.07, right=.95)
 sp1 = pl.subplot(2, 3, 1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
               np.log10(np.sqrt(Ex_singlegrid_matrix**2 + Ey_singlegrid_matrix**2).T), vmin=vmin, vmax=vmax)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
 pl.ylabel('y [m]')
@@ -224,7 +224,7 @@ sp1.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 sp2 = pl.subplot(2, 3, 4, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
               np.log10(np.sqrt(Ex_multigrid_matrix**2 + Ey_multigrid_matrix**2).T), vmin=vmin, vmax=vmax)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
 pl.ylabel('y [m]')
@@ -240,7 +240,7 @@ sp2.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 sp3 = pl.subplot(2, 3, 2)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
               Ex_singlegrid_matrix.T)  # , vmin=vmin, vmax=vmax)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp1.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
 pl.ylabel('y [m]')
@@ -255,7 +255,7 @@ sp3.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 sp4 = pl.subplot(2, 3, 5, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes,
               Ex_multigrid_matrix.T)  # , vmin=vmin, vmax=vmax)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
 pl.ylabel('y [m]')
@@ -269,7 +269,7 @@ sp4.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 sp5 = pl.subplot(2, 3, 3, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, rho_singlegrid_matrix.T)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
 pl.ylabel('y [m]')
@@ -283,7 +283,7 @@ sp5.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 sp6 = pl.subplot(2, 3, 6, sharex=sp1)  # , sharey=sp1)
 pl.pcolormesh(x_grid_probes, y_grid_probes, rho_multigrid_matrix.T)
-for ii in xrange(pic_multigrid.n_grids):
+for ii in range(pic_multigrid.n_grids):
     sp2.plot(pic_multigrid.pic_list[ii].pic_internal.chamb.Vx, pic_multigrid.pic_list[ii].pic_internal.chamb.Vy, '.-')
 pl.xlabel('x [m]')
 pl.ylabel('y [m]')

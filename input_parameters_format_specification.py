@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+
 import sys
 import os
 import time
@@ -75,7 +75,7 @@ def update_config_dict(config_dict, module, module_name, verbose=False, default_
         if verbose:
             print('%s: %s = %s' % (module_name, parameter, value))
 
-    for parameter, default_value in optional_parameters.items(): # iterates on keys and values of the dictionary
+    for parameter, default_value in list(optional_parameters.items()): # iterates on keys and values of the dictionary
 
         if hasattr(module, parameter): # the parameter is specified in the input file
             value = getattr(module, parameter)

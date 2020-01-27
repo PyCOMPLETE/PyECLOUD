@@ -43,7 +43,7 @@ class Transverse_Efield_map(object):
         slices = beam.get_slices(self.slicer)
 
         sid = 0
-        for _ in xrange(slices.n_slices):
+        for _ in range(slices.n_slices):
 
             sid -= 1
 

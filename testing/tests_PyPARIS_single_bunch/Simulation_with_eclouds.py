@@ -46,10 +46,10 @@ class Simulation(object):
 		i_start_part, i_end_part = sharing.my_part(myid)
 		self.mypart = self.machine.one_turn_map[i_start_part:i_end_part]
 		if self.ring_of_CPUs.I_am_a_worker:
-			print 'I am id=%d (worker) and my part is %d long'%(myid, len(self.mypart))
+			print('I am id=%d (worker) and my part is %d long'%(myid, len(self.mypart)))
 		elif self.ring_of_CPUs.I_am_the_master:
 			self.non_parallel_part = self.machine.one_turn_map[i_end_parallel:]
-			print 'I am id=%d (master) and my part is %d long'%(myid, len(self.mypart))
+			print('I am id=%d (master) and my part is %d long'%(myid, len(self.mypart)))
 
 	
 		# config e-cloud
@@ -103,7 +103,7 @@ class Simulation(object):
 		# initialization bunch
 		bunch = self.machine.generate_6D_Gaussian_bunch(
 			macroparticlenumber_track, intensity, epsn_x, epsn_y, sigma_z=sigma_z)
-		print 'Bunch initialized.'
+		print('Bunch initialized.')
 
 		#replace particles with HDTL ones
 		self.n_part_per_turn = 5000
@@ -142,7 +142,7 @@ class Simulation(object):
 
 		pieces_to_be_treated = slice_obj_list
 		
-		print 'N_turns', self.N_turns
+		print('N_turns', self.N_turns)
 
 		return pieces_to_be_treated
 

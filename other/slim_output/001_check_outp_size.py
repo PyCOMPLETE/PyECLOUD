@@ -16,7 +16,7 @@ for ff in fields:
 ind_sorted = np.argsort(fsizes)
 
 for ind in ind_sorted:
-    print('%s : %f kB'%(fields[ind], fsizes[ind]/1e3))
+    print(('%s : %f kB'%(fields[ind], fsizes[ind]/1e3)))
 
 import matplotlib.pyplot as plt
 plt.figure(1)

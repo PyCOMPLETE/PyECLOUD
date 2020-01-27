@@ -65,9 +65,9 @@ def comb_legend(sp1, sp2, *args, **kwargs):
 
 def mystyle_2(fontsz=16, dist_tick_lab=10, figsize=(12, 10)):
     rcdefaults()
-    RcParams[u'axes.grid'] = True
-    RcParams[u'axes.linewidth'] = 2.0
-    RcParams[u'figure.facecolor'] = 'w'
+    RcParams['axes.grid'] = True
+    RcParams['axes.linewidth'] = 2.0
+    RcParams['figure.facecolor'] = 'w'
 
     rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
     rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)

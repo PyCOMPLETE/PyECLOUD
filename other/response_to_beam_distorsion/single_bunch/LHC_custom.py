@@ -70,7 +70,7 @@ class LHC(BasicSynchrotron):
         pp.app_y = 0
         pp.app_xy = 0
 
-        for attr in kwargs.keys():
+        for attr in list(kwargs.keys()):
             if kwargs[attr] is not None:
                 if type(kwargs[attr]) is list or type(kwargs[attr]) is np.ndarray:
                     str2print = '[%s ...]'%repr(kwargs[attr][0])

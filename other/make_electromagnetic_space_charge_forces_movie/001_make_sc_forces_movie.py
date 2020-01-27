@@ -25,7 +25,7 @@ folder_sim = '../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11pp
 folder_imgs = 'maps/'
 main_outp_filename = 'Pyecltest_angle3D.mat'
 
-passlist = range(first_passage, first_passage + num_passage)
+passlist = list(range(first_passage, first_passage + num_passage))
 
 x_beam_pos = 0.
 y_beam_pos = 0.
@@ -100,7 +100,7 @@ for pass_ind in passlist:
     (nphotog, _, _) = sc_Fe_norm_video.shape
     (nphotog_big, _, _) = rho_video.shape
 
-    for ii in xrange(0, nphotog, N_dec):
+    for ii in range(0, nphotog, N_dec):
 		fig = pl.figure(1, figsize=(9, 9))  # ,figsize=(4.5,6)
 		t_curr = t_video[ii]
 		ii2, = np.where( t_video_old == t_curr)
@@ -109,7 +109,7 @@ for pass_ind in passlist:
 		lam_b1_curr = np.interp(t_curr, t, lam_b1)
 		cendens_curr = np.interp(t_curr, t, cendens)
 
-		print 'Pass %d %d/%d'%(pass_ind, ii, nphotog)
+		print('Pass %d %d/%d'%(pass_ind, ii, nphotog))
 
 		imm = np.squeeze(rho_video[ii2, :, :])
 		imm_Fe_norm = np.squeeze(sc_Fe_norm_video[ii, :, :])
@@ -142,7 +142,7 @@ for pass_ind in passlist:
 		pl.subplot(2, 2, 2)
 		ax = pl.gca()
 		im = ax.imshow(imm_Fe_norm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
-                 alpha=None, vmax=0.8*max(map(max, imm_Fe_norm)), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+                 alpha=None, vmax=0.8*max(list(map(max, imm_Fe_norm))), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
 
 		pl.plot(Vx * 1e3, Vy * 1e3, 'y', linewidth=1.5)
 		pl.axis('equal')
@@ -157,7 +157,7 @@ for pass_ind in passlist:
 		pl.subplot(2, 2, 3)
 		ax = pl.gca()
 		im = ax.imshow(imm_Fb_norm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
-                 alpha=None, vmax=0.8*max(map(max, imm_Fb_norm)), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+                 alpha=None, vmax=0.8*max(list(map(max, imm_Fb_norm))), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
 
 		pl.plot(Vx * 1e3, Vy * 1e3, 'y', linewidth=1.5)
 		pl.axis('equal')
@@ -172,7 +172,7 @@ for pass_ind in passlist:
 		pl.subplot(2, 2, 4)
 		ax = pl.gca()
 		im = ax.imshow(imm_Fes_norm.T, cmap=None, norm=None, aspect='auto', interpolation=None,
-                 alpha=None, vmax=0.8*max(map(max, imm_Fes_norm)), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
+                 alpha=None, vmax=0.8*max(list(map(max, imm_Fes_norm))), origin='lower', extent=[xmin * 1e3, xmax * 1e3, ymin * 1e3, ymax * 1e3])
 
 		pl.plot(Vx * 1e3, Vy * 1e3, 'y', linewidth=1.5)
 		pl.axis('equal')

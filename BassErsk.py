@@ -1,6 +1,6 @@
 from cmath import *
 from numpy import *
-from errffor import errf
+from .errffor import errf
 
 
 def wfun(z):

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -64,10 +64,10 @@ class Ionization_Process(object):
         # Warn if target density doesn't correspond to density of gas ionization class?
 
         self.name = process_name
-        print('Init process %s' % self.name)
+        print(('Init process %s' % self.name))
 
         self.target_dens = process_definitions['target_density']
-        print('Target density = %.2e' %(self.target_dens))
+        print(('Target density = %.2e' %(self.target_dens)))
         self.last_reported_target_dens = self.target_dens
 
         self.target_area = target_area
@@ -75,12 +75,12 @@ class Ionization_Process(object):
 
         self.E_eV_init = process_definitions['E_eV_init']
 
-        if 'extract_sigma' in process_definitions.keys():
+        if 'extract_sigma' in list(process_definitions.keys()):
             self.extract_sigma = process_definitions['extract_sigma']
         else:
             self.extract_sigma = True
 
-        if 'generate_equally' in process_definitions.keys():
+        if 'generate_equally' in list(process_definitions.keys()):
             self.generate_equally = process_definitions['generate_equally']
         else:
             self.generate_equally = False
@@ -88,7 +88,7 @@ class Ionization_Process(object):
         #  Check that ionization product names correspond to existing clouds
         product_names = process_definitions['products']
         for product in product_names:
-            assert product in cloud_dict.keys(), "Product name %s does not correspond to a defined cloud name."%(product)
+            assert product in list(cloud_dict.keys()), "Product name %s does not correspond to a defined cloud name."%(product)
         self.products = product_names
 
         # Read cross section file
@@ -101,7 +101,7 @@ class Ionization_Process(object):
         else:
             cross_section_file_path = cross_section_file
 
-        print('Cross-section from file %s' %cross_section_file_path)
+        print(('Cross-section from file %s' %cross_section_file_path))
 
         cross_section = sio.loadmat(cross_section_file_path)
 
@@ -166,7 +166,7 @@ class Ionization_Process(object):
             self.target_dens = self.N_target / self.target_area
 
             if self.target_dens < 0.1 * self.last_reported_target_dens:
-                print('Cross-ionization process %s target density = %.2e' %(self.name, self.target_dens))
+                print(('Cross-ionization process %s target density = %.2e' %(self.name, self.target_dens)))
                 self.last_reported_target_dens = self.target_dens
 
         new_mp_info = {}
@@ -309,16 +309,16 @@ class Cross_Ionization(object):
         self.products = []
 
         # Init projectiles and make list of products
-        for projectile in cross_ion_definitions.keys():
-            print('Projectile %s:' %(projectile))
+        for projectile in list(cross_ion_definitions.keys()):
+            print(('Projectile %s:' %(projectile)))
  
            # Check that projectile name corresponds to existing cloud
-            assert projectile in cloud_dict.keys(), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
+            assert projectile in list(cloud_dict.keys()), "Projectile name %s does not correspond to a defined cloud name."%(projectile)
 
             self.projectiles_dict.update({projectile : []})
 
             # Init processes
-            for process_name in cross_ion_definitions[projectile].keys():
+            for process_name in list(cross_ion_definitions[projectile].keys()):
                 process_definitions = cross_ion_definitions[projectile][process_name]
                 process = Ionization_Process(pyecl_input_folder, process_name,
                                              process_definitions, cloud_dict, chamber_area)
@@ -352,7 +352,7 @@ class Cross_Ionization(object):
 
         new_mps_to_gen = self._init_new_mp_dict(self.products)
 
-        for projectile in self.projectiles_dict.keys():
+        for projectile in list(self.projectiles_dict.keys()):
             thiscloud = cloud_dict[projectile]
             MP_e = thiscloud.MP_e
             N_mp = MP_e.N_mp
@@ -439,7 +439,7 @@ class Cross_Ionization(object):
         y_mp = np.zeros(n_rep)
         z_mp = np.zeros(n_rep)
 
-        for projectile in self.projectiles_dict.keys():
+        for projectile in list(self.projectiles_dict.keys()):
 
             thiscloud = cloud_dict[projectile]
             mass = thiscloud.MP_e.mass
@@ -451,7 +451,7 @@ class Cross_Ionization(object):
 
                 if process.extract_sigma:
 
-                    print('Extracting cross section for process %s' %process.name )
+                    print(('Extracting cross section for process %s' %process.name ))
 
                     save_dict = {}
                     save_dict['energy_eV'] = energy_eV
@@ -463,7 +463,7 @@ class Cross_Ionization(object):
                     for i_ene, energy in enumerate(energy_eV):
 
                         if np.mod(i_ene, N_ene / 10) == 0:
-                            print ('Extracting sigma %.0f'%(float(i_ene) / float(N_ene) * 100) + """%""")
+                            print(('Extracting sigma %.0f'%(float(i_ene) / float(N_ene) * 100) + """%"""))
 
                         # Test process.get_sigma()
                         sigma_m2 = process.get_sigma(np.array([energy]))
@@ -479,7 +479,7 @@ class Cross_Ionization(object):
                                                              y_proj=y_mp, z_proj=z_mp,
                                                              v_mp_proj=v_mp, flag_generate=False)
 
-                        for product in mp_info_from_proc.keys():
+                        for product in list(mp_info_from_proc.keys()):
                             DN_gen = np.sum(mp_info_from_proc[product]['nel_new_MPs'])
                             if v_ene > 0:
                                 sigma_m2_est = DN_gen / process.target_dens / v_ene / Dt / np.sum(nel_mp)
@@ -489,7 +489,7 @@ class Cross_Ionization(object):
                             save_dict[this_sigma_name][i_ene] = sigma_m2_est * 1e4
 
                     sio.savemat(process.extract_sigma_path, save_dict, oned_as='row')
-                    print('Saved extracted cross section as %s' %process.extract_sigma_path)
+                    print(('Saved extracted cross section as %s' %process.extract_sigma_path))
 
 
     def _init_new_mp_dict(self, products):
@@ -510,7 +510,7 @@ class Cross_Ionization(object):
 
     def _add_to_mp_dict(self, mp_dict, dict_to_add):
         #sum_dict = {}
-        for key in mp_dict.keys():
+        for key in list(mp_dict.keys()):
             if key == 'N_new_MPs':
                 mp_dict[key] += dict_to_add['N_new_MPs']
             else:

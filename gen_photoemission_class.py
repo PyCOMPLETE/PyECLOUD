@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -50,14 +50,14 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from __future__ import division, print_function
+
 import numpy as np
 import numpy.random as random
 
 import scipy.io as sio
 from scipy.constants import c
 
-import electron_emission
+from . import electron_emission
 
 
 class PyECLOUD_PhotoemissionException(ValueError):

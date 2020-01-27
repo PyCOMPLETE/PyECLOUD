@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -51,13 +51,13 @@
 #-End-preamble---------------------------------------------------------
 
 
-from __future__ import division, print_function
+
 import os
 
 import numpy as np
 import scipy.io as sio
 from numpy.random import rand
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
+from .sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 
 class SEY_model_from_file(SEY_model_ECLOUD):
@@ -80,7 +80,7 @@ class SEY_model_from_file(SEY_model_ECLOUD):
         self.secondary_angle_distribution = secondary_angle_distribution
 
         if secondary_angle_distribution is not None:
-            import electron_emission
+            from . import electron_emission
             self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
         else:
             self.angle_dist_func = None
@@ -94,7 +94,7 @@ class SEY_model_from_file(SEY_model_ECLOUD):
                 os.path.expanduser(sey_file),
                 os.path.abspath(os.path.dirname(__file__)) + '/sey_files/' + sey_file,
             ]
-            existing_files = filter(os.path.isfile, candidate_files)
+            existing_files = list(filter(os.path.isfile, candidate_files))
             if not existing_files:
                 raise ValueError('SEY file %s is not found' % sey_file)
             sey_file_real = existing_files[0]

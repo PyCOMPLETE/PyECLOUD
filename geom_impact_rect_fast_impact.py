@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -50,7 +50,7 @@
 #
 #-End-preamble---------------------------------------------------------
 
-import geom_impact_poly_fast_impact as gipfi
+from . import geom_impact_poly_fast_impact as gipfi
 import numpy as np
 
 na = np.array

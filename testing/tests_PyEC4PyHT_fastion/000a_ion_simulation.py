@@ -12,7 +12,7 @@ from PyHEADTAIL.particles.slicing import UniformBinSlicer
 import PyECLOUD.myfilemanager as mfm
 
 
-print 'Start initialization'
+print('Start initialization')
 t_start = time.mktime(time.localtime())
 
 
@@ -83,16 +83,16 @@ n_macroparticles = 10000
 
 # make beam
 n_bunches = 156
-print 'Initializing', n_bunches, 'bunches, of', n_macroparticles, 'macroparticles'
+print('Initializing', n_bunches, 'bunches, of', n_macroparticles, 'macroparticles')
 
 bunches = []
-for i_bun in xrange(n_bunches):
-    print 'Bunch', i_bun
+for i_bun in range(n_bunches):
+    print('Bunch', i_bun)
     bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=n_macroparticles, intensity=intensity,
                                                epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=sigma_z)
     bunch.z -= machine.circumference / machine.longitudinal_map.harmonics[0] * i_bun
 
-    print 'Bunch centroid at', bunch.mean_x(), bunch.mean_y(), bunch.mean_z()
+    print('Bunch centroid at', bunch.mean_x(), bunch.mean_y(), bunch.mean_z())
     bunches.append(bunch)
 
 beam = sum(bunches)
@@ -102,7 +102,7 @@ beam = sum(bunches)
 inj_optics = machine.transverse_map.get_injection_optics()
 sigma_x = np.sqrt(inj_optics['beta_x'] * epsn_x / machine.betagamma)
 sigma_y = np.sqrt(inj_optics['beta_y'] * epsn_y / machine.betagamma)
-print 'sigma_x = %.2e, sigma_y = %.2e'%(sigma_x, sigma_y)
+print('sigma_x = %.2e, sigma_y = %.2e'%(sigma_x, sigma_y))
 
 # define apertures and PIC grid size
 chamb_type = 'rect'
@@ -157,7 +157,7 @@ ecloud_sk = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / n_segments, slicer
 
 # print grid size
 nx, ny = ecloud_sk.spacech_ele.PyPICobj.nx, ecloud_sk.spacech_ele.PyPICobj.ny
-print 'nx = %d, ny = %d'%(nx, ny)
+print('nx = %d, ny = %d'%(nx, ny))
 
 
 # install ion clouds in the machine
@@ -165,11 +165,11 @@ machine.install_after_each_transverse_segment(ecloud_sk)
 
 
 # run simulation
-print 'Start track...'
+print('Start track...')
 t_start_sw = time.mktime(time.localtime())
-print 'Time for initialization ', (t_start_sw - t_start), 's'
-for i_turn in xrange(n_turns):
-    print 'Turn %d'%(i_turn + 1)
+print('Time for initialization ', (t_start_sw - t_start), 's')
+for i_turn in range(n_turns):
+    print('Turn %d'%(i_turn + 1))
     machine.track(beam)
 t_stop_sw = time.mktime(time.localtime())
-print 'Done track in ', (t_stop_sw - t_start_sw), 's'
+print('Done track in ', (t_stop_sw - t_start_sw), 's')

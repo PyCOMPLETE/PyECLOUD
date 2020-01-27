@@ -174,12 +174,12 @@ sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, seco
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
     deltas = {}
-    for etype in sey_mod.event_types.keys():
+    for etype in list(sey_mod.event_types.keys()):
         etype_name = sey_mod.event_types[etype]
         deltas[etype_name] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
     print('Extracting SEY curves...')
     for i_ct, ct in enumerate(cos_theta_test):
-        print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
+        print(('%d/%d' % (i_ct + 1, len(cos_theta_test))))
         for i_ene, Ene in enumerate(E_impact_eV_test):
 
             nel_impact = np.ones(n_rep)
@@ -204,7 +204,7 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
                     nel_mp_th=1,
                     flag_seg=True)
 
-            for etype in sey_mod.event_types.keys():
+            for etype in list(sey_mod.event_types.keys()):
                 etype_name = sey_mod.event_types[etype]
                 thisdelta = deltas[etype_name]
                 thisdelta[i_ct, i_ene] = np.sum(

@@ -82,7 +82,7 @@ def _forces_movie_save(sim):
         pyeclsaver.Fbfz_video = np.array(pyeclsaver.Fbfz_video)
         pyeclsaver.t_efield_video_new = np.array(pyeclsaver.t_efield_video_new)
         filename_sc_forces = pyeclsaver.folder_outp + '/sc_forces/sc_forces_pass%d.mat'%(beamtim.pass_numb - 1)
-        print('Saving %s'%filename_sc_forces)
+        print(('Saving %s'%filename_sc_forces))
         sio.savemat(filename_sc_forces, {'xg_sc': spacech_ele.xg, 'yg_sc': spacech_ele.yg, 't_efield_video_new': pyeclsaver.t_efield_video_new,
                                   'Fefx_video': pyeclsaver.Fefx_video, 'Fefy_video': pyeclsaver.Fefy_video,
                                   'Fesfx_video': pyeclsaver.Fesfx_video, 'Fesfy_video': pyeclsaver.Fesfy_video, 'Fbfx_video': pyeclsaver.Fbfx_video,

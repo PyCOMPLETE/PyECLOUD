@@ -108,10 +108,10 @@ yp_before = bunch.yp[bunch.id <= n_part_per_turn]
 
 rms_err_x_list = []
 rms_err_y_list = []
-for ii in xrange(N_turns - 1):
+for ii in range(N_turns - 1):
 	# track
 	machine.track(bunch)  # , verbose = True)
-	print 'Turn', ii
+	print('Turn', ii)
 
 	# id and momenta after track
 	id_after = bunch.id[bunch.id <= n_part_per_turn]
@@ -194,7 +194,7 @@ if show_movie:
     pl.figure(1, figsize=(8, 8))
     vmax = np.max(ecloud.rho_ele_last_track[:])
     vmin = np.min(ecloud.rho_ele_last_track[:])
-    for ii in xrange(n_frames - 1, 0, -1):
+    for ii in range(n_frames - 1, 0, -1):
         pl.subplot2grid((10, 1), (0, 0), rowspan=3)
         pl.plot(slices.z_centers, np.float_(slices.n_macroparticles_per_slice) / np.max(slices.n_macroparticles_per_slice))
         pl.xlabel('z [m]'); pl.ylabel('Long. profile')

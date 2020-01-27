@@ -10,8 +10,8 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
     qx_i = np.empty(macroparticlenumber)
     qy_i = np.empty(macroparticlenumber)
 
-    print 'analysing particle spectra ... this may take some time.'
-    for p_idx in xrange(macroparticlenumber):
+    print('analysing particle spectra ... this may take some time.')
+    for p_idx in range(macroparticlenumber):
         
         qx_i[p_idx] = NAFFlib.get_tune(x_i[p_idx, :])
         qy_i[p_idx] = NAFFlib.get_tune(y_i[p_idx, :])

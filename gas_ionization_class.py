@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.2.0
+#                   PyECLOUD Version 8.4.0
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -61,7 +61,7 @@ class residual_gas_ionization:
 
     def __init__(self, unif_frac, P_nTorr, sigma_ion_MBarn, Temp_K, chamb, E_init_ion, flag_lifetime_hist = False):
 
-        print 'Start res. gas ioniz. init.'
+        print('Start res. gas ioniz. init.')
         self.unif_frac = unif_frac
         self.P_nTorr = P_nTorr
         self.sigma_ion_MBarn = sigma_ion_MBarn
@@ -76,7 +76,7 @@ class residual_gas_ionization:
 
         self.flag_lifetime_hist = flag_lifetime_hist
 
-        print 'Done res. gas ioniz. init.'
+        print('Done res. gas ioniz. init.')
 
     #@profile
     def generate(self, MP_e, lambda_t, Dt, sigmax, sigmay, x_beam_pos=0., y_beam_pos=0.):
