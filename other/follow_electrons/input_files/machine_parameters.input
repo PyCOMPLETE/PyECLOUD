@@ -1,0 +1,34 @@
+# MACHINE PARAMETERS (SPS QD)
+
+chamb_type = 'ellip'
+
+x_aper = 0.078
+y_aper = 0.02115
+
+betafx = 1.042594e+02
+betafy = 3.227890e+01
+
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [0.0, 0.82]
+
+# gas ionization parameters
+gas_ion_flag = 1
+P_nTorr=200.;
+sigma_ion_MBarn=2.;
+Temp_K=300.;
+unif_frac=1.
+E_init_ion=0.1;   #in eV
+
+# photoemission parameters
+photoem_flag = 0
+inv_CDF_refl_photoem_file = -1
+k_pe_st = -1
+refl_frac = -1
+alimit= -1
+e_pe_sigma = -1
+e_pe_max = -1
+x0_refl = -1
+y0_refl = -1
+out_radius = -1
+

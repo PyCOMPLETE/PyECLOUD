@@ -6,20 +6,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def mystyle(fontsz=16):
+def mystyle(fontsz=16, traditional_look=True):
     rcdefaults()
     version = matplotlib.__version__.split('.')[0]
-    if version == '2':
-        print('Reverting matplotlib look to v1.5')
-        plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
-        plt.rcParams['axes.xmargin'] = 0
-        plt.rcParams['axes.ymargin'] = 0
-        plt.rcParams['xtick.direction'] = 'in'
-        plt.rcParams['ytick.direction'] = 'in'
-        plt.rcParams['xtick.top'] = True
-        plt.rcParams['ytick.right'] = True
-        plt.rcParams['legend.numpoints'] = 1
-        plt.style.use('classic')
+
+    if traditional_look:
+        if int(version) >= '2':
+            print('Reverting matplotlib look to v1.5')
+            plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
+            plt.rcParams['axes.xmargin'] = 0
+            plt.rcParams['axes.ymargin'] = 0
+            plt.rcParams['xtick.direction'] = 'in'
+            plt.rcParams['ytick.direction'] = 'in'
+            plt.rcParams['xtick.top'] = True
+            plt.rcParams['ytick.right'] = True
+            plt.rcParams['legend.numpoints'] = 1
+            plt.style.use('classic')
 
     font = {  # 'family' : 'normal',
         #'weight' : 'bold',
