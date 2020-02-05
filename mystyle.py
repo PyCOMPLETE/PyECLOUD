@@ -11,7 +11,7 @@ def mystyle(fontsz=16, traditional_look=True):
     version = matplotlib.__version__.split('.')[0]
 
     if traditional_look:
-        if int(version) >= '2':
+        if int(version) >= 2:
             print('Reverting matplotlib look to v1.5')
             plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
             plt.rcParams['axes.xmargin'] = 0
@@ -30,7 +30,7 @@ def mystyle(fontsz=16, traditional_look=True):
     rc('font', **font)
 
 
-def mystyle_arial(fontsz=16, dist_tick_lab=10):
+def mystyle_arial(fontsz=16, dist_tick_lab=10, traditional_look=True):
 
     mystyle(fontsz)
     rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
