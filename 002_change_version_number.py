@@ -9,7 +9,7 @@ for filename in files:
         with open(filename) as fid:
             content = fid.read()
         if 'giovanni.iadarola@cern.ch' in content:
-            content = content.replace('PyECLOUD Version 8.4.1', 'PyECLOUD Version 8.4.1')
+            content = content.replace('PyECLOUD Version 8.4.2', 'PyECLOUD Version 8.4.2')
             with open(filename, 'w') as fid:
                 fid.write(content)
 
