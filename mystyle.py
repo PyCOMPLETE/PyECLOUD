@@ -32,7 +32,7 @@ def mystyle(fontsz=16, traditional_look=True):
 
 def mystyle_arial(fontsz=16, dist_tick_lab=10, traditional_look=True):
 
-    mystyle(fontsz)
+    mystyle(fontsz, traditional_look)
     rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
     rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
 
