@@ -37,12 +37,16 @@ def mystyle_arial(fontsz=16, dist_tick_lab=10, traditional_look=True):
     rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
 
 
-def sciy():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
+def sciy(ax=None):
+    if ax is None:
+        ax = pl.gca()
+    ax.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 
-def scix():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
+def scix(ax=None):
+    if ax is None:
+        ax = pl.gca()
+    ax.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 
 
 def colorprog(i_prog, Nplots, v1=.9, v2=1., cm='hsv'):
