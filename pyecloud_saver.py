@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.5.0
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -96,7 +96,7 @@ class pyecloud_saver:
 
         if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
-                flog.write('PyECLOUD Version 8.5.0\n')
+                flog.write('PyECLOUD Version 8.5.1\n')
                 flog.write('%s\n' % git_hash)
                 flog.write('%s\n' % git_branch)
                 flog.write('Simulation started on %s\n' % timestr)

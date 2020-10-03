@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.5.0
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -238,7 +238,7 @@ class Ecloud(object):
 
         """
 
-        print("PyECLOUD Version 8.5.0")
+        print("PyECLOUD Version 8.5.1")
 
         # These git commands return the hash and the branch of the specified git directory.
         path_to_git = os.path.dirname(os.path.abspath(__file__)) + "/.git"
