@@ -79,7 +79,7 @@ class Transverse_Efield_map(object):
 
     def _track_in_single_slice_mode(self, beam):
 
-        if beam.slice_info is not 'unsliced':
+        if beam.slice_info != 'unsliced':
             self.sid -= 1
             self._track_single_slice(beam=beam, sid=self.sid, pid=np.arange(beam.macroparticlenumber))
 
