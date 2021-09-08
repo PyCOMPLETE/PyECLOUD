@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 E_impact_eV = np.linspace(0, 1000., 10000)
-theta = 0 * np.pi/180 #0.
+theta = 40 * np.pi/180 #0.
 
 Ehat_e = 0
 W = 100
@@ -27,10 +27,12 @@ delta_r = delta_r_0 * (1. + r1*(1-(np.cos(theta))**r2))
 plt.close('all')
 fig1 = plt.figure(1)
 ax = fig1.add_subplot(111)
-ax.plot(E_impact_eV, delta_e)
-ax.plot(E_impact_eV, delta_r)
-ax.plot(E_impact_eV, delta_e + delta_r)
+ax.plot(E_impact_eV, delta_e, label=r'$\delta_e$')
+ax.plot(E_impact_eV, delta_r, label=r'$\delta_r$')
+ax.plot(E_impact_eV, delta_e + delta_r, label=r'$\delta_e + \delta_r$')
 
 ax.grid(True)
+ax.legend(loc='best')
+ax.set_title(r'$\theta$ = ' + f'{theta*180/np.pi:.1f} deg')
 
 plt.show()

@@ -137,6 +137,12 @@ class SEY_model_furman_pivi():
         self.e1 = furman_pivi_surface['e1']
         self.e2 = furman_pivi_surface['e2']
         self.sigmaE = furman_pivi_surface['sigmaE']
+        theta_e_max = furman_pivi_surface.get('theta_e_max')
+        if theta_e_max is not None:
+            assert theta_e_max > 0 and theta_e_max < np.pi/2
+            self.costheta_e_clip = np.cos(theta_e_max)
+        else:
+            self.costheta_e_clip= 0.
 
         # Parameters for rediffused electrons
         self.p1RInf = furman_pivi_surface['p1RInf']
@@ -145,6 +151,12 @@ class SEY_model_furman_pivi():
         self.q = furman_pivi_surface['q']
         self.r1 = furman_pivi_surface['r1']
         self.r2 = furman_pivi_surface['r2']
+        theta_r_max = furman_pivi_surface.get('theta_r_max')
+        if theta_r_max is not None:
+            assert theta_r_max > 0 and theta_r_max < np.pi/2
+            self.costheta_r_clip = np.cos(theta_r_max)
+        else:
+            self.costheta_r_clip= 0.
 
         # Parameters for true secondaries
         self.deltaTSHat = furman_pivi_surface['deltaTSHat']
@@ -227,7 +239,8 @@ class SEY_model_furman_pivi():
             if self.use_ECLOUD_theta0_dependence:
                 angular_factor = 1.
             else:
-                angular_factor = 1. + self.e1 * (1. - costheta_impact**self.e2)
+                costheta_clipped = np.clip(costheta_impact, self.costheta_e_clip, 1.)
+                angular_factor = 1. + self.e1 * (1. - costheta_clipped**self.e2)
         else:
             angular_factor = 1
 
@@ -241,7 +254,8 @@ class SEY_model_furman_pivi():
         exp_factor = -(E_impact_eV / self.eR)**self.r
         delta_r0 = self.p1RInf * (1. - np.exp(exp_factor))
         if self.flag_costheta_delta_scale:
-            angular_factor = 1. + self.r1 * (1. - costheta_impact**self.r2)
+            costheta_clipped = np.clip(costheta_impact, self.costheta_r_clip, 1.)
+            angular_factor = 1. + self.r1 * (1. - costheta_clipped**self.r2)
         else:
             angular_factor = 1
 
