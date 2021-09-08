@@ -38,12 +38,14 @@ furman_pivi_surface = {
 'e1': 0.26,
 'e2': 2.,
 'sigmaE': 2.,
+'theta_e_max': 89.99 * np.pi / 180, # just for testing
 'p1RInf': 0.2,
 'eR': 0.041,
 'r': 0.104,
 'q': 0.5,
 'r1': 0.26,
 'r2': 2.,
+'theta_r_max': 89.99 * np.pi / 180, # just for testing
 'deltaTSHat': 1.600000,
 'eHat0': 276.8,
 's': 1.54,
