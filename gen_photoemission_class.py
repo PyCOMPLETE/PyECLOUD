@@ -144,8 +144,8 @@ class photoemission(photoemission_base):
         else:
             self.x0_refl = x0_refl
 
-        x0_refl_np_arr = np.array([self.x0_refl])
-        y0_refl_np_arr = np.array([self.y0_refl])
+        x0_refl_np_arr = np.array([float(self.x0_refl)])
+        y0_refl_np_arr = np.array([float(self.y0_refl)])
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
             raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
 
