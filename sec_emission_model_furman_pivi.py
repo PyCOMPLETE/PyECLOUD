@@ -208,11 +208,11 @@ class SEY_model_furman_pivi():
 
         return flag_backscattered, flag_rediffused, flag_truesec, delta_e, delta_r, delta_ts
 
-    def yield_fun_furman_pivi(self, E, costheta):
+    def yield_fun_furman_pivi(self, E, costheta, check=True):
         delta_e = self.delta_e(E, costheta)
         delta_r = self.delta_r(E, costheta)
         delta_ts = self.delta_ts(E, costheta)
-        if (delta_e + delta_r >= 1).any():
+        if check and (delta_e + delta_r >= 1).any():
             raise ValueError('delta_e + delta_r is greater than 1')
         return delta_e, delta_r, delta_ts
 
@@ -399,10 +399,15 @@ class SEY_model_furman_pivi():
             # Cut above M_cut
             flag_above_th = (n_emit_truesec_MPs_flag_true_sec > self.M_cut)
             Nabove_th = np.sum(flag_above_th)
+            i_attempt = 0
             while Nabove_th > 0:
                 n_emit_truesec_MPs_flag_true_sec[flag_above_th] = random.poisson(delta_ts_prime[flag_above_th])
+                if i_attempt>10:
+                    n_emit_truesec_MPs_flag_true_sec[flag_above_th] = np.clip(
+                            n_emit_truesec_MPs_flag_true_sec[flag_above_th], 0, self.M_cut)
                 flag_above_th = (n_emit_truesec_MPs_flag_true_sec > self.M_cut)
                 Nabove_th = np.sum(flag_above_th)
+                i_attempt += 1
             n_emit_truesec_MPs[flag_truesec] = n_emit_truesec_MPs_flag_true_sec
 
             # MPs to be replaced
