@@ -75,7 +75,7 @@ ecloud_list = []
 for ele in machine.one_turn_map:
 	new_one_turn_map.append(ele)
 	if ele in machine.transverse_map:
-		new_ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / N_kicks, slicer=slicer,
+		new_ecloud = PyEC4PyHT.Ecloud(L_ecloud=machine.circumference / N_kicks, slicer=None,
                                 Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
                                 x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
                                 init_unif_edens_flag=init_unif_edens_flag,
@@ -112,12 +112,12 @@ rms_err_y_list = []
 # pl.show()
 
 
-for ii in xrange(N_turns - 1):
+for ii in range(N_turns - 1):
 	slices_list = bunch.extract_slices(slicer)
 
 	for slice_obj in slices_list[::-1]:
 		machine.track(slice_obj)  # , verbose = True)
-	print 'Turn', ii
+	print('Turn', ii)
 
 	bunch = sum(slices_list)
 

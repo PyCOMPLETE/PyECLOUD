@@ -26,7 +26,7 @@ def dict_of_arrays_and_scalar_from_h5(filename):
 	import h5py
 	with h5py.File(filename, 'r') as fid:
 		f_dict = {}
-		for kk in fid.keys():
+		for kk in list(fid.keys()):
 			f_dict[kk] = np.array(fid[kk]).copy()
 			if f_dict[kk].shape == ():
 				f_dict[kk] = f_dict[kk].tolist()
@@ -86,7 +86,7 @@ for ele in machine.one_turn_map:
     if ele in machine.transverse_map:
         new_ecloud = PyEC4PyHT.Ecloud(slice_by_slice_mode=True,
                                       L_ecloud=machine.circumference / machine.transverse_map.n_segments,
-                                      slicer=slicer,
+                                      slicer=None,
                                       Dt_ref=25e-12, pyecl_input_folder='./drift_sim',
                                       x_aper=x_aper, y_aper=y_aper, Dh_sc=Dh_sc,
                                       init_unif_edens_flag=init_unif_edens_flag,
@@ -115,10 +115,10 @@ y_i = np.empty((n_record, n_turns))
 yp_i = np.empty((n_record, n_turns))
 
 
-for ii in xrange(n_turns):
+for ii in range(n_turns):
     slices_list = bunch.extract_slices(slicer)
 
-    print 'Turn', ii
+    print('Turn', ii)
 
     for slice_obj in slices_list[::-1]:
         machine.track(slice_obj)  # , verbose = True)

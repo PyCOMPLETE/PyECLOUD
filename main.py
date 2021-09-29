@@ -1,5 +1,3 @@
-#!/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/python
-
 #-Begin-preamble-------------------------------------------------------
 #
 #                           CERN
@@ -9,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -21,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -54,11 +53,11 @@
 #for compatibility with old PyECLOUD versions
 
 try:
-    from buildup_simulation import BuildupSimulation
-    print 'Imported from local folder'
+    from .buildup_simulation import BuildupSimulation
+    print('Imported from local folder')
 except ImportError:
     from PyECLOUD.buildup_simulation import BuildupSimulation
-    print 'Imported from PyECLOUD folder'
+    print('Imported from PyECLOUD folder')
 
 
 sim = BuildupSimulation()

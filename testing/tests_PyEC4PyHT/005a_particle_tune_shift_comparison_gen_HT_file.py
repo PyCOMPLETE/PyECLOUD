@@ -2,10 +2,10 @@ import sys, os
 sys.path.append(os.path.expanduser('../../../'))
 sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
-print ''
-print 'This script generates h5 file with tunes from Headtail output files.'
-print 'Skip this if h5 is already available.'
-print ''
+print('')
+print('This script generates h5 file with tunes from Headtail output files.')
+print('Skip this if h5 is already available.')
+print('')
 
 import numpy as np
 import pylab as pl
@@ -28,7 +28,7 @@ n_record = 1000
 
 n_part_per_turn = 5000
 
-print 'Loading HEADTAIL data...'
+print('Loading HEADTAIL data...')
 appo = np.loadtxt(filename)
 
 parid = np.reshape(appo[:, 0], (-1, n_part_per_turn))[::N_kicks, :]
@@ -40,10 +40,10 @@ z = np.reshape(appo[:, 5], (-1, n_part_per_turn))[::N_kicks, :]
 dp = np.reshape(appo[:, 6], (-1, n_part_per_turn))[::N_kicks, :]
 n_turns = len(x[:, 0])
 
-print 'Done!'
+print('Done!')
 
 # compute tunes from headtail data
-print 'Tune analysis for headtail...'
+print('Tune analysis for headtail...')
 from tune_analysis import tune_analysis
 qx_ht, qy_ht, qx_centroid_ht, qy_centroid_ht = tune_analysis(x[:, :n_record].T, xp[:, :n_record].T, y[:, :n_record].T, yp[:, :n_record].T)
 
@@ -71,6 +71,6 @@ dict_save = {\
     'n_turns': n_turns}
 
 with h5py.File('footprint_HT.h5', 'w') as fid:
-        for kk in dict_save.keys():
+        for kk in list(dict_save.keys()):
                 fid[kk] = dict_save[kk]
 

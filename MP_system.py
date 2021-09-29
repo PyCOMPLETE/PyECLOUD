@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -51,7 +52,7 @@
 
 import numpy as np
 from numpy.random import rand
-import hist_for as histf
+from . import hist_for as histf
 from scipy.constants import e, m_e
 
 
@@ -66,7 +67,9 @@ class MP_system:
     def __init__(self, N_mp_max, nel_mp_ref_0, fact_split, fact_clean,
                  N_mp_regen_low, N_mp_regen, N_mp_after_regen,
                  Dx_hist_reg, Nx_reg, Ny_reg, Nvx_reg, Nvy_reg, Nvz_reg, regen_hist_cut, chamb,
-                 N_mp_soft_regen=None, N_mp_after_soft_regen=None, charge=-e, mass=m_e):
+                 N_mp_soft_regen=None, N_mp_after_soft_regen=None,
+                 N_mp_async_regen=None, N_mp_after_async_regen=None,
+                 charge=-e, mass=m_e, flag_lifetime_hist = False, name=None):
 
         N_mp_max = int(N_mp_max)
         self.x_mp = np.zeros(N_mp_max, float)
@@ -75,6 +78,12 @@ class MP_system:
         self.vx_mp = np.zeros(N_mp_max, float)
         self.vy_mp = np.zeros(N_mp_max, float)
         self.vz_mp = np.zeros(N_mp_max, float)
+
+        #Time of last impact with the chamber
+        self.flag_lifetime_hist = flag_lifetime_hist
+        if self.flag_lifetime_hist:
+            self.t_last_impact = -1*np.ones(N_mp_max, float)
+
         self.nel_mp = np.zeros(N_mp_max, float)
         self.N_mp = 0
 
@@ -99,6 +108,7 @@ class MP_system:
 
         self.charge = charge
         self.mass = mass
+        self.name = name
 
         xg_hist_reg = np.arange(0, chamb.x_aper + 2. * Dx_hist_reg, Dx_hist_reg, float)
         xgr_hist_reg = xg_hist_reg[1:]
@@ -116,9 +126,15 @@ class MP_system:
             self.N_mp_soft_regen = N_mp_soft_regen
             self.N_mp_after_soft_regen = N_mp_after_soft_regen
 
+        self.flag_async_regen = False
+        if (N_mp_async_regen is not None) and (N_mp_after_async_regen is not None):
+            self.flag_async_regen = True
+            self.N_mp_async_regen = N_mp_async_regen
+            self.N_mp_after_async_regen = N_mp_after_async_regen
+
     def clean_small_MPs(self):
 
-        print "Start clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
+        print("Cloud %s: Start clean. N_mp=%d Nel=%e"%(self.name, self.N_mp, np.sum(self.nel_mp[0:self.N_mp])))
 
         flag_clean = (self.nel_mp < self.nel_mp_cl_th)
         flag_keep = ~(flag_clean)
@@ -135,31 +151,36 @@ class MP_system:
 
         self.nel_mp[self.N_mp:] = 0.0
 
-        print "Done clean. N_mp=%d Nel=%e"%(self.N_mp, np.sum(self.nel_mp[0:self.N_mp]))
+        if self.flag_lifetime_hist:
+            self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
+
+        print("Cloud %s: Done clean. N_mp=%d Nel=%e"%(self.name, self.N_mp, np.sum(self.nel_mp[0:self.N_mp])))
+
+        if self.N_mp == 0:
+            self.set_nel_mp_ref(self.nel_mp_ref_0)
+            print(('Cloud %s: nel_mp_ref set to nel_mp_ref_0'%self.name))
 
     def set_nel_mp_ref(self, val):
         self.nel_mp_ref = val
         self.nel_mp_split = self.fact_split * val
         self.nel_mp_cl_th = self.fact_clean * val
 
-    def check_for_soft_regeneration(self):
+    def perform_soft_regeneration(self, target_N_mp):
 
-        if self.flag_soft_regen:
-
-            if self.N_mp > self.N_mp_soft_regen:
+            if self.N_mp > target_N_mp:
                 chrg = np.sum(self.nel_mp)
                 erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
 
-                new_nel_mp_ref = chrg / self.N_mp_after_soft_regen
+                new_nel_mp_ref = chrg / target_N_mp
                 if new_nel_mp_ref < self.nel_mp_ref_0:
                     new_nel_mp_ref = self.nel_mp_ref_0
 
                 #if new_nel_mp_ref>self.nel_mp_ref_0:removed from version 3.16
-                print 'Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg)
+                print('Cloud %s: Start SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.name, self.N_mp, chrg, erg))
 
                 self.set_nel_mp_ref(new_nel_mp_ref)
 
-                death_prob = float(self.N_mp - self.N_mp_after_soft_regen) / float(self.N_mp)
+                death_prob = float(self.N_mp - target_N_mp) / float(self.N_mp)
 
                 flag_keep = np.array(len(self.x_mp) * [False])
                 flag_keep[:self.N_mp] = (rand(self.N_mp) > death_prob)
@@ -175,25 +196,43 @@ class MP_system:
 
                 self.nel_mp[self.N_mp:] = 0.0
 
+                if self.flag_lifetime_hist:
+                    self.t_last_impact[0:self.N_mp] = np.array(self.t_last_impact[flag_keep].copy())
+
                 chrg_before = chrg
                 chrg_after = np.sum(self.nel_mp)
 
                 correct_fact = chrg_before / chrg_after
 
-                print 'Applied correction factor = %e'%correct_fact
+                print('Cloud %s: Applied correction factor = %e'%(self.name, correct_fact))
 
                 self.nel_mp[0:self.N_mp] = self.nel_mp[0:self.N_mp] * correct_fact
 
                 chrg = np.sum(self.nel_mp)
                 erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
-                print 'Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg)
+                print('Cloud %s: Done SOFT regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.name, self.N_mp, chrg, erg))
+
+    def check_for_soft_regeneration(self):
+
+        if self.flag_soft_regen:
+            if self.N_mp > self.N_mp_soft_regen:
+                self.perform_soft_regeneration(target_N_mp=self.N_mp_after_soft_regen)
+
+    def check_for_async_regeneration(self):
+
+        if self.flag_async_regen:
+            if self.N_mp > self.N_mp_async_regen:
+                print(('Cloud %s: Asynchronous clean and regeneration.' %self.name))
+                self.clean_small_MPs()
+                if self.N_mp > self.N_mp_async_regen:
+                    self.perform_soft_regeneration(target_N_mp=self.N_mp_after_async_regen)
 
     def check_for_regeneration(self):
 
         if (self.N_mp > self.N_mp_regen or (self.N_mp < self.N_mp_regen_low and self.nel_mp_ref > self.nel_mp_ref_0)):
             chrg = np.sum(self.nel_mp)
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
-            print 'Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg)
+            print('Cloud %s: Start regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.name, self.N_mp, chrg, erg))
 
             new_nel_mp_ref = chrg / self.N_mp_after_regen
             if new_nel_mp_ref < self.nel_mp_ref_0:
@@ -214,7 +253,7 @@ class MP_system:
 
             x_max = (len(hist_vect) - i_cut + 1) * self.Dx_hist_reg + self.bias_x_hist_reg
 
-            print 'x_max = %e'%x_max
+            print('Cloud %s: x_max = %e'%(self.name, x_max))
 
             flag_clean = (abs(self.x_mp) > x_max)
             flag_keep = ~(flag_clean)
@@ -264,7 +303,7 @@ class MP_system:
             bias_vz = np.ceil(float(self.Nvz_reg) / 2)
             #Attention when trnslating to python
 
-            print 'particles_assigned_to grid'
+            print('Cloud %s: particles_assigned_to grid'%(self.name))
 
             ##
             #% MATLAB-like indices
@@ -285,7 +324,7 @@ class MP_system:
             indices_nonzero_cells = np.array(list(set(indexes)))
             indices_nonzero_cells = np.sort(indices_nonzero_cells)
 
-            vect_dens = dict(zip(indices_nonzero_cells, np.zeros(len(indices_nonzero_cells))))
+            vect_dens = dict(list(zip(indices_nonzero_cells, np.zeros(len(indices_nonzero_cells)))))
             #lil_matrix((Nx_reg*Ny_reg*Nvx_reg*Nvy_reg*Nvz_reg,1));#allocate a sparse matrix
             #
 
@@ -293,7 +332,7 @@ class MP_system:
                 index_curr = indexes[i_mp]
                 vect_dens[index_curr] = vect_dens[index_curr] + self.nel_mp[i_mp]
 
-            nonzero_cells = np.array(map(vect_dens.get, indices_nonzero_cells))
+            nonzero_cells = np.array(list(map(vect_dens.get, indices_nonzero_cells)))
 
             #%% retrieve indices of nonempty cells
             #% NB use C-like indices
@@ -392,9 +431,12 @@ class MP_system:
 
             #end
 
+            if self.flag_lifetime_hist:
+                self.t_last_impact[:] = -1
+
             chrg = np.sum(self.nel_mp)
             erg = np.sum(0.5 / np.abs(self.charge / self.mass) * self.nel_mp[0:self.N_mp] * (self.vx_mp[0:self.N_mp] * self.vx_mp[0:self.N_mp] + self.vy_mp[0:self.N_mp] * self.vy_mp[0:self.N_mp] + self.vz_mp[0:self.N_mp] * self.vz_mp[0:self.N_mp]))
-            print 'Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.N_mp, chrg, erg)
+            print('Cloud %s: Done regeneration. N_mp=%d Nel_tot=%1.2e En_tot=%1.2e'%(self.name, self.N_mp, chrg, erg))
 
     def add_uniform_MP_distrib(self, DNel, E_init, x_max, x_min, y_max, y_min):
 
@@ -440,6 +482,9 @@ class MP_system:
 
                 self.N_mp = int(self.N_mp + Nint_new_MP)
 
+                if self.flag_lifetime_hist:
+                    self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+
     def add_uniform_ele_density(self, n_ele, E_init, x_max, x_min, y_max, y_min):
 
         if x_max is None:
@@ -482,12 +527,15 @@ class MP_system:
             self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = v0 * (rand() - 0.5)
             self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = self.nel_mp_ref
 
-            self.N_mp = int(self.N_mp + Nint_new_MP)
+        if self.flag_lifetime_hist:
+            self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
+
+        self.N_mp = int(self.N_mp + Nint_new_MP)
 
     def get_positions(self):
             return MP_positions(self.x_mp[:self.N_mp], self.y_mp[:self.N_mp], self.z_mp[:self.N_mp])
 
-    def add_new_MPs(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz):
+    def add_new_MPs(self, N_new_MP, nel_new_mp, x, y, z, vx, vy, vz, t_last_impact):
         N_mp_old = self.N_mp
         N_mp_new = self.N_mp + N_new_MP
         self.x_mp[N_mp_old:N_mp_new] = x
@@ -498,6 +546,9 @@ class MP_system:
         self.vz_mp[N_mp_old:N_mp_new] = vz
         self.nel_mp[N_mp_old:N_mp_new] = nel_new_mp
         self.N_mp = N_mp_new
+
+        if self.flag_lifetime_hist:
+            self.t_last_impact[N_mp_old:N_mp_new] = t_last_impact
 
     def add_from_file(self, filename_MPs):
 
@@ -516,6 +567,13 @@ class MP_system:
         self.vy_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vy_mp'])
         self.vz_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['vz_mp'])
         self.nel_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['nel_mp'])
+
+        if self.flag_lifetime_hist:
+            if 't_last_impact' in list(dict_MP_init.keys()):
+                self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(
+                    dict_MP_init['t_last_impact'])
+            else:
+                self.t_last_impact[self.N_mp:self.N_mp + Nint_new_MP] = -1
 
         self.N_mp = int(self.N_mp + Nint_new_MP)
 

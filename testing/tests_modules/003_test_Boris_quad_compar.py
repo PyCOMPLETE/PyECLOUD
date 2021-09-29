@@ -160,7 +160,7 @@ z_lisg = []
 
 for ii in range(N_steps):
     if np.mod(ii, 10000) == 0:
-        print float(ii) / float(N_steps)
+        print(float(ii) / float(N_steps))
     #print ii
     x_lisB.append(MP_eB.x_mp.copy())
     y_lisB.append(MP_eB.y_mp.copy())

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -49,45 +50,47 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from __future__ import division, print_function
+
 import os
 import numpy as np
 from scipy.constants import c, m_e, e as qe
+from scipy.constants import m_p
 
-import myloadmat_to_obj as mlm
+from . import myloadmat_to_obj as mlm
 
-import beam_and_timing as beatim
-from geom_impact_ellip import ellip_cham_geom_object
-import geom_impact_poly_fast_impact as gipfi
-import geom_impact_rect_fast_impact as girfi
+from . import beam_and_timing as beatim
+from .geom_impact_ellip import ellip_cham_geom_object
+from . import geom_impact_poly_fast_impact as gipfi
+from . import geom_impact_rect_fast_impact as girfi
 
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
-from sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
-from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
-from sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
-from sec_emission_model_cos_low_ener import SEY_model_cos_le
-from sec_emission_model_flat_low_ener import SEY_model_flat_le
-from sec_emission_model_from_file import SEY_model_from_file
-from sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from .sec_emission_model_ECLOUD import SEY_model_ECLOUD
+from .sec_emission_model_accurate_low_ene import SEY_model_acc_low_ene
+from .sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif
+from .sec_emission_model_ECLOUD_nunif import SEY_model_ECLOUD_non_unif_charging
+from .sec_emission_model_cos_low_ener import SEY_model_cos_le
+from .sec_emission_model_flat_low_ener import SEY_model_flat_le
+from .sec_emission_model_from_file import SEY_model_from_file
+from .sec_emission_model_furman_pivi import SEY_model_furman_pivi
+from .sec_emission_model_perfect_absorber import SEY_model_perfect_absorber
 
-import dynamics_dipole as dyndip
-import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
-import dynamics_Boris_multipole as dynmul
+from . import dynamics_dipole as dyndip
+from . import dynamics_Boris_f2py as dynB
+from . import dynamics_strong_B_generalized as dyngen
+from . import dynamics_Boris_multipole as dynmul
 
-import MP_system as MPs
-import space_charge_class as scc
-import impact_management_class as imc
-import perfect_absorber_class as pac
-import pyecloud_saver as pysav
-import gas_ionization_class as gic
-import gen_photoemission_class as gpc
+from . import MP_system as MPs
+from . import space_charge_class as scc
+from . import space_charge_class_electromagnetic as scc_em
+from . import impact_management_class as imc
+from . import pyecloud_saver as pysav
+from . import gas_ionization_class as gic
+from . import gen_photoemission_class as gpc
 
-import parse_beam_file as pbf
-import parse_cloud_file as pcf
-import input_parameters_format_specification as inp_spec
-import cloud_manager as cman
-
+from . import parse_beam_file as pbf
+from . import parse_cloud_file as pcf
+from . import input_parameters_format_specification as inp_spec
+from . import cloud_manager as cman
+from . import cross_ionization as cion
 
 def read_parameter_files(pyecl_input_folder='./', skip_beam_files=False):
     simulation_param_file = 'simulation_parameters.input'
@@ -129,7 +132,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
     config_dict = read_parameter_files(pyecl_input_folder, skip_beam_files=skip_beam)
     # Override config values with kwargs
-    for attr, value in kwargs.items():
+    for attr, value in list(kwargs.items()):
         if attr in ignore_kwargs:
             continue
         print('Ecloud init. From kwargs: %s = %r' % (attr, value))
@@ -227,7 +230,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         sec_beams_list = []
         if flag_presence_sec_beams:
             N_sec_beams = len(sec_b_par_list)
-            for ii in xrange(N_sec_beams):
+            for ii in range(N_sec_beams):
                 print('Initialize secondary beam %d/%d' % (ii + 1, N_sec_beams))
                 sb_par = sec_b_par_list[ii]
 
@@ -263,8 +266,23 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
         if cc.sparse_solver == 'klu':
             print('''sparse_solver: 'klu' no longer supported --> going to PyKLU''')
             cc.sparse_solver = 'PyKLU'
-        spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
-                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main)
+
+        if cc.flag_em_tracking:
+            if skip_beam:
+                raise ValueError("Beam must be included when using electromagnetic tracking!!")
+
+            spacech_ele_sim = scc_em.space_charge_electromagnetic(chamb, cc.Dh_sc, b_par.gamma_rel, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                           f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
+                                           Dh_U_eV=cc.Dh_electric_energy)
+        else:
+            spacech_ele_sim = scc.space_charge(chamb, cc.Dh_sc, Dt_sc=cc.Dt_sc, sparse_solver=cc.sparse_solver, PyPICmode=cc.PyPICmode,
+                                        f_telescope=cc.f_telescope, target_grid=cc.target_grid, N_nodes_discard=cc.N_nodes_discard, N_min_Dh_main=cc.N_min_Dh_main,
+                                        Dh_U_eV=cc.Dh_electric_energy)
+
+    # Init cross-ionization
+    flag_cross_ion = False
+    if cc.cross_ion_definitions is not None:
+        flag_cross_ion = True
 
     # Loop over clouds to init all cloud-specific objects
     cloud_list = []
@@ -286,11 +304,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                              thiscloud.Dx_hist, thiscloud.Nx_regen, thiscloud.Ny_regen, thiscloud.Nvx_regen,
                              thiscloud.Nvy_regen, thiscloud.Nvz_regen, thiscloud.regen_hist_cut, chamb,
                              N_mp_soft_regen=thiscloud.N_mp_soft_regen, N_mp_after_soft_regen=thiscloud.N_mp_after_soft_regen,
-                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass)
+                             N_mp_async_regen=thiscloud.N_mp_async_regen, N_mp_after_async_regen=thiscloud.N_mp_after_async_regen,
+                             charge=thiscloud.cloud_charge, mass=thiscloud.cloud_mass, flag_lifetime_hist = thiscloud.flag_lifetime_hist,
+                             name=thiscloud.cloud_name)
 
         # Init secondary emission object
         if thiscloud.switch_model == 'perfect_absorber':
-            sey_mod = pac.Dummy_SEY()
+            sey_mod = SEY_model_perfect_absorber()
         else:
 
             kwargs_secem = {}
@@ -377,27 +397,27 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 raise inp_spec.PyECLOUD_ConfigException('switch_model not recognized!')
 
         # Init impact management
-        flag_seg = (thiscloud.flag_hist_impact_seg == 1)
+        flag_seg = (thiscloud.flag_hist_impact_seg == 1 or thiscloud.flag_hist_impact_seg is True)
 
         if flag_seg and cc.chamb_type == 'ellip':
             print('Warning: You cannot enable flag_hist_impact_seg for an ellip chamber --> disabled!')
             flag_seg = False
 
+        if cc.flag_lifetime_hist:
+            if cc.Nbin_lifetime_hist is None or cc.lifetime_hist_max is None or cc.Dt_lifetime_hist is None:
+                raise inp_spec.PyECLOUD_ConfigException(
+                        'If flag_lifetime_hist is True then all the histogram parameters must be specified')
 
-        if thiscloud.switch_model == 'perfect_absorber':
-            impact_man_class = pac.impact_management_perfect_absorber
-        else:
-            impact_man_class = imc.impact_management
-
-        impact_man = impact_man_class(chamb, sey_mod,
-                                      thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
-                                      flag_seg=flag_seg, cos_angle_width=cc.cos_angle_width,
-                                      )
+        impact_man = imc.impact_management(chamb, sey_mod,
+            thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
+            cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
+            flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
+            cos_angle_width=cc.cos_angle_width)
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag == 1:
             resgasion = gic.residual_gas_ionization(thiscloud.unif_frac, thiscloud.P_nTorr, thiscloud.sigma_ion_MBarn,
-                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion)
+                                                    thiscloud.Temp_K, chamb, thiscloud.E_init_ion, thiscloud.flag_lifetime_hist)
         else:
             resgasion = None
 
@@ -445,14 +465,31 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        step_by_step_custom_observables=cc.step_by_step_custom_observables,
                                        pass_by_pass_custom_observables=cc.pass_by_pass_custom_observables,
                                        save_once_custom_observables=cc.save_once_custom_observables,
-                                       extract_ene_dist=cc.extract_ene_dist)
+                                       flag_lifetime_hist = thiscloud.flag_lifetime_hist,
+                                       Dt_lifetime_hist = thiscloud.Dt_lifetime_hist,
+                                       extract_ene_dist=cc.extract_ene_dist,
+                                       ene_dist_test_E_impact_eV=cc.ene_dist_test_E_impact_eV,
+                                       Nbin_extract_ene=cc.Nbin_extract_ene,
+                                       factor_ene_dist_max=cc.factor_ene_dist_max,
+                                       flag_cross_ion=flag_cross_ion,
+                                       save_only = thiscloud.save_only,
+                                       flag_electric_energy=(cc.Dh_electric_energy is not None)
+                                       )
             print('pyeclsaver saves to file: %s' % pyeclsaver.filen_main_outp)
 
         # Init electron tracker
         if cc.track_method == 'Boris':
-            dynamics = dynB.pusher_Boris(cc.Dt, cc.B0x, cc.B0y, cc.B0z,
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
+            temp_B0x = {True: 0., False: cc.B0x}[cc.B0x is None]
+            temp_B0y = {True: 0., False: cc.B0y}[cc.B0y is None]
+            temp_B0z = {True: 0., False: cc.B0z}[cc.B0z is None]
+
+            dynamics = dynB.pusher_Boris(cc.Dt, temp_B0x, temp_B0y, temp_B0z,
                                          cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBdip tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBdip tracking method is implemented only for electrons!')
@@ -462,31 +499,34 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                 B = cc.B
             dynamics = dyndip.pusher_dipole_magnet(cc.Dt, B)
         elif cc.track_method == 'StrongBgen':
+            if cc.flag_em_tracking == True:
+                raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
             #~ raise ValueError('The StrongBgen tracker is no longer supported! If you really want to use it remove this line.')
             if not(np.abs(thiscloud.cloud_charge - (-qe)) / np.abs(qe) < 1e-3 and np.abs(thiscloud.cloud_mass - m_e) / m_e < 1e-3):
                 raise ValueError('StrongBgen tracking method is implemented only for electrons!')
             dynamics = dyngen.pusher_strong_B_generalized(cc.Dt, cc.B0x, cc.B0y,
                                                           cc.B_map_file, cc.fact_Bmap, cc.B_zero_thrhld)
         elif cc.track_method == 'BorisMultipole':
-            dynamics = dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew)
+            dynamics = dynmul.pusher_Boris_multipole(Dt=cc.Dt, N_sub_steps=cc.N_sub_steps, B_multip=cc.B_multip, B_skew=cc.B_skew,
+                        B0x=cc.B0x, B0y=cc.B0y, B0z=cc.B0z)
         else:
             raise inp_spec.PyECLOUD_ConfigException("track_method should be 'Boris' or 'StrongBdip' or 'StrongBgen' or 'BorisMultipole'")
 
         # Initial electron density
         if thiscloud.init_unif_flag == 1:
-            print("Adding inital %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
+            print("Adding initial %.2e electrons to the initial distribution" % thiscloud.Nel_init_unif)
             MP_e.add_uniform_MP_distrib(thiscloud.Nel_init_unif, thiscloud.E_init_unif,
                                         thiscloud.x_max_init_unif, thiscloud.x_min_init_unif,
                                         thiscloud.y_max_init_unif, thiscloud.y_min_init_unif)
 
         if thiscloud.init_unif_edens_flag == 1:
-            print("Adding inital %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
+            print("Adding initial %.2e electrons/m^3 to the initial distribution" % thiscloud.init_unif_edens)
             MP_e.add_uniform_ele_density(n_ele=thiscloud.init_unif_edens, E_init=thiscloud.E_init_unif_edens,
                                          x_max=thiscloud.x_max_init_unif_edens, x_min=thiscloud.x_min_init_unif_edens,
                                          y_max=thiscloud.y_max_init_unif_edens, y_min=thiscloud.y_min_init_unif_edens)
 
         if thiscloud.filename_init_MP_state != -1 and thiscloud.filename_init_MP_state is not None:
-            print("Adding inital electrons from: %s" % thiscloud.filename_init_MP_state)
+            print("Adding initial electrons from: %s" % thiscloud.filename_init_MP_state)
             MP_e.add_from_file(thiscloud.filename_init_MP_state)
 
         # Init empty rho for cloud
@@ -500,6 +540,13 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
 
         cloud_list.append(cloud)
 
+    # Init cross-ionization object
+    if flag_cross_ion:
+        cross_ion = cion.Cross_Ionization(pyecl_input_folder, cc.cross_ion_definitions, cloud_list, chamb.area)
+    else:
+        cross_ion = None
+
+
     return (beamtim,
             spacech_ele_sim,
             cc.t_sc_ON,
@@ -508,5 +555,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             config_dict,
             flag_multiple_clouds,
             cloud_list,
-            cc.checkpoint_folder
+            cc.checkpoint_folder,
+            cross_ion,
+            cc.flag_reinterp_fields_at_substeps 
             )

@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -52,7 +53,7 @@
 import numpy as np
 from numpy import sqrt, exp
 from numpy.random import rand
-import electron_emission as ee
+from . import electron_emission as ee
 
 
 def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
@@ -101,7 +102,7 @@ class SEY_model_ECLOUD(object):
         self.secondary_angle_distribution = secondary_angle_distribution
 
         if secondary_angle_distribution is not None:
-            import electron_emission
+            from . import electron_emission
             self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
         else:
             self.angle_dist_func = None
@@ -114,11 +115,11 @@ class SEY_model_ECLOUD(object):
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
-        print('Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s))
+        print(('Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)))
 
     def SEY_model_evol(self, Dt):
         pass
-    
+
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = yield_fun2(
@@ -215,12 +216,7 @@ class SEY_model_ECLOUD(object):
             events = np.concatenate([event_type, events_add])
         extended_event_type = events
 
-        # extended_nel_emit_tot_events used for extraction of energy distributions
-        extended_nel_emit_tot_events = np.concatenate([nel_emit_tot_events, nel_new_MPs])
-
-        event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
-                      'extended_event_type': extended_event_type,
-                      }
+        event_info = {'extended_event_type': extended_event_type}
 
         return nel_emit_tot_events, event_type, event_info,\
             nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\

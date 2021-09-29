@@ -1,0 +1,12 @@
+# CLOUD PARAMETERS
+
+cloud_mass = 28 * 1.672621777e-27
+cloud_charge = 1.602176565e-19
+
+switch_model = 'perfect_absorber'
+
+gas_ion_flag = 1
+
+init_unif_flag = 0
+init_unif_edens_flag = 0
+photoem_flag = 0

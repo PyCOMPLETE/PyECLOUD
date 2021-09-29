@@ -20,7 +20,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -32,6 +32,7 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -108,5 +109,5 @@ for dirpath, _, filenames in os.walk('.'):
 
         with open(path, 'w') as f:
             f.writelines(new_lines)
-        print('Modified %s' % path)
+        print(('Modified %s' % path))
 

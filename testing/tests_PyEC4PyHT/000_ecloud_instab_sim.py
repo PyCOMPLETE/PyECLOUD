@@ -59,8 +59,8 @@ machine.one_turn_map.append(apt_xy)
 bunch = machine.generate_6D_Gaussian_bunch(n_macroparticles=300000, intensity=1.5e11, epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=.11)
 
 # simulate
-for i_turn in xrange(N_turns):
-	print 'Turn', i_turn
+for i_turn in range(N_turns):
+	print('Turn', i_turn)
 	machine.track(bunch, verbose=True)
 
 

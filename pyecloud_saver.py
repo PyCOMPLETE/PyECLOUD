@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -49,19 +50,19 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from __future__ import print_function
+
 import scipy.io as sio
 import numpy as np
 import os
 import subprocess
-import hist_for as histf
+from . import hist_for as histf
 import time
 from scipy.constants import e as qe
-import myloadmat_to_obj as mlm
+from . import myloadmat_to_obj as mlm
 import shutil
 try:
     # cPickle is faster in python2
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     # No cPickle in python3
     import pickle
@@ -95,7 +96,7 @@ class pyecloud_saver:
 
         if self.logfile_path is not None:
             with open(self.logfile_path, 'w') as flog:
-                flog.write('PyECLOUD Version 7.7.1\n')
+                flog.write('PyECLOUD Version 8.5.1\n')
                 flog.write('%s\n' % git_hash)
                 flog.write('%s\n' % git_branch)
                 flog.write('Simulation started on %s\n' % timestr)
@@ -117,10 +118,23 @@ class pyecloud_saver:
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
                         pass_by_pass_custom_observables=None,
                         save_once_custom_observables=None,
-                        extract_ene_dist=None):
+                        flag_lifetime_hist = False,
+                        Dt_lifetime_hist = None,
+                        extract_ene_dist=None,
+                        ene_dist_test_E_impact_eV=None,
+                        Nbin_extract_ene=None,
+                        factor_ene_dist_max=None,
+                        flag_cross_ion=False,
+                        save_only=None,
+                        flag_electric_energy=False
+                        ):
         print('Start pyecloud_saver observation')
 
         self.filen_main_outp = filen_main_outp
+
+        self.save_only = save_only
+
+        self.flag_electric_energy = flag_electric_energy
 
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
@@ -130,6 +144,10 @@ class pyecloud_saver:
             self.extract_sey = extract_sey
         if extract_ene_dist is not None:
             self.extract_ene_dist = extract_ene_dist
+            self.ene_dist_test_E_impact_eV = ene_dist_test_E_impact_eV
+            self.Nbin_extract_ene = Nbin_extract_ene
+            self.factor_ene_dist_max = factor_ene_dist_max
+
 
         if '/' in self.filen_main_outp:
             self.folder_outp = '/'.join(self.filen_main_outp.split('/')[:-1])
@@ -139,6 +157,8 @@ class pyecloud_saver:
             self.fname_only_main_outp = self.filen_main_outp
 
         self.flag_detailed_MP_info = flag_detailed_MP_info
+
+        self.flag_cross_ion = flag_cross_ion
 
         # cloud info
         self.flag_multiple_clouds = flag_multiple_clouds
@@ -173,7 +193,8 @@ class pyecloud_saver:
                                      x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det)
 
         # Init energy and cos angle histogram saving
-        self._energy_and_cos_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width)
+        self._energy_cos_and_lifetime_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width, flag_lifetime_hist, Dt_lifetime_hist)
+
 
         #Space charge electrostatic energy
         self.t_sc_video = []
@@ -212,16 +233,14 @@ class pyecloud_saver:
 
         # extract energy distributions
         if self.extract_ene_dist:
-            n_rep = 100000
-            ene_impact_single = 300.
-            self.ene_dist_test_E_impact_eV = np.array([ene_impact_single] * int(1e5))
-            self.ene_dist_test_cos_theta = np.linspace(0, 1., 10)
-            self.ene_dist_test_emitted_energies = impact_man.extract_energy_distributions(n_rep, self.ene_dist_test_E_impact_eV,
-                self.ene_dist_test_cos_theta, mass=MP_e.mass)
+            n_rep = int(1e5)
+            self.ene_dist_test_cos_theta = np.linspace(0., 1., 10)
+            self.emit_ene_dist_test = impact_man.extract_energy_distributions(n_rep, self.ene_dist_test_E_impact_eV,
+                self.ene_dist_test_cos_theta, mass=MP_e.mass, Nbin_extract_ene=self.Nbin_extract_ene, factor_ene_dist_max=self.factor_ene_dist_max)
         else:
             self.ene_dist_test_cos_theta = 0.
             self.ene_dist_test_E_impact_eV = 0.
-            self.ene_dist_test_emitted_energies = {}
+            self.emit_ene_dist_test = {}
 
         # Log
         print('Done init pyecloud_saver.')
@@ -234,8 +253,9 @@ class pyecloud_saver:
 
     def witness(self, MP_e, beamtim, spacech_ele, impact_man,
                 dynamics, gas_ion_flag, resgasion, t_ion,
-                t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams, sec_beams_list,
-                cloud_list, buildup_sim, rho_cloud=None):
+                t_sc_ON, photoem_flag, phemiss, flag_presence_sec_beams,
+                sec_beams_list,
+                cloud_list, buildup_sim, cross_ion, rho_cloud=None):
 
         ####################################################
         # Quantities saved at custom times provided by user #
@@ -255,7 +275,7 @@ class pyecloud_saver:
         self._sc_video_save(spacech_ele, beamtim)
 
         # Check for energy and cos angle hist update
-        self._energy_and_cos_angle_hist_save(beamtim, impact_man, MP_e)
+        self._energy_cos_and_lifetime_angle_hist_save(beamtim, impact_man, MP_e)
 
         #Space charge electrostatic energy
         if spacech_ele.last_recomputation_check:
@@ -265,7 +285,7 @@ class pyecloud_saver:
         #########################
         # Step-by-step saveings #
         #########################
-        self._stepbystep_data_save(impact_man, MP_e, beamtim, buildup_sim)
+        self._stepbystep_data_save(impact_man, MP_e, beamtim, buildup_sim, cross_ion)
 
         ##########################################################
         # Quantities saved at each bunch passage and dump to file #
@@ -278,6 +298,10 @@ class pyecloud_saver:
             # I want all elements that go to the output file to be members of this object
             self.xg_hist = impact_man.xg_hist
             self.En_g_hist = impact_man.En_g_hist
+
+            if self.flag_lifetime_hist:
+                self.lifetime_g_hist = impact_man.lifetime_g_hist
+
             self.b_spac = beamtim.b_spac
             self.area = impact_man.chamb.area
 
@@ -308,15 +332,17 @@ class pyecloud_saver:
         self.N_mp_pass = []
         self.N_mp_ref_pass = []
 
+        self.nel_hist_impact_seg = -1
+        self.nel_hist_emit_seg = -1
+        self.energ_eV_impact_seg = -1
+        self.En_hist_seg = -1
         if impact_man.flag_seg:
-           self.nel_hist_impact_seg = []
-           self.nel_hist_emit_seg = []
-           self.energ_eV_impact_seg = []
-        else:
-           self.nel_hist_impact_seg = -1
-           self.nel_hist_emit_seg = -1
-           self.energ_eV_impact_seg = -1
-
+            self.nel_hist_impact_seg = []
+            self.nel_hist_emit_seg = []
+            self.energ_eV_impact_seg = []
+            if impact_man.flag_En_hist_seg:
+                self.En_hist_seg = [ [] for _ in range(impact_man.chamb.N_vert)]
+            
         # detailed hist
         self.flag_hist_det = False
         self.xg_hist_det = -1
@@ -342,7 +368,7 @@ class pyecloud_saver:
         # Custom data
         self.pbp_custom_data = {}
         if self.pass_by_pass_custom_observables is not None:
-            for kk in self.pass_by_pass_custom_observables.keys():
+            for kk in list(self.pass_by_pass_custom_observables.keys()):
                 self.pbp_custom_data[kk] = []
 
 
@@ -396,13 +422,13 @@ class pyecloud_saver:
             self.nel_hist_det.append(self.nel_hist_det_line.copy())
 
         if self.pass_by_pass_custom_observables is not None:
-            for kk in self.pass_by_pass_custom_observables.keys():
+            for kk in list(self.pass_by_pass_custom_observables.keys()):
                self.pbp_custom_data[kk].append(
                        self.pass_by_pass_custom_observables[kk](buildup_sim))
 
     def build_outp_dict(self, buildup_sim):
         saved_dict = {
-            't_hist': self.t_hist,
+                    't_hist': self.t_hist,
                     'nel_hist': self.nel_hist,
                     'xg_hist': self.xg_hist,
                     'nel_impact_hist_tot': self.nel_impact_hist_tot,
@@ -410,6 +436,7 @@ class pyecloud_saver:
                     'energ_eV_impact_hist': self.energ_eV_impact_hist,
                     'En_g_hist': self.En_g_hist,
                     'En_hist': self.En_hist,
+                    'En_hist_seg': self.En_hist_seg,
                     'all_Ekin_hist': self.all_Ekin_hist,
                     't_En_hist': self.t_En_hist,
                     'b_spac': self.b_spac,
@@ -435,16 +462,26 @@ class pyecloud_saver:
                     'xg_hist_cos_angle': self.xg_hist_cos_angle
         }
 
+        if self.flag_lifetime_hist:
+            saved_dict['lifetime_g_hist'] = self.lifetime_g_hist
+            saved_dict['lifetime_hist'] = self.lifetime_hist
+            saved_dict['t_lifetime_hist'] = self.t_lifetime_hist
+
+
         # Extracted sey
         saved_dict['sey_test_E_impact_eV'] = self.sey_test_E_impact_eV,
         saved_dict['sey_test_cos_theta'] = self.sey_test_cos_theta
-        for etypn in self.sey_test_deltas.keys():
+        for etypn in list(self.sey_test_deltas.keys()):
             saved_dict['sey_test_del_%s_mat' % etypn] = self.sey_test_deltas[etypn]
 
         # Extracted energy distributions
-        saved_dict['ene_dist_test_emitted_energies'] = self.ene_dist_test_emitted_energies
-        saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
-        saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
+        if self.extract_ene_dist:
+            saved_dict['ene_dist_test_cos_theta'] = self.ene_dist_test_cos_theta
+            saved_dict['ene_dist_test_E_impact_eV'] = self.ene_dist_test_E_impact_eV
+            saved_dict['emit_ene_g_hist'] = self.emit_ene_dist_test['emit_ene_g_hist']
+            for etypn in list(self.emit_ene_dist_test.keys()):
+                if 'hist' not in etypn:
+                    saved_dict['emit_ene_test_%s_mat' % etypn] = self.emit_ene_dist_test[etypn]
 
         saved_dict.update(self._stepbystep_get_dict())
 
@@ -453,11 +490,17 @@ class pyecloud_saver:
 
         # custom once
         if self.save_once_custom_observables is not None:
-            for kk in self.save_once_custom_observables.keys():
+            for kk in list(self.save_once_custom_observables.keys()):
                 saved_dict[kk] = self.save_once_custom_observables[kk](buildup_sim)
 
-        for kk in saved_dict.keys():
+        for kk in list(saved_dict.keys()):
             saved_dict[kk] = np.array(saved_dict[kk])
+
+        if self.save_only is not None:
+            old_dict = saved_dict
+            saved_dict = {}
+            for kk in self.save_only:
+                saved_dict[kk] = old_dict[kk]
 
         return saved_dict
 
@@ -555,9 +598,15 @@ class pyecloud_saver:
                                      'cen_density',
                                      'lam_t_array',
                                      'N_mp_time',
+                                     'nel_mp_ref_time',
+                                     'Nel_cross_ion',
+                                     'N_mp_cross_ion',
+                                     'DN_cross_ion',
+                                     'En_electric_eV_time',
                                      't']
 
         saved_every_passage_list = ['En_hist',
+                                    'all_Ekin_hist',
                                     't_En_hist',
                                     'N_mp_corrected_pass',
                                     'N_mp_impact_pass',
@@ -572,7 +621,9 @@ class pyecloud_saver:
                                     'nel_impact_hist_scrub',
                                     'nel_impact_hist_tot',
                                     'cos_angle_hist',
-                                    't_hist']
+                                    't_hist'
+                                    'lifetime_hist'
+                                    't_lifetime_hist']
 
         not_time_dependent_list = ['xg_hist',
                                    'xg_hist_det',
@@ -594,9 +645,12 @@ class pyecloud_saver:
                                    'sey_test_cos_theta',
                                    'ene_dist_test_cos_theta',
                                    'ene_dist_test_E_impact_eV',
-                                   'ene_dist_test_emitted_energies',
+                                   'emit_ene_dist_test',
                                    'U_sc_eV'
                                    ]
+
+        if self.flag_lifetime_hist:
+            not_time_dependent_list.append('lifetime_g_hist')
 
         should_be_list_list = ['U_sc_eV',
                                'x_el_dens_probes',
@@ -606,7 +660,7 @@ class pyecloud_saver:
 
         dict_restored = {}
         for var in saved_every_timestep_list:
-            if var in dict_history.keys():
+            if var in list(dict_history.keys()):
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var]
                 else:
@@ -614,25 +668,25 @@ class pyecloud_saver:
         self.i_last_save = len(dict_restored['Nel_timep']) - 1
 
         for var in saved_every_passage_list:
-            if var in dict_history.keys():
+            if var in list(dict_history.keys()):
                 if dict_history[var].shape == np.array(0).shape:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
                     dict_restored[var] = dict_history[var][: idx_t_hist + 1].tolist()
 
         for var in not_time_dependent_list:
-            if var in dict_history.keys():
+            if var in list(dict_history.keys()):
                 if var in should_be_list_list:
                     dict_restored[var] = dict_history[var].tolist()
                 else:
                     dict_restored[var] = dict_history[var]
 
         # Treating t_sc_video separately because of different indicies
-        if 't_sc_video' in dict_history.keys():
+        if 't_sc_video' in list(dict_history.keys()):
             dict_restored['t_sc_video'] = dict_history['t_sc_video'][: idx_t_sc_video + 1].tolist()
 
         # Restore this pyecloud_saver object with values from dict_restored
-        for var in dict_restored.keys():
+        for var in list(dict_restored.keys()):
             setattr(self, var, dict_restored[var])
 
     def _stepbystep_check_for_data_resize(self):
@@ -651,8 +705,17 @@ class pyecloud_saver:
             ]
             if self.flag_detailed_MP_info == 1:
                 list_members.append('N_mp_time')
+                list_members.append('nel_mp_ref_time')
 
-            for kk in self.sbs_custom_data.keys():
+            if self.flag_cross_ion:
+                list_members.append('Nel_cross_ion')
+                list_members.append('N_mp_cross_ion')
+                list_members.append('DN_cross_ion')
+
+            if self.flag_electric_energy:
+                list_members.append('En_electric_eV_time')
+
+            for kk in list(self.sbs_custom_data.keys()):
                 vv = self.sbs_custom_data[kk]
                 self.sbs_custom_data[kk] = np.concatenate((vv, 0 * vv))
 
@@ -697,8 +760,25 @@ class pyecloud_saver:
 
         if self.flag_detailed_MP_info == 1:
             self.N_mp_time = 0. * self.t
+            self.nel_mp_ref_time = 0. * self.t
         else:
             self.N_mp_time = -1
+            self.nel_mp_ref_time = -1
+
+        if self.flag_cross_ion:
+            self.Nel_cross_ion = 0. * self.t
+            self.N_mp_cross_ion = 0 * self.t
+            self.DN_cross_ion = 0 * self.t
+        else:
+            self.Nel_cross_ion = -1
+            self.N_mp_cross_ion = -1
+            self.DN_cross_ion = -1
+
+        if self.flag_electric_energy:
+            self.En_electric_eV_time = 0. * self.t
+        else:
+            self.En_electric_eV_time = -1
+
 
         # initialize electron density probes
         self.flag_el_dens_probes = False
@@ -713,7 +793,7 @@ class pyecloud_saver:
             self.x_el_dens_probes = []
             self.y_el_dens_probes = []
             self.r_el_dens_probes = []
-            for ii in xrange(self.N_el_dens_probes):
+            for ii in range(self.N_el_dens_probes):
                 self.x_el_dens_probes.append(el_density_probes[ii]['x'])
                 self.y_el_dens_probes.append(el_density_probes[ii]['y'])
                 self.r_el_dens_probes.append(el_density_probes[ii]['r_obs'])
@@ -724,10 +804,10 @@ class pyecloud_saver:
 
         self.sbs_custom_data = {}
         if step_by_step_custom_observables is not None:
-            for kk in step_by_step_custom_observables.keys():
+            for kk in list(step_by_step_custom_observables.keys()):
                 self.sbs_custom_data[kk] = 0 * self.t
 
-    def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim):
+    def _stepbystep_data_save(self, impact_man, MP_e, beamtim, buildup_sim, cross_ion):
         #save step by step data
         # Vars to be accumulated
         self.Nel_impact_last_step_group += impact_man.Nel_impact_last_step
@@ -759,21 +839,30 @@ class pyecloud_saver:
             self.Nel_timep[self.i_last_save] = np.sum(MP_e.nel_mp[0:MP_e.N_mp])
             self.En_kin_eV_time[self.i_last_save] = np.sum(0.5 * MP_e.mass / qe * MP_e.nel_mp[0:MP_e.N_mp] * (MP_e.vx_mp[0:MP_e.N_mp] * MP_e.vx_mp[0:MP_e.N_mp] + MP_e.vy_mp[0:MP_e.N_mp] * MP_e.vy_mp[0:MP_e.N_mp] + MP_e.vz_mp[0:MP_e.N_mp] * MP_e.vz_mp[0:MP_e.N_mp]))
 
+            if self.flag_electric_energy:
+                self.En_electric_eV_time[self.i_last_save] = buildup_sim.spacech_ele.get_potential_electric_energy()
+
             flag_center = ((MP_e.x_mp**2 + MP_e.y_mp**2) < self.r_center**2)
             flag_center[MP_e.N_mp:] = False
             self.cen_density[self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_center * self.r_center)
 
             if self.flag_el_dens_probes:
-                for ii in xrange(self.N_el_dens_probes):
+                for ii in range(self.N_el_dens_probes):
                     flag_center = ((MP_e.x_mp - self.x_el_dens_probes[ii])**2 + (MP_e.y_mp - self.y_el_dens_probes[ii])**2) < self.r_el_dens_probes[ii]**2
                     flag_center[MP_e.N_mp:] = False
                     self.el_dens_at_probes[ii, self.i_last_save] = np.sum(MP_e.nel_mp[flag_center]) / (np.pi * self.r_el_dens_probes[ii]**2)
 
             if self.flag_detailed_MP_info == 1:
                 self.N_mp_time[self.i_last_save] = MP_e.N_mp
+                self.nel_mp_ref_time[self.i_last_save] = MP_e.nel_mp_ref
+
+            if self.flag_cross_ion:
+                (self.Nel_cross_ion[self.i_last_save],
+                    self.N_mp_cross_ion[self.i_last_save],
+                    self.DN_cross_ion[self.i_last_save]) = cross_ion.save_cross_ion_data(self.cloud_name)
 
             if self.step_by_step_custom_observables is not None:
-                for kk in self.step_by_step_custom_observables.keys():
+                for kk in list(self.step_by_step_custom_observables.keys()):
                     self.sbs_custom_data[kk][self.i_last_save] = self.step_by_step_custom_observables[kk](buildup_sim)
 
     def _stepbystep_get_dict(self):
@@ -791,11 +880,20 @@ class pyecloud_saver:
 
         if self.flag_detailed_MP_info == 1:
             dict_sbs_data['N_mp_time'] = self.N_mp_time[:self.i_last_save + 1]
+            dict_sbs_data['nel_mp_ref_time'] = self.nel_mp_ref_time[:self.i_last_save + 1]
+
+        if self.flag_cross_ion:
+            dict_sbs_data['Nel_cross_ion'] = self.Nel_cross_ion[:self.i_last_save + 1]
+            dict_sbs_data['N_mp_cross_ion'] = self.N_mp_cross_ion[:self.i_last_save + 1]
+            dict_sbs_data['DN_cross_ion'] = self.DN_cross_ion[:self.i_last_save + 1]
+
+        if self.flag_electric_energy:
+            dict_sbs_data['En_electric_eV_time'] = self.En_electric_eV_time[:self.i_last_save + 1]
 
         if self.flag_el_dens_probes:
             dict_sbs_data['el_dens_at_probes'] = self.el_dens_at_probes[:, :self.i_last_save]
 
-        for kk in self.sbs_custom_data.keys():
+        for kk in list(self.sbs_custom_data.keys()):
             dict_sbs_data[kk] = self.sbs_custom_data[kk][:self.i_last_save + 1]
 
         return dict_sbs_data
@@ -858,7 +956,18 @@ class pyecloud_saver:
             spacech_ele.luobj = None
             spacech_ele.PyPICobj.luobj = None
 
-            #~ dynamics.get_B=None
+            if spacech_ele.flag_em_tracking:
+                temp_state_Ax = spacech_ele.state_Ax
+                temp_state_Ay = spacech_ele.state_Ay
+                temp_state_As = spacech_ele.state_As
+                temp_state_Ax_old = spacech_ele.state_Ax_old
+                temp_state_Ay_old = spacech_ele.state_Ay_old
+                spacech_ele.state_Ax = None
+                spacech_ele.state_Ay = None
+                spacech_ele.state_As = None
+                spacech_ele.state_Ax_old = None
+                spacech_ele.state_Ay_old = None
+
 
             # remove savers
             temp_saver_list = []
@@ -876,6 +985,9 @@ class pyecloud_saver:
                 'cloud_list': cloud_list,
                 't_last_En_hist': self.t_last_En_hist}
 
+            if self.flag_lifetime_hist:
+                dict_state['t_last_lifetime_hist'] = self.t_last_lifetime_hist
+
             with open(outfile, 'wb') as fid:
                 # use best protocol available
                 pickle.dump(dict_state, fid, protocol=-1)
@@ -885,6 +997,13 @@ class pyecloud_saver:
                 cloud.pyeclsaver = saver
 
             spacech_ele.PyPICobj.luobj = temp_luobj
+
+            if spacech_ele.flag_em_tracking:
+                spacech_ele.state_Ax = temp_state_Ax
+                spacech_ele.state_Ay = temp_state_Ay
+                spacech_ele.state_As = temp_state_As
+                spacech_ele.state_Ax_old = temp_state_Ax_old
+                spacech_ele.state_Ay_old = temp_state_Ay_old
 
             print('Save simulation state in: ' + outfile)
 
@@ -1020,8 +1139,8 @@ class pyecloud_saver:
             except IOError:
                 pass
 
-    def _energy_and_cos_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
-                                        cos_angle_width):
+    def _energy_cos_and_lifetime_angle_hist_init(self, Dt_En_hist, flag_cos_angle_hist,
+                                        cos_angle_width, flag_lifetime_hist, Dt_lifetime_hist):
         # Energy histogram init
         self.Dt_En_hist = Dt_En_hist
         self.t_last_En_hist = -1.
@@ -1038,10 +1157,18 @@ class pyecloud_saver:
             self.cos_angle_hist = -1
             self.xg_hist_cos_angle = -1
 
+        # Lifetime histogram init
+        self.flag_lifetime_hist = flag_lifetime_hist
+        if self.flag_lifetime_hist:
+            self.Dt_lifetime_hist = Dt_lifetime_hist
+            self.t_last_lifetime_hist = -1.
+            self.lifetime_hist = []
+            self.t_lifetime_hist = []
+
         # Kinetic energy histogram init
         self.all_Ekin_hist = []
 
-    def _energy_and_cos_angle_hist_save(self, beamtim, impact_man, MP_e):
+    def _energy_cos_and_lifetime_angle_hist_save(self, beamtim, impact_man, MP_e):
         # Energy histogram saver
         # if (np.mod(beamtim.ii_curr,self.Nst_En_hist)==0):
         if beamtim.tt_curr >= self.t_last_En_hist + self.Dt_En_hist or np.isclose(beamtim.tt_curr, self.t_last_En_hist + self.Dt_En_hist, rtol=1.e-10, atol=0.0):
@@ -1055,12 +1182,26 @@ class pyecloud_saver:
                 impact_man.reset_cos_angle_hist()
 
             # Histogram of the kinetic energy of all the particles
-            v_mod = np.sqrt(MP_e.vx_mp**2 + MP_e.vy_mp**2 + MP_e.vz_mp**2)
-            Ekin = 0.5 * MP_e.mass/qe * v_mod * v_mod
-            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
-            nel = MP_e.nel_mp[np.nonzero(MP_e.nel_mp)]
             N_mp = MP_e.N_mp
+            v_mod_square = MP_e.vx_mp[:N_mp]**2 + MP_e.vy_mp[:N_mp]**2 + MP_e.vz_mp[:N_mp]**2
+            Ekin = 0.5 * MP_e.mass/qe * v_mod_square
+            ekin_hist = np.zeros(impact_man.Nbin_En_hist, float)
             if N_mp > 0:
-                histf.compute_hist(Ekin[np.nonzero(MP_e.nel_mp)], nel, 0, impact_man.DEn_hist, ekin_hist)
+                histf.compute_hist(Ekin, MP_e.nel_mp[:N_mp], 0, impact_man.DEn_hist, ekin_hist)
             self.all_Ekin_hist.append(ekin_hist.copy())
 
+            # Energy histogram per segment
+            if impact_man.flag_seg:
+                if impact_man.flag_En_hist_seg:
+                    for iseg in range(impact_man.chamb.N_vert):
+                        self.En_hist_seg[iseg].append(impact_man.seg_En_hist_lines[iseg].copy())
+                    impact_man.reset_seg_En_hist_lines()
+
+
+        # Lifetime histogram saver
+        if self.flag_lifetime_hist:
+            if beamtim.tt_curr >= self.t_last_lifetime_hist + self.Dt_lifetime_hist or np.isclose(beamtim.tt_curr, self.t_last_lifetime_hist + self.Dt_lifetime_hist, rtol=1.e-10, atol=0.0):
+                self.lifetime_hist.append(impact_man.lifetime_hist_line.copy())
+                self.t_lifetime_hist.append(beamtim.tt_curr)
+                impact_man.reset_lifetime_hist_line()
+                self.t_last_lifetime_hist = beamtim.tt_curr

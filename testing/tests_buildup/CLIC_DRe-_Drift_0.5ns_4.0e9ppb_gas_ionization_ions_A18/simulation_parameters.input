@@ -71,6 +71,10 @@ target_grid = {'x_min_target':-1.5e-4, 'x_max_target':1.5e-4,'y_min_target':-3e-
 N_nodes_discard = 3.
 N_min_Dh_main = 10
 
+extract_ene_dist = True
+ene_dist_test_E_impact_eV = 100.
+Nbin_extract_ene = 500
+factor_ene_dist_max = 1.05
 
 flag_movie = 0       #1/0
 flag_sc_movie = 0    #1/0

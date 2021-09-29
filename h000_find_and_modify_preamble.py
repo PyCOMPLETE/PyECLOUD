@@ -16,7 +16,7 @@ begin = '''#--------------------------------------------------------------------
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -28,6 +28,7 @@ begin = '''#--------------------------------------------------------------------
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -79,7 +80,7 @@ for dirpath, _, filenames in os.walk('.'):
                 f.write(content)
 
         if end in content:
-            print 'End to be changed:'
+            print('End to be changed:')
             print(path)
             content = content.replace(end, newend)
 
@@ -87,7 +88,7 @@ for dirpath, _, filenames in os.walk('.'):
                 f.write(content)
 
         if '#--------------' in content:
-            print 'Test'
+            print('Test')
             print(path)
 
 

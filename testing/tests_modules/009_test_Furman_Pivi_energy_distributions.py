@@ -23,6 +23,7 @@ linewid = 2
 me = 9.10938356e-31
 
 furman_pivi_surface_tweak = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -57,6 +58,7 @@ furman_pivi_surface_tweak = {
     't4': 1.}
 
 furman_pivi_surface_LHC = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -91,6 +93,7 @@ furman_pivi_surface_LHC = {
     't4': 1.}
 
 furman_pivi_surface = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -136,14 +139,13 @@ impact_management_object = impact_management(chamb=chamb, sey_mod=sey_mod, Dx_hi
                                              Nbin_En_hist=100, En_hist_max=3000, flag_seg=False,
                                              cos_angle_width=0.05, flag_cos_angle_hist=True)
 
-cos_theta_test = np.linspace(1., 1., 1)
+cos_theta_test = np.linspace(0., 1., 10)
 E_0_single = 50.
-n_rep = int(5e6)
-# n_rep = int(1e5)
-E_impact_eV_test = np.array([E_0_single] * n_rep)
+n_rep = int(1e5)
+E_impact_eV_test = E_0_single
 alpha = 0.9
 
-dists = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me)
+extract_ene_hist = impact_management_object.extract_energy_distributions(n_rep, E_impact_eV_test, cos_theta_test, mass=me, Nbin_extract_ene=500, factor_ene_dist_max=1.0)
 
 plt.close('all')
 ms.mystyle_arial()
@@ -158,11 +160,16 @@ sp4 = fig1.add_subplot(2, 2, 4)
 for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
-    label = 'Extracted histogram'
-    sp1.hist(dists['true'][i_ct], bins=60, color=thiscol, label=label, alpha=alpha, density=True)
-    sp2.hist(dists['elast'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    sp3.hist(dists['rediff'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
-    sp4.hist(dists['absorb'][i_ct], bins=30, color=thiscol, label=label, alpha=alpha, density=True)
+
+    areats = scipy.integrate.simps(extract_ene_hist['true'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    arear = scipy.integrate.simps(extract_ene_hist['rediff'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areaab = scipy.integrate.simps(extract_ene_hist['absorb'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+
+    sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'][:, i_ct] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp2.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['elast'][:, i_ct] / areae, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp3.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['rediff'][:, i_ct] / arear, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
+    sp4.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['absorb'][:, i_ct] / areaab, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
 
 linewid = 3
 sp2.plot(0, 0, 'k', label='FP-model PDF', linewidth=linewid)
@@ -191,7 +198,7 @@ prob_density_ts = test_obj.average_true_sec_energy_PDF(delta_ts=delta_ts_prime, 
 sp1.plot(energy, prob_density_ts, 'k', label='PDF of true secondary electrons (average)', linewidth=linewid)
 # sp1.plot(energy, normalised_hilleret_energy(energy), 'k', linestyle='--', label='ECLOUD hilleret energy', linewidth=linewid)
 for sp in [sp1, sp2, sp3, sp4]:
-    sp.grid('on')
+    sp.grid(alpha=.5)
     sp.set_xlabel('Electron energy [eV]', fontsize=sz)
     sp.tick_params(axis='both', labelsize=sz - 10)
 
@@ -200,13 +207,19 @@ plt.subplots_adjust(right=0.97, left=.09)
 plt.suptitle(r'Energy distribution extraction tests: Furman-Pivi model, $E_0 = %.1f eV$' % E_0_single, fontsize=30)
 
 plt.figure(2, figsize=(12, 9), facecolor='white')
+ms.mystyle(35)
+fontsz = 65
+N_plots = sey_mod.M_cut
 for M in np.arange(1, sey_mod.M_cut + 1, 1):
+    colorcurr = ms.colorprog(M - 1, N_plots)
     prob_density_ts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts_prime, nn=M, E_0=E_0_single, energy=energy)
-    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid)
-plt.legend()
-plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
-plt.xlabel('Energy [eV]', fontsize=sz - 10)
-plt.ylabel('Normalised energy spectrum', fontsize=sz - 10)
-plt.grid(.3)
+    plt.plot(energy, prob_density_ts[0], label='n: %i' % M, linewidth=linewid, color=colorcurr)
+plt.legend(fontsize=sz - 8)
+# plt.title('Energy distribution PDFs for secondary electron energies \n in the Furman-Pivi model', fontsize=sz - 10)
+plt.xlabel('Energy [eV]', fontsize=sz)
+plt.ylabel('Normalised energy spectrum', fontsize=sz)
+plt.text(20, 0.25, r'$F_{n,ts}$', fontsize=fontsz)
+plt.grid(alpha=.5)
+plt.subplots_adjust(left=0.15, bottom=0.13, right=0.97, top=0.96)
 
 plt.show()

@@ -6,20 +6,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def mystyle(fontsz=16):
+def mystyle(fontsz=16, traditional_look=True):
     rcdefaults()
     version = matplotlib.__version__.split('.')[0]
-    if version == '2':
-        print('Reverting matplotlib look to v1.5')
-        plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
-        plt.rcParams['axes.xmargin'] = 0
-        plt.rcParams['axes.ymargin'] = 0
-        plt.rcParams['xtick.direction'] = 'in'
-        plt.rcParams['ytick.direction'] = 'in'
-        plt.rcParams['xtick.top'] = True
-        plt.rcParams['ytick.right'] = True
-        plt.rcParams['legend.numpoints'] = 1
-        plt.style.use('classic')
+
+    if traditional_look:
+        if int(version) >= 2:
+            print('Reverting matplotlib look to v1.5')
+            plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
+            plt.rcParams['axes.xmargin'] = 0
+            plt.rcParams['axes.ymargin'] = 0
+            plt.rcParams['xtick.direction'] = 'in'
+            plt.rcParams['ytick.direction'] = 'in'
+            plt.rcParams['xtick.top'] = True
+            plt.rcParams['ytick.right'] = True
+            plt.rcParams['legend.numpoints'] = 1
+            plt.style.use('classic')
 
     font = {  # 'family' : 'normal',
         #'weight' : 'bold',
@@ -28,19 +30,23 @@ def mystyle(fontsz=16):
     rc('font', **font)
 
 
-def mystyle_arial(fontsz=16, dist_tick_lab=10):
+def mystyle_arial(fontsz=16, dist_tick_lab=10, traditional_look=True):
 
-    mystyle(fontsz)
+    mystyle(fontsz, traditional_look)
     rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
     rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
 
 
-def sciy():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
+def sciy(ax=None):
+    if ax is None:
+        ax = pl.gca()
+    ax.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 
-def scix():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
+def scix(ax=None):
+    if ax is None:
+        ax = pl.gca()
+    ax.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 
 
 def colorprog(i_prog, Nplots, v1=.9, v2=1., cm='hsv'):
@@ -65,9 +71,9 @@ def comb_legend(sp1, sp2, *args, **kwargs):
 
 def mystyle_2(fontsz=16, dist_tick_lab=10, figsize=(12, 10)):
     rcdefaults()
-    RcParams[u'axes.grid'] = True
-    RcParams[u'axes.linewidth'] = 2.0
-    RcParams[u'figure.facecolor'] = 'w'
+    RcParams['axes.grid'] = True
+    RcParams['axes.linewidth'] = 2.0
+    RcParams['figure.facecolor'] = 'w'
 
     rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
     rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)

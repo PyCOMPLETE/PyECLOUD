@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -51,7 +52,7 @@
 
 from numpy import sqrt, exp
 from numpy.random import rand
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
+from .sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 
 def yield_fun3(E, costheta, Emax, del_max, R0, E0):
@@ -87,7 +88,7 @@ class SEY_model_acc_low_ene(SEY_model_ECLOUD):
             self.secondary_angle_distribution = secondary_angle_distribution
 
             if secondary_angle_distribution is not None:
-                import electron_emission
+                from . import electron_emission
                 self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
             else:
                 self.angle_dist_func = None

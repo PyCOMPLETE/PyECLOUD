@@ -1,5 +1,4 @@
 from scipy.constants import m_p, m_e, e as qe
-import numpy as np
 
 # To be safe, only use immutable python types as default values in the parameters_dict.
 # This most importantly excludes python lists. Tuples may be used in their place.
@@ -63,10 +62,13 @@ parameters_dict = {
 
             'N_mp_soft_regen': None,
             'N_mp_after_soft_regen': None,
+            'N_mp_async_regen': None,
+            'N_mp_after_async_regen': None,
             'stopfile': 'stop',
 
             # Saving settings
             'filen_main_outp': 'Pyecltest.mat',
+            'save_only': None,
             'flag_movie': 0,
             'flag_sc_movie': 0,
             'flag_cos_angle_hist': True,
@@ -74,6 +76,7 @@ parameters_dict = {
             'save_mp_state_time_file': -1,
             'flag_detailed_MP_info': 0,
             'flag_hist_impact_seg': 1,
+            'flag_En_hist_seg': False,
             'flag_verbose_file': False,
             'flag_verbose_stdout': False,
             'dec_fac_secbeam_prof': 1,
@@ -88,9 +91,15 @@ parameters_dict = {
             'x_max_hist_det': None,
             'y_max_hist_det': None,
             'Dx_hist_det': None,
+            'flag_lifetime_hist': False,
+            'Nbin_lifetime_hist': None,
+            'lifetime_hist_max': None,
+            'Dt_lifetime_hist':None,
 
+            'Dh_electric_energy': None,
             'sparse_solver': 'scipy_slu',
             'PyPICmode'    : 'FiniteDifferences_ShortleyWeller',
+            'flag_reinterp_fields_at_substeps': False,
 
             # Multigrid parameters
             'f_telescope': None,
@@ -109,7 +118,16 @@ parameters_dict = {
             'pass_by_pass_custom_observables': None,
             'save_once_custom_observables': None,
 
+            # Energy extraction parameters
             'extract_ene_dist': False,
+            'ene_dist_test_E_impact_eV': None,
+            'Nbin_extract_ene': None,
+            'factor_ene_dist_max': None,
+
+            'flag_em_tracking' : False,
+
+            # Cross-ionization
+            'cross_ion_definitions': None
 
         },
     },
@@ -131,9 +149,9 @@ parameters_dict = {
             'B_map_file': None,
             'Bz_map_file': None, # documented?
             'fact_Bmap': 1.,
-            'B0x': 0.,
-            'B0y': 0.,
-            'B0z': 0.,
+            'B0x': None,
+            'B0y': None,
+            'B0z': None,
             'B_zero_thrhld': None,
             'N_sub_steps': 1,
             'B_multip': [],
@@ -321,6 +339,8 @@ parameters_dict = {
         },
         'optional': {
 
+            'save_only': (),
+            
             # MP management settings
             'N_mp_max': (),
             'N_mp_regen': (),
@@ -335,6 +355,8 @@ parameters_dict = {
 
             'N_mp_soft_regen': (),
             'N_mp_after_soft_regen': (),
+            'N_mp_async_regen': (),
+            'N_mp_after_async_regen': (),
 
             # Tracking and magnetic field
             'N_sub_steps': (),
@@ -411,6 +433,10 @@ parameters_dict = {
             'Dt_En_hist': (),
             'Nbin_En_hist': (),
             'En_hist_max': (),
+            'flag_lifetime_hist': (),
+            'Nbin_lifetime_hist': (),
+            'lifetime_hist_max': (),
+            'Dt_lifetime_hist': (),
 
             'flag_movie': (),
             'flag_sc_movie': (),
@@ -419,6 +445,7 @@ parameters_dict = {
             'save_mp_state_time_file': (),
             'flag_detailed_MP_info': (),
             'flag_hist_impact_seg': (),
+            'flag_En_hist_seg':(),
             'flag_verbose_file': (),
             'flag_verbose_stdout': (),
             'dec_fac_secbeam_prof': (),

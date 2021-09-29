@@ -28,6 +28,7 @@ def del_true_ECLOUD(energy, del_max, s=1.35, E_max=332., costheta=1.):
 
 
 furman_pivi_surface_tweak = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': True,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -62,6 +63,7 @@ furman_pivi_surface_tweak = {
     't4': 1.}
 
 furman_pivi_surface_LHC = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -96,6 +98,7 @@ furman_pivi_surface_LHC = {
     't4': 1.}
 
 furman_pivi_surface = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -128,6 +131,7 @@ furman_pivi_surface = {
 
 # Scaled py POSINST to del_tot_max = 1.6
 furman_pivi_surface_scaled = {
+    'use_modified_sigmaE': False,
     'use_ECLOUD_theta0_dependence': False,
     'use_ECLOUD_energy': False,
     'conserve_energy': False,
@@ -163,19 +167,19 @@ flag_costheta_Emax_shift = True
 
 sey_mod = fp.SEY_model_furman_pivi(E_th=35., sigmafit=1.0828, mufit=1.6636, secondary_angle_distribution='cosine_3D',
                                    switch_no_increase_energy=0, thresh_low_energy=-1,
-                                   furman_pivi_surface=furman_pivi_surface_tweak, flag_costheta_delta_scale=flag_costheta_delta_scale,
+                                   furman_pivi_surface=furman_pivi_surface, flag_costheta_delta_scale=flag_costheta_delta_scale,
                                    flag_costheta_Emax_shift=flag_costheta_Emax_shift)
 
 
 def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
     deltas = {}
-    for etype in sey_mod.event_types.keys():
+    for etype in list(sey_mod.event_types.keys()):
         etype_name = sey_mod.event_types[etype]
         deltas[etype_name] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
     print('Extracting SEY curves...')
     for i_ct, ct in enumerate(cos_theta_test):
-        print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
+        print(('%d/%d' % (i_ct + 1, len(cos_theta_test))))
         for i_ene, Ene in enumerate(E_impact_eV_test):
 
             nel_impact = np.ones(n_rep)
@@ -200,7 +204,7 @@ def extract_sey_curves(n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
                     nel_mp_th=1,
                     flag_seg=True)
 
-            for etype in sey_mod.event_types.keys():
+            for etype in list(sey_mod.event_types.keys()):
                 etype_name = sey_mod.event_types[etype]
                 thisdelta = deltas[etype_name]
                 thisdelta[i_ct, i_ene] = np.sum(
@@ -253,7 +257,7 @@ sp5.set_ylabel('Delta total')
 sp6.set_ylabel(r'$\delta_{ts} + \delta_{e}$')
 
 for sp in [sp1, sp2, sp3, sp4, sp5, sp6]:
-    sp.grid('on')
+    sp.grid(True)
     sp.set_xlabel('Electron energy [eV]')
 
 plt.subplots_adjust(right=0.99, left=.05)
@@ -278,6 +282,6 @@ for ct in cos_theta_test:
     sp1.plot(energy, del_true_ECLOUD(energy, del_max=test_obj.deltaTSHat, costheta=ct), '--', color='r', linewidth=linewid, label='ECLOUD model')
 sp2.legend(loc='best', prop={'size': 14})
 
-plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s' % str(furman_pivi_surface_LHC['exclude_rediffused']), fontsize=30)
+plt.suptitle('SEY extraction tests: Furman-Pivi model \nexclude_rediffused=%s' % str(sey_mod.exclude_rediffused), fontsize=30)
 
 plt.show()

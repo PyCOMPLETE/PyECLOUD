@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -78,8 +79,8 @@ for pass_ind in range(firs_pass, last_pass):
 
     #subprocess.check_call(('rm',  '*.png'))
 
-    for ii in xrange(0, nphotog, N_dec):
-        print 'Pass %d %d/%d'%(pass_ind, ii, nphotog)
+    for ii in range(0, nphotog, N_dec):
+        print('Pass %d %d/%d'%(pass_ind, ii, nphotog))
         imm = np.squeeze(rho_video[ii, :, :])
         if flag_log:
             imm = np.log10(np.abs(imm))

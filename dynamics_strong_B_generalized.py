@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -52,7 +53,7 @@
 
 from numpy import sqrt, sin, cos, squeeze, sum
 import scipy.io as sio
-import int_field_for as iff
+from . import int_field_for as iff
 
 me = 9.10938291e-31
 qe = 1.602176565e-19
@@ -64,7 +65,7 @@ class pusher_strong_B_generalized():
     def __init__(self, Dt, B0x, B0y, \
                  B_map_file, fact_Bmap, B_zero_thrhld):
 
-        print "Tracker: Generalized strong B"
+        print("Tracker: Generalized strong B")
 
         self.Dt = Dt
         self.B0x = B0x
@@ -74,14 +75,14 @@ class pusher_strong_B_generalized():
             self.flag_B_map = False
             self.analyt_quad_grad1 = False
         elif B_map_file is 'analytic_qaudrupole_unit_grad':
-            print "B map analytic quadrupole"
+            print("B map analytic quadrupole")
             self.flag_B_map = False
             self.analyt_quad_grad1 = True
             self.fact_Bmap = fact_Bmap
         else:
             self.flag_B_map = True
             self.analyt_quad_grad1 = False
-            print 'Loading B map'
+            print('Loading B map')
             dict_Bmap = sio.loadmat(B_map_file)
 
             self.Bmap_x = fact_Bmap * squeeze(dict_Bmap['Bx'].real)
@@ -111,7 +112,7 @@ class pusher_strong_B_generalized():
 
 
 #    def step(self, xn, yn, zn, vxn, vyn, vzn,Ex_n,Ey_n):
-    def step(self, MP_e, Ex_n, Ey_n):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0.):
 
         if MP_e.N_mp > 0:
             xn = MP_e.x_mp[0:MP_e.N_mp]
@@ -192,5 +193,3 @@ class pusher_strong_B_generalized():
             MP_e.vz_mp[0:MP_e.N_mp] = vzn1
 
         return MP_e
-
-

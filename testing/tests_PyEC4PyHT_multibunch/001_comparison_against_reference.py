@@ -37,7 +37,7 @@ ax1.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 ax1.grid(True)
 ax1.set_xlabel('Time [s]')
 ax1.set_ylabel('Number of electrons [m^-1]')
-ax1.legend(prop={'size':14}, loc='upper left').draggable()
+ax1.legend(prop={'size':14}, loc='upper left')
 
 fig1.subplots_adjust(bottom=.12)
 
@@ -55,7 +55,7 @@ ax2.plot(np.sum(dict_curr1['En_hist'], axis=1), '.g-', linewidth=2,
 
 ax2.set_xlabel('Bunch passage')
 ax2.set_ylabel('Heat load eV/bunch')
-ax2.legend(prop={'size':14}, loc='upper left').draggable()
+ax2.legend(prop={'size':14}, loc='upper left')
 ax2.grid(True)
 dict_curr = dict_curr1
 

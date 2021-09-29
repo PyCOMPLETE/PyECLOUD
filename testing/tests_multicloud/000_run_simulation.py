@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+
 import sys
 import os
 import time
@@ -10,7 +10,6 @@ if BIN not in sys.path:
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multispecies'
-
 
 # check if user provided folder as command line argument
 parser = argparse.ArgumentParser()

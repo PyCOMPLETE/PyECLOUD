@@ -56,7 +56,7 @@ fig2 = plt.figure(2, figsize=(8*1.5, 6*1.5))
 
 for i_frame, z_obs in enumerate(list(z_movie) + [z_single_frame_interactive]):
     
-    print('Frame %d/%d'%(i_frame, len(z_movie)))
+    print(('Frame %d/%d'%(i_frame, len(z_movie))))
 
     if not gen_movie and i_frame < len(z_movie):
         continue

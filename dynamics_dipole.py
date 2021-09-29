@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -49,7 +50,7 @@
 #
 #-End-preamble---------------------------------------------------------
 
-import sincc_cosincc_cubsincc as cs
+from . import sincc_cosincc_cubsincc as cs
 
 
 me = 9.10938291e-31
@@ -60,7 +61,7 @@ qm = qe / me
 class pusher_dipole_magnet():
     def __init__(self, Dt, B):
 
-        print "Tracker: Dipole - strong B"
+        print("Tracker: Dipole - strong B")
         omegac = B * qm
         self.sincc_v = cs.sincc(omegac * Dt)
         self.cosincc_v = cs.cosincc(omegac * Dt)
@@ -71,7 +72,7 @@ class pusher_dipole_magnet():
         self.omegac = omegac
 
 #    def step(self, xn, yn, zn, vxn, vyn, vzn,Ex_n,Ey_n):
-    def step(self, MP_e, Ex_n, Ey_n):
+    def step(self, MP_e, Ex_n, Ey_n, Ez_n=0., Bx_n=0., By_n=0., Bz_n=0.):
 
         if MP_e.N_mp > 0:
             xn = MP_e.x_mp[0:MP_e.N_mp]
@@ -99,6 +100,3 @@ class pusher_dipole_magnet():
             MP_e.vz_mp[0:MP_e.N_mp] = vzn1
 
         return MP_e
-
-
-

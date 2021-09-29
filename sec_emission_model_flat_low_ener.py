@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -51,7 +52,7 @@
 
 from numpy import sqrt, exp, cos, pi, logical_and
 from numpy.random import rand
-from sec_emission_model_ECLOUD import SEY_model_ECLOUD
+from .sec_emission_model_ECLOUD import SEY_model_ECLOUD
 
 
 def yield_fun2(E, costheta, Emax, del_max, R0):
@@ -90,7 +91,7 @@ class SEY_model_flat_le(SEY_model_ECLOUD):
             self.secondary_angle_distribution = secondary_angle_distribution
 
             if secondary_angle_distribution is not None:
-                import electron_emission
+                from . import electron_emission
                 self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
             else:
                 self.angle_dist_func = None
@@ -98,7 +99,7 @@ class SEY_model_flat_le(SEY_model_ECLOUD):
             self.Emax = Emax
             self.del_max = del_max
             self.R0 = R0
-            print 'Secondary emission model: Flat Low Energy '
+            print('Secondary emission model: Flat Low Energy ')
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
             yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0)

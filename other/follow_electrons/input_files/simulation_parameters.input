@@ -1,0 +1,58 @@
+# SIMULATION PARAMETERS
+
+machine_param_file='machine_parameters.input'
+secondary_emission_parameters_file='secondary_emission_parameters.input'
+beam_parameters_file='beam1.beam' 
+
+
+logfile_path = '/afs/cern.ch/work/x/xicui/QF/normal/simulations/sim001_mux0.000_bx104.259/logfile.txt'
+progress_path = '/afs/cern.ch/work/x/xicui/QF/normal/simulations/progress/twiss001'
+
+Dt=25e-12          #s (no effect if log. profile is imported from file)
+t_end=1e-9;       #s (no effect if log. profile is imported from file)
+
+dec_fact_out = 5
+
+lam_th=1.e2        #e-/m
+Dx_hist=1.e-3      #m
+r_center=5.e-3     #m
+
+
+Dt_En_hist = 25e-9 #s
+Nbin_En_hist= 100
+En_hist_max= 1000.  #eV
+
+t_ion=100.;        #s
+
+N_mp_max=100000;   #size of allocated vectors 
+
+#Regen parameters
+
+N_mp_regen=50000;
+N_mp_regen_low=5000;
+N_mp_after_regen=10000;
+t_ON_regen_low=0.
+fact_split=1.5;
+fact_clean=1e-4;
+nel_mp_ref_0=100.   #e-/m
+regen_hist_cut = 1.e-4
+
+# Number of bins
+Nx_regen=51;#it must be odd!
+Ny_regen=51;#it must be odd!
+Nvx_regen=51;#it must be odd!
+Nvy_regen=101;#it must be odd!
+Nvz_regen=51;#it must be odd!
+
+#Sp_ch params
+Dt_sc = 0.5e-9
+Dh_sc = 0.5e-3
+t_sc_ON=0e-9;		#s
+
+flag_movie = 0             #1/0
+flag_sc_movie = 0          #1/0
+
+
+    
+
+

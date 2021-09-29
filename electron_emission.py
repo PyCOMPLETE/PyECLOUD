@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -49,7 +50,7 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from __future__ import division
+
 import time
 import numpy as np
 import numpy.random as random
@@ -204,7 +205,7 @@ of generated electrons (https://indico.cern.ch/event/673160/).
         time.sleep(3)
         return velocities_angle_cosine_2D
     elif string == 'normal_emission':
-        print('Electrons are emmited orthogonally to the chamber.')
+        print('Electrons are emmited orthogonally to the chamber surface.')
         return velocities_angle_normal_emission
     else:
         raise ValueError("""

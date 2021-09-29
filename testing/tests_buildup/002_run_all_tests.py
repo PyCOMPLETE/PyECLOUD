@@ -30,10 +30,14 @@ all_sim_folders = [
     'CLIC_DRe+_Drift_0.5ns_4.0e9ppb_gas_ionization_ions_A18',
     'LHC_TDIS_non_unif_sey',
     'LHC_Solenoid_sey1.10_100.00mT',
+    'LHC_Solenoid_sey1.10_100.00mT_BorisCython',
     'FCC_Dipole_25ns_50.00TeV_sey1.9_segment_photoemission',
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_nonuniftime',
-    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint'
-]
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint',
+    'Rectangular_Dip_450GeV_sey1.60_1.1e11ppb_furman_pivi',
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_em_tracking',
+    'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_reinterp_at_substeps',
+    ]
 
 if args.all:
     dists = all_dists
@@ -41,11 +45,15 @@ else:
     dists = [args.angle_dist_func]
 
 for ctr, sim_folder in enumerate(all_sim_folders):
+    test_script = './000_run_simulation.py'
+    if sim_folder.endswith('checkpoint'):
+        test_script = './000b_run_test_checkpoint.py'
     for dist in dists:
         for cmd in [
-            'python ./000_run_simulation.py --folder %s --angle-dist-func %s' % (sim_folder, dist),
+            'python %s --folder %s --angle-dist-func %s' % (test_script, sim_folder, dist),
             'python ./001_comparison_against_reference.py --folder %s --angle-dist-func %s' % (sim_folder, dist)
         ]:
+            print(cmd)
             status = os.system(cmd)
             if status != 0:
                 raise SystemError('%s finished with status %i' % (cmd, status))

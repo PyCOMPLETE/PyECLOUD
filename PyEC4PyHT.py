@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.7.1
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -47,18 +48,17 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 import os
 import subprocess
 import time
 
 import numpy as np
-from scipy.constants import c, e, m_e
+from scipy.constants import c
 
-import myloadmat_to_obj as mlm
-import init
-import buildup_simulation as bsim
+from . import myloadmat_to_obj as mlm
+from . import buildup_simulation as bsim
 
 
 class Empty(object):
@@ -66,66 +66,204 @@ class Empty(object):
 
 
 class DummyBeamTim(object):
+    """Dummy beam-timing class to interface with buildup simulation"""
+
     def __init__(self, PyPIC_state):
         self.PyPIC_state = PyPIC_state
 
-        self.b_spac = 0.
+        self.b_spac = 0.0
         self.pass_numb = 0
         self.N_pass_tot = 1
 
     def get_beam_eletric_field(self, MP_e):
-        if (MP_e.N_mp > 0):
+        if MP_e.N_mp > 0:
             if self.PyPIC_state is None:
-                Ex_n_beam = 0. * MP_e.x_mp[0:MP_e.N_mp]
-                Ey_n_beam = 0. * MP_e.y_mp[0:MP_e.N_mp]
+                Ex_n_beam = 0.0 * MP_e.x_mp[0 : MP_e.N_mp]
+                Ey_n_beam = 0.0 * MP_e.y_mp[0 : MP_e.N_mp]
             else:
                 # compute beam electric field
-                Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(MP_e.x_mp[0:MP_e.N_mp], MP_e.y_mp[0:MP_e.N_mp])
+                Ex_n_beam, Ey_n_beam = self.PyPIC_state.gather(
+                    MP_e.x_mp[0 : MP_e.N_mp], MP_e.y_mp[0 : MP_e.N_mp]
+                )
         else:
-            Ex_n_beam = 0.
-            Ey_n_beam = 0.
+            Ex_n_beam = 0.0
+            Ey_n_beam = 0.0
         return Ex_n_beam, Ey_n_beam
 
 
-extra_allowed_kwargs = {'x_beam_offset', 'y_beam_offset', 'probes_position', 'enable_kick_x', 'enable_kick_y'}
+extra_allowed_kwargs = {
+    "x_beam_offset",
+    "y_beam_offset",
+    "probes_position",
+    "enable_kick_x",
+    "enable_kick_y",
+}
 
 
 class Ecloud(object):
-
     def generate_twin_ecloud_with_shared_space_charge(self):
-        if hasattr(self, 'efieldmap'):
-            raise ValueError('Ecloud has been replaced with field map. I cannot generate a twin ecloud!')
-        return Ecloud(self.L_ecloud, self.slicer, self.Dt_ref, self.pyecl_input_folder, self.flag_clean_slices,
-                      self.slice_by_slice_mode, self.spacech_ele, self.kick_mode_for_beam_field,
-                      self.beam_monitor, self.verbose, self.save_pyecl_outp_as, **self.kwargs)
+        """Generate an identical Ecloud objet with shared space-charge member."""
 
-    def __init__(self, L_ecloud, slicer, Dt_ref, pyecl_input_folder='./', flag_clean_slices=False,
-                 slice_by_slice_mode=False, space_charge_obj=None, kick_mode_for_beam_field=False,
-                 beam_monitor=None, verbose=False, save_pyecl_outp_as=None,
-                 **kwargs):
+        if hasattr(self, "efieldmap"):
+            raise ValueError(
+                "Ecloud has been replaced with field map. I cannot generate a twin ecloud!"
+            )
+        return Ecloud(
+            self.L_ecloud,
+            self.slicer,
+            self.Dt_ref,
+            self.pyecl_input_folder,
+            self.flag_clean_slices,
+            self.slice_by_slice_mode,
+            self.spacech_ele,
+            self.kick_mode_for_beam_field,
+            self.beam_monitor,
+            self.verbose,
+            self.save_pyecl_outp_as,
+            self.force_interp_at_substeps_interacting_slices,
+            **self.kwargs
+        )
 
-        print 'PyECLOUD Version 7.7.1'
+    def __init__(
+        self,
+        L_ecloud,
+        slicer,
+        Dt_ref,
+        pyecl_input_folder="./",
+        flag_clean_slices=False,
+        slice_by_slice_mode=False,
+        space_charge_obj=None,
+        kick_mode_for_beam_field=False,
+        beam_monitor=None,
+        verbose=False,
+        save_pyecl_outp_as=None,
+        force_interp_at_substeps_interacting_slices=False,
+        **kwargs
+    ):
+        """
+        Construct an e-cloud object that can be inserted in a PyHEADTAIL machine
+
+        Parameters
+        ---------
+
+        L_ecloud : m
+            Length of the e-cloud interaction
+
+        slicer :
+            PyHEADTAIL slicer object, used to define slices for e-cloud insteraction.
+            Needs to be provided only if slice_by_slice_mode is False.
+
+        Dt_ref : s
+            Target duration of the sub-steps perfomed in each slice.
+
+        pyecl_input_folder : path
+            Folder containing the PyECLOUD input files defining the e-cloud.
+
+        flag_clean_slices : {True, False}
+            If True, slicing is redone before the e-cloud interation.
+            This flag has no effect is slice_by_slice_mode is True.
+
+        slice_by_slice_mode : {True, False}
+
+            - If False, the e-cloud receives a full bunch, slicing is done interally,
+              the cloud is automatically re-initialized after each interaction.
+            - If True, the e-cloud receives one slice at a time (the slice object
+              should have metadata in a member called slice_info. The reinitialization
+              of the cloud is done based on the meta-data or esplicitly by the user.
+
+        space_charge_obj :
+
+            - If None a space-charge object (Particle In Cell) is constructed for
+              the e-cloud
+            - If not None the provided space-charge objeci is used
+
+        kick_mode_for_beam_field : {True, False}
+            If True, the force of the beam on the electrons is applied as a
+            discrete kick (used mainly for fast beam-ion simulations).
+
+        beam_monitor :
+            PyHEADTAIL beam-monitor, used sometimes for debug purposes.
+
+        verbose : {True, False}
+
+        save_pyecl_outp_as : path
+            File in which cloud evolution is stored.
+
+        force_reinterp_at_substeps_interacting_slices : {True, False}
+            Fields from beams and clouds are re-interpolated at each subsstep.
+
+        x_beam_offset : m
+            Horizontal position of the PyHEADTAIL reference trajectoy in
+            the PyECLOUD referece system.
+
+        y_beam_offset: m
+            Vertical position of the PyHEADTAIL reference trajectoy in
+            the PyECLOUD referece system.
+
+        probes_position : dict
+            Positions at which electron density and field can be measured.
+
+        enable_kick_x :
+            Enable horizontal kick from the cloud on the beam.
+
+        enable_kick_y :
+            Enable vertical kick from the cloud on the beam.
+
+        **kwargs :
+            Any input parameter of PyECLOUD can be passes as a keyword arguments.
+            Parameters definded in the input files are overridden by those passas as
+            keyword arguments.
+
+        Additional information
+        ----------------------
+        After building the object, the following members can be set to true to record
+        additional information (which is then attached as a member to the ecloud object
+        itself. After setting any of these ot true the [ecloud]._reinitialize
+        function needs to be called to prepare the data storage, which also resets cloud
+        state.
+
+        [ecloud].save_ele_distributions_last_track
+        [ecloud].save_ele_potential_and_field
+        [ecloud].save_ele_potential
+        [ecloud].save_ele_field
+        [ecloud].save_ele_MP_position
+        [ecloud].save_ele_MP_velocity
+        [ecloud].save_ele_MP_size
+
+        [ecloud].save_beam_distributions_last_track
+        [ecloud].save_beam_potential_and_field
+        [ecloud].save_beam_potential
+        [ecloud].save_beam_field
+
+
+        """
+
+        print("PyECLOUD Version 8.5.1")
 
         # These git commands return the hash and the branch of the specified git directory.
-        path_to_git = os.path.dirname(os.path.abspath(__file__)) + '/.git'
-        cmd_hash = 'git --git-dir %s rev-parse HEAD' % path_to_git
-        cmd_branch = 'git --git-dir %s rev-parse --abbrev-ref HEAD' % path_to_git
+        path_to_git = os.path.dirname(os.path.abspath(__file__)) + "/.git"
+        cmd_hash = "git --git-dir %s rev-parse HEAD" % path_to_git
+        cmd_branch = "git --git-dir %s rev-parse --abbrev-ref HEAD" % path_to_git
         try:
-            git_hash = 'git hash: %s' % (subprocess.check_output(cmd_hash.split()).split()[0])
+            git_hash = "git hash: %s" % (
+                subprocess.check_output(cmd_hash.split()).split()[0]
+            )
         except Exception as e:
-            git_hash = 'Retrieving git hash failed'
+            git_hash = "Retrieving git hash failed"
             print(e)
         print(git_hash)
 
         try:
-            git_branch = 'git branch: %s' % (subprocess.check_output(cmd_branch.split()).split()[0])
+            git_branch = "git branch: %s" % (
+                subprocess.check_output(cmd_branch.split()).split()[0]
+            )
         except Exception as e:
-            git_branch = 'Retrieving git branch failed'
+            git_branch = "Retrieving git branch failed"
             print(e)
         print(git_branch)
 
-        print 'PyHEADTAIL module'
-        print 'Initializing ecloud from folder: ' + pyecl_input_folder
+        print("PyHEADTAIL module")
+        print("Initializing ecloud from folder: " + pyecl_input_folder)
         self.slicer = slicer
         self.Dt_ref = Dt_ref
         self.L_ecloud = L_ecloud
@@ -133,38 +271,48 @@ class Ecloud(object):
         self.pyecl_input_folder = pyecl_input_folder
         self.kwargs = kwargs
 
+        self.force_interp_at_substeps_interacting_slices = (
+            force_interp_at_substeps_interacting_slices
+        )
+
+        print(f"Reinterp fields at substeps for interacting slices: {self.force_interp_at_substeps_interacting_slices}")
+
         self.cloudsim = bsim.BuildupSimulation(
-            pyecl_input_folder=pyecl_input_folder, skip_beam=True,
+            pyecl_input_folder=pyecl_input_folder,
+            skip_beam=True,
             spacech_ele=space_charge_obj,
             ignore_kwargs=extra_allowed_kwargs,
             skip_pyeclsaver=(save_pyecl_outp_as is None),
             filen_main_outp=save_pyecl_outp_as,
-            **self.kwargs)
+            **self.kwargs
+        )
 
-        if self.cloudsim.config_dict['track_method'] == 'Boris':
+        if self.cloudsim.config_dict["track_method"] == "Boris":
             pass
-        elif self.cloudsim.config_dict['track_method'] == 'BorisMultipole':
+        elif self.cloudsim.config_dict["track_method"] == "BorisMultipole":
             pass
         else:
-            raise ValueError("""track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module""")
+            raise ValueError(
+                """track_method should be 'Boris' or 'BorisMultipole' - others are not implemented in the PyEC4PyHT module"""
+            )
 
-        self.x_beam_offset = 0.
-        self.y_beam_offset = 0.
-        if 'x_beam_offset' in kwargs:
-            self.x_beam_offset = kwargs['x_beam_offset']
-        if 'y_beam_offset' in kwargs:
-            self.y_beam_offset = kwargs['y_beam_offset']
+        self.x_beam_offset = 0.0
+        self.y_beam_offset = 0.0
+        if "x_beam_offset" in kwargs:
+            self.x_beam_offset = kwargs["x_beam_offset"]
+        if "y_beam_offset" in kwargs:
+            self.y_beam_offset = kwargs["y_beam_offset"]
 
         self.enable_kick_x = True
         self.enable_kick_y = True
-        if 'enable_kick_x' in kwargs:
-            self.enable_kick_x = kwargs['enable_kick_x']
+        if "enable_kick_x" in kwargs:
+            self.enable_kick_x = kwargs["enable_kick_x"]
         if not self.enable_kick_x:
-            print('Horizontal kick on the beam is disabled!')
-        if 'enable_kick_y' in kwargs:
-            self.enable_kick_y = kwargs['enable_kick_y']
+            print("Horizontal kick on the beam is disabled!")
+        if "enable_kick_y" in kwargs:
+            self.enable_kick_y = kwargs["enable_kick_y"]
         if not self.enable_kick_y:
-            print('Vertical kick on the beam is disabled!')
+            print("Vertical kick on the beam is disabled!")
 
         # initialize proton density probes
         self.save_ele_field_probes = False
@@ -172,25 +320,25 @@ class Ecloud(object):
         self.y_probes = -1
         self.Ex_ele_last_track_at_probes = -1
         self.Ey_ele_last_track_at_probes = -1
-        if 'probes_position' in kwargs.keys():
+        if "probes_position" in list(kwargs.keys()):
             self.save_ele_field_probes = True
-            self.probes_position = kwargs['probes_position']
+            self.probes_position = kwargs["probes_position"]
             self.N_probes = len(self.probes_position)
             self.x_probes = []
             self.y_probes = []
-            for ii_probe in xrange(self.N_probes):
-                self.x_probes.append(self.probes_position[ii_probe]['x'])
-                self.y_probes.append(self.probes_position[ii_probe]['y'])
+            for ii_probe in range(self.N_probes):
+                self.x_probes.append(self.probes_position[ii_probe]["x"])
+                self.y_probes.append(self.probes_position[ii_probe]["y"])
 
             self.x_probes = np.array(self.x_probes)
             self.y_probes = np.array(self.y_probes)
 
         self.N_tracks = 0
 
-        #self.cloudsim.spacech_ele.flag_decimate = False
+        # self.cloudsim.spacech_ele.flag_decimate = False
 
         if self.cloudsim.flag_multiple_clouds:
-            raise ValueError('Multiple clouds not yet tested in PyEC4PyHT!')
+            raise ValueError("Multiple clouds not yet tested in PyEC4PyHT!")
 
         self.save_ele_distributions_last_track = False
         self.save_ele_potential_and_field = False
@@ -199,7 +347,7 @@ class Ecloud(object):
         self.save_ele_MP_position = False
         self.save_ele_MP_velocity = False
         self.save_ele_MP_size = False
-        
+
         self.save_beam_distributions_last_track = False
         self.save_beam_potential_and_field = False
         self.save_beam_potential = False
@@ -207,7 +355,9 @@ class Ecloud(object):
 
         self.track_only_first_time = False
 
-        self.initial_MP_e_clouds = [cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list]
+        self.initial_MP_e_clouds = [
+            cl.MP_e.extract_dict() for cl in self.cloudsim.cloud_list
+        ]
 
         self.flag_clean_slices = flag_clean_slices
 
@@ -215,10 +365,11 @@ class Ecloud(object):
 
         self.slice_by_slice_mode = slice_by_slice_mode
         if self.slice_by_slice_mode:
+            assert(slicer is None)
             self.track = self._track_in_single_slice_mode
             self.finalize_and_reinitialize = self._finalize_and_reinitialize
 
-        self.spacech_ele = self.cloudsim.spacech_ele # For backwards compatibility
+        self.spacech_ele = self.cloudsim.spacech_ele  # For backwards compatibility
 
         self.kick_mode_for_beam_field = kick_mode_for_beam_field
         self.beam_monitor = beam_monitor
@@ -227,7 +378,7 @@ class Ecloud(object):
         self.save_pyecl_outp_as = save_pyecl_outp_as
 
         self.i_reinit = 0
-        self.t_sim = 0.
+        self.t_sim = 0.0
         self.i_curr_bunch = -1
 
     #    @profile
@@ -235,7 +386,7 @@ class Ecloud(object):
 
         if self.track_only_first_time:
             if self.N_tracks > 0:
-                print 'Warning: Track skipped because track_only_first_time is True.'
+                print("Warning: Track skipped because track_only_first_time is True.")
                 return
 
         if self.verbose:
@@ -243,23 +394,23 @@ class Ecloud(object):
 
         self._reinitialize()
 
-        if hasattr(beam.particlenumber_per_mp, '__iter__'):
-            raise ValueError('ecloud module assumes same size for all beam MPs')
+        if hasattr(beam.particlenumber_per_mp, "__iter__"):
+            raise ValueError("ecloud module assumes same size for all beam MPs")
 
         if self.flag_clean_slices:
             beam.clean_slices()
 
         slices = beam.get_slices(self.slicer)
 
-        for i in xrange(slices.n_slices - 1, -1, -1):
+        for i in range(slices.n_slices - 1, -1, -1):
             if self.verbose:
-                print('Slice %d/%d'%(i, slices.n_slices))
+                print(("Slice %d/%d" % (i, slices.n_slices)))
 
             # select particles in the slice
             ix = slices.particle_indices_of_slice(i)
 
             # slice size and time step
-            dz = (slices.z_bins[i + 1] - slices.z_bins[i])
+            dz = slices.z_bins[i + 1] - slices.z_bins[i]
 
             self._track_single_slice(beam, ix, dz, force_pyecl_newpass=(i == 0))
 
@@ -271,24 +422,33 @@ class Ecloud(object):
 
         if self.verbose:
             stop_time = time.mktime(time.localtime())
-            print 'Done track %d in %.1f s'%(self.N_tracks, stop_time - start_time)
+            print("Done track %d in %.1f s" % (self.N_tracks, stop_time - start_time))
 
         self.N_tracks += 1
 
     def replace_with_recorded_field_map(self, delete_ecloud_data=True):
 
         if self.track_only_first_time:
-            print 'Warning: replace_with_recorded_field_map resets track_only_first_time = False'
+            print(
+                "Warning: replace_with_recorded_field_map resets track_only_first_time = False"
+            )
             self.track_only_first_time = False
 
-        if not hasattr(self, 'efieldmap'):
-            from Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
-            self.efieldmap = Transverse_Efield_map(xg=self.spacech_ele.xg, yg=self.spacech_ele.yg,
-                                                   Ex=self.Ex_ele_last_track, Ey=self.Ey_ele_last_track, L_interaction=self.L_ecloud,
-                                                   slicer=self.slicer,
-                                                   flag_clean_slices=True,
-                                                   x_beam_offset=self.x_beam_offset, y_beam_offset=self.y_beam_offset,
-                                                   slice_by_slice_mode=self.slice_by_slice_mode)
+        if not hasattr(self, "efieldmap"):
+            from .Transverse_Efield_map_for_frozen_cloud import Transverse_Efield_map
+
+            self.efieldmap = Transverse_Efield_map(
+                xg=self.spacech_ele.xg,
+                yg=self.spacech_ele.yg,
+                Ex=self.Ex_ele_last_track,
+                Ey=self.Ey_ele_last_track,
+                L_interaction=self.L_ecloud,
+                slicer=self.slicer,
+                flag_clean_slices=True,
+                x_beam_offset=self.x_beam_offset,
+                y_beam_offset=self.y_beam_offset,
+                slice_by_slice_mode=self.slice_by_slice_mode,
+            )
 
             self._ecloud_track = self.track
 
@@ -300,14 +460,16 @@ class Ecloud(object):
                 self.cloudsim = None
 
         else:
-            print 'Warning: efieldmap already exists. I do nothing.'
+            print("Warning: efieldmap already exists. I do nothing.")
 
-    def track_once_and_replace_with_recorded_field_map(self, bunch, delete_ecloud_data=True):
+    def track_once_and_replace_with_recorded_field_map(
+        self, bunch, delete_ecloud_data=True
+    ):
         self.save_ele_field = True
         self.track_only_first_time = True
         if self.slice_by_slice_mode:
-            if not hasattr(bunch, '__iter__'):
-                raise ValueError('A list of slices should be provided!')
+            if not hasattr(bunch, "__iter__"):
+                raise ValueError("A list of slices should be provided!")
             self._reinitialize()
             for slc in bunch:
                 self.track(slc)
@@ -323,9 +485,9 @@ class Ecloud(object):
         spacech_ele = self.cloudsim.spacech_ele
 
         # Check if the slice interacts with the beam
-        if hasattr(slic, 'slice_info'):
-            if 'interact_with_EC' in slic.slice_info.keys():
-                interact_with_EC = slic.slice_info['interact_with_EC']
+        if hasattr(slic, "slice_info"):
+            if "interact_with_EC" in list(slic.slice_info.keys()):
+                interact_with_EC = slic.slice_info["interact_with_EC"]
             else:
                 interact_with_EC = True
         else:
@@ -335,12 +497,16 @@ class Ecloud(object):
         dt_slice = dz / (slic.beta * c)
 
         # Check if sub-slicing is needed
-        if self.cloudsim.config_dict['Dt'] is not None:
-            if dt_slice > self.cloudsim.config_dict['Dt']:
+        if self.cloudsim.config_dict["Dt"] is not None:
+            if dt_slice > self.cloudsim.config_dict["Dt"]:
                 if interact_with_EC:
-                    raise ValueError('Slices that interact with the cloud cannot be longer than the buildup timestep!')
+                    raise ValueError(
+                        "Slices that interact with the cloud cannot be longer than the buildup timestep!"
+                    )
 
-                N_cloud_steps = np.int_(np.ceil(dt_slice / self.cloudsim.config_dict['Dt']))
+                N_cloud_steps = np.int_(
+                    np.ceil(dt_slice / self.cloudsim.config_dict["Dt"])
+                )
                 dt_cloud_step = dt_slice / N_cloud_steps
                 dt_array = np.array(N_cloud_steps * [dt_cloud_step])
             else:
@@ -349,16 +515,19 @@ class Ecloud(object):
             dt_array = np.array([dt_slice])
 
         # Acquire bunch passage information
-        if hasattr(slic, 'slice_info'):
-            if 'info_parent_bunch' in slic.slice_info.keys():
+        if hasattr(slic, "slice_info"):
+            if "info_parent_bunch" in list(slic.slice_info.keys()):
 
                 # check if first slice of first bunch
-                if slic.slice_info['info_parent_bunch']['i_bunch'] == 0 and slic.slice_info['i_slice'] == 0:
+                if (
+                    slic.slice_info["info_parent_bunch"]["i_bunch"] == 0
+                    and slic.slice_info["i_slice"] == 0
+                ):
                     self.finalize_and_reinitialize()
 
                 # check if new passage
-                if slic.slice_info['info_parent_bunch']['i_bunch'] > self.i_curr_bunch:
-                    self.i_curr_bunch = slic.slice_info['info_parent_bunch']['i_bunch']
+                if slic.slice_info["info_parent_bunch"]["i_bunch"] > self.i_curr_bunch:
+                    self.i_curr_bunch = slic.slice_info["info_parent_bunch"]["i_bunch"]
                     new_pass = True
                 else:
                     new_pass = force_pyecl_newpass
@@ -380,44 +549,49 @@ class Ecloud(object):
                 N_sub_steps = 1
 
             Dt_substep = dt / N_sub_steps
-            #print Dt_substep, N_sub_steps, dt
+            # print Dt_substep, N_sub_steps, dt
 
             if len(ix) == 0 or not interact_with_EC:  # no particles in the beam
 
-                #build dummy beamtim object
+                # build dummy beamtim object
                 dummybeamtim = DummyBeamTim(None)
 
-                dummybeamtim.lam_t_curr = 0.
-                dummybeamtim.sigmax = 0.
-                dummybeamtim.sigmay = 0.
-                dummybeamtim.x_beam_pos = 0.
-                dummybeamtim.y_beam_pos = 0.
+                dummybeamtim.lam_t_curr = 0.0
+                dummybeamtim.sigmax = 0.0
+                dummybeamtim.sigmay = 0.0
+                dummybeamtim.x_beam_pos = 0.0
+                dummybeamtim.y_beam_pos = 0.0
             else:
 
                 # beam field
                 self.beam_PyPIC_state.scatter(
                     x_mp=slic.x[ix] + self.x_beam_offset,
                     y_mp=slic.y[ix] + self.y_beam_offset,
-                    nel_mp=slic.x[ix] * 0. + slic.particlenumber_per_mp / dz,
-                    charge=slic.charge)
+                    nel_mp=slic.x[ix] * 0.0 + slic.particlenumber_per_mp / dz,
+                    charge=slic.charge,
+                )
                 self.cloudsim.spacech_ele.PyPICobj.solve_states([self.beam_PyPIC_state])
 
-                #build dummy beamtim object
+                # build dummy beamtim object
                 dummybeamtim = DummyBeamTim(self.beam_PyPIC_state)
 
-                dummybeamtim.lam_t_curr = np.mean(slic.particlenumber_per_mp / dz) * len(ix)
+                dummybeamtim.lam_t_curr = np.mean(
+                    slic.particlenumber_per_mp / dz
+                ) * len(ix)
                 dummybeamtim.sigmax = np.std(slic.x[ix])
                 dummybeamtim.sigmay = np.std(slic.y[ix])
                 dummybeamtim.x_beam_pos = np.mean(slic.x[ix]) + self.x_beam_offset
                 dummybeamtim.y_beam_pos = np.mean(slic.y[ix]) + self.y_beam_offset
 
-            dummybeamtim.tt_curr = self.t_sim # In order to have the PIC activated
+            dummybeamtim.tt_curr = self.t_sim  # In order to have the PIC activated
             dummybeamtim.Dt_curr = dt
             dummybeamtim.pass_numb = self.i_curr_bunch
             dummybeamtim.flag_new_bunch_pass = new_pass
 
             # Force space charge recomputation
-            force_recompute_space_charge = interact_with_EC or (i_clou_step == 0) # we always force at the first step, as we don't know the state of the PIC
+            force_recompute_space_charge = interact_with_EC or (
+                i_clou_step == 0
+            )  # we always force at the first step, as we don't know the state of the PIC
 
             # Disable cleanings and regenerations
             skip_MP_cleaning = interact_with_EC
@@ -426,11 +600,17 @@ class Ecloud(object):
             # print(dummybeamtim.tt_curr, dummybeamtim.flag_new_bunch_pass, force_recompute_space_charge)
 
             # Perform cloud simulation step
-            self.cloudsim.sim_time_step(beamtim_obj=dummybeamtim,
-                                        Dt_substep_custom=Dt_substep, N_sub_steps_custom=N_sub_steps,
-                                        kick_mode_for_beam_field=self.kick_mode_for_beam_field,
-                                        force_recompute_space_charge=force_recompute_space_charge,
-                                        skip_MP_cleaning=skip_MP_cleaning, skip_MP_regen=skip_MP_regen)
+            self.cloudsim.sim_time_step(
+                beamtim_obj=dummybeamtim,
+                Dt_substep_custom=Dt_substep,
+                N_sub_steps_custom=N_sub_steps,
+                kick_mode_for_beam_field=self.kick_mode_for_beam_field,
+                force_recompute_space_charge=force_recompute_space_charge,
+                skip_MP_cleaning=skip_MP_cleaning,
+                skip_MP_regen=skip_MP_regen,
+                force_reinterp_fields_at_substeps=(interact_with_EC
+                    and self.force_interp_at_substeps_interacting_slices)
+            )
 
             if interact_with_EC:
                 # Build MP_system-like object with beam coordinates
@@ -443,7 +623,11 @@ class Ecloud(object):
                 Ex_sc_p, Ey_sc_p = spacech_ele.get_sc_eletric_field(MP_p)
 
                 ## kick beam particles
-                fact_kick = slic.charge / (slic.mass * slic.beta * slic.beta * slic.gamma * c * c) * self.L_ecloud
+                fact_kick = (
+                    slic.charge
+                    / (slic.mass * slic.beta * slic.beta * slic.gamma * c * c)
+                    * self.L_ecloud
+                )
                 if self.enable_kick_x:
                     slic.xp[ix] += fact_kick * Ex_sc_p
                 if self.enable_kick_y:
@@ -483,14 +667,18 @@ class Ecloud(object):
             if self.save_ele_MP_size:
                 self.nel_MP_last_track.append(MPe_for_save.nel_mp.copy())
 
-            if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
+            if (
+                self.save_ele_MP_position
+                or self.save_ele_MP_velocity
+                or self.save_ele_MP_size
+            ):
                 self.N_MP_last_track.append(MPe_for_save.N_mp)
 
             if self.save_ele_field_probes:
                 MP_probes = Empty()
                 MP_probes.x_mp = self.x_probes
                 MP_probes.y_mp = self.y_probes
-                MP_probes.nel_mp = self.x_probes * 0. + 1.  # fictitious charge of 1 C
+                MP_probes.nel_mp = self.x_probes * 0.0 + 1.0  # fictitious charge of 1 C
                 MP_probes.N_mp = len(self.x_probes)
                 Ex_sc_probe, Ey_sc_probe = spacech_ele.get_sc_eletric_field(MP_probes)
 
@@ -498,13 +686,15 @@ class Ecloud(object):
                 self.Ey_ele_last_track_at_probes.append(Ey_sc_probe.copy())
 
             self.t_sim += dt
-            new_pass = False # it can be true only for the first sub-slice of a slice
+            new_pass = False  # it can be true only for the first sub-slice of a slice
 
     def _reinitialize(self):
 
         cc = mlm.obj_from_dict(self.cloudsim.config_dict)
 
-        for thiscloud, initdict in zip(self.cloudsim.cloud_list, self.initial_MP_e_clouds):
+        for thiscloud, initdict in zip(
+            self.cloudsim.cloud_list, self.initial_MP_e_clouds
+        ):
             thiscloud.MP_e.init_from_dict(initdict)
             thiscloud.MP_e.set_nel_mp_ref(thiscloud.MP_e.nel_mp_ref_0)
 
@@ -512,19 +702,45 @@ class Ecloud(object):
 
             if thiscloud.pyeclsaver is not None:
                 thiscloud.pyeclsaver.extract_sey = False
-                thiscloud.pyeclsaver.start_observing(cc.Dt, thiscloud.MP_e, None, thiscloud.impact_man,
-                                                     thisconf.r_center, thisconf.Dt_En_hist, thisconf.logfile_path, thisconf.progress_path,
-                                                     flag_detailed_MP_info=thisconf.flag_detailed_MP_info, flag_movie=thisconf.flag_movie,
-                                                     flag_sc_movie=thisconf.flag_sc_movie, save_mp_state_time_file=thisconf.save_mp_state_time_file,
-                                                     flag_presence_sec_beams=self.cloudsim.flag_presence_sec_beams, sec_beams_list=self.cloudsim.sec_beams_list, dec_fac_secbeam_prof=thisconf.dec_fac_secbeam_prof,
-                                                     el_density_probes=thisconf.el_density_probes, save_simulation_state_time_file=thisconf.save_simulation_state_time_file,
-                                                     x_min_hist_det=thisconf.x_min_hist_det, x_max_hist_det=thisconf.x_max_hist_det,
-                                                     y_min_hist_det=thisconf.y_min_hist_det, y_max_hist_det=thisconf.y_max_hist_det,
-                                                     Dx_hist_det=thisconf.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thisconf.filen_main_outp,
-                                                     flag_cos_angle_hist=thisconf.flag_cos_angle_hist, cos_angle_width=thisconf.cos_angle_width,
-                                                     flag_multiple_clouds=(len(self.cloudsim.cloud_list) > 1), cloud_name=thisconf.cloud_name, flag_last_cloud=(thiscloud is self.cloudsim.cloud_list[-1]))
+                thiscloud.pyeclsaver.start_observing(
+                    cc.Dt,
+                    thiscloud.MP_e,
+                    None,
+                    thiscloud.impact_man,
+                    thisconf.r_center,
+                    thisconf.Dt_En_hist,
+                    thisconf.logfile_path,
+                    thisconf.progress_path,
+                    flag_detailed_MP_info=thisconf.flag_detailed_MP_info,
+                    flag_movie=thisconf.flag_movie,
+                    flag_sc_movie=thisconf.flag_sc_movie,
+                    save_mp_state_time_file=thisconf.save_mp_state_time_file,
+                    flag_presence_sec_beams=self.cloudsim.flag_presence_sec_beams,
+                    sec_beams_list=self.cloudsim.sec_beams_list,
+                    dec_fac_secbeam_prof=thisconf.dec_fac_secbeam_prof,
+                    el_density_probes=thisconf.el_density_probes,
+                    save_simulation_state_time_file=thisconf.save_simulation_state_time_file,
+                    x_min_hist_det=thisconf.x_min_hist_det,
+                    x_max_hist_det=thisconf.x_max_hist_det,
+                    y_min_hist_det=thisconf.y_min_hist_det,
+                    y_max_hist_det=thisconf.y_max_hist_det,
+                    Dx_hist_det=thisconf.Dx_hist_det,
+                    dec_fact_out=cc.dec_fact_out,
+                    stopfile=cc.stopfile,
+                    filen_main_outp=thisconf.filen_main_outp,
+                    flag_cos_angle_hist=thisconf.flag_cos_angle_hist,
+                    cos_angle_width=thisconf.cos_angle_width,
+                    flag_multiple_clouds=(len(self.cloudsim.cloud_list) > 1),
+                    cloud_name=thisconf.cloud_name,
+                    flag_last_cloud=(thiscloud is self.cloudsim.cloud_list[-1]),
+                )
 
-                thiscloud.pyeclsaver.filen_main_outp = thiscloud.pyeclsaver.filen_main_outp.split('.mat')[0].split('__iter')[0] + '__iter%d.mat'%self.i_reinit
+                thiscloud.pyeclsaver.filen_main_outp = (
+                    thiscloud.pyeclsaver.filen_main_outp.split(".mat")[0].split(
+                        "__iter"
+                    )[0]
+                    + "__iter%d.mat" % self.i_reinit
+                )
 
         if self.save_ele_distributions_last_track:
             self.rho_ele_last_track = []
@@ -565,14 +781,18 @@ class Ecloud(object):
         if self.save_ele_MP_size:
             self.nel_MP_last_track = []
 
-        if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
+        if (
+            self.save_ele_MP_position
+            or self.save_ele_MP_velocity
+            or self.save_ele_MP_size
+        ):
             self.N_MP_last_track = []
 
         if self.save_ele_field_probes:
             self.Ex_ele_last_track_at_probes = []
             self.Ey_ele_last_track_at_probes = []
 
-        #~ self.t_sim = 0.
+        # ~ self.t_sim = 0.
         self.i_curr_bunch = -1
         self.i_reinit += 1
 
@@ -587,7 +807,7 @@ class Ecloud(object):
         if self.save_ele_field:
             self.Ex_ele_last_track = np.array(self.Ex_ele_last_track[::-1])
             self.Ey_ele_last_track = np.array(self.Ey_ele_last_track[::-1])
-        
+
         if self.save_beam_distributions_last_track:
             self.rho_beam_last_track = np.array(self.rho_beam_last_track[::-1])
 
@@ -609,33 +829,40 @@ class Ecloud(object):
         if self.save_ele_MP_size:
             self.nel_MP_last_track = np.array(self.nel_MP_last_track[::-1])
 
-        if self.save_ele_MP_position or self.save_ele_MP_velocity or self.save_ele_MP_size:
-                self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])
+        if (
+            self.save_ele_MP_position
+            or self.save_ele_MP_velocity
+            or self.save_ele_MP_size
+        ):
+            self.N_MP_last_track = np.array(self.N_MP_last_track[::-1])
 
         if self.save_ele_field_probes:
-            self.Ex_ele_last_track_at_probes = np.array(self.Ex_ele_last_track_at_probes[::-1])
-            self.Ey_ele_last_track_at_probes = np.array(self.Ey_ele_last_track_at_probes[::-1])
+            self.Ex_ele_last_track_at_probes = np.array(
+                self.Ex_ele_last_track_at_probes[::-1]
+            )
+            self.Ey_ele_last_track_at_probes = np.array(
+                self.Ey_ele_last_track_at_probes[::-1]
+            )
 
     def _finalize_and_reinitialize(self):
-        print('Exec. finalize and reinitialize')
+        print("Exec. finalize and reinitialize")
         self._finalize()
         self._reinitialize()
 
     def _track_in_single_slice_mode(self, beam):
 
-        if hasattr(beam.particlenumber_per_mp, '__iter__'):
-            raise ValueError('ecloud module assumes same size for all beam MPs')
+        if hasattr(beam.particlenumber_per_mp, "__iter__"):
+            raise ValueError("ecloud module assumes same size for all beam MPs")
 
         if self.flag_clean_slices:
-            raise ValueError(
-                'track cannot clean the slices in slice-by-slice mode! ')
+            raise ValueError("track cannot clean the slices in slice-by-slice mode! ")
 
-        if beam.slice_info != 'unsliced':
-            dz = beam.slice_info['z_bin_right'] - beam.slice_info['z_bin_left']
-            self._track_single_slice(beam, ix=np.arange(beam.macroparticlenumber), dz=dz)
+        if beam.slice_info != "unsliced":
+            dz = beam.slice_info["z_bin_right"] - beam.slice_info["z_bin_left"]
+            self._track_single_slice(
+                beam, ix=np.arange(beam.macroparticlenumber), dz=dz
+            )
 
     def remove_savers(self):
         for thiscloud in self.cloudsim.cloud_list:
             thiscloud.pyeclsaver = None
-
-

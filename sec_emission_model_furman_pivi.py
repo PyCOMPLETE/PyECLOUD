@@ -7,7 +7,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 7.6.0
+#                   PyECLOUD Version 8.5.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -19,6 +19,7 @@
 #
 #     Contributors:         Eleonora Belli
 #                           Philipp Dijkstal
+#                           Lorenzo Giacomel
 #                           Lotta Mether
 #                           Annalisa Romano
 #                           Giovanni Rumolo
@@ -58,8 +59,33 @@ from scipy.special import gammaincinv
 from scipy.special import binom
 from scipy.special import erf
 from scipy.special import erfinv
-from scipy.misc import factorial
-import electron_emission as ee
+from . import electron_emission as ee
+
+_factorial = np.array([1,
+                       1,
+                       2,
+                       6,
+                       24,
+                       120,
+                       720,
+                       5040,
+                       40320,
+                       362880,
+                       3628800,
+                       39916800,
+                       479001600,
+                       6227020800,
+                       87178291200,
+                       1307674368000,
+                       20922789888000,
+                       355687428096000,
+                       6402373705728000,
+                       121645100408832000,
+                       2432902008176640000])
+
+
+def factorial(n):
+    return _factorial[np.array(n)]
 
 
 class SEY_model_furman_pivi():
@@ -92,6 +118,7 @@ class SEY_model_furman_pivi():
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
         # General FP model parameters
+        self.use_modified_sigmaE = furman_pivi_surface['use_modified_sigmaE']
         self.use_ECLOUD_theta0_dependence = furman_pivi_surface['use_ECLOUD_theta0_dependence']
         self.use_ECLOUD_energy = furman_pivi_surface['use_ECLOUD_energy']
         self.conserve_energy = furman_pivi_surface['conserve_energy']
@@ -135,9 +162,9 @@ class SEY_model_furman_pivi():
             self.t4 = furman_pivi_surface['t4']
 
         if self.exclude_rediffused:
-            print('Secondary emission model: Furman-Pivi excluding rediffused, s=%.4f' % (self.s))
+            print(('Secondary emission model: Furman-Pivi excluding rediffused, s=%.4f' % (self.s)))
         else:
-            print('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s))
+            print(('Secondary emission model: Furman-Pivi, s=%.4f' % (self.s)))
 
     def SEY_model_evol(self, Dt):
         pass
@@ -151,15 +178,13 @@ class SEY_model_furman_pivi():
         """
         # Furman-Pivi algorithm
         # (1): Compute emission angles and energy
-
-        # Already implemented in the impact_man class.
+        # Implemented in the impact_management_class.
 
         # (2): Compute delta_e, delta_r, delta_ts
         delta_e, delta_r, delta_ts = self.yield_fun_furman_pivi(E_impact_eV, costheta_impact)
 
-        # (3): Generate probability of number electrons created
-
-        # Emission probability per penetrated electron
+        # (3): Generate probability of number of electrons created
+        # Implemented in the impact_management_class.
 
         # Decide on type
         rand = random.rand(E_impact_eV.size)
@@ -243,6 +268,7 @@ class SEY_model_furman_pivi():
         return delta_ts0 * angular_factor
 
     def _D(self, x):
+        """(32) in FP paper"""
         s = self.s
         return s * x / (s - 1 + x**s)
 
@@ -253,7 +279,16 @@ class SEY_model_furman_pivi():
         """
         sqrt2 = np.sqrt(2)
         uu = random.rand(len(E_0))
-        return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
+
+        if self.use_modified_sigmaE:
+            aa = 1.88
+            bb = 2.5
+            cc = 1e-2
+            dd = 1.5e2
+            sigmaE_modified = (self.sigmaE - aa) + bb * (1 + np.tanh(cc * (E_0 - dd)))
+            return E_0 + sqrt2 * sigmaE_modified * erfinv((uu - 1) * erf(E_0 / (sqrt2 * sigmaE_modified)))
+        else:
+            return E_0 + sqrt2 * self.sigmaE * erfinv((uu - 1) * erf(E_0 / (sqrt2 * self.sigmaE)))
 
     def get_energy_rediffused(self, E0):
         """
@@ -395,33 +430,35 @@ class SEY_model_furman_pivi():
 
                 # Generate new MP properties, angles and energies
                 n_emit_truesec_MPs_extended = np.repeat(n_emit_truesec_MPs_flag_true_sec, n_add[flag_truesec])
-
                 En_truesec_eV_add = self.get_energy_true_sec(nn=n_emit_truesec_MPs_extended, E_0=E_impact_eV_add)
 
                 # Ensure energy conservation in each event
                 if self.conserve_energy:
-                    En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])
-                    E_impact_eV_add = np.repeat(E_impact_eV[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])
+                    En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])  # Energy of replaced MPs
+                    E_impact_eV_add = np.repeat(E_impact_eV[flag_truesec][flag_above_zero], n_add[flag_truesec][flag_above_zero])  # Energy of new MPs
+                    En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add  # Total energy emitted in each trusec event
 
-                    En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add
-                    flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
-                    flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)
+                    flag_violation = (En_emit_eV_event_add > E_impact_eV_add)  # Violation flag for the new MPs
+                    flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)  # Violation flag for the replaced MPs
 
                     N_violations = np.sum(flag_violation)
                     while N_violations > 0:
+                        # Regenerating energies for the new MPs
                         En_truesec_eV_add[flag_violation] = self.get_energy_true_sec(
                             nn=n_emit_truesec_MPs_extended[flag_violation],
                             E_0=E_impact_eV_add[flag_violation])
 
+                        # Regenerating energies for the replaced MPs
                         En_truesec_eV[flag_violation_replace] = self.get_energy_true_sec(
                             nn=n_emit_truesec_MPs_flag_true_sec[flag_above_zero][flag_violation_replace],
                             E_0=E_impact_eV[flag_truesec][flag_above_zero][flag_violation_replace])
 
                         En_truesec_eV_extended = np.repeat(En_truesec_eV, n_add[flag_truesec][flag_above_zero])
-
                         En_emit_eV_event_add = En_truesec_eV_extended + En_truesec_eV_add
+
                         flag_violation = (En_emit_eV_event_add > E_impact_eV_add)
                         flag_violation_replace = self.inverse_repeat(flag_violation, repeats=n_add[flag_truesec][flag_above_zero], axis=None)
+
                         N_violations = np.sum(flag_violation)
 
                 # Replace velocities
@@ -456,9 +493,6 @@ class SEY_model_furman_pivi():
             vz_new_MPs = np.array([])
             i_seg_new_MPs = np.array([])
 
-        # extended_nel_emit_tot_events used for extraction of energy distributions
-        # extended_nel_emit_tot_events = np.concatenate([nel_replace, nel_new_MPs])
-
         # Elastic and rediffused events emit 1 MP
         n_emit_MPs = n_emit_truesec_MPs
         n_emit_MPs[flag_backscattered] = 1
@@ -466,13 +500,7 @@ class SEY_model_furman_pivi():
             n_emit_MPs[flag_rediffused] = 1
 
         nel_emit_tot_events = nel_impact * n_emit_MPs
-        # if np.isclose(np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), atol=1e-3):
-        #     pass
-        # else:
-        #     raise ValueError('There is something wrong in the adding of new MPs\nnel_emit_tot_events: %d\nextended_nel_emit_tot_events: %d\nnel_replace + nel_new: %d' % (np.sum(nel_emit_tot_events), np.sum(extended_nel_emit_tot_events), np.sum(nel_replace) + np.sum(nel_new_MPs)))
-
         events = flag_truesec.astype(int)
-
         events[n_emit_MPs == 0] = 3  # Absorbed MPs
 
         if self.exclude_rediffused:
@@ -481,14 +509,13 @@ class SEY_model_furman_pivi():
             events = events + 2 * flag_rediffused.astype(int)
         event_type = events
 
+        # extended_event_type keeps track of the event type for new MPs, it is
+        # needed for the extraction of emission-energy distributions.
         if n_add_total != 0:
             events_add = np.repeat(events, n_add)
             events = np.concatenate([events, events_add])
         extended_event_type = events
 
-        # event_info = {'extended_nel_emit_tot_events': extended_nel_emit_tot_events,
-        #               'extended_event_type': extended_event_type,
-        #               }
         event_info = {'extended_event_type': extended_event_type,
                       }
 
@@ -500,8 +527,17 @@ class SEY_model_furman_pivi():
     #  The following functions are not used in the simulation code but are     #
     #  provided here for use in tests and development.                         #
     ############################################################################
-    def backscattered_energy_PDF(self, energy, E_0, sigma_e=2.):
+    def backscattered_energy_PDF(self, energy, E_0):
         """The PDF for backscattered electrons."""
+        if self.use_modified_sigmaE:
+            aa = 1.88
+            bb = 2.5
+            cc = 1e-2
+            dd = 1.5e2
+            sigmaE_modified = (self.sigmaE - aa) + bb * (1 + np.tanh(cc * (E_0 - dd)))
+            sigma_e = sigmaE_modified
+        else:
+            sigma_e = self.sigmaE
         ene = energy - E_0
         a = 2 * np.exp(-(ene)**2 / (2 * sigma_e**2))
         c = (np.sqrt(2 * np.pi) * sigma_e * erf(E_0 / (np.sqrt(2) * sigma_e)))

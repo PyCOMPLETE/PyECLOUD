@@ -38,9 +38,9 @@ ec = sim.cloud_list[0]
 
 for ii, t_stop in enumerate(t_stop_list):
     print('\n\n==============================')
-    print('Simulation run %d - t_stop = %s s'%(ii, repr(t_stop))) 
-    print(' starting at tt=%s s'%repr(sim.beamtim.tt_curr)) 
+    print(('Simulation run %d - t_stop = %s s'%(ii, repr(t_stop)))) 
+    print((' starting at tt=%s s'%repr(sim.beamtim.tt_curr))) 
     
     sim.run(t_end_sim = t_stop)
     
-    print(' after run a tt=%s'%repr(sim.beamtim.tt_curr))
+    print((' after run a tt=%s'%repr(sim.beamtim.tt_curr)))
