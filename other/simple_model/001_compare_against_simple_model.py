@@ -8,7 +8,7 @@ i_det = 6
 ob = mfm.myloadmat_to_obj('Pyecltest.mat')
 
 plt.close('all')
-ms.mystyle_arial(fontsz=14, dist_tick_lab=5)
+ms.mystyle_arial(fontsz=14, dist_tick_lab=5, traditional_look=False)
 fig1 = plt.figure(1)
 sp1 = fig1.add_subplot(1,1,1)
 sp1.semilogy(ob.t/ob.b_spac, ob.Nel_timep)
@@ -123,5 +123,28 @@ sp1.plot(N_after_impact, '.r')
 # fig100 = plt.figure(100)
 # sp100 = fig100.add_subplot(1,1,1)
 # sp100.plot(E_vect, phi_emit(E_vect))
+
+# Figure for Handbook
+fig4 = plt.figure(4)
+sp1 = plt.subplot2grid(fig=fig4, shape=(1,3), loc=(0,0), colspan=2)
+sp2 = plt.subplot2grid(fig=fig4, shape=(1,3), loc=(0,2), colspan=1,
+                       sharey=sp1)
+
+sp1.semilogx(N_vect, E_minus_vect, color='C0')
+sp1.semilogx(N_vect, E_plus_vect, color='C0')
+sp1.fill_between(x=N_vect, y1=E_minus_vect, y2=E_plus_vect,
+                 alpha=0.5)
+
+E = np.linspace(0, 25, 1000)
+sp2.plot(phi_emit(E), E)
+sp2.fill_betweenx(x2=phi_emit(E), x1=0, y=E, alpha=0.5)
+
+sp1.set_xlim(1e6, 3e10)
+sp1.set_ylim(0, 20)
+sp2.set_xlim(left=0)
+sp1.set_ylabel('Electron energy (eV)')
+sp1.set_xlabel(r'Electron  density (m$^{-1}$)')
+sp2.set_xlabel(r'$\phi_{emit}(E)$')
+plt.setp(sp2.get_yticklabels(), visible=False)
 
 plt.show()
