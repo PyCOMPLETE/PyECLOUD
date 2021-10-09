@@ -15,7 +15,7 @@ save_once_custom_observables = {
         'mufit': lambda sim: sim.cloud_list[0].impact_man.sey_mod.mufit
          }
 
-sim = BuildupSimulation(pyecl_input_folder=sim_input_folder, 
+sim = BuildupSimulation(pyecl_input_folder=sim_input_folder,
         filen_main_outp='./Pyecltest.mat',
         extract_sey=False,
         save_once_custom_observables = save_once_custom_observables
@@ -24,4 +24,4 @@ sim = BuildupSimulation(pyecl_input_folder=sim_input_folder,
 ec = sim.cloud_list[0]
 
 sim.run(t_end_sim = t_stop)
-    
+

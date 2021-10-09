@@ -15,7 +15,7 @@ sp1.semilogy(ob.t/ob.b_spac, ob.Nel_timep)
 
 fig2 = plt.figure()
 sp21 = fig2.add_subplot(2,1,1)
-mask_det = np.logical_and(ob.t>=i_det*ob.b_spac, ob.t<(i_det+1)*ob.b_spac) 
+mask_det = np.logical_and(ob.t>=i_det*ob.b_spac, ob.t<(i_det+1)*ob.b_spac)
 t_det = ob.t[mask_det]
 t_det -= t_det[0]
 
@@ -32,7 +32,7 @@ from scipy.constants import epsilon_0
 from scipy.constants import m_e
 
 # Compute representative kick
-Dp_bar = 3./4. * qe**2 * N_b/(np.pi*epsilon_0*clight*R)
+Dp_bar = 3./4. * qe**2 * N_b/(np.pi*epsilon_0*clight*R)*2/3
 E_bar_J = Dp_bar**2/(2*m_e)
 E_bar_eV = E_bar_J/qe
 
@@ -54,10 +54,10 @@ def phi_emit(E):
 
 def compute_P_surv(N):
     tanh2 = (np.tanh(0.5*np.sqrt(k_ele*N)*ob.b_spac))**2
-    
+
     E_minus_eV = 0.5*m_e*k_ele*N*R**2*tanh2/qe
     E_plus_eV = 0.5*m_e*k_ele*N*R**2/tanh2/qe
-    
+
     E_vect = np.linspace(E_minus_eV, E_plus_eV, 1000)
     P_surv = np.trapz(phi_emit(E_vect), E_vect)
 
@@ -70,7 +70,7 @@ P_surv_vect = N_vect*0
 E_minus_vect = N_vect*0
 E_plus_vect = N_vect*0
 for ii, N in enumerate(N_vect):
-    
+
     P_surv, E_minus_eV, E_plus_eV = compute_P_surv(N)
 
     P_surv_vect[ii] = P_surv
@@ -146,5 +146,25 @@ sp1.set_ylabel('Electron energy (eV)')
 sp1.set_xlabel(r'Electron  density (m$^{-1}$)')
 sp2.set_xlabel(r'$\phi_{emit}(E)$')
 plt.setp(sp2.get_yticklabels(), visible=False)
+fig4.subplots_adjust(bottom=.265, wspace=.063)
+
+fig5 = plt.figure()
+ax5 = fig5.add_subplot(111)
+i_vect = np.arange(0, 100)
+ax5.semilogy(ob.t/ob.b_spac, ob.Nel_timep, color='grey', alpha=.7,
+             label='simulation')
+ax5.semilogy(i_vect, 3*N_vect[0]*del_eff_vect[0]**i_vect,
+             linestyle='--', linewidth=2, color='C3',
+             label=r'$\delta_{eff}^i$')
+ax5.axhline(y=N_sat,
+            linestyle='--', linewidth=2, color='C0', label=r'$N_{sat}$')
+ax5.set_xlim(0, 80)
+ax5.set_ylim(1e6, 1e10)
+ax5.set_ylabel(r'Electron  density (m$^{-1}$)')
+ax5.set_xlabel('Bunch passage')
+ax5.legend(loc='lower right', frameon=False)
+fig5.subplots_adjust(bottom=.265, left=.15)
+
+
 
 plt.show()
