@@ -155,7 +155,7 @@ ax5.semilogy(ob.t/ob.b_spac, ob.Nel_timep, color='grey', alpha=.7,
              label='simulation')
 ax5.semilogy(i_vect, 3*N_vect[0]*del_eff_vect[0]**i_vect,
              linestyle='--', linewidth=2, color='C3',
-             label=r'$\delta_{eff}^i$')
+             label=r'$N_0\delta_{eff}^i$')
 ax5.axhline(y=N_sat,
             linestyle='--', linewidth=2, color='C0', label=r'$N_{sat}$')
 ax5.set_xlim(0, 80)
