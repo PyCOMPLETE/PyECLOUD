@@ -309,7 +309,6 @@ class pyecloud_saver:
 
             if (beamtim.pass_numb + 1) % self.save_mat_every == 0:
                 sio.savemat(self.filen_main_outp, self.build_outp_dict(buildup_sim), oned_as='row')
-                print("Saving mat file")
 
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
