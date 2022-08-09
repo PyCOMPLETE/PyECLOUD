@@ -108,6 +108,7 @@ parameters_dict = {
             'N_min_Dh_main': None,
 
             'dec_fact_out': 1,
+            'save_mat_every': 1,
 
             # Where to put this?
             't_ion': -1,

@@ -112,7 +112,7 @@ class pyecloud_saver:
                         el_density_probes=[],
                         save_simulation_state_time_file=-1,
                         x_min_hist_det=None, x_max_hist_det=None, y_min_hist_det=None, y_max_hist_det=None, Dx_hist_det=None,
-                        filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop',
+                        filen_main_outp='Pyecltest', dec_fact_out=1, stopfile='stop', save_mat_every=1,
                         flag_multiple_clouds=False, cloud_name=None, flag_last_cloud=True,
                         checkpoint_DT=None, checkpoint_folder=None, copy_main_outp_folder=None,
                         copy_main_outp_DT=None, extract_sey=None, step_by_step_custom_observables=None,
@@ -139,6 +139,8 @@ class pyecloud_saver:
         self.step_by_step_custom_observables = step_by_step_custom_observables
         self.pass_by_pass_custom_observables = pass_by_pass_custom_observables
         self.save_once_custom_observables = save_once_custom_observables
+
+        self.save_mat_every = save_mat_every
 
         if extract_sey is not None:
             self.extract_sey = extract_sey
@@ -305,7 +307,9 @@ class pyecloud_saver:
             self.b_spac = beamtim.b_spac
             self.area = impact_man.chamb.area
 
-            sio.savemat(self.filen_main_outp, self.build_outp_dict(buildup_sim), oned_as='row')
+            if (beamtim.pass_numb + 1) % self.save_mat_every == 0:
+                sio.savemat(self.filen_main_outp, self.build_outp_dict(buildup_sim), oned_as='row')
+                print("Saving mat file")
 
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
