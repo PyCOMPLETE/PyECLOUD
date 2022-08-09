@@ -226,6 +226,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                          chamb=chamb, sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                                          x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
                                          Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=progress_mapgen_file)
+        
+        if beamtim.N_pass_tot % cc.save_mat_every != 0:
+            raise ValueError("Variable save_mat_every=" + str(cc.save_mat_every) + " does not divide the total number of passages=" + str(beamtim.N_pass_tot))
 
         sec_beams_list = []
         if flag_presence_sec_beams:
