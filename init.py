@@ -226,6 +226,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                          chamb=chamb, sigmax=b_par.sigmax, sigmay=b_par.sigmay,
                                          x_beam_pos=b_par.x_beam_pos, y_beam_pos=b_par.y_beam_pos, save_beam_field_file_as=b_par.save_beam_field_file_as,
                                          Nx=b_par.Nx, Ny=b_par.Ny, nimag=b_par.nimag, progress_mapgen_file=progress_mapgen_file)
+        
+        if beamtim.N_pass_tot % cc.save_mat_every != 0:
+            raise ValueError("Variable save_mat_every=" + str(cc.save_mat_every) + " does not divide the total number of passages=" + str(beamtim.N_pass_tot))
 
         sec_beams_list = []
         if flag_presence_sec_beams:
@@ -457,8 +460,8 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
                                        el_density_probes=thiscloud.el_density_probes, save_simulation_state_time_file=thiscloud.save_simulation_state_time_file,
                                        x_min_hist_det=thiscloud.x_min_hist_det, x_max_hist_det=thiscloud.x_max_hist_det,
                                        y_min_hist_det=thiscloud.y_min_hist_det, y_max_hist_det=thiscloud.y_max_hist_det,
-                                       Dx_hist_det=thiscloud.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, filen_main_outp=thiscloud.filen_main_outp,
-                                       flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
+                                       Dx_hist_det=thiscloud.Dx_hist_det, dec_fact_out=cc.dec_fact_out, stopfile=cc.stopfile, save_mat_every=cc.save_mat_every,
+                                       filen_main_outp=thiscloud.filen_main_outp, flag_cos_angle_hist=thiscloud.flag_cos_angle_hist, cos_angle_width=thiscloud.cos_angle_width,
                                        flag_multiple_clouds=flag_multiple_clouds, cloud_name=thiscloud.cloud_name, flag_last_cloud=flag_last_cloud,
                                        checkpoint_DT=cc.checkpoint_DT, checkpoint_folder=cc.checkpoint_folder, copy_main_outp_folder=cc.copy_main_outp_folder,
                                        copy_main_outp_DT=cc.copy_main_outp_DT, extract_sey=cc.extract_sey,
