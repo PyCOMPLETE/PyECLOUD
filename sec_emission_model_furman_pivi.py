@@ -355,7 +355,7 @@ class SEY_model_furman_pivi():
     def inverse_repeat(self, a, repeats, axis):
         """The inverse of numpy.repeat(a, repeats, axis)"""
         if isinstance(repeats, int):
-            indices = np.arange(a.shape[axis] / repeats, dtype=np.int) * repeats
+            indices = np.arange(a.shape[axis] / repeats, dtype=int) * repeats
         else:  # assume array_like of int
             indices = np.cumsum(repeats) - 1
         return a.take(indices, axis)
