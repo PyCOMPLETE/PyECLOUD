@@ -21,7 +21,7 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
     cdef np.ndarray[DOUBLE_t] z_int = np.zeros((N_impacts,),dtype=np.double)
     cdef np.ndarray[DOUBLE_t] Nx_int = np.zeros((N_impacts,),dtype=np.double)
     cdef np.ndarray[DOUBLE_t] Ny_int = np.zeros((N_impacts,),dtype=np.double)
-    cdef np.ndarray[INT_t] i_found = np.zeros((N_impacts,),dtype=np.int)
+    cdef np.ndarray[INT_t] i_found = np.zeros((N_impacts,),dtype=int)
 
     cdef int i_imp, ii, i_found_curr
     cdef double t_min_curr, t_ii, t_border, t_border_min_curr
@@ -88,7 +88,7 @@ cpdef is_outside_convex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np
     #print 'Convex'
 
 
-    flag_outside_vec = np.zeros((N_mp,),dtype=np.int)
+    flag_outside_vec = np.zeros((N_mp,),dtype=int)
 
 #~     with nogil, parallel():
 #~     for i_mp in prange(N_mp):
@@ -125,7 +125,7 @@ cpdef is_outside_nonconvex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp,
     #print 'NON convex'
 
 
-    flag_outside_vec = np.zeros((N_mp,),dtype=np.int)
+    flag_outside_vec = np.zeros((N_mp,),dtype=int)
 
 
     for i_mp in xrange(N_mp):
