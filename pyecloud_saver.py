@@ -196,7 +196,9 @@ class pyecloud_saver:
 
         # Init energy and cos angle histogram saving
         self._energy_cos_and_lifetime_angle_hist_init(Dt_En_hist, flag_cos_angle_hist, cos_angle_width, flag_lifetime_hist, Dt_lifetime_hist)
-
+        
+        # Init impact angle histogram
+        self._impact_angle_hist_init(impact_man)
 
         #Space charge electrostatic energy
         self.t_sc_video = []
@@ -313,6 +315,9 @@ class pyecloud_saver:
             # Check for checkpoint save state
             self._checkpoint_save(beamtim, spacech_ele, t_sc_ON, flag_presence_sec_beams,
                                   sec_beams_list, self.flag_multiple_clouds, cloud_list)
+
+            # check for impact angle hist save
+            self._impact_angle_hist_save(impact_man)
 
             self._copy_main_outp_save(beamtim)
 
@@ -462,7 +467,9 @@ class pyecloud_saver:
                     'dec_fact_out': self.dec_fact_out,
                     'chamber_area': self.area,
                     'cos_angle_hist': self.cos_angle_hist,
-                    'xg_hist_cos_angle': self.xg_hist_cos_angle
+                    'xg_hist_cos_angle': self.xg_hist_cos_angle,
+                    'hist_impact_angle': self.hist_impact_angle,
+                    'xg_hist_impact_angle': self.xg_hist_impact_angle
         }
 
         if self.flag_lifetime_hist:
@@ -1208,3 +1215,19 @@ class pyecloud_saver:
                 self.t_lifetime_hist.append(beamtim.tt_curr)
                 impact_man.reset_lifetime_hist_line()
                 self.t_last_lifetime_hist = beamtim.tt_curr
+
+    def _impact_angle_hist_init(self, impact_man):
+        # Angle histogram
+        self.flag_hist_impact_angle = impact_man.flag_hist_impact_angle 
+        if self.flag_hist_impact_angle:
+            N_angles = len(impact_man.hist_impact_angle)
+            self.hist_impact_angle = []
+            self.xg_hist_impact_angle = np.linspace(0., np.rad2deg(2 * np.pi), N_angles)
+        else:
+            self.hist_impact_angle = -1
+            self.xg_hist_impact_angle = -1
+
+    def _impact_angle_hist_save(self, impact_man):
+            if self.flag_hist_impact_angle:
+                self.hist_impact_angle.append(impact_man.hist_impact_angle.copy())
+                impact_man.reset_hist_impact_angle()

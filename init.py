@@ -415,7 +415,9 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             thiscloud.Dx_hist, thiscloud.scrub_en_th, cc.Nbin_En_hist, cc.En_hist_max,
             cc.Nbin_lifetime_hist, cc.lifetime_hist_max, cc.flag_lifetime_hist,
             flag_seg=flag_seg, flag_En_hist_seg=thiscloud.flag_En_hist_seg,
-            cos_angle_width=cc.cos_angle_width)
+            cos_angle_width=cc.cos_angle_width, flag_hist_impact_angle=cc.flag_hist_impact_angle,
+            impact_x_ref=cc.impact_x_ref, impact_y_ref=cc.impact_y_ref,
+            hist_impact_angle_nbins=cc.hist_impact_angle_nbins)
 
         # Init gas ionization and photoemission
         if thiscloud.gas_ion_flag == 1:
