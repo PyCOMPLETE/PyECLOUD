@@ -57,6 +57,7 @@ from . import init as init
 import pickle
 import numpy as np
 import os
+import scipy.constants as sc
 
 
 class BuildupSimulation(object):
@@ -74,6 +75,7 @@ class BuildupSimulation(object):
         print("PyECLOUD Version 8.6.0")
         (
             beamtim,
+            wf,
             spacech_ele,
             t_sc_ON,
             flag_presence_sec_beams,
@@ -96,6 +98,7 @@ class BuildupSimulation(object):
 
         self.config_dict = config_dict
         self.beamtim = beamtim
+        self.wf = wf
         self.spacech_ele = spacech_ele
         self.t_sc_ON = t_sc_ON
         self.flag_presence_sec_beams = flag_presence_sec_beams
@@ -247,11 +250,29 @@ class BuildupSimulation(object):
         else:
             ## Compute electron space charge electric field
             Ex_sc_n, Ey_sc_n = self.spacech_ele.get_sc_eletric_field(MP_e)
-            Bx_sc_n = np.asarray([0.0])
-            By_sc_n = np.asarray([0.0])
-            Bz_sc_n = np.asarray([0.0])
+            if self.wf != None:
+                Bx_sc_n = np.zeros_like(Ex_sc_n)
+                By_sc_n = np.zeros_like(Ex_sc_n)
+                Bz_sc_n = np.zeros_like(Ex_sc_n)
+            else:
+                Bx_sc_n = np.asarray([0.0])
+                By_sc_n = np.asarray([0.0])
+                Bz_sc_n = np.asarray([0.0])
 
         return Ex_sc_n, Ey_sc_n, Bx_sc_n, By_sc_n, Bz_sc_n
+
+    def _get_field_from_wakefields(self, MP_e, beamtim):
+        z_curr = beamtim.tt_curr * sc.c
+        x_mp = MP_e.x_mp[: MP_e.N_mp]
+        y_mp = MP_e.y_mp[: MP_e.N_mp]
+        Ex_n_wf = self.wf.E_x(x_mp, y_mp, z_curr)
+        Ey_n_wf = self.wf.E_y(x_mp, y_mp, z_curr)
+        Es_n_wf = self.wf.E_s(z_curr) 
+        Bx_n_wf = self.wf.B_x(x_mp, y_mp, z_curr)
+        By_n_wf = self.wf.B_y(x_mp, y_mp, z_curr)
+
+        return Ex_n_wf, Ey_n_wf, Es_n_wf, Bx_n_wf, By_n_wf
+            
 
     def _apply_instantaneous_kick(self, MP_e, Ex_n_kick, Ey_n_kick, Dt_kick):
 
@@ -373,6 +394,16 @@ class BuildupSimulation(object):
                 )
                 Ex_n += Ex_n_beam
                 Ey_n += Ey_n_beam
+
+            if self.wf != None:
+                Ex_n_wf, Ey_n_wf, Es_n_wf, Bx_n_wf, By_n_wf = self._get_field_from_wakefields(
+                    cloud.MP_e, beamtim
+                )
+                Ex_n += Ex_n_wf
+                Ey_n += Ey_n_wf
+                #Ez_n += Es_n_wf
+                Bx_n += Bx_n_wf
+                By_n += By_n_wf
 
             if not flag_substeps:
                 # Standard simulation mode

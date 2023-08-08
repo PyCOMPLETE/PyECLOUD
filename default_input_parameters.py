@@ -189,6 +189,9 @@ parameters_dict = {
             'energy_distribution'               : 'gaussian',
             'flag_continuous_emission'          : False,
 
+            # Wakefield
+            'init_wakefield_flag'   : 0,
+            'resistivity'           : 0,
 
             # Uniform initial distribution
             'init_unif_flag'        : 0,
