@@ -1221,8 +1221,9 @@ class pyecloud_saver:
         self.flag_hist_impact_angle = impact_man.flag_hist_impact_angle 
         if self.flag_hist_impact_angle:
             N_angles = len(impact_man.hist_impact_angle)
+            dx = impact_man.hist_impact_angle_bin_width
             self.hist_impact_angle = []
-            self.xg_hist_impact_angle = np.linspace(0., np.rad2deg(2 * np.pi), N_angles)
+            self.xg_hist_impact_angle = np.linspace(dx/2., np.rad2deg(2 * np.pi) - dx/2., N_angles)
         else:
             self.hist_impact_angle = -1
             self.xg_hist_impact_angle = -1
