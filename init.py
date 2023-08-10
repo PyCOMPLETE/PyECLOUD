@@ -85,6 +85,7 @@ from . import impact_management_class as imc
 from . import pyecloud_saver as pysav
 from . import gas_ionization_class as gic
 from . import gen_photoemission_class as gpc
+from . import wakefield_class as wfc
 
 from . import parse_beam_file as pbf
 from . import parse_cloud_file as pcf
@@ -549,8 +550,19 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
     else:
         cross_ion = None
 
+    # Init wakefield
+    if cc.init_wakefield_flag == 1:
+        if cc.x_aper != cc.y_aper:
+            raise ValueError("chamb_type must be circular (x_aper = y_aper)")
+        else:
+            wf = wfc.wakefield(cc.resistivity, cc.x_aper, beamtim.t, beamtim.lam_t_array, 0.05)
+            print("Wakefield created")
+    else:
+        wf = None
+        print("Wakefield not created")
 
     return (beamtim,
+            wf,
             spacech_ele_sim,
             cc.t_sc_ON,
             flag_presence_sec_beams,
