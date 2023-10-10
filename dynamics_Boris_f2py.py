@@ -152,7 +152,7 @@ class pusher_Boris():
         if B_map_file is None:
             self.B_ob = B_none(B0x, B0y, B0z)
 
-        elif B_map_file is 'analytic_qaudrupole_unit_grad':
+        elif B_map_file == 'analytic_qaudrupole_unit_grad':
             print("B map analytic quadrupole")
             self.B_ob = B_quad(B0x, B0y, B0z, fact_Bmap)
 
