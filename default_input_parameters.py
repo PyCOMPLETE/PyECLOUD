@@ -148,7 +148,6 @@ parameters_dict = {
             'B': 0.,  # Tesla (if B=-1 computed from energy and bending radius)
             'bm_totlen': -1,  # m
             'B_map_file': None,
-            'Bz_map_file': None, # documented?
             'fact_Bmap': 1.,
             'B0x': None,
             'B0y': None,

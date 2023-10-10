@@ -137,7 +137,7 @@ class B_file():
 class pusher_Boris():
 
     def __init__(self, Dt, B0x, B0y, B0z, \
-                 B_map_file, fact_Bmap, Bz_map_file, N_sub_steps=1):
+                 B_map_file, fact_Bmap, N_sub_steps=1):
 
         print("Tracker: Boris")
 
