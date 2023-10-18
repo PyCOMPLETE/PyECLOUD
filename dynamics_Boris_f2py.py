@@ -50,7 +50,7 @@
 #
 #-End-preamble---------------------------------------------------------
 
-from numpy import array, cross, sum, squeeze
+from numpy import squeeze
 import scipy.io as sio
 from . import int_field_for as iff
 from .boris_step import boris_step
@@ -103,6 +103,11 @@ class B_file():
 
         self.Bmap_x = fact_Bmap * squeeze(dict_Bmap['Bx'].real)
         self.Bmap_y = fact_Bmap * squeeze(dict_Bmap['By'].real)
+        if 'Bz' in dict_Bmap.keys():
+             self.has_Bz = True
+             self.Bmap_z = fact_Bmap * squeeze(dict_Bmap['Bz'].real)
+        else:
+             self.has_Bz = False
         self.xx = squeeze(dict_Bmap['xx'].T)
         self.yy = squeeze(dict_Bmap['yy'].T)
         self.B0x = B0x
@@ -117,17 +122,22 @@ class B_file():
     def get_B(self, xn, yn):
                 Bx_n, By_n = iff.int_field(xn, yn, self.xmin, self.ymin,\
                                            self.dx, self.dy, self.Bmap_x, self.Bmap_y)
+                if self.has_Bz:
+                    Bz_n, _ = iff.int_field(xn, yn, self.xmin, self.ymin,
+                                            self.dx, self.dy, self.Bmap_z, self.Bmap_y)
+                else:
+                    Bz_n = 0. * xn
                 # the rescaling factor has already been applied to the map
                 Bx_n = Bx_n + self.B0x
                 By_n = By_n + self.B0y
-                Bz_n = 0 * xn + self.B0z
+                Bz_n = Bz_n + self.B0z
                 return Bx_n, By_n, Bz_n
 
 
 class pusher_Boris():
 
     def __init__(self, Dt, B0x, B0y, B0z, \
-                 B_map_file, fact_Bmap, Bz_map_file, N_sub_steps=1):
+                 B_map_file, fact_Bmap, N_sub_steps=1):
 
         print("Tracker: Boris")
 
@@ -142,7 +152,7 @@ class pusher_Boris():
         if B_map_file is None:
             self.B_ob = B_none(B0x, B0y, B0z)
 
-        elif B_map_file is 'analytic_qaudrupole_unit_grad':
+        elif B_map_file == 'analytic_qaudrupole_unit_grad':
             print("B map analytic quadrupole")
             self.B_ob = B_quad(B0x, B0y, B0z, fact_Bmap)
 

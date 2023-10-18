@@ -489,7 +489,7 @@ def read_input_files_and_init_components(pyecl_input_folder='./', skip_beam=Fals
             temp_B0z = {True: 0., False: cc.B0z}[cc.B0z is None]
 
             dynamics = dynB.pusher_Boris(cc.Dt, temp_B0x, temp_B0y, temp_B0z,
-                                         cc.B_map_file, cc.fact_Bmap, cc.Bz_map_file, N_sub_steps=thiscloud.N_sub_steps)
+                                         cc.B_map_file, cc.fact_Bmap, N_sub_steps=thiscloud.N_sub_steps)
         elif cc.track_method == 'StrongBdip':
             if cc.flag_em_tracking == True:
                 raise ValueError("Track_method should be 'BorisMultipole' to use electromagnetic space charge!!")
