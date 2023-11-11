@@ -1,0 +1,20 @@
+# secondary emission model
+Emax=500.;
+del_max = 2.0
+R0 = 0.
+switch_model=0
+
+# hilleret model for sec. emission
+E_th=35.;
+sigmafit =1.0828;
+mufit = 1.6636;
+
+switch_no_increase_energy=0
+thresh_low_energy=-1
+
+scrub_en_th=20.#eV
+
+flag_costheta_delta_scale=False
+flag_costheta_Emax_shift=False
+
+secondary_angle_distribution = 'normal_emission'

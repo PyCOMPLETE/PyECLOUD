@@ -2,7 +2,7 @@
 
 machine_param_file='machine_parameters.input'
 secondary_emission_parameters_file='secondary_emission_parameters.input'
-beam_parameters_file='beam.beam'
+beam_parameters_file='beam.beam' 
 
 logfile_path = './logfile.txt'
 progress_path = './progress.txt'
@@ -25,7 +25,7 @@ En_hist_max= 5000.  #eV
 
 t_ion=100.;        #s
 
-N_mp_max=250000;   #size of allocated vectors
+N_mp_max=250000;   #size of allocated vectors 
 
 #Regen parameters
 
@@ -37,10 +37,10 @@ fact_split=1.5;
 fact_clean=1e-6;
 regen_hist_cut = 1.e-4
 
-N_mp_soft_regen = 60000
-N_mp_after_soft_regen = 20000
+N_mp_soft_regen = 6000
+N_mp_after_soft_regen = 2000
 
-nel_mp_ref_0= 2e8/(0.7*N_mp_soft_regen)   #e-/m
+nel_mp_ref_0= 2e6/(0.7*N_mp_soft_regen)   #e-/m
 
 
 # Number of bins
@@ -52,16 +52,13 @@ Nvz_regen=51;#it must be odd!
 
 
 #Sp_ch params
-Dt_sc = .5e-9
+Dt_sc = .5e-9 
 Dh_sc = .3e-3
 t_sc_ON=0e-9;		#s
 sparse_solver = 'klu'
 
-flag_hist_impact_seg = 1
 
 flag_movie = 0             #1/0
 flag_sc_movie = 0          #1/0
 
 save_mp_state_time_file =  -1
-
-extract_sey = False
