@@ -9,7 +9,7 @@
 #
 #     This file is part of the code:
 #
-#                   PyECLOUD Version 8.7.0
+#                   PyECLOUD Version 8.7.1
 #
 #
 #     Main author:          Giovanni IADAROLA
@@ -71,7 +71,7 @@ class BuildupSimulation(object):
         **kwargs
     ):
 
-        print("PyECLOUD Version 8.7.0")
+        print("PyECLOUD Version 8.7.1")
         (
             beamtim,
             spacech_ele,
