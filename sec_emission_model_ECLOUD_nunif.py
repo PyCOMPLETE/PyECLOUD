@@ -99,9 +99,9 @@ class SEY_model_ECLOUD_non_unif(SEY_model_ECLOUD):
             else:
                 self.angle_dist_func = None
 
-            self.del_max_segments = np.float_(chamb.del_max_segments)
-            self.R0_segments = np.float_(chamb.R0_segments)
-            self.Emax_segments = np.float_(chamb.Emax_segments)
+            self.del_max_segments = np.float64(chamb.del_max_segments)
+            self.R0_segments = np.float64(chamb.R0_segments)
+            self.Emax_segments = np.float64(chamb.Emax_segments)
 
             self.del_max_segments[chamb.del_max_segments < 0.] = del_max
             self.R0_segments[chamb.R0_segments < 0.] = R0
@@ -141,9 +141,9 @@ class SEY_model_ECLOUD_non_unif_charging(SEY_model_ECLOUD_non_unif):
         self.chamb = chamb
         self.Q_segments = 0. * self.del_max_segments
         self.flag_charging =  np.int_(chamb.flag_charging)>0
-        self.Q_max_segments = np.float_(chamb.Q_max_segments)
-        self.EQ_segments = np.float_(chamb.EQ_segments)
-        self.tau_segments = np.float_(chamb.tau_segments)
+        self.Q_max_segments = np.float64(chamb.Q_max_segments)
+        self.EQ_segments = np.float64(chamb.EQ_segments)
+        self.tau_segments = np.float64(chamb.tau_segments)
 
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):

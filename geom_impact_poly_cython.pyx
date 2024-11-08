@@ -7,7 +7,7 @@ cimport cython
 from libc.math cimport sqrt
 
 ctypedef np.float_t DOUBLE_t
-ctypedef np.int_t INT_t
+ctypedef np.intp_t INT_t
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
