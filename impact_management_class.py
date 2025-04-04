@@ -63,7 +63,9 @@ class impact_management(object):
             En_hist_max, Nbin_lifetime_hist=None,
             lifetime_hist_max=None, flag_lifetime_hist=False,
             flag_seg=False, flag_En_hist_seg=False,
-            cos_angle_width=0.05, flag_cos_angle_hist=True):
+            cos_angle_width=0.05, flag_cos_angle_hist=True,
+            flag_hist_impact_angle=True, hist_impact_angle_nbins=360.,
+            impact_x_ref=0., impact_y_ref=0.):
 
         print('Start impact man. init.')
 
@@ -99,6 +101,15 @@ class impact_management(object):
             print('Saving cosine of angle of incident electrons.')
         else:
             print('Not saving cosine of angle of incident electrons.')
+
+        # recording of angle impacts (in degrees) with respect to a reference point 
+        self.flag_hist_impact_angle = flag_hist_impact_angle
+        if self.flag_hist_impact_angle:
+            self.impact_x_ref = impact_x_ref
+            self.impact_y_ref = impact_y_ref
+            self.hist_impact_angle = np.zeros(hist_impact_angle_nbins, float)
+            self.hist_impact_angle_bin_width = np.rad2deg(2 * np.pi) / hist_impact_angle_nbins
+            print(f'Saving angle of impact with respect to reference (x,y)=({self.impact_x_ref:.4f}, {self.impact_y_ref:.4f}).')
 
         self.xg_hist = xg_hist
         self.Nxg_hist = Nxg_hist
@@ -166,6 +177,9 @@ class impact_management(object):
 
     def reset_cos_angle_hist(self):
         self.cos_angle_hist *= 0
+
+    def reset_hist_impact_angle(self):
+        self.hist_impact_angle *= 0
 
     def reset_lifetime_hist_line(self):
         self.lifetime_hist_line *= 0.
@@ -266,10 +280,18 @@ class impact_management(object):
                 histf.compute_hist(x_impact, nel_impact * E_impact_eV,
                                    bias_x_hist, Dx_hist, self.energ_eV_impact_hist)
 
-                # angle histogram
+                # angle histograms
                 if self.flag_cos_angle_hist:
                     histf.compute_hist(
                         costheta_impact, nel_impact, 0., self.cos_angle_width, self.cos_angle_hist)
+                if self.flag_hist_impact_angle:
+                    x_impact_wrt_ref = x_impact - self.impact_x_ref
+                    y_impact_wrt_ref = y_impact - self.impact_y_ref
+                    impact_angle_rad = np.arctan2(y_impact_wrt_ref, x_impact_wrt_ref)
+                    impact_angle = np.rad2deg(np.mod(impact_angle_rad, 2*np.pi))
+                    histf.compute_hist(impact_angle, nel_impact, 0., 
+                                       self.hist_impact_angle_bin_width,
+                                       self.hist_impact_angle)
 
                 if flag_seg:
                     segi.update_seg_impact(
