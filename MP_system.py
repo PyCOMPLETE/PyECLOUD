@@ -557,8 +557,8 @@ class MP_system:
             dict_MP_init = sio.loadmat(filename_MPs)
         else:
             dict_MP_init = filename_MPs
-
-        Nint_new_MP = int(dict_MP_init['N_mp'])
+        
+        Nint_new_MP = int(dict_MP_init['N_mp'].item() if hasattr(dict_MP_init['N_mp'],"item") else dict_MP_init['N_mp'])
 
         self.x_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['x_mp'])
         self.y_mp[self.N_mp:self.N_mp + Nint_new_MP] = np.squeeze(dict_MP_init['y_mp'])

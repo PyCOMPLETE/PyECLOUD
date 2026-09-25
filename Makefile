@@ -24,10 +24,10 @@ cern:
 	/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/f2py -m boris_step -c boris_step.f
 	/afs/cern.ch/project/uslarp/opt/lxplus64/Python-2.7.2/bin/f2py -m vectsum -c vectsum.f
 local:
-	$(F2PY) -m rhocompute -c compute_rho.f
-	$(F2PY) -m int_field_for -c interp_field_for.f
-	$(F2PY) -m hist_for -c compute_hist.f
-	$(F2PY) -m seg_impact -c update_seg_impact.f
-	$(F2PY) -m errffor -c errfff.f
-	$(F2PY) -m boris_step -c boris_step.f
-	$(F2PY) -m vectsum -c vectsum.f
+	$(F2PY) -m rhocompute -c --backend meson compute_rho.f
+	$(F2PY) -m int_field_for -c --backend meson interp_field_for.f
+	$(F2PY) -m hist_for -c --backend meson compute_hist.f
+	$(F2PY) -m seg_impact -c --backend meson update_seg_impact.f
+	$(F2PY) -m errffor -c --backend meson errfff.f
+	$(F2PY) -m boris_step -c --backend meson boris_step.f
+	$(F2PY) -m vectsum -c --backend meson vectsum.f

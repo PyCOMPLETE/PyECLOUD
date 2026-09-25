@@ -55,7 +55,6 @@ from . import hist_for as histf
 from . import seg_impact as segi
 from scipy.constants import e as qe
 
-
 class impact_management(object):
     def __init__(
             self, chamb, sey_mod,
@@ -170,7 +169,6 @@ class impact_management(object):
     def reset_lifetime_hist_line(self):
         self.lifetime_hist_line *= 0.
 
-    # @profile
     def backtrack_and_second_emiss(self, old_pos, MP_e, tt_curr=None):
 
         self.Nel_impact_last_step = 0.
@@ -215,18 +213,20 @@ class impact_management(object):
             # detect impact
             flag_impact[:N_mp_old] = chamb.is_outside(
                 x_mp[0:N_mp_old], y_mp[0:N_mp_old])
-
+            
+            idx = np.flatnonzero(flag_impact)
             Nimpact = int(np.sum(flag_impact))
 
             if Nimpact > 0:
 
                 # load segment endpoints
-                x_in = x_mp_old[flag_impact[:N_mp_old]]
-                y_in = y_mp_old[flag_impact[:N_mp_old]]
-                z_in = z_mp_old[flag_impact[:N_mp_old]]
-                x_out = x_mp[flag_impact]
-                y_out = y_mp[flag_impact]
-                z_out = z_mp[flag_impact]
+                x_in = x_mp_old[idx]
+                y_in = y_mp_old[idx]
+                z_in = z_mp_old[idx]
+
+                x_out = x_mp[idx]
+                y_out = y_mp[idx]
+                z_out = z_mp[idx]
 
                 # backtracking and surface normal generation
                 [x_impact, y_impact, z_impact, Norm_x, Norm_y, i_found] =\
@@ -234,20 +234,20 @@ class impact_management(object):
                         x_in, y_in, z_in, x_out, y_out, z_out)
 
                 # load velocities and charges
-                vx_impact = vx_mp[flag_impact]
-                vy_impact = vy_mp[flag_impact]
-                vz_impact = vz_mp[flag_impact]
-                nel_impact = nel_mp[flag_impact]
+                vx_impact = vx_mp[idx]
+                vy_impact = vy_mp[idx]
+                vz_impact = vz_mp[idx]
+                nel_impact = nel_mp[idx]
 
                 # add to lifetime histogram
                 if self.flag_lifetime_hist:
-                    lifetime_impact = tt_curr - MP_e.t_last_impact[flag_impact]
-                    if sum(MP_e.t_last_impact[flag_impact] > 0) > 0:
-                        histf.compute_hist(lifetime_impact[MP_e.t_last_impact[flag_impact] > 0],
-                                           nel_impact[MP_e.t_last_impact[flag_impact] > 0],
+                    lifetime_impact = tt_curr - MP_e.t_last_impact[idx]
+                    if sum(MP_e.t_last_impact[idx] > 0) > 0:
+                        histf.compute_hist(lifetime_impact[MP_e.t_last_impact[idx] > 0],
+                                           nel_impact[MP_e.t_last_impact[idx] > 0], 
                                            0., Dt_lifetime_hist, self.lifetime_hist_line)
 
-                    MP_e.t_last_impact[flag_impact] = tt_curr
+                    MP_e.t_last_impact[idx] = tt_curr
 
                 # compute impact velocities, energy and angle
                 v_impact_mod = np.sqrt(
@@ -310,13 +310,13 @@ class impact_management(object):
                 self.Nel_emit_last_step = np.sum(nel_emit_tot_events)
 
                 # Replace old MPs
-                x_mp[flag_impact] = x_replace
-                y_mp[flag_impact] = y_replace
-                z_mp[flag_impact] = z_replace
-                vx_mp[flag_impact] = vx_replace
-                vy_mp[flag_impact] = vy_replace
-                vz_mp[flag_impact] = vz_replace
-                nel_mp[flag_impact] = nel_replace
+                x_mp[idx] = x_replace
+                y_mp[idx] = y_replace
+                z_mp[idx] = z_replace
+                vx_mp[idx] = vx_replace
+                vy_mp[idx] = vy_replace
+                vz_mp[idx] = vz_replace
+                nel_mp[idx] = nel_replace
 
                 # subtract replaced macroparticles
                 v_replace_mod = np.sqrt(
