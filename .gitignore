@@ -12,6 +12,11 @@ logfile.txt
 *.so
 *.pyc
 build/
+dist/
+*.egg-info/
+*.pyd
+__pycache__/
+.pytest_cache/
 scripts/
 *~
 .#*
@@ -58,4 +63,3 @@ testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_s
 testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver/simulation_state_0.pkl
 testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_stress_saver/simulation_state_1.pkl
 testing/tests_buildup/progress
-

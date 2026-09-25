@@ -1,6 +1,4 @@
-#!/bin/bash
-
-#compile flags and link flags
-#CFLAGS="-Iinclude -fPIC"  \
-#LDFLAGS="-Llib "     \
-    python setup.py build_ext -i
+#!/usr/bin/env bash
+set -e
+cd -- "$(dirname -- "$0")"
+exec "${PYTHON:-python}" -m pip install -e .

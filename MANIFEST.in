@@ -1,0 +1,5 @@
+include README.md Makefile setup_pyecloud cythonize
+recursive-include PyECLOUD *.py *.pyx *.pxd *.c *.h *.f
+recursive-include tests *.py *.input *.beam
+recursive-include examples *.py *.md
+global-exclude *.so *.pyd *.pyc

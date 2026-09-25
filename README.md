@@ -2,4 +2,76 @@
 
 PyECLOUD is a 2D macro-particle code for the simulation of electron cloud effects in particle accelerators.
 
+## Installation from source
+
+Python 3.11 or newer and working C and Fortran compilers are required. In a conda
+environment, these can be installed with `conda install -c conda-forge c-compiler
+fortran-compiler`. Activate the environment before building.
+
+With sibling PyPIC and PyECLOUD checkouts, run from their parent directory:
+
+```sh
+python -m pip install -e ./PyPIC
+python -m pip install -e ./PyECLOUD
+```
+
+Or, after installing PyPIC, run `python -m pip install -e .` inside this checkout.
+Pip installs the Python build dependencies and compiles seven Fortran extensions
+with F2PY/Meson and two Cython/C extensions. There is no separate `make` or
+`cythonize` step. Cython, Meson, and Ninja are build dependencies; NumPy, SciPy,
+matplotlib, and PyPIC are runtime dependencies.
+
+Python edits take effect immediately with an editable installation. Rerun the
+installation command after changing native sources. Use `python -m pip install .`
+for a regular installation. `make`, `setup_pyecloud`, and `cythonize` remain
+convenience wrappers around the same editable pip installation.
+
+Optional integrations can be installed with `.[pyheadtail]` (PyHEADTAIL and h5py)
+or `.[hdf5]` (h5py). PyKLU is optional; the SciPy sparse solver is available with
+the core dependencies.
+
+## Running simulations
+
+The Python namespace is unchanged:
+
+```python
+from PyECLOUD.buildup_simulation import BuildupSimulation
+
+sim = BuildupSimulation(pyecl_input_folder="/path/to/input_folder")
+sim.run()
+```
+
+The input folder contains `simulation_parameters.input`, machine and secondary
+emission parameters, and beam files. Existing configuration/data paths retain
+their original meaning; choose your working directory and output paths as before.
+
+The launch scripts now live under `examples/`:
+
+```sh
+python examples/000_run_simulation.py /path/to/input_folder
+python examples/001_reload_state_and_run.py /path/to/input_folder /path/to/simulation_state_0.pkl
+```
+
+## Repository layout and validation
+
+- `PyECLOUD/`: Python modules, Cython/C sources, and `fortran/` sources.
+- `tests/`: automated installation and numerical smoke tests.
+- `testing/`: existing simulation regression cases and their reference data.
+- `examples/`: simulation launch scripts.
+- `other/`, `doc/`, and `dev/`: studies, documentation, and maintenance scripts.
+
+```sh
+python -m pip install -e '.[tests]'
+python -m pytest
+python -m pip install build
+python -m build
+```
+
+The tests exercise the installed extensions and a short build-up simulation.
+`python -m build` creates a source distribution and builds a wheel from it.
+The large historical regression datasets stay in the repository and are not
+included in the installed package. Version metadata lives in `PyECLOUD/_version.py`;
+simulation logs include Git provenance when running from a checkout and work
+without Git in a wheel installation.
+
 More information about installation and usage can be found in the [Wiki](https://github.com/PyCOMPLETE/PyECLOUD/wiki).

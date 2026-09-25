@@ -54,6 +54,7 @@
 
 
 from . import init as init
+from ._version import __version__
 import pickle
 import numpy as np
 import os
@@ -71,7 +72,7 @@ class BuildupSimulation(object):
         **kwargs
     ):
 
-        print("PyECLOUD Version 8.7.1")
+        print(f"PyECLOUD Version {__version__}")
         (
             beamtim,
             spacech_ele,

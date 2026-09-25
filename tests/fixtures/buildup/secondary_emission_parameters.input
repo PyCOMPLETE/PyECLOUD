@@ -1,0 +1,5 @@
+switch_model = 'perfect_absorber'
+E_th = 35.
+sigmafit = 1.0828
+mufit = 1.6636
+scrub_en_th = 20.

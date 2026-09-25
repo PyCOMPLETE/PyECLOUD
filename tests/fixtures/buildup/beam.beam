@@ -1,0 +1,11 @@
+energy_eV = 450e9
+sigmax = 1e-3
+sigmay = 0.5e-3
+beam_field_file = 'computeFD'
+Dh_beam_field = 1e-3
+b_spac = 25e-9
+fact_beam = 1e9
+flag_bunched_beam = 1
+sigmaz = 0.092
+t_offs = 1e-9
+filling_pattern_file = [1.]

@@ -1,3 +1,4 @@
+# cython: language_level=3
 import numpy as np
 cimport numpy as np
 cimport cython
@@ -6,7 +7,7 @@ cimport cython
 
 from libc.math cimport sqrt
 
-ctypedef np.float_t DOUBLE_t
+ctypedef np.float64_t DOUBLE_t
 ctypedef np.intp_t INT_t
 
 @cython.boundscheck(False)
@@ -31,7 +32,7 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
 
     #with nogil, parallel():
     #for i_imp in prange(N_impacts):
-    for i_imp in xrange(N_impacts):
+    for i_imp in range(N_impacts):
         t_min_curr = 1.
         i_found_curr = -1
         fould_curr = False
@@ -40,7 +41,7 @@ cpdef impact_point_and_normal(double[::1] x_in, double[::1] y_in, double[::1] z_
         x_out_curr = x_out[i_imp]
         y_out_curr = y_out[i_imp]
 
-        for ii in xrange(N_edg):
+        for ii in range(N_edg):
 
             den    = ((y_out_curr-y_in_curr)*(Vx[ii+1]-Vx[ii])+(x_in_curr-x_out_curr)*(Vy[ii+1]-Vy[ii]))
             if den == 0.:
@@ -92,7 +93,7 @@ cpdef is_outside_convex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp, np
 
 #~     with nogil, parallel():
 #~     for i_mp in prange(N_mp):
-    for i_mp in xrange(N_mp):
+    for i_mp in range(N_mp):
         x_curr = x_mp[i_mp]
         y_curr = y_mp[i_mp]
         flag_inside_curr = (((x_curr/cx)**2 + (y_curr/cy)**2)<=1.)
@@ -128,7 +129,7 @@ cpdef is_outside_nonconvex(np.ndarray[DOUBLE_t] x_mp, np.ndarray[DOUBLE_t] y_mp,
     flag_outside_vec = np.zeros((N_mp,),dtype=int)
 
 
-    for i_mp in xrange(N_mp):
+    for i_mp in range(N_mp):
         x_curr = x_mp[i_mp]
         y_curr = y_mp[i_mp]
         flag_inside_curr = (((x_curr/cx)**2 + (y_curr/cy)**2)<=1.)

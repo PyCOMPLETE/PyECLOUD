@@ -1,0 +1,34 @@
+machine_param_file = 'machine_parameters.input'
+secondary_emission_parameters_file = 'secondary_emission_parameters.input'
+beam_parameters_file = 'beam.beam'
+logfile_path = 'logfile.txt'
+progress_path = 'progress.txt'
+
+Dt = 1e-11
+t_end = 5e-11
+lam_th = 1e2
+N_mp_max = 1000
+N_mp_regen = 800
+N_mp_regen_low = 0
+t_ON_regen_low = 10.
+N_mp_after_regen = 100
+fact_split = 1.5
+fact_clean = 1e-6
+nel_mp_ref_0 = 1e4
+Nx_regen = 5
+Ny_regen = 5
+Nvx_regen = 5
+Nvy_regen = 5
+Nvz_regen = 5
+regen_hist_cut = 1e-4
+
+Dt_sc = Dt
+Dh_sc = 1e-3
+t_sc_ON = 0.
+sparse_solver = 'scipy_slu'
+Dx_hist = 1e-3
+r_center = 1e-3
+Dt_En_hist = 25e-9
+Nbin_En_hist = 30
+En_hist_max = 3000.
+extract_sey = False

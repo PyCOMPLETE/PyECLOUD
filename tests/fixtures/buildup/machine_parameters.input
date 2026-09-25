@@ -1,0 +1,16 @@
+chamb_type = 'rect'
+x_aper = 0.01
+y_aper = 0.008
+track_method = 'BorisMultipole'
+N_sub_steps = 2
+B0z = 0.1
+betafx = 100.
+betafy = 100.
+
+init_unif_flag = 1
+Nel_init_unif = 1e6
+E_init_unif = 1.
+x_min_init_unif = -0.002
+x_max_init_unif = 0.002
+y_min_init_unif = -0.002
+y_max_init_unif = 0.002
