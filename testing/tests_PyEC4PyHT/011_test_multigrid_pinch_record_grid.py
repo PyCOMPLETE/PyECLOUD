@@ -64,22 +64,36 @@ sigma_y = bunch.sigma_y()
 slicer = UniformBinSlicer(n_slices=n_slices, z_cuts=(-z_cut, z_cut))
 
 ecloud = Ecloud(
-    L_ecloud=L_ecloud, slicer=slicer, Dt_ref=20e-12,
+    L_ecloud=L_ecloud, # scales the strength of the e-cloud interaction
+    # Define how the beam is longitudinally discretized
+    slicer=slicer,
+    # Time step required to resolve the electron cloud dynamics accurately
+    Dt_ref=20e-12,
+    # General settings for the electron cloud simulation
     pyecl_input_folder=str(input_dir / 'pyecloud_config_LHC'),
-    chamb_type='polyg', filename_chm=str(chamber_file),
-    init_unif_edens_flag=1, init_unif_edens=init_unif_edens,
+    # Geometry of the chamber
+    chamb_type='polyg',
+    filename_chm=str(chamber_file),
+    # Magnetic field expansion coefficients (multipoles times rigidity)
+    B_multip=[0.],
+    # Initial electron distribution (in this case uniform)
+    init_unif_edens_flag=1,
+    init_unif_edens=init_unif_edens,
+    # Macroparticle size control parameters
     N_mp_max=N_mp_max,
     nel_mp_ref_0=nel_mp_ref_0,
-    B_multip=[0.], x_beam_offset=0., y_beam_offset=0.,
+    # Particle-in-cell settings (multi-grid)
     sparse_solver='scipy_slu',
     PyPICmode='ShortleyWeller_WithTelescopicGrids',
-    Dh_sc=1e-3, f_telescope=0.3,
+    Dh_sc=1e-3, # grid size covering the whole cha
+    f_telescope=0.3,
     target_grid={
         'x_min_target': -5 * sigma_x, 'x_max_target': 5 * sigma_x,
         'y_min_target': -5 * sigma_y, 'y_max_target': 5 * sigma_y,
         'Dh_target': 0.2 * sigma_x,
     },
-    N_nodes_discard=10, N_min_Dh_main=10,
+    N_nodes_discard=10,
+    N_min_Dh_main=10,
 )
 print(f'Initial electron macroparticles: {ecloud.cloudsim.cloud_list[0].MP_e.N_mp:,}'
       f' (target {N_electron_macroparticles:,})')
