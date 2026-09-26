@@ -17,6 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.constants import c, e
 from scipy.interpolate import interp1d
+from scipy.io import loadmat
 
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 from PyECLOUD.PyEC4PyHT import Ecloud
@@ -26,16 +27,29 @@ from machines_for_testing import LHC
 input_dir = Path(__file__).resolve().parent
 np.random.seed(12345)
 
-# Same bunch and cloud parameters as 008; use SciPy's CPU sparse solver.
+# Same physical parameters as 008, with more slices and electron macroparticles.
 n_macroparticles = 3_000_000
-n_slices = 150
+n_slices = 301
 p0_GeV = 2000
 z_cut = 2.5e-9 * c
 L_ecloud = 1000.
 sigma_z = 0.10
 epsn_x = epsn_y = 2.5e-6
 init_unif_edens = 1e7
+N_electron_macroparticles = 1_000_000  # target initial count inside the chamber
 N_mp_max = 3_000_000
+
+# The 2D cloud uses macroparticle weights in electrons per metre. Include the
+# polygon area when converting the physical volume density to a target count.
+# Initialization samples a bounding rectangle and rejects points outside the
+# chamber, so the actual accepted count fluctuates slightly around the target.
+chamber_file = input_dir / 'LHC_chm_ver.mat'
+chamber_data = loadmat(chamber_file)
+vx = chamber_data['Vx'].ravel()
+vy = chamber_data['Vy'].ravel()
+chamber_area = 0.5 * abs(np.dot(vx, np.roll(vy, -1))
+                         - np.dot(vy, np.roll(vx, -1)))
+nel_mp_ref_0 = init_unif_edens * chamber_area / N_electron_macroparticles
 
 machine = LHC(
     machine_configuration='6.5_TeV_collision_tunes',
@@ -52,10 +66,10 @@ slicer = UniformBinSlicer(n_slices=n_slices, z_cuts=(-z_cut, z_cut))
 ecloud = Ecloud(
     L_ecloud=L_ecloud, slicer=slicer, Dt_ref=20e-12,
     pyecl_input_folder=str(input_dir / 'pyecloud_config_LHC'),
-    chamb_type='polyg', filename_chm=str(input_dir / 'LHC_chm_ver.mat'),
+    chamb_type='polyg', filename_chm=str(chamber_file),
     init_unif_edens_flag=1, init_unif_edens=init_unif_edens,
     N_mp_max=N_mp_max,
-    nel_mp_ref_0=init_unif_edens / (0.7 * N_mp_max),
+    nel_mp_ref_0=nel_mp_ref_0,
     B_multip=[0.], x_beam_offset=0., y_beam_offset=0.,
     sparse_solver='scipy_slu',
     PyPICmode='ShortleyWeller_WithTelescopicGrids',
@@ -67,6 +81,8 @@ ecloud = Ecloud(
     },
     N_nodes_discard=10, N_min_Dh_main=10,
 )
+print(f'Initial electron macroparticles: {ecloud.cloudsim.cloud_list[0].MP_e.N_mp:,}'
+      f' (target {N_electron_macroparticles:,})')
 
 # Set these after construction. track() calls _reinitialize() itself to prepare
 # the storage, then _finalize() converts the snapshots to arrays ordered by z.
@@ -89,8 +105,8 @@ Ey_ele = ecloud.Ey_ele_last_track  # V/m
 
 print(f'Recorded grid arrays with shape {rho_ele.shape} (slice, x, y)')
 
-# Interpolate onto the exact zero planes: with 150 slices, z=0 lies between
-# two slice centers. The z coordinate labels successive cloud snapshots during
+# Interpolate onto the exact zero planes (also works with an even slice count).
+# The z coordinate labels successive cloud snapshots during
 # the bunch passage, not a simultaneous 3D cloud distribution.
 n_at_x0 = interp1d(x_grid, n_ele, axis=1)(0.)  # (z, y)
 n_at_y0 = interp1d(y_grid, n_ele, axis=2)(0.)  # (z, x)
