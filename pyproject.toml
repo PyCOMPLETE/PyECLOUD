@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-dependencies = ["numpy>=1.26", "scipy", "matplotlib", "PyPIC>=2.4.5"]
+dependencies = ["numpy>=1.26", "scipy", "matplotlib", "pypic-poisson>=2.5.0"]
 
 [project.urls]
 "Source Code" = "https://github.com/PyCOMPLETE/PyECLOUD"
