@@ -27,42 +27,59 @@ from machines_for_testing import LHC
 input_dir = Path(__file__).resolve().parent
 np.random.seed(12345)
 
-# Same physical parameters as 008, with more slices and electron macroparticles.
-n_macroparticles = 3_000_000
-n_slices = 301
-p0_GeV = 2000
-z_cut = 2.5e-9 * c
-L_ecloud = 1000.
-sigma_z = 0.10
-epsn_x = epsn_y = 2.5e-6
-init_unif_edens = 1e7
-N_electron_macroparticles = 1_000_000  # target initial count inside the chamber
-N_mp_max = 3_000_000
+# Beam parameters
+p0_GeV = 2000 # momentum in GeV/c
+epsn_x = epsn_y = 2.5e-6 # normalized emittances in m.rad
+sigma_z = 0.10 # r.m.s bunch length in m
+bunch_intensity = 1e11
 
-# The 2D cloud uses macroparticle weights in electrons per metre. Include the
-# polygon area when converting the physical volume density to a target count.
-# Initialization samples a bounding rectangle and rejects points outside the
-# chamber, so the actual accepted count fluctuates slightly around the target.
+# Beam discretization
+z_cut = 2.5e-9 * c # range
+n_slices = 301
+
+# Portion of the machine on which this e-cloud kick acts
+L_ecloud = 1000.
+
+# Initial electron density
+init_unif_edens = 1e7
+
+# Chamber geometry file
 chamber_file = input_dir / 'LHC_chm_ver.mat'
+
+# Macro-particle settings
+n_macroparticles = 3_000_000 # Beam macroparticles
+N_electron_macroparticles = 1_000_000  # target initial count inside the chamber
+N_mp_max = 3_000_000 # size of allocated storage (electrons can multiply)
+
+# Load chamber geometry and compute its area
 chamber_data = loadmat(chamber_file)
 vx = chamber_data['Vx'].ravel()
 vy = chamber_data['Vy'].ravel()
 chamber_area = 0.5 * abs(np.dot(vx, np.roll(vy, -1))
                          - np.dot(vy, np.roll(vx, -1)))
+
+# Reference macroparticle size for the initial uniform electron density
 nel_mp_ref_0 = init_unif_edens * chamber_area / N_electron_macroparticles
 
+# Generate a bunch (can be easily generalized to other machines)
 machine = LHC(
     machine_configuration='6.5_TeV_collision_tunes',
     optics_mode='smooth', n_segments=1, p0=p0_GeV * 1e9 * e / c,
 )
 bunch = machine.generate_6D_Gaussian_bunch(
-    n_macroparticles=n_macroparticles, intensity=1e11,
+    n_macroparticles=n_macroparticles, intensity=bunch_intensity,
     epsn_x=epsn_x, epsn_y=epsn_y, sigma_z=sigma_z,
 )
 sigma_x = bunch.sigma_x()
 sigma_y = bunch.sigma_y()
+
+# Distort the bunch
+bunch.y += 0.3 * sigma_x * np.sin(bunch.z / sigma_z * 2 * np.pi)
+
+# Beam discretization
 slicer = UniformBinSlicer(n_slices=n_slices, z_cuts=(-z_cut, z_cut))
 
+# Build e-cloud simulation object
 ecloud = Ecloud(
     L_ecloud=L_ecloud, # scales the strength of the e-cloud interaction
     # Define how the beam is longitudinally discretized
@@ -90,7 +107,7 @@ ecloud = Ecloud(
     target_grid={
         'x_min_target': -5 * sigma_x, 'x_max_target': 5 * sigma_x,
         'y_min_target': -5 * sigma_y, 'y_max_target': 5 * sigma_y,
-        'Dh_target': 0.2 * sigma_x,
+        'Dh_target': 0.05 * sigma_x,
     },
     N_nodes_discard=10,
     N_min_Dh_main=10,
@@ -107,7 +124,7 @@ t_start = perf_counter()
 ecloud.track(bunch)
 print(f'Multigrid tracking time: {perf_counter() - t_start:.3f} s')
 
-# Keep convenient aliases for interactive use, with explicit physical units.
+# This are the quantities we want our surrogate to return
 x_grid = ecloud.spacech_ele.xg.copy()  # m; finest grid, including its boundary
 y_grid = ecloud.spacech_ele.yg.copy()  # m
 z_centers = bunch.get_slices(slicer).z_centers.copy()  # m, increasing order
@@ -117,7 +134,9 @@ phi_ele = ecloud.phi_ele_last_track  # V
 Ex_ele = ecloud.Ex_ele_last_track  # V/m
 Ey_ele = ecloud.Ey_ele_last_track  # V/m
 
-print(f'Recorded grid arrays with shape {rho_ele.shape} (slice, x, y)')
+#########
+# Plots #
+#########
 
 # Interpolate onto the exact zero planes (also works with an even slice count).
 # The z coordinate labels successive cloud snapshots during
@@ -125,6 +144,8 @@ print(f'Recorded grid arrays with shape {rho_ele.shape} (slice, x, y)')
 n_at_x0 = interp1d(x_grid, n_ele, axis=1)(0.)  # (z, y)
 n_at_y0 = interp1d(y_grid, n_ele, axis=2)(0.)  # (z, x)
 n_at_z0 = interp1d(z_centers, n_ele, axis=0)(0.)  # (x, y)
+
+plt.close('all')
 
 plt.ion()
 fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), layout='constrained')
