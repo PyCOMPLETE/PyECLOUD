@@ -5,13 +5,14 @@ import time
 import argparse
 
 import signal
+import shutil
 
 from PyECLOUD.buildup_simulation import BuildupSimulation
 
 sim_folder = 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_checkpoint/'
 # check if user provided folder as command line argument
 
-os.system('rm -r %s/checkpoints'%sim_folder)
+shutil.rmtree(os.path.join(sim_folder, "checkpoints"), ignore_errors=True)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder', help='Simulation_folder')
@@ -25,6 +26,9 @@ class KillSimulation(Exception):
 
 
 def handler(signum, frame):
+    print('Warning: The simulation was terminated by the checkpointing test.')
+    print('The error is raised by a signal handler, which is called when the timer expires.')
+    print('If you see an unexpected error, please check the timings.')
     raise KillSimulation('The simulation was terminated by the checkpointing test')
 
 
@@ -40,7 +44,7 @@ filen_main_outp = sim_folder + '/Pyecltest_angle%s.mat' % args.angle_dist_func
 sim = BuildupSimulation(pyecl_input_folder=sim_folder, filen_main_outp=filen_main_outp,
                         secondary_angle_distribution=angle_distribution, photoelectron_angle_distribution=angle_distribution)
 signal.signal(signal.SIGALRM, handler)
-signal.alarm(20)
+signal.alarm(10)
 print('TIMER STARTED')
 time_0 = time.time()
 try:
@@ -48,6 +52,19 @@ try:
 except KillSimulation as exc:
     print(exc)
     print("***** Checkpoint test: Termination done!")
+"""
+Alternative block to avoid signal alarm issues:
+try:
+    sim.run()
+    time.sleep(5)
+except KillSimulation as exc:
+    print(exc)
+    print("***** Checkpoint test: Termination done!")
+finally:
+    signal.alarm(0)
+
+# Restart
+"""
 
 time.sleep(5)
 
