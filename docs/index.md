@@ -68,6 +68,7 @@ citation
 :caption: Contributing
 
 documentation
+contributors
 ```
 
 The [original wiki](https://github.com/PyCOMPLETE/PyECLOUD/wiki) remains available
