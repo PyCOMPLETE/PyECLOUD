@@ -142,7 +142,8 @@ G. Iadarola’s thesis.
 * - **scrub_en_th**
   - Minimum energy of scrubbing electrons (for scrubbing current estimations).
 * - **secondary_angle_distribution**
-  - Can be ’cosine_2D’, ’cosine_3D’ or ’normal_emission’. For new electrons, $\theta$ describes
+  - Can be ’cosine_3D’ or ’normal_emission’. `cosine_2D` is a legacy option that has been deprecated as of PyECLOUD v8.9.0.
+    For new electrons, $\theta$ describes
     the angle between the surface normal and their initial velocity vector.
     d$n$/d$\theta=\cos\theta$ or d$n$/d$\theta=\cos\theta\sin\theta$ in the 2D or 3D cases,
     respectively. More info
