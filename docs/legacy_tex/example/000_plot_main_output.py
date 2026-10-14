@@ -2,8 +2,6 @@
 # Thanks for E. Belli, L. Mether and A. Romano for preparing this script
 
 import sys, os
-BIN = os.path.expanduser("../../../")
-sys.path.append(BIN)
 
 import pylab as pl
 import numpy as np

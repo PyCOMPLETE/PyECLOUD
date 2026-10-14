@@ -14,5 +14,5 @@ secondary-emission
 multiple-clouds
 ```
 
-The {download}`original reference manual <../../doc/reference/reference.pdf>`
+The {download}`original reference manual <../legacy_tex/reference/reference.pdf>`
 also describes simulation outputs.
