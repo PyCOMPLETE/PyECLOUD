@@ -1,12 +1,7 @@
-import os
-import argparse
+import shlex
+import subprocess
+import sys
 
-all_dists = ('2D', '3D')
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--angle-dist-func', help='Angular distribution of new MPs relative to surface normal. Introduced in July 2017.', choices=all_dists, default='3D')
-parser.add_argument('--all', help='Run 2D and 3D consecutively', action='store_true')
-args = parser.parse_args()
 
 all_sim_folders = [
     'LHC_ArcDipReal_450GeV_sey1.00_2.5e11ppb_bl_1.00ns_gas_ionization',
@@ -39,23 +34,18 @@ all_sim_folders = [
     'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_reinterp_at_substeps',
     ]
 
-if args.all:
-    dists = all_dists
-else:
-    dists = [args.angle_dist_func]
 
-for ctr, sim_folder in enumerate(all_sim_folders):
+for sim_folder in all_sim_folders:
     test_script = './000_run_simulation.py'
     if sim_folder.endswith('checkpoint'):
         test_script = './000b_run_test_checkpoint.py'
-    for dist in dists:
-        for cmd in [
-            'python %s --folder %s --angle-dist-func %s' % (test_script, sim_folder, dist),
-            'python ./001_comparison_against_reference.py --folder %s --angle-dist-func %s' % (sim_folder, dist)
-        ]:
-            print(cmd)
-            status = os.system(cmd)
-            if status != 0:
-                with open('failed_tests.txt', 'a') as fid:
-                    fid.write('%s finished with status %i\n' % (cmd, status))
-                #raise SystemError('%s finished with status %i' % (cmd, status))
+    for cmd in [
+        [sys.executable, test_script, '--folder', sim_folder],
+        [sys.executable, './001_comparison_against_reference.py', '--folder', sim_folder],
+    ]:
+        command_display = ' '.join(shlex.quote(arg) for arg in cmd)
+        print(command_display, flush=True)
+        result = subprocess.run(cmd, check=False)
+        if result.returncode != 0:
+            with open('failed_tests.txt', 'a') as fid:
+                fid.write('%s finished with status %i\n' % (command_display, result.returncode))

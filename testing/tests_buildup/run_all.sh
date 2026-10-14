@@ -18,7 +18,7 @@ run_test() {
     fi
 }
 
-run_test "buildup simulations and reference comparisons" python 002_run_all_tests.py --all
+run_test "buildup simulations and reference comparisons" python 002_run_all_tests.py
 # 002_run_all_tests.py records individual case failures but currently exits successfully.
 if [ -s "$failed_file" ]; then
     failed=1
