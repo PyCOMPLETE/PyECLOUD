@@ -52,6 +52,7 @@
 
 
 import time
+import warnings
 import numpy as np
 import numpy.random as random
 from scipy.constants import e as qe
@@ -152,6 +153,13 @@ def velocities_angle_cosine_3D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
 
 
 def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
+    warnings.warn(
+        "You are explicitly calling the deprecated cosine_2D emission angle distribution."
+        "The cosine_2D emission angle distribution is deprecated; "
+        "use cosine_3D instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     sin_theta_p = random.rand(N_new_MP)
     return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass)
 
@@ -192,8 +200,8 @@ def get_angle_dist_func(string):
         print('Using cosine_3D emission angle distribution.')
         return velocities_angle_cosine_3D
     elif string == 'cosine_2D':
-        print("""
-Warning! The 2D emission angle distribution is used!
+        raise ValueError("""
+The cosine_2D emission angle distribution is deprecated as of PyECLOUD v8.9.0!
 The 'cosine_3D' distribution is more appropriate. This can be enabled by
 setting in the machine parameter input file:
 "photoelectron_angle_distribution = 'cosine_3D'"
@@ -202,8 +210,6 @@ and in the secondary emission input file:
 For more info, see presentation by P. Dijkstal on the angle of emission
 of generated electrons (https://indico.cern.ch/event/673160/).
 """)
-        time.sleep(3)
-        return velocities_angle_cosine_2D
     elif string == 'normal_emission':
         print('Electrons are emmited orthogonally to the chamber surface.')
         return velocities_angle_normal_emission
