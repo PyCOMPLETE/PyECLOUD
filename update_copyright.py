@@ -1,8 +1,3 @@
-# copyright ##################################
-# This file is part of the PyECLOUD Package. #
-# Copyright (c) CERN, 2011.                  #
-# ############################################
-
 import os
 from pathlib import Path
 
@@ -10,12 +5,12 @@ from pathlib import Path
 # directory where this script is run. Excluded directories are not traversed.
 EXCLUDED_FILES = {
     '_version.py',
-    'update_copyright.py'
+    'update_copyright.py',
     '__init__.py',
     '_git.py',
 }
 EXCLUDED_DIRS = {
-    'doc'
+    'doc',
     '.git',
     '.venv',
     'venv',
@@ -25,6 +20,7 @@ EXCLUDED_DIRS = {
     'other',
     'examples',
     '.github',
+    'tests',
 }
 
 
