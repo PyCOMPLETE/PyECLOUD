@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 import os
 
 def htcondor_config(scan_folder, time_requirement_days, job_filename = 'job.job',

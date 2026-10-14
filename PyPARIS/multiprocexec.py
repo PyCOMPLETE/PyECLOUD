@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
 
 import multiprocessing as mp
 import numpy as np

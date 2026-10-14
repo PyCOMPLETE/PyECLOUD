@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 from PyHEADTAIL.machines.synchrotron import BasicSynchrotron
 import numpy as np
 from scipy.constants import c, e, m_p

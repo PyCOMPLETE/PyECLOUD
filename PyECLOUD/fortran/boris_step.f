@@ -1,3 +1,8 @@
+* copyright ################################# *
+* This file is part of the PyECLOUD Package.  *
+* Copyright (c) CERN, 2011.                   *
+* ########################################### *
+
 *----------------------------------------------------------------------*
 * COMPILE USING
 *  f2py -m boris_step -c boris_step.f        

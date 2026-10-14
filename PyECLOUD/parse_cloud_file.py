@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 from . import input_parameters_format_specification as inp_spec
 from . import myloadmat_to_obj as mlm
 
