@@ -62,7 +62,7 @@ Run it with the environment active:
 python run_buildup.py
 ```
 
-The repository also provides `examples/000_run_simulation.py`, which accepts an
+The repository also provides `examples/getting_started/000_run_simulation.py`, which accepts an
 input-folder argument. Running from the example's working directory keeps its
 relative input and output paths together.
 

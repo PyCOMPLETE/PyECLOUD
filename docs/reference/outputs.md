@@ -108,7 +108,7 @@ empty array or a sentinel value. Inspect the saved data before plotting them.
 | `xg_hist_cos_angle` | Coordinates of the impact-angle histogram bins |
 
 This reference adapts the output section of
-{download}`the original manual <../../doc/reference/reference.pdf>` by
+{download}`the original manual <../legacy_tex/reference/reference.pdf>` by
 Giovanni Iadarola, Eleonora Belli, Philipp Dijkstal, Lotta Mether, Annalisa Romano,
 Giovanni Rumolo, and Eric Wulff. Model-specific fields are not exhaustively
 listed here.

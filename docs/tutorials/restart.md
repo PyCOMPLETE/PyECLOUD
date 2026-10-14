@@ -26,7 +26,7 @@ simulation.run()
 
 By default, `load_state` disables further explicit state saving and changes the
 main output name to a restarted variant. The repository's
-`examples/001_reload_state_and_run.py` provides the same workflow with input-folder
+`examples/getting_started/001_reload_state_and_run.py` provides the same workflow with input-folder
 and state-file arguments. These pickle files contain Python objects, so preserve
 the environment used to produce them; they are not a portable interchange format.
 

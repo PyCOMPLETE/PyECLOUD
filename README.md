@@ -67,11 +67,11 @@ The input folder contains `simulation_parameters.input`, machine and secondary
 emission parameters, and beam files. Existing configuration/data paths retain
 their original meaning; choose your working directory and output paths as before.
 
-The launch scripts now live under `examples/`:
+The launch scripts live under `examples/getting_started/`:
 
 ```sh
-python examples/000_run_simulation.py /path/to/input_folder
-python examples/001_reload_state_and_run.py /path/to/input_folder /path/to/simulation_state_0.pkl
+python examples/getting_started/000_run_simulation.py /path/to/input_folder
+python examples/getting_started/001_reload_state_and_run.py /path/to/input_folder /path/to/simulation_state_0.pkl
 ```
 
 ## Repository layout and validation
@@ -79,8 +79,9 @@ python examples/001_reload_state_and_run.py /path/to/input_folder /path/to/simul
 - `PyECLOUD/`: Python modules, Cython/C sources, and `fortran/` sources.
 - `tests/`: automated installation and numerical smoke tests.
 - `testing/`: existing simulation regression cases and their reference data.
-- `examples/`: simulation launch scripts.
-- `other/`, `doc/`, and `dev/`: studies, documentation, and maintenance scripts.
+- `examples/`: launch scripts, example simulations, and studies.
+- `docs/`: website sources and the original manual under `legacy_tex/`.
+- `dev/`: maintenance scripts.
 
 ```sh
 python -m pip install -e '.[tests]'

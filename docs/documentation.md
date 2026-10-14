@@ -40,8 +40,8 @@ python -m sphinx -b linkcheck docs docs/_build/linkcheck
 
 ## GitHub and Read the Docs
 
-The `Documentation` GitHub Actions workflow builds the site on pushes and pull
-requests. Download the `documentation-html` artifact from a successful run,
+Run the `Documentation` GitHub Actions workflow manually from the **Actions**
+tab. Download the `documentation-html` artifact from a successful run,
 extract it, and serve the extracted folder with `python -m http.server 8000`.
 Actions may need to be enabled in a fork's **Actions** tab first.
 
@@ -55,7 +55,7 @@ hosting integration; committing the configuration alone does not publish a site.
 ## Updating content
 
 The buildup parameter pages were migrated from
-`doc/reference/src/reference.tex`. The single-bunch page includes
+`docs/legacy_tex/reference/src/reference.tex`. The single-bunch page includes
 `PyPARIS_sim_class/Simulation_parameters_doc.md` directly, so that guide has one
 editable source. Preserve original authorship when migrating further material.
 
@@ -89,7 +89,7 @@ The parallel execution guide retains the wiki's MPI environment advice;
 the old Python and MPI source-compilation recipes remain historical.
 
 The buildup tutorial plots the output of the reader's simulation. The older
-plotting script in `doc/example/` reads a stored regression reference file.
+plotting script in `docs/legacy_tex/example/` reads a stored regression reference file.
 
 | Original material | Destination |
 | --- | --- |
@@ -107,4 +107,4 @@ index remain historical. The old macOS recipe has not been promoted to current
 instructions without platform validation. The separate Furman–Pivi and fast
 beam-ion wiki pages were placeholders; the useful Furman–Pivi references were
 retained from the physics page. The old PDF compilation page is superseded by
-the Sphinx build instructions; its LaTeX sources remain in `doc/reference/src/`.
+the Sphinx build instructions; its LaTeX sources remain in `docs/legacy_tex/reference/src/`.

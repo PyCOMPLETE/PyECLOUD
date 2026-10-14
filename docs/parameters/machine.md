@@ -274,7 +274,7 @@ photons (non-reflected). The reflected photons generated elsewhere.**
   - See inv_CDF_refl_photoem_file, but for all photons. If it is set to ’unif_no_file’, the
     photoelectron generation is uniform over the whole surface. Example scripts to generate a file
     with the correct format can be found in the folder
-    `other/photoemission_angular_distribution/` in the repository.
+    `examples/photoemission_angular_distribution/` in the repository.
 ```
 
 **Uniform initial distribution** Simulation starts with electrons uniformly distributed in the

@@ -2,6 +2,7 @@
 # Thanks for E. Belli, L. Mether and A. Romano for preparing this script
 
 import sys, os
+from pathlib import Path
 
 import pylab as pl
 import numpy as np
@@ -13,7 +14,10 @@ pl.close('all')
 ms.mystyle_arial(fontsz=16)
 dpiset = 200
 
-ob = mlo.myloadmat_to_obj('../../testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/Pyecltest_angle3D_ref.mat')
+reference_file = (Path(__file__).resolve().parents[3] / 'testing/tests_buildup'
+                  / 'LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns'
+                  / 'Pyecltest_angle3D_ref.mat')
+ob = mlo.myloadmat_to_obj(str(reference_file))
 
 ifig = 0
 
