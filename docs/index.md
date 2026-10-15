@@ -40,6 +40,7 @@ installation
 :caption: Tutorials
 
 tutorials/buildup
+tutorials/buildup-outputs
 tutorials/single-bunch
 tutorials/parallel
 tutorials/restart

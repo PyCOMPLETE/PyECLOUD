@@ -9,17 +9,21 @@ beam monitors use HDF5 files as shown in the
 ## Read a result
 
 ```python
-from scipy.io import loadmat
+from PyECLOUD.myloadmat_to_obj import myloadmat_to_obj
 
-data = loadmat("Pyecltest.mat", squeeze_me=True)
-print(sorted(name for name in data if not name.startswith("__")))
-print(data["t"].shape, data["Nel_timep"].shape)
+data = myloadmat_to_obj("Pyecltest.mat")
+print(sorted(name for name in vars(data) if not name.startswith("__")))
+print(data.t.shape, data.Nel_timep.shape)
 ```
 
-`squeeze_me=True` removes singleton dimensions. Inspect shapes before indexing
+The loader exposes output variables as attributes and removes singleton dimensions
+by default (`squeeze=True`). Inspect shapes before indexing
 histograms, especially for runs with only one sample or bunch passage.
+Use `myloadmat_to_obj("Pyecltest.mat", squeeze=False)` to preserve singleton axes.
 The [buildup tutorial](../tutorials/buildup.md#inspect-your-result) plots the
 simulation time series.
+See [Plotting buildup results](../tutorials/buildup-outputs.md) for the full
+set of example figures and histogram projections.
 
 ## Time series
 

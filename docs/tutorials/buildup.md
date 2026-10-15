@@ -73,13 +73,13 @@ your output file:
 
 ```python
 import matplotlib.pyplot as plt
-from scipy.io import loadmat
+from PyECLOUD.myloadmat_to_obj import myloadmat_to_obj
 
-data = loadmat("Pyecltest.mat", squeeze_me=True)
+data = myloadmat_to_obj("Pyecltest.mat")
 fig, axes = plt.subplots(2, 1, sharex=True)
-axes[0].plot(data["t"] * 1e9, data["lam_t_array"])
+axes[0].plot(data.t * 1e9, data.lam_t_array)
 axes[0].set_ylabel("Beam particles / m")
-axes[1].plot(data["t"] * 1e9, data["Nel_timep"])
+axes[1].plot(data.t * 1e9, data.Nel_timep)
 axes[1].set_ylabel("Electrons / m")
 axes[1].set_xlabel("Time [ns]")
 fig.tight_layout()
@@ -90,9 +90,8 @@ fig.savefig("buildup.png", dpi=150)
 python plot_buildup.py
 ```
 
-Open `buildup.png` to inspect the beam profile and cloud population.
+The resulting `buildup.png` shows the beam profile and cloud population.
 
-Continue with the [output reference](../reference/outputs.md) or
-[saving and restarting simulations](restart.md).
+For more examples, see [Plotting buildup results](buildup-outputs.md).
 
 Adapted from the [original buildup tutorial](https://github.com/PyCOMPLETE/PyECLOUD/wiki/How-to-simulate-an-electron-cloud-buildup).

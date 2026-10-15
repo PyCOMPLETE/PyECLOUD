@@ -90,6 +90,16 @@ the old Python and MPI source-compilation recipes remain historical.
 
 The buildup tutorial plots the output of the reader's simulation. The older
 plotting script in `docs/legacy_tex/example/` reads a stored regression reference file.
+The plotting guide presents all 20 legacy output examples in five grouped SVG
+figures. They are generated from the saved LHC dipole reference data using
+`docs/_static/plot_buildup_outputs.py` and stored in `docs/_static/buildup/`.
+Sphinx includes these figures directly, so building the website does not require
+running PyECLOUD or regenerating plots. To regenerate them from the repository
+root with PyECLOUD and Matplotlib installed:
+
+```bash
+python docs/_static/plot_buildup_outputs.py testing/tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns/Pyecltest_angle3D_ref.mat --output-dir docs/_static/buildup
+```
 
 | Original material | Destination |
 | --- | --- |
