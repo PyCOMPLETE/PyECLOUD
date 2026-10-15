@@ -116,12 +116,13 @@ the repository root:
 ./release.sh
 ```
 
-As in xwakes, the script creates and pushes `v<version>` to `origin`, builds an
-sdist with `setup.py`, then uploads it using Twine and your PyPI credentials
-(for example, configured in `~/.pypirc`). The archive is built in a temporary
-directory so only this release's source archive is uploaded, then cleaned up.
-No wheels are uploaded. If building or uploading fails after the tag is pushed,
-finish the remaining release steps manually.
+The script reads the version from `PyECLOUD/_version.py`, builds the sdist with
+`python -m build`, creates and pushes `v<version>` to `origin`, then uploads the
+archive using Twine and your PyPI credentials (for example, configured in
+`~/.pypirc`). The archive is built in a temporary directory so only this
+release's source archive is uploaded, then cleaned up. No wheels are uploaded.
+A failed build stops the script before anything is tagged. If uploading fails
+after the tag is pushed, finish the upload manually.
 
 ## Documentation
 
