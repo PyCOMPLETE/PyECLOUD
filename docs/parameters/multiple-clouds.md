@@ -31,20 +31,12 @@ files, as listed below. The following parameters are required in the cloud input
 
 * - Parameter
   - Description
-* - **cloud_mass**
-  - See Simulation parameters section.
-* - **cloud_charge**
-  - Cloud particle charge. See the Simulation parameters section.
-* - **gas_ion_flag**
-  - See Machine parameters section.
-* - **photoem_flag**
-  - —
-* - **init_unif_flag**
-  - —
-* - **init_unif_edens_flag**
-  - —
+* - **cloud_mass**, **cloud_charge**
+  - See the [Simulation parameters](simulation.md) section.
+* - **gas_ion_flag**, **photoem_flag**, **init_unif_flag**, **init_unif_edens_flag**
+  - See the [Machine parameters](machine.md) section.
 * - **switch_model**
-  - See Secondary emission parameters section.
+  - See the [Secondary emission parameters](secondary-emission.md) section.
 ```
 
 In addition, a cloud file can contain the following optional parameters. Any optional parameter
@@ -59,25 +51,19 @@ default value if the parameter is not given in the main input files.
 
 * - Parameter
   - Description
-* - **MP management settings**
-  - See the Simulation parameters section for the detailed list of parameters and their usage.
-* - **Saving settings**
-  - —
-* - **Log and progress files**
-  - —
+* - **MP management settings**, **Saving settings**, **Log and progress files**
+  - See the [Simulation parameters](simulation.md) section for the detailed list of parameters
+    and their usage.
 * - **N_sub_steps**
-  - See under “Tracking and magnetic field” in the Machine parameters section.
-* - **Residual gas ionization parameters**
-  - See the Machine parameters section for the detailed list of parameters and their usage.
-* - **Photoemission parameters**
-  - —
-* - **Uniform initial distribution**
-  - —
-* - **Uniform initial density**
-  - —
+  - See under “Tracking and magnetic field” in the [Machine parameters](machine.md) section.
+* - **Residual gas ionization parameters**, **Photoemission parameters**, **Uniform initial
+    distribution**, **Uniform initial density**
+  - See the [Machine parameters](machine.md) section for the detailed list of parameters and
+    their usage.
 * - **Secondary emission parameters**
-  - As listed in the Secondary emission parameters section.
+  - As listed in the [Secondary emission parameters](secondary-emission.md) section.
 ```
 
-Each cloud produces its own .mat output file, as described in the original reference manual.
+Each cloud produces its own .mat output file, as described in the
+[output reference](../reference/outputs.md).
 The file is named according to the main output file name and the cloud file name.

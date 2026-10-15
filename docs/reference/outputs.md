@@ -125,8 +125,8 @@ empty array or a sentinel value. Inspect the saved data before plotting them.
 | `el_dens_at_probes` | Volume densities at locations configured by `el_density_probes` [m⁻³], indexed by probe and saved sample |
 | `x_el_dens_probes`, `y_el_dens_probes` | Probe centre coordinates [m] |
 | `r_el_dens_probes` | Probe radii [m] |
-| `nel_hist_det` | Detailed electron-position histogram, with `flag_hist_det` |
-| `xg_hist_det` | Coordinates of the detailed histogram bins [m], with `flag_hist_det` |
+| `nel_hist_det` | Detailed electron-position histogram, saved when the `*_hist_det` inputs are set |
+| `xg_hist_det` | Coordinates of the detailed histogram bins [m], saved when the `*_hist_det` inputs are set |
 | `cos_angle_hist` | Histogram of the cosine of electron impact angles |
 | `xg_hist_cos_angle` | Coordinates of the impact-angle histogram bins |
 

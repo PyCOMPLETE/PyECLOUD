@@ -110,7 +110,7 @@ used for regeneration and saving purposes.
     than fact_split\*Nref, the impacting MP is simply rescaled according to the SEY. Otherwise new
     MPs are generated in order to keep the MP size as close as possible to Nref.
 * - **fact_clean**
-  - MP clean factor. MPs smaller than fact_split\*Nref are deleted from the MP set. This test is
+  - MP clean factor. MPs smaller than fact_clean\*Nref are deleted from the MP set. This test is
     performed at each t=n\*b_spac with n an integer.
 * - **nel_mp_ref_0**
   - \[e-/m\] Initial MP size.
@@ -334,7 +334,7 @@ If **flag_lifetime_hist** is set to True, the variables **Dt_lifetime_hist**,
 ```
 
 **Additional clouds** Simulations with multiple clouds can be enabled with the following input
-parameter. See the multiple-clouds page for a detailed description of this simulation mode.
+parameter. See the [multiple-clouds page](multiple-clouds.md) for a detailed description of this simulation mode.
 
 ```{list-table}
 :header-rows: 1
@@ -355,7 +355,7 @@ parameter. See the multiple-clouds page for a detailed description of this simul
 * - Parameter
   - Description
 * - **extract_sey**
-  - (optional – default=True) If set to False, it disables the extraction the SEY curves.
+  - (optional – default=True) If set to False, it disables the extraction of the SEY curves.
 ```
 
 **Extraction of electron emission energy distribution**
