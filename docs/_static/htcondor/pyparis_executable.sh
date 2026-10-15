@@ -3,6 +3,12 @@ set -uo pipefail
 
 ROOT_URL="root://eosproject-e.cern.ch/"
 SIM_PATH="/eos/project/e/ecloud-simulations/YOURDIRECTORY/stability/run_000/"
+# Normalize to one trailing slash before joining URLs and filenames.
+while [[ "$ROOT_URL" == */ ]]; do ROOT_URL="${ROOT_URL%/}"; done
+ROOT_URL="$ROOT_URL/"
+while [[ "$SIM_PATH" == */ ]]; do SIM_PATH="${SIM_PATH%/}"; done
+SIM_PATH="$SIM_PATH/"
+previous_bunch_state=""
 JOB_PWD="${_CONDOR_SCRATCH_DIR:?}"
 cpus=${1:?Missing CPU count}
 xrdcp_opts=(--retry 3)
@@ -32,6 +38,7 @@ transfer_inputs() {
         for file in "${files[@]}"; do
             xrdcp "${xrdcp_opts[@]}" "${ROOT_URL}${SIM_PATH}${file}" ./ || return 1
         done
+        previous_bunch_state="${files[2]}"
         for file in multigrid_config_dip.pkl multigrid_config_dip.txt; do
             if grep -Fxq "${SIM_PATH}${file}" <<< "$listing"; then
                 xrdcp "${xrdcp_opts[@]}" "${ROOT_URL}${SIM_PATH}${file}" ./ || return 1
@@ -64,12 +71,22 @@ transfer_outputs() {
     # Publish the status only after every associated file has arrived.
     xrdcp "${xrdcp_opts[@]}" -f simulation_status.sta \
         "${ROOT_URL}${SIM_PATH}simulation_status.sta" || return 1
+
+    # Delete only the state we resumed from, after the new checkpoint is saved.
+    if [[ -n "$previous_bunch_state" && "$previous_bunch_state" != "${files[2]}" ]]; then
+        if ! xrdfs "$ROOT_URL" rm "${SIM_PATH}${previous_bunch_state}"; then
+            echo "Warning: checkpoint saved, but could not remove $previous_bunch_state" >&2
+        fi
+    fi
+    return 0
 }
 
 transfer_inputs || exit 1
-source /eos/project/e/ecloud-simulations/YOURDIRECTORY/environments/activate-ecloud.sh || exit 1
+# Remove if using container -------------------------------------------------
+conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env || exit 1
+# ---------------------------------------------------------------------------
 date >> envinfo.txt
-run_python -c 'import os, sys; print(sys.version); print("ECLOUD_CONTAINER_VERSION=" + os.environ.get("ECLOUD_CONTAINER_VERSION", "not using a container"))' >> envinfo.txt || exit 1
+run_python -c 'import os, PyECLOUD; key = "ECLOUD_CONTAINER_VERSION"; print(f"{key}={os.environ[key]}" if key in os.environ else f"PyECLOUD={PyECLOUD.__version__}")' > envinfo.txt
 
 run_python -m PyPARIS.multiprocexec -n "$cpus" \
     sim_class=PyPARIS_sim_class.Simulation.Simulation >> stdout.txt 2>> stderr.txt
@@ -79,6 +96,6 @@ if (( script_exit == 0 || script_exit == 177 )); then
     transfer_outputs || exit 1
 else
     echo "Simulation failed; completed checkpoint not published." >&2
-    cat stderr.txt >&2
+    tail -n 100 stderr.txt >&2
 fi
 exit "$script_exit"

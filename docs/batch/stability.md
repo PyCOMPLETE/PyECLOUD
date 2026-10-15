@@ -57,8 +57,9 @@ the worker, so no simulation filenames appear in `transfer_output_files`.
 ## Worker script
 
 Download {download}`pyparis_executable.sh <../_static/htcondor/pyparis_executable.sh>`
-and save it beside `htcondor.sub`. Set `ROOT_URL`, `SIM_PATH`, and the environment
-activation path. `SIM_PATH` must end in `/`. See
+and save it beside `htcondor.sub`. Set `ROOT_URL`, `SIM_PATH`, and the EOS
+environment path. The script normalizes trailing slashes in `ROOT_URL` and
+`SIM_PATH`. See
 [Python environment](index.md#python-environment) for setup instructions.
 
 This script follows the example in
@@ -93,7 +94,9 @@ job. Never remove the status file to recover a failed continuation.
 ### Alternative: use the maintained container
 
 Replace `run_python` with the [CVMFS container wrapper](index.md#alternative-a-cvmfs-container)
-and remove the `source .../activate-ecloud.sh` line. The exact container path is:
+and remove the `conda activate` line. No environment activation is needed
+when using the container.
+The exact container path is:
 
 ```text
 /cvmfs/unpacked.cern.ch/ghcr.io/ekatralis/ecloud-containers:latest/
@@ -110,7 +113,11 @@ on `0` or `177`, then returns that code. Input or output transfer failures retur
 checkpoint must be uploaded before exiting.
 
 The script checks the required files and transfer results, then uploads
-`simulation_status.sta` last. Previous bunch states are retained.
+`simulation_status.sta` last. Only after all uploads succeed does it delete
+the previous `bunch_status_partNN.h5` used to resume the simulation. The new
+bunch state and evolution files are kept. If deletion fails, the script logs
+a warning and preserves the simulation exit code so continuation can proceed;
+the old file can be removed manually.
 An interrupted upload can leave files from different parts on EOS. Inspect
 the checkpoint before restarting. Run only one workflow per EOS simulation
 directory.

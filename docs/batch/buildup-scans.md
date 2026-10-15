@@ -31,85 +31,90 @@ space for inputs, unpacked results, and the compressed archive simultaneously.
 
 ```text
 universe = vanilla
+arguments = ""
 executable = job.sh
-output = logs/$(ClusterId).$(ProcId).out
-error = logs/$(ClusterId).$(ProcId).err
+output = htcondor.out
+error = htcondor.err
 log = logs/$(ClusterId).log
 
 should_transfer_files = YES
 transfer_input_files = $(folder)/inputs.tgz, root://eosproject-e.cern.ch//eos/project/e/ecloud-simulations/YOURDIRECTORY/scan/jobfiles.tgz
 when_to_transfer_output = ON_EXIT
 transfer_output_files = output.tgz
-output_destination = root://eosproject-e.cern.ch//eos/project/e/ecloud-simulations/YOURDIRECTORY/scan/results/$(folder)/$(ClusterId).$(ProcId)/
+output_destination = root://eosproject-e.cern.ch//eos/project/e/ecloud-simulations/YOURDIRECTORY/scan/results/$(folder)/
 MY.XRDCP_CREATE_DIR = True
 
-request_cpus = 1
-request_memory = 4GB
-request_disk = 10GB
 +JobFlavour = "tomorrow"
 queue folder from sims.txt
 ```
 
-Each attempt has a separate destination to avoid overwriting earlier results.
-The event log stays on AFS; the named archive goes to EOS.
+Each scan point has one EOS directory containing `output.tgz`. Resubmitting
+a point reuses that destination. The event log stays on AFS.
 
 ## Worker script
 
-Save as `job.sh`. The archive includes inputs, outputs, and a wrapper status
-file, including when extraction, environment activation, or Python fails.
+Save as `job.sh`. Set `OUTPUT_MAT` to the filename configured by
+`filen_main_outp` in your simulation inputs, including the `.mat` extension.
+The default option set by PyECLOUD is `Pyecltest.mat`.
 
 ```bash
 #!/bin/bash
-set -euo pipefail
-cd "${_CONDOR_SCRATCH_DIR:?}"
-scratch=$PWD
-mkdir work
-printf 'Worker started; simulation has not completed.\n' > work/job-status.txt
-# A fallback exists even if later archive creation fails.
-tar -czf output.tgz -C work .
+set -e
 
-finish() {
-    rc=$?
-    trap - EXIT
-    set +e
-    printf 'worker_exit_code=%s\n' "$rc" > "$scratch/work/job-status.txt"
-    tar -czf "$scratch/output.tmp.tgz" -C "$scratch/work" .
-    archive_rc=$?
-    if (( archive_rc == 0 )); then
-        mv "$scratch/output.tmp.tgz" "$scratch/output.tgz"
-        archive_rc=$?
-    fi
-    if (( archive_rc != 0 )); then
-        echo "Output archiving failed; retaining fallback archive" >&2
-        if (( rc == 0 )); then rc=$archive_rc; fi
-    fi
-    exit "$rc"
+OUTPUT_MAT="Pyecltest.mat"
+
+# Keep an archive available if a later command fails.
+printf 'Job did not complete; see the HTCondor logs.\n' > job-status.txt
+tar -czf output.tgz job-status.txt
+
+tar -xzf jobfiles.tgz
+rm jobfiles.tgz
+tar -xzf inputs.tgz
+rm inputs.tgz
+
+# Remove if using container and replace with container command -----
+conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env
+run_python() {
+    python "$@"
 }
-trap finish EXIT
+# -------------------------------------------------------------------
 
-tar -xzf jobfiles.tgz -C work
-tar -xzf inputs.tgz -C work
-cd work
-source /eos/project/e/ecloud-simulations/YOURDIRECTORY/environments/activate-ecloud.sh
-python run_sim.py > simulation.stdout 2> simulation.stderr
+run_python -c 'import os, PyECLOUD; key = "ECLOUD_CONTAINER_VERSION"; print(f"{key}={os.environ[key]}" if key in os.environ else f"PyECLOUD={PyECLOUD.__version__}")' > envinfo.txt
+run_python run_sim.py
+
+printf 'Simulation completed successfully.\n' > job-status.txt
+optional_files=()
+if [[ -f stop.txt ]]; then optional_files+=(stop.txt); fi
+
+tar -czvf output.tmp.tgz "$OUTPUT_MAT" progress.txt logfile.txt \
+    envinfo.txt job-status.txt "${optional_files[@]}" *.input *.beam
+mv output.tmp.tgz output.tgz
 ```
 
-The EXIT trap preserves a nonzero simulation exit code. If the simulation
-succeeds but archiving fails, the worker returns the archive failure instead.
-Archives are created outside `work` to avoid including themselves. A failure
-before the fallback is created, disk failure, or forced termination can still
-prevent delivery; this is not eviction recovery.
+The simulation runs directly in `_CONDOR_SCRATCH_DIR`. `set -e` stops the
+script if extraction, activation, Python, or archiving fails. The final archive
+contains the named result and log files, the inputs, and `stop.txt` when present.
+Required files must exist for archiving to succeed.
 
-After retrieval, inspect `job-status.txt`, the logs, and expected simulation
-completion. A fallback archive or partially written `output.mat` is not a
-successful result. Keep the archive until validation is complete.
+A small fallback archive is created before the simulation. The final archive
+replaces it only after `tar` succeeds, so an ordinary failure still leaves
+`output.tgz` available for HTCondor to transfer. Forced termination or disk
+failure can still prevent delivery. Check the job exit code and logs before
+using the results.
+
+### Using the container
+
+Remove `conda activate` and replace `run_python` with the
+[CVMFS container wrapper](index.md#alternative-a-cvmfs-container).
+The same recording command then writes `ECLOUD_CONTAINER_VERSION` from inside
+the container to `envinfo.txt`. With the EOS Conda environment, it records the
+installed PyECLOUD version instead. No environment activation is needed for
+the container.
 
 ## Submit
 
 ```bash
 mkdir -p logs
-chmod +x job.sh
-condor_submit -dry-run submit.ads htcondor.sub
 condor_submit htcondor.sub
 ```
 
@@ -123,5 +128,4 @@ To avoid archiving, set `transfer_output_files = ""`, remove
 after Python exits. Capture Python's exit code before transferring. Enumerate
 existing local files in the shell and check **every** transfer's exit code;
 do not pass wildcards to `transfer_output_files`. Fail the job if a required
-result is missing or its upload fails. Use a distinct EOS directory per
-attempt, and retain logs for failed simulations too.
+result is missing or its upload fails. Use the scan point's EOS directory and retain logs for failed simulations too.

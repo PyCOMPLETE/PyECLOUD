@@ -2,7 +2,7 @@
 
 Submit buildup scans and single-bunch stability simulations to CERN HTCondor
 using the examples below. Replace the example EOS locations,
-environment activation script, resources, and simulation inputs before use.
+Conda paths, resources, and simulation inputs before use.
 
 ```{toctree}
 :maxdepth: 1
@@ -48,31 +48,41 @@ root://eosproject-e.cern.ch//eos/project/e/ecloud-simulations/YOURDIRECTORY/scan
 
 For user storage, use `root://eosuser.cern.ch` with your `/eos/user/...` path.
 Update both the endpoint and the path when switching storage. In the stability
-worker script these are `ROOT_URL` and `SIM_PATH`; keep their trailing slashes
-as shown so the combined URL has `//eos/` after the hostname.
+worker script these are `ROOT_URL` and `SIM_PATH`. The script normalizes their
+trailing slashes so the combined URL has `//eos/` after the hostname.
 
 ## Python environment
 
-For the default examples, install the **complete Python/Conda environment on
-EOS**, including its interpreter, packages, and activation scripts. Workers
-activate the environment by sourcing:
+Before creating the environment or installing packages, put Conda's package
+cache in `/tmp` to avoid filling your AFS home directory:
 
 ```bash
-source /eos/project/e/ecloud-simulations/YOURDIRECTORY/environments/activate-ecloud.sh
-python -c 'import PyECLOUD, PyPARIS'
+mkdir -p /tmp/$USER/conda-pkgs
+export CONDA_PKGS_DIRS=/tmp/$USER/conda-pkgs
 ```
 
-Create this script to activate your EOS-hosted virtualenv or Conda environment.
-For Conda, source the EOS-hosted installation's `conda.sh` before activating
-the environment by its EOS path. Use an environment compatible with the
-worker OS. Follow the
-[installation instructions](../installation.md) when preparing it.
+Run these commands in the shell you use for installation.
+
+Create the **complete Conda environment on EOS** so workers can access its
+Python interpreter and installed packages. Replace `{yourinitial}` and
+`{yourusername}` with your CERN username's first letter and your username:
+
+```bash
+conda create -p /eos/user/{yourinitial}/{yourusername}/pyecloud-env python=3.13
+conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env
+```
+
+With this environment active, follow the package installation steps in the
+[installation guide](../installation.md), skipping its environment creation
+and activation commands. Ensure that conda is properly activated and you can
+activate the environment on lxplus. The worker scripts can then use `conda activate` directly.
 
 ### Alternative: a CVMFS container
 
-We recommend `ghcr.io/ekatralis/ecloud-containers:latest`, maintained for
+It is recommended to use `ghcr.io/ekatralis/ecloud-containers:latest`, maintained for
 electron cloud simulations and available through CERN CVMFS. This avoids
-maintaining your own Python environment on EOS.
+maintaining your own Python environment on EOS. The container provides the
+Python environment, so no Conda or other environment activation is needed.
 Replace environment activation and the Python invocation with a wrapper such as:
 
 ```bash
