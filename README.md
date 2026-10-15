@@ -127,8 +127,8 @@ finish the remaining release steps manually.
 
 The documentation site includes installation, simulation tutorials, input and
 output references, and links to the physical models.
-See [Working on the documentation](docs/documentation.md) for local builds and
-GitHub/Read the Docs previews. Building the site does not require installing the
+See [Working on the documentation](docs/documentation.md) for local builds,
+previews, and publishing. Building the site does not require installing the
 simulation packages or compiling their native extensions.
 
 The original [Wiki](https://github.com/PyCOMPLETE/PyECLOUD/wiki) remains available

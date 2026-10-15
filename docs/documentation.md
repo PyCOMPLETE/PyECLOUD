@@ -12,7 +12,7 @@ cells can contain paragraphs, lists, and equations without long table rows.
 ## Build and preview locally
 
 From the repository root, create a separate environment in `docs/.venv-docs`
-using Python 3.11 or newer (Read the Docs builds with Python 3.12):
+using Python 3.11 or newer (the publishing workflow uses Python 3.12):
 
 ```bash
 python -m venv docs/.venv-docs
@@ -39,19 +39,24 @@ unavailable:
 python -m sphinx -b linkcheck docs docs/_build/linkcheck
 ```
 
-## GitHub and Read the Docs
+## Publishing
 
-Run the `Documentation` GitHub Actions workflow manually from the **Actions**
-tab. Download the `documentation-html` artifact from a successful run,
-extract it, and serve the extracted folder with `python -m http.server 8000`.
-Actions may need to be enabled in a fork's **Actions** tab first.
+The site is published with GitHub Pages by the `Documentation` workflow
+(`.github/workflows/docs.yml`):
 
-For a hosted preview, connect your fork to a separate Read the Docs project and
-select the documentation branch in its version settings. The repository's
-`.readthedocs.yaml` installs the same documentation requirements and enables
-strict Sphinx builds. Enable pull request builds in the project's settings to
-preview pull requests opened against your fork. This requires configuring the
-hosting integration; committing the configuration alone does not publish a site.
+- Every push to `main`, including merged pull requests, builds the site and
+  deploys it.
+- Every pull request against `main` builds the site without deploying it, so
+  warnings and broken references are caught before merging.
+- The workflow can also be started manually from the **Actions** tab.
+
+The build uses the same strict settings as the local build above. Only
+`PyCOMPLETE/PyECLOUD` deploys; forks run the build check only.
+
+To preview a build, download the `documentation-html` artifact from the run
+summary, extract it, and serve the extracted folder with
+`python -m http.server 8000`. In a fork, Actions may need to be enabled in the
+fork's **Actions** tab first.
 
 ## Updating content
 
