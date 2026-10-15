@@ -105,10 +105,7 @@ using the results.
 ### Using the container
 
 Remove `conda activate` and replace `run_python` with the
-[CVMFS container wrapper](index.md#alternative-a-cvmfs-container).
-The same recording command then writes `ECLOUD_CONTAINER_VERSION` from inside
-the container to `envinfo.txt`. With the EOS Conda environment, it records the
-installed PyECLOUD version instead. No environment activation is needed for
+[CVMFS container wrapper](index.md#alternative-a-cvmfs-container). No environment activation is needed for 
 the container.
 
 ## Submit

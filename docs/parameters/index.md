@@ -14,5 +14,5 @@ secondary-emission
 multiple-clouds
 ```
 
-The {download}`original reference manual <../legacy_tex/reference/reference.pdf>`
-also describes simulation outputs.
+The {download}`original reference manual <../legacy_tex/reference/reference.pdf>` can be used as a reference
+when using PyECLOUD versions older than v8.9.0.

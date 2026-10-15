@@ -85,6 +85,12 @@ The restart guide was checked against `PyECLOUD/buildup_simulation.py`,
 `PyECLOUD/pyecloud_saver.py`, and `PyPARIS_sim_class/Save_Load_Status.py`.
 Output field names were checked against `PyECLOUD/pyecloud_saver.py`, including
 `xg_hist_det`, which was duplicated as `nel_hist_det` in the original manual.
+The output reference also preserves the manual's array dimensions, sampling
+definitions, and enabling flags. The manual describes lifetime histograms as
+being saved per bunch passage; the current implementation uses
+`Dt_lifetime_hist` and saves `t_lifetime_hist`, so the reference documents that
+timing instead. Energy normalization and the transverse sampling region for
+`cen_density` follow the implementation rather than the manual's older wording.
 The parallel execution guide retains the wiki's MPI environment advice;
 the old Python and MPI source-compilation recipes remain historical.
 

@@ -102,8 +102,7 @@ The exact container path is:
 /cvmfs/unpacked.cern.ch/ghcr.io/ekatralis/ecloud-containers:latest/
 ```
 
-Input and output transfers still run in the host worker shell. The environment
-recording command will then capture the container's `ECLOUD_CONTAINER_VERSION`.
+Input and output transfers always run in the host worker shell. 
 
 ### Exit codes and checkpoint transfers
 
@@ -153,7 +152,6 @@ number of additional parts; choose it to cover your planned run. See
 ```bash
 mkdir -p logs
 chmod +x pyparis_executable.sh post_check.sh
-condor_submit -dry-run submit.ads htcondor.sub
 condor_submit_dag workflow.dag
 ```
 

@@ -20,12 +20,18 @@ The loader exposes output variables as attributes and removes singleton dimensio
 by default (`squeeze=True`). Inspect shapes before indexing
 histograms, especially for runs with only one sample or bunch passage.
 Use `myloadmat_to_obj("Pyecltest.mat", squeeze=False)` to preserve singleton axes.
+The file can also be read with SciPy's `scipy.io.loadmat`.
 The [buildup tutorial](../tutorials/buildup.md#inspect-your-result) plots the
 simulation time series.
 See [Plotting buildup results](../tutorials/buildup-outputs.md) for the full
 set of example figures and histogram projections.
 
 ## Time series
+
+`N_steps` denotes the number of saved time samples, `N_pass` the number of
+recorded bunch passages, `N_bins` the number of horizontal histogram bins,
+and `N_en` the number of energy bins. The time-series arrays below have shape
+`(N_steps,)` after squeezing, provided there is more than one sample.
 
 Use the saved `t` array as the time coordinate. The saver uses a sampling
 interval based on `Dt_ref * dec_fact_out`; saving and tracking need not occur
@@ -50,10 +56,11 @@ area to give volume density.
 | `En_kin_eV_time` | Total weighted electron kinetic energy currently in the chamber [eV/m] |
 | `cen_density` | Electron volume density in a transverse disk of radius `r_center` around the origin [m⁻³] |
 
-These time-series arrays share the saved sample index. Optional time-series
-fields include `N_mp_time` and `nel_mp_ref_time` when `flag_detailed_MP_info`
-is enabled. Other enabled models can add fields, such as electric-field energy
-or cross-ionization observables.
+These time-series arrays share the saved sample index. With
+`flag_detailed_MP_info`, `N_mp_time` records the total number of macroparticles
+at each saved time and `nel_mp_ref_time` records their reference weight.
+Other enabled models can add fields, such as electric-field energy or
+cross-ionization observables.
 
 ## Bunch passages and histograms
 
@@ -62,6 +69,13 @@ coordinates. Horizontal histograms are organized by passage and horizontal
 bin. Energy spectra use their own recorded times, `t_En_hist`, and energy-bin
 coordinates, `En_g_hist`; do not assume their number of records equals the
 number of bunch passages.
+
+The passage arrays `t_hist`, `N_mp_pass`, `N_mp_ref_pass`, `N_mp_impact_pass`,
+and `N_mp_corrected_pass` have shape `(N_pass,)`. The horizontal coordinates
+`xg_hist` have shape `(N_bins,)`. The four horizontal histograms—`nel_hist`,
+`nel_impact_hist_tot`, `nel_impact_hist_scrub`, and `energ_eV_impact_hist`—have
+shape `(N_pass, N_bins)`, with one row per passage and one column per bin.
+Singleton axes are removed by the loader's default squeezing.
 
 | Variable | Meaning |
 | --- | --- |
@@ -75,14 +89,19 @@ number of bunch passages.
 | `nel_impact_hist_tot` | Horizontal histogram of electron impacts |
 | `nel_impact_hist_scrub` | Horizontal impact histogram restricted to energies above `scrub_en_th` |
 | `energ_eV_impact_hist` | Horizontal histogram of weighted energy deposited at the walls |
-| `En_hist` | Impacting-electron energy spectrum |
-| `all_Ekin_hist` | Energy histogram of the electrons in the chamber |
+| `En_hist` | Impacting-electron counts per recorded interval and energy bin |
+| `all_Ekin_hist` | Kinetic-energy histogram of all electrons in the chamber at each recorded energy-sampling time |
 | `t_En_hist` | Times associated with the energy spectra [s] |
 | `En_g_hist` | Energy-bin centres [eV] |
-| `lifetime_hist` | Electron lifetime histogram, when enabled |
+| `lifetime_hist` | Electron lifetime counts per recorded interval and lifetime bin, with `flag_lifetime_hist` |
 | `lifetime_g_hist` | Lifetime-bin centres [s] |
+| `t_lifetime_hist` | Saved lifetime-histogram times [s], controlled by `Dt_lifetime_hist` |
 
-The energy and lifetime histograms include overflow in their final bin. Counts
+Lifetime histograms have their own sampling interval, `Dt_lifetime_hist`;
+use `t_lifetime_hist` to locate their records in time.
+
+The final bin of each energy and lifetime histogram collects entries outside
+the selected energy or lifetime range. Counts
 are binned accumulations; converting them into a density per unit energy or
 time requires the corresponding bin width and accumulation interval.
 
@@ -93,21 +112,21 @@ empty array or a sentinel value. Inspect the saved data before plotting them.
 
 | Variable | Meaning |
 | --- | --- |
-| `dec_fact_out` | Time-series output sampling factor |
+| `dec_fact_out` | Time-series output sampling factor: for a fixed step `Dt_ref`, output is saved every `dec_fact_out` steps |
 | `b_spac` | Bunch spacing used internally [s] |
 | `t_sc_video` | Recorded space-charge update times [s] |
 | `U_sc_eV` | Legacy field described as unused in the original manual |
 | `chamber_area` | Transverse chamber area [m²] |
 | `nel_hist_impact_seg` | Electron impacts on chamber segments, with `flag_hist_impact_seg` |
 | `nel_hist_emit_seg` | Emitted-electron histogram on chamber segments |
-| `energ_eV_impact_seg` | Weighted impacting-electron energy on chamber segments |
+| `energ_eV_impact_seg` | Total weighted energy deposited by impacting electrons on each chamber segment [eV/m], with `flag_hist_impact_seg` |
 | `t_sec_beams` | Times of saved secondary-beam information [s] |
 | `sec_beam_profiles` | Secondary-beam line-density profiles [particles/m] |
-| `el_dens_at_probes` | Volume densities measured at configured probes [m⁻³], indexed by probe and saved sample |
+| `el_dens_at_probes` | Volume densities at locations configured by `el_density_probes` [m⁻³], indexed by probe and saved sample |
 | `x_el_dens_probes`, `y_el_dens_probes` | Probe centre coordinates [m] |
 | `r_el_dens_probes` | Probe radii [m] |
 | `nel_hist_det` | Detailed electron-position histogram, with `flag_hist_det` |
-| `xg_hist_det` | Coordinates of the detailed histogram bins [m] |
+| `xg_hist_det` | Coordinates of the detailed histogram bins [m], with `flag_hist_det` |
 | `cos_angle_hist` | Histogram of the cosine of electron impact angles |
 | `xg_hist_cos_angle` | Coordinates of the impact-angle histogram bins |
 

@@ -104,6 +104,9 @@ are available.
 
 ## Output transfers and held jobs
 
+Both examples save `envinfo.txt`, which records the container version or the
+PyECLOUD version used for the simulation.
+
 Configure output transfers in the **HTCondor submit file** (`htcondor.sub`).
 For the `root://` destinations used here, explicitly list individual files in
 the submit file's `transfer_output_files`. Do not use wildcards or rely on directory transfer via

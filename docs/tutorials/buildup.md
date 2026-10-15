@@ -93,5 +93,3 @@ python plot_buildup.py
 The resulting `buildup.png` shows the beam profile and cloud population.
 
 For more examples, see [Plotting buildup results](buildup-outputs.md).
-
-Adapted from the [original buildup tutorial](https://github.com/PyCOMPLETE/PyECLOUD/wiki/How-to-simulate-an-electron-cloud-buildup).

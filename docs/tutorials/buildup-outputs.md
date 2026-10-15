@@ -81,6 +81,3 @@ shown on this page. The [output reference](../reference/outputs.md) describes
 these fields and how to load them with `myloadmat_to_obj`.
 Results from a new run can differ with the software version, input settings,
 and random particle sampling.
-
-Adapted from the original manual's plotting examples by E. Belli, L. Mether,
-and A. Romano, preserved in `docs/legacy_tex/example/000_plot_main_output.py`.
