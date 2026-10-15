@@ -5,9 +5,9 @@ rm -rf outputs
 
 mkdir -p outputs/000_test_photoemission
 for energy_dist in gaussian lognormal lorentz rect; do
-    python 000_test_photoemission.py -o "outputs/000_test_photoemission/output_${energy_dist}_3D" --noshow --energy-dist "$energy_dist" 
+    python 000_test_photoemission.py -o "outputs/000_test_photoemission/output_${energy_dist}_cosine_3D" --noshow --energy-dist "$energy_dist"
     if [ $? -ne 0 ]; then
-        echo "python 000_test_photoemission.py -o "000_test_photoemission/output_${energy_dist}_3D" --noshow --energy-dist $energy_dist" >> failed_tests.txt
+        echo "python 000_test_photoemission.py -o outputs/000_test_photoemission/output_${energy_dist}_cosine_3D --noshow --energy-dist $energy_dist" >> failed_tests.txt
     fi
 done
 
