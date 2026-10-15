@@ -1,29 +1,11 @@
 # Simulations with multiple clouds
 
-The code provides the option of including more than one cloud in the simulation. Each cloud is
-influenced by the other clouds through their space charge. Cross-ionization processes between
-different clouds can be defined. These options can be enabled by providing the following
-additional information.
+A simulation can include more than one cloud. Each cloud feels the space charge of the others,
+and cross-ionization processes between clouds can be defined.
 
-In the **simulation_parameters.input** file:
+## Main input
 
-```{list-table}
-:header-rows: 1
-:widths: 35 65
-
-* - Parameter
-  - Description
-* - **additional_clouds_file_list**
-  - (optional – default=\[\]) List of names of additional cloud files.
-* - **cross_ion_definitions**
-  - (optional – default={ }) Dictionary that describes the desired cross-ionization processes (more
-    details can be found in <https://indico.cern.ch/event/835473/contributions/3525107/>).
-```
-
-Each cloud file should contain a subset of the input parameters specified in the main input
-files, as listed below. The following parameters are required in the cloud input file.
-
-**Mandatory cloud parameters**
+Add these parameters to `simulation_parameters.input`:
 
 ```{list-table}
 :header-rows: 1
@@ -31,19 +13,18 @@ files, as listed below. The following parameters are required in the cloud input
 
 * - Parameter
   - Description
-* - **cloud_mass**, **cloud_charge**
-  - See the [Simulation parameters](simulation.md) section.
-* - **gas_ion_flag**, **photoem_flag**, **init_unif_flag**, **init_unif_edens_flag**
-  - See the [Machine parameters](machine.md) section.
-* - **switch_model**
-  - See the [Secondary emission parameters](secondary-emission.md) section.
+* - `additional_clouds_file_list`
+  - *Optional, default `[]`.* List of additional cloud file names.
+* - `cross_ion_definitions`
+  - *Optional, default `None`.* Dictionary describing the cross-ionization processes (see this
+    [presentation](https://indico.cern.ch/event/835473/contributions/3525107/) for details).
 ```
 
-In addition, a cloud file can contain the following optional parameters. Any optional parameter
-that is not specified in the cloud input file takes its value from the main input, and gets the
-default value if the parameter is not given in the main input files.
+## Cloud files
 
-**Optional cloud parameters**
+Each cloud file contains a subset of the parameters of the main input files.
+
+### Required parameters
 
 ```{list-table}
 :header-rows: 1
@@ -51,19 +32,34 @@ default value if the parameter is not given in the main input files.
 
 * - Parameter
   - Description
-* - **MP management settings**, **Saving settings**, **Log and progress files**
-  - See the [Simulation parameters](simulation.md) section for the detailed list of parameters
-    and their usage.
-* - **N_sub_steps**
-  - See under “Tracking and magnetic field” in the [Machine parameters](machine.md) section.
-* - **Residual gas ionization parameters**, **Photoemission parameters**, **Uniform initial
-    distribution**, **Uniform initial density**
-  - See the [Machine parameters](machine.md) section for the detailed list of parameters and
-    their usage.
-* - **Secondary emission parameters**
-  - As listed in the [Secondary emission parameters](secondary-emission.md) section.
+* - `cloud_mass`, `cloud_charge`
+  - See [Simulation parameters](simulation.md#cloud-particles).
+* - `gas_ion_flag`, `photoem_flag`, `init_unif_flag`, `init_unif_edens_flag`
+  - See [Machine parameters](machine.md).
+* - `switch_model`
+  - See [Secondary emission parameters](secondary-emission.md).
 ```
 
-Each cloud produces its own .mat output file, as described in the
-[output reference](../reference/outputs.md).
-The file is named according to the main output file name and the cloud file name.
+### Optional parameters
+
+A cloud file can also contain the following parameters. Any parameter missing from the cloud
+file takes its value from the main input files, or its default if it is not set there either.
+
+```{list-table}
+:header-rows: 1
+:widths: 35 65
+
+* - Parameters
+  - Reference
+* - MP management, saving, log and progress files
+  - [Simulation parameters](simulation.md)
+* - `N_sub_steps`
+  - [Machine parameters: `'BorisMultipole'`](machine.md#borismultipole)
+* - Residual gas ionization, photoemission, uniform initial distribution and density
+  - [Machine parameters](machine.md)
+* - Secondary emission
+  - [Secondary emission parameters](secondary-emission.md)
+```
+
+Each cloud writes its own `.mat` output file, named after the main output file and the cloud
+file. The contents are described in the [output reference](../reference/outputs.md).

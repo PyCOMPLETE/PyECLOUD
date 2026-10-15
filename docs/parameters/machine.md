@@ -1,6 +1,6 @@
-# Machine Parameters
+# Machine parameters
 
-**Chamber profile description**
+## Chamber profile
 
 ```{list-table}
 :header-rows: 1
@@ -8,16 +8,17 @@
 
 * - Parameter
   - Description
-* - **chamb_type**
-  - (optional – default = ‘ellip’)\
-    Possible settings:
+* - `chamb_type`
+  - *Optional, default `'ellip'`.* Shape of the chamber cross-section:
 
-    1.  chamb_type = ‘ellip’ for elliptical chamber profile.
-    2.  chamb_type = ‘rect’ for rectangular chamber profile.
-    3.  chamb_type = ‘polyg’ or ‘polyg_cython’ for polygonal chamber profile.
+    - `'ellip'`: elliptical.
+    - `'rect'`: rectangular.
+    - `'polyg'` or `'polyg_cython'`: polygonal.
 ```
 
-When chamb_type = ‘ellip’ or ’rect’ the following input variables must be provided:
+### Elliptical and rectangular chambers
+
+Required when `chamb_type` is `'ellip'` or `'rect'`:
 
 ```{list-table}
 :header-rows: 1
@@ -25,11 +26,13 @@ When chamb_type = ‘ellip’ or ’rect’ the following input variables must b
 
 * - Parameter
   - Description
-* - **x_aper, y_aper**
-  - Horizontal and vertical semi-apertures of the transverse chamber profile.
+* - `x_aper`, `y_aper`
+  - \[m\] Horizontal and vertical semi-apertures of the chamber cross-section.
 ```
 
-When chamb_type = ‘polyg’ the following input variable must be provided:
+### Polygonal chambers
+
+Required when `chamb_type` is `'polyg'`:
 
 ```{list-table}
 :header-rows: 1
@@ -37,22 +40,22 @@ When chamb_type = ‘polyg’ the following input variable must be provided:
 
 * - Parameter
   - Description
-* - **filename_chm**
-  - Name of file containing horizontal and vertical vertexes of the chamber profile.
-* - **filename_chm_photoem**
-  - Name of file containing horizontal and vertical vertexes of the chamber profile that is used
-    for the photoemission mode ’per_segment’. The chamber file must also contain the cumulative
-    distribution function of the emission probability for each segment. The vertexes of this
-    chamber must lie on the edges of the main chamber.
-* - **flag_assume_convex**
-  - \[optional\] Default: True
-* - **flag_counter_clockwise_chamb**
-  - \[optional\] Default: True. Only needed for the photoemission model ’per_segment’. It specifies
-    the order in which the vertexes are defined.
+* - `filename_chm`
+  - Name of the file containing the horizontal and vertical coordinates of the chamber vertices.
+    The vertices must be listed in counter-clockwise order; otherwise an error is raised.
+* - `filename_chm_photoem`
+  - Name of the file containing the chamber vertices used by the `'per_segment'` photoemission
+    mode. The file must also contain the cumulative distribution function of the emission
+    probability for each segment. These vertices must lie on the edges of the main chamber.
+* - `flag_assume_convex`
+  - *Optional, default `True`.* Assume the polygon is convex, which allows a faster
+    impact-detection algorithm. An error is raised if the polygon is not convex; set to `False` to
+    use the general (slower) algorithm for non-convex chambers.
 ```
 
-**Tracking and magnetic field** (the tracking algorithm has to be chosen according to the
-magnetic field conditions).
+## Tracking and magnetic field
+
+Choose the tracking algorithm according to the magnetic field in the simulated element.
 
 ```{list-table}
 :header-rows: 1
@@ -60,18 +63,16 @@ magnetic field conditions).
 
 * - Parameter
   - Description
-* - **track_method**
-  - (optional – default = ‘StrongBdip’)
+* - `track_method`
+  - *Optional, default `'StrongBdip'`.* Tracking algorithm:
 
-    Possible settings:
-
-    1.  track_method = ‘Boris’ for a magnetic field loaded from a file.
-    2.  track_method = ‘StrongBdip’ for vertical uniform magnetic field.
-    3.  track_method = ‘StrongBgen’ for a generic transverse magnetic field map.
-    4.  track_method = ‘BorisMultipole’ for arbitrary multipoles with Boris electron tracker.
+    - `'Boris'`: magnetic field map loaded from a file.
+    - `'StrongBdip'`: uniform vertical magnetic field.
+    - `'StrongBgen'`: generic transverse magnetic field map.
+    - `'BorisMultipole'`: arbitrary multipoles, with the Boris tracker.
 ```
 
-When track_method = ‘Boris’ the following input variables must be provided:
+### `'Boris'`
 
 ```{list-table}
 :header-rows: 1
@@ -79,17 +80,17 @@ When track_method = ‘Boris’ the following input variables must be provided:
 
 * - Parameter
   - Description
-* - **B_map_file**
-  - Name of a .mat file containing the magnetic field map (x, y, Bx(x,y), By(x,y), Bz(x,y)). The
-    case of a quadrupole magnet with unit gradient is embedded in the code and can be used setting:
-    B_map_file = ‘analytic_quadrupole_unit_grad’.
-* - **fact_Bmap**
-  - (optional – default = 1.) Scaling factor applied to the magnetic field map.
-* - **B0x, B0y, B0z**
-  - (optional – default = 0) \[T\] Uniform magnetic fields added to the map.
+* - `B_map_file`
+  - Name of a `.mat` file containing the magnetic field map (x, y, Bx(x, y), By(x, y),
+    Bz(x, y)). For a quadrupole with unit gradient, set
+    `B_map_file = 'analytic_quadrupole_unit_grad'`; no file is needed.
+* - `fact_Bmap`
+  - *Optional, default `1.`* Scaling factor applied to the field map.
+* - `B0x`, `B0y`, `B0z`
+  - *Optional, default `0`.* \[T\] Uniform field components added to the map.
 ```
 
-When track_method = ‘StrongBdip’ the following input variables must be provided:
+### `'StrongBdip'`
 
 ```{list-table}
 :header-rows: 1
@@ -97,14 +98,14 @@ When track_method = ‘StrongBdip’ the following input variables must be provi
 
 * - Parameter
   - Description
-* - **B**
-  - \[T\] Value of the vertical uniform magnetic field. If B=-1 the magnetic field is calculated
-    from the total length of the bending magnets (bm_totlen) and from the beam energy.
-* - **bm_totlen**
-  - \[m\] Total length of dipoles inside the accelerator (it must be provided when B=-1).
+* - `B`
+  - \[T\] Vertical magnetic field. If `B = -1`, the field is calculated from the beam energy and
+    the total length of the bending magnets, `bm_totlen`.
+* - `bm_totlen`
+  - \[m\] Total length of the dipoles in the accelerator. Required when `B = -1`.
 ```
 
-When track_method = ‘StrongBgen’ the following input variables must be provided:
+### `'StrongBgen'`
 
 ```{list-table}
 :header-rows: 1
@@ -112,20 +113,20 @@ When track_method = ‘StrongBgen’ the following input variables must be provi
 
 * - Parameter
   - Description
-* - **B_map_file**
-  - Name of a .mat file containing the transverse field map. The case of a quadrupole magnet with
-    unit gradient is embedded in the code and can be used setting: B_map_file =
-    ‘analytic_quadrupole_unit_grad’.
-* - **fact_Bmap**
-  - (optional – default = 1.) Scaling factor applied to the magnetic field map.
-* - **B0x, B0y, B0z**
-  - (optional – default = 0) \[T\] Uniform magnetic fields added to the map.
-* - **B_zero_thrld**
-  - \[T\] Value below which the local magnetic field is approximated with 0.
+* - `B_map_file`
+  - Name of a `.mat` file containing the transverse field map. For a quadrupole with unit
+    gradient, set `B_map_file = 'analytic_quadrupole_unit_grad'`; no file is needed.
+* - `fact_Bmap`
+  - *Optional, default `1.`* Scaling factor applied to the field map.
+* - `B0x`, `B0y`
+  - *Optional, default `0`.* \[T\] Uniform field components added to the map.
+* - `B_zero_thrhld`
+  - \[T\] Field magnitude below which the local magnetic field is treated as zero.
 ```
 
-When track_method = ‘BorisMultipole’, N_sub_steps and B_multip must be provided, while B_skew
-is optional:
+### `'BorisMultipole'`
+
+`N_sub_steps` and `B_multip` are required; `B_skew` is optional.
 
 ```{list-table}
 :header-rows: 1
@@ -133,28 +134,29 @@ is optional:
 
 * - Parameter
   - Description
-* - **N_sub_steps**
+* - `N_sub_steps`
   - Number of tracking sub-steps per time step.
-* - **B_multip**
-  - Magnetic momenta. Higher order multipoles and skew magnets are supported, as well as compound
-    magnets. The formalism in PyECLOUD follows this formula:
+* - `B_multip`
+  - Normal multipole coefficients. Higher-order, skew, and combined-function magnets are
+    supported. PyECLOUD uses the convention
 
     $B_y + iB_x = \sum_{n=0}^\infty \frac{1}{n!}\left( b_n + ib'_n \right)\left( x + iy \right)^{n}$
 
-    B_multip specifies $b_n =\frac{\partial^n B_y}{\partial x^n}$. For example: to simulate a
-    dipole with B=8.3 T set B_multip = \[8.3\]; to simulate a sextupole with 100 T/m$^2$ set
-    B_multip = \[0., 0., 100.\].
-* - **B_skew**
-  - The skew parameters can be included through B_skew. For a skew quadrupole with a gradient of 12
-    T/m, set B_multip to \[0.,0.\] and B_skew to \[0.,12.\]. B_skew specifies
-    $b'_n =\frac{\partial^n B_x}{\partial x^n}$ and defaults to *None*.
-* - **B0x, B0y, B0z**
-  - (optional – default = 0) \[T\] Uniform magnetic fields added to the map.
+    where `B_multip` gives $b_n =\frac{\partial^n B_y}{\partial x^n}$. For example, a dipole with
+    B = 8.3 T is `B_multip = [8.3]`, and a sextupole with 100 T/m² is
+    `B_multip = [0., 0., 100.]`.
+* - `B_skew`
+  - *Optional, default `None`.* Skew multipole coefficients,
+    $b'_n =\frac{\partial^n B_x}{\partial x^n}$. For example, a skew quadrupole with a gradient
+    of 12 T/m is `B_multip = [0., 0.]` with `B_skew = [0., 12.]`.
+* - `B0x`, `B0y`, `B0z`
+  - *Optional, default `0`.* \[T\] Uniform field components added to the multipole field.
 ```
 
-**Optics parameters** (can be provided also in the beam parameter file(s) independently for the
-different beams) — not needed if transverse beam size is directly defined in the beam parameter
-files.
+## Optics
+
+These parameters can also be given in the beam parameter file(s), separately for each beam.
+They are not needed if the transverse beam size is set directly in the beam parameter files.
 
 ```{list-table}
 :header-rows: 1
@@ -162,15 +164,15 @@ files.
 
 * - Parameter
   - Description
-* - **betafx, betafy**
-  - \[m\] Horizontal and vertical beta functions at the simulation section.
-* - **Dx, Dy**
-  - (optional – default = 0) \[m\] Horizontal and vertical dispersion functions at the simulation
-    section.
+* - `betafx`, `betafy`
+  - \[m\] Horizontal and vertical beta functions at the simulated section.
+* - `Dx`, `Dy`
+  - *Optional, default `0`.* \[m\] Horizontal and vertical dispersion at the simulated section.
 ```
 
-**Residual gas ionization parameters** (if the following input parameters are omitted primary
-electron generation by residual gas ionization is not enabled).
+## Residual gas ionization
+
+Primary electrons from residual gas ionization are generated only if these parameters are set.
 
 ```{list-table}
 :header-rows: 1
@@ -178,28 +180,28 @@ electron generation by residual gas ionization is not enabled).
 
 * - Parameter
   - Description
-* - **gas_ion_flag**
-  - (optional – default=0) (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables primary electron
-    generation by residual gas ionization.
-* - **P_nTorr**
+* - `gas_ion_flag`
+  - *Optional, default `0`.* Set to 1 to generate primary electrons by residual gas ionization.
+* - `P_nTorr`
   - \[nTorr\] Pressure in the vacuum chamber.
-* - **sigma_ion_MBarn**
-  - \[MBarn\] Ionization cross section of the residual gas.
-* - **Temp_K**
+* - `sigma_ion_MBarn`
+  - \[MBarn\] Ionization cross-section of the residual gas.
+* - `Temp_K`
   - \[K\] Temperature of the residual gas.
-* - **unif_frac**
-  - Fraction of primary electrons uniformly distributed inside the chamber. The remaining part is
-    generated according to the transverse distribution of the beam.
-* - **E_init_ion**
+* - `unif_frac`
+  - Fraction of primary electrons distributed uniformly in the chamber. The rest follow the
+    transverse distribution of the beam.
+* - `E_init_ion`
   - \[eV\] Initial energy of the generated electrons.
-* - **t_ion**
-  - \[s\] Electrons are generated by residual gas ionization only for t \< t_ion. The default
-    (-1) never generates any, so t_ion must be set (e.g. t_ion = 100.) when gas_ion_flag = 1. A
-    warning is issued if gas_ion_flag = 1 and t_ion ≤ 0.
+* - `t_ion`
+  - \[s\] Electrons are generated by residual gas ionization only for $t <$ `t_ion`. The default
+    (`-1`) generates none, so set `t_ion` (e.g. `t_ion = 100.`) when `gas_ion_flag = 1`. A
+    warning is issued if `gas_ion_flag = 1` and `t_ion` ≤ 0.
 ```
 
-**Photoemission parameters** (if generation by photoemission is not desired, the following
-parameters can be omitted).
+## Photoemission
+
+Primary electrons from photoemission are generated only if these parameters are set.
 
 ```{list-table}
 :header-rows: 1
@@ -207,42 +209,49 @@ parameters can be omitted).
 
 * - Parameter
   - Description
-* - **photoem_flag**
-  - (optional – default=0) (0 $\Rightarrow$ Off, 1 $\Rightarrow$ traditional, 2 or ’from_file’
-    $\Rightarrow$ Angular distribution from file, 3 or ’per_segment’ $\Rightarrow$ Part of
-    chamber definition) Enables primary electron generation by photoemission.
-* - **k_pe_st**
-  - \[m$^{-1}$\] Number of photoelectrons to be generated per proton and per unit length.
-* - **energy_distribution**
-  - Can be one of:
+* - `photoem_flag`
+  - *Optional, default `0`.* Photoemission mode:
 
-    - ’gaussian’:
-      $p(E) = \frac{1}{\sigma\sqrt{2\pi}}\exp\left(\frac{(E-\mu)^2}{2\sigma^2}\right)$
-    - ’log-normal’: $p(E) = \frac{1}{E\sigma\sqrt{2\pi}}e^{\frac{(\log(E)-\mu)^2}{2\sigma^2}}$
-    - ’rect’: $p(E)$ uniform for $\mu-\sigma < E < \mu+\sigma$
-    - ’mono’: $E = \mu$
-    - ’lorentz’: $p(E) = \frac{1}{\pi}\frac{\sigma}{\sigma^2+(E-\mu)^2}$
+    - `0`: off.
+    - `1`: traditional model (see below).
+    - `2` or `'from_file'`: angular distribution read from a file (see below).
+    - `3` or `'per_segment'`: emission defined per chamber segment, through
+      `filename_chm_photoem`.
+* - `k_pe_st`
+  - \[1/m\] Number of photoelectrons generated per beam particle and per unit length.
+* - `energy_distribution`
+  - *Optional, default `'gaussian'`.* Energy distribution of the photoelectrons, with parameters
+    $\mu$ (`e_pe_max`) and $\sigma$ (`e_pe_sigma`):
 
-    The Lorentz and normal distributions are cut at 0 to prevent negative energies of photoemitted
-    electrons.
-* - **e_pe_sigma**
-  - \[eV\] $\sigma$ from above.
-* - **e_pe_max**
-  - \[eV\] $\mu$ from above.
-* - **out_radius**
-  - \[m\] Radius of a circle external to the chamber.
-* - **phem_resc_fact**
-  - Rescaling factor on the position vector of the generated photoelectrons.
-* - **photoelectron_angle_distribution**
-  - (no default – must be set when photoem_flag is not 0) Can be ’cosine_3D’ or
-    ’normal_emission’. See secondary_angle_distribution in the
+    - `'gaussian'`: $p(E) = \frac{1}{\sigma\sqrt{2\pi}}\exp\left(-\frac{(E-\mu)^2}{2\sigma^2}\right)$
+    - `'lognormal'`: $p(E) = \frac{1}{E\sigma\sqrt{2\pi}}\exp\left(-\frac{(\log E-\mu)^2}{2\sigma^2}\right)$
+    - `'rect'`: $p(E)$ uniform for $\mu-\sigma/2 < E < \mu+\sigma/2$
+    - `'mono'`: $E = \mu$
+    - `'lorentz'`: $p(E) = \frac{1}{\pi}\frac{\sigma}{\sigma^2+(E-\mu)^2}$
+
+    The Gaussian and Lorentz distributions are cut at zero so that no photoelectron has a
+    negative energy.
+* - `e_pe_sigma`
+  - \[eV\] $\sigma$ of the energy distribution.
+* - `e_pe_max`
+  - \[eV\] $\mu$ of the energy distribution.
+* - `out_radius`
+  - \[m\] Radius of a circle enclosing the chamber. Photons are traced from inside the chamber
+    towards points on this circle, and photoelectrons are generated where these paths cross the
+    chamber wall. Must be larger than the chamber.
+* - `phem_resc_fac`
+  - *Optional, default `0.9999`.* Factor applied to the position of each generated
+    photoelectron, so that it starts just inside the chamber wall.
+* - `photoelectron_angle_distribution`
+  - Must be set when `photoem_flag` is not 0. Emission angle distribution: `'cosine_3D'` or
+    `'normal_emission'`. See `secondary_angle_distribution` in the
     [secondary emission parameters](secondary-emission.md).
 ```
 
-**Photoemission parameters for photoem_flag = 1**
+### Traditional model (`photoem_flag = 1`)
 
-**A part of photoelectrons is generated in the corner of the beam screen on direct impact of
-photons (non-reflected). The reflected photons generated elsewhere.**
+Part of the photoelectrons is generated where unreflected photons hit the beam screen, and the
+rest, from reflected photons, elsewhere on the chamber wall.
 
 ```{list-table}
 :header-rows: 1
@@ -250,23 +259,23 @@ photons (non-reflected). The reflected photons generated elsewhere.**
 
 * - Parameter
   - Description
-* - **inv_CDF_refl_photoem_file**
-  - Name of a .mat file providing the inverse of the Cumulative Distribution Function (CDF) for the
-    angular distribution of the reflected photons. If inv_CDF_refl_photoem_file = ‘unif_no_file’
-    the reflected photons have uniform angular distribution and no file needs to be provided.
-* - **refl_frac**
+* - `inv_CDF_refl_photoem_file`
+  - Name of a `.mat` file with the inverse cumulative distribution function (CDF) of the angular
+    distribution of reflected photons. Set to `'unif_no_file'` for a uniform angular
+    distribution; no file is then needed.
+* - `refl_frac`
   - Fraction of photoelectrons generated by reflected photons.
-* - **x0_refl, y0_refl**
-  - \[m\] Impact point of primary (not reflected) photons. x0_refl can be set to ‘left’ or ‘right’,
-    in that case the point is computed automatically.
-* - **alimit**
-  - \[rad\] Extent (1$\sigma$) of the Gaussian angular distribution of photoelectrons generated
-    by non-reflected photons.
+* - `x0_refl`, `y0_refl`
+  - \[m\] Impact point of the unreflected photons. `x0_refl` can also be set to `'left'` or
+    `'right'`, in which case the point is computed automatically.
+* - `alimit`
+  - \[rad\] RMS width of the Gaussian angular distribution of photoelectrons generated by
+    unreflected photons.
 ```
 
-**Photoemission parameters for photoem_flag = 2 or ’from_file’**
+### Distribution from file (`photoem_flag = 2`)
 
-**The coordinates of all generated photoelectrons is specified from a file**
+The positions of all photoelectrons are drawn from a distribution read from a file.
 
 ```{list-table}
 :header-rows: 1
@@ -274,15 +283,16 @@ photons (non-reflected). The reflected photons generated elsewhere.**
 
 * - Parameter
   - Description
-* - **inv_CDF_all_photoem_file**
-  - See inv_CDF_refl_photoem_file, but for all photons. If it is set to ’unif_no_file’, the
-    photoelectron generation is uniform over the whole surface. Example scripts to generate a file
-    with the correct format can be found in the folder
-    `examples/photoemission_angular_distribution/` in the repository.
+* - `inv_CDF_all_photoem_file`
+  - Like `inv_CDF_refl_photoem_file`, but for all photons. Set to `'unif_no_file'` for uniform
+    generation over the whole chamber surface. Example scripts that create a file in the correct
+    format are in `examples/photoemission_angular_distribution/` in the repository.
 ```
 
-**Uniform initial distribution** Simulation starts with electrons uniformly distributed in the
-chamber (if the following input parameters are omitted this feature is not enabled).
+## Uniform initial distribution
+
+The simulation starts with a given number of electrons distributed uniformly in the chamber.
+Enabled only if these parameters are set.
 
 ```{list-table}
 :header-rows: 1
@@ -290,20 +300,21 @@ chamber (if the following input parameters are omitted this feature is not enabl
 
 * - Parameter
   - Description
-* - **init_unif_flag**
-  - (optional – default=0) (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables uniform electron
-    distribution at the beginning of the simulation.
-* - **Nel_init_unif**
-  - Initial number of electrons.
-* - **E_init_unif**
-  - \[eV\] Initial energy of the generated electrons.
-* - **x_max_init_unif, x_min_init_unif, y_max_init_unif, y_min_init_unif**
-  - \[m\] Edges of the region where the electrons are generated.
+* - `init_unif_flag`
+  - *Optional, default `0`.* Set to 1 to start with a uniform electron distribution.
+* - `Nel_init_unif`
+  - \[electrons/m\] Initial number of electrons.
+* - `E_init_unif`
+  - *Optional, default `0`.* \[eV\] Initial energy of the electrons.
+* - `x_max_init_unif`, `x_min_init_unif`, `y_max_init_unif`, `y_min_init_unif`
+  - *Optional, default: the chamber semi-apertures, ±`x_aper` and ±`y_aper`.* \[m\] Edges of the
+    region in which the electrons are generated.
 ```
 
-**Uniform initial density** Simulation starts with a uniform electron volume density in a
-region of the chamber (if the following input parameters are omitted this feature is not
-enabled).
+## Uniform initial density
+
+The simulation starts with a uniform electron volume density in a region of the chamber.
+Enabled only if these parameters are set.
 
 ```{list-table}
 :header-rows: 1
@@ -311,15 +322,14 @@ enabled).
 
 * - Parameter
   - Description
-* - **init_unif_edens_flag**
-  - (optional – default=0) (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables a uniform
-    initial electron density.
-* - **init_unif_edens**
+* - `init_unif_edens_flag`
+  - *Optional, default `0`.* Set to 1 to start with a uniform electron density.
+* - `init_unif_edens`
   - \[m$^{-3}$\] Initial electron volume density.
-* - **E_init_unif_edens**
-  - (optional – default=0) \[eV\] Initial energy of the generated electrons.
-* - **x_max_init_unif_edens, x_min_init_unif_edens, y_max_init_unif_edens,
-    y_min_init_unif_edens**
-  - (optional – default: chamber semi-apertures ±x_aper, ±y_aper) \[m\] Edges of the region
-    where the electrons are generated.
+* - `E_init_unif_edens`
+  - *Optional, default `0`.* \[eV\] Initial energy of the electrons.
+* - `x_max_init_unif_edens`, `x_min_init_unif_edens`, `y_max_init_unif_edens`,
+    `y_min_init_unif_edens`
+  - *Optional, default: the chamber semi-apertures, ±`x_aper` and ±`y_aper`.* \[m\] Edges of the
+    region in which the electrons are generated.
 ```

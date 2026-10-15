@@ -11,19 +11,20 @@ cells can contain paragraphs, lists, and equations without long table rows.
 
 ## Build and preview locally
 
-From the repository root, create a separate environment using Python 3.11 or
-newer:
+From the repository root, create a separate environment in `docs/.venv-docs`
+using Python 3.11 or newer (Read the Docs builds with Python 3.12):
 
 ```bash
-python -m venv .venv-docs
-source .venv-docs/bin/activate
+python -m venv docs/.venv-docs
+source docs/.venv-docs/bin/activate
 python -m pip install -r docs/requirements.txt
 python -m sphinx -n -W --keep-going -b html docs docs/_build/html
 python -m http.server 8000 --directory docs/_build/html
 ```
 
 Open <http://localhost:8000>. On Windows, activate the environment with
-`.venv-docs\Scripts\activate` instead. Rebuild after editing a page, then refresh
+`docs\.venv-docs\Scripts\activate` instead. The environment is ignored by Git
+and excluded from the Sphinx sources in `docs/conf.py`. Rebuild after editing a page, then refresh
 the browser. Stop the server with Ctrl+C.
 
 The build treats warnings as errors and checks internal references. It does
@@ -66,9 +67,26 @@ when changing their descriptions.
 
 A clean documentation build checks markup and references; it does not verify
 simulation behaviour. The tutorials still need a complete numerical validation.
-Descriptions and defaults inherited from the reference manual have not undergone
-a full audit against the implementation, although individual entries have been
-updated during the migration.
+
+The buildup parameter pages have been checked against
+`PyECLOUD/default_input_parameters.py` and the code that reads each parameter:
+
+- Every documented parameter name, and every `furman_pivi_surface` key, exists
+  in the code. Misspelled names inherited from the manual were corrected
+  (`secondary_beams_file_list`, `B_zero_thrhld`, `phem_resc_fac`,
+  `theta_r_max`), and `flag_counter_clockwise_chamb`, which does not exist,
+  was removed.
+- Defaults were checked for parameters marked *Optional*, and accepted option
+  values were checked for `switch_model`, `secondary_angle_distribution`,
+  `energy_distribution`, `beam_field_file`, `sparse_solver`, and `track_method`.
+- Behaviour described in the descriptions was checked where it was changed or
+  added, for example `t_ion`, `fact_clean`, the uniform initial density, and
+  the photoemission energy distributions.
+
+Not yet checked: the physical meaning and units of the SEY model parameters,
+most units elsewhere, and descriptions carried over unchanged from the manual.
+The input parameters `stopfile`, `filename_init_MP_state`,
+`flag_continuous_emission`, and `cloud_name` are not yet documented.
 
 ## Wiki migration record
 

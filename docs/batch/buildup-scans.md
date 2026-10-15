@@ -57,6 +57,20 @@ Save as `job.sh`. Set `OUTPUT_MAT` to the filename configured by
 `filen_main_outp` in your simulation inputs, including the `.mat` extension.
 The default option set by PyECLOUD is `Pyecltest.mat`.
 
+The script archives the output, log, and progress files by name, so in
+`simulation_parameters.input` set them to plain filenames, without directories:
+
+```python
+filen_main_outp = 'Pyecltest.mat'   # must match OUTPUT_MAT
+logfile_path = 'logfile.txt'
+progress_path = 'progress.txt'
+```
+
+These files are then written to the job's scratch directory, where the script
+expects them. A path such as `'/eos/.../logfile.txt'` or `'output/logfile.txt'`
+writes them elsewhere, and archiving fails because they are missing. If you
+choose other names, change them in the script's `tar` command as well.
+
 ```bash
 #!/bin/bash
 set -e
@@ -73,13 +87,17 @@ tar -xzf inputs.tgz
 rm inputs.tgz
 
 # Remove if using container and replace with container command -----
+# Batch shells do not run 'conda init'; load Conda's shell functions first.
+eval "$(conda shell.bash hook)"
 conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env
 run_python() {
     python "$@"
 }
 # -------------------------------------------------------------------
 
-run_python -c 'import os, PyECLOUD; key = "ECLOUD_CONTAINER_VERSION"; print(f"{key}={os.environ[key]}" if key in os.environ else f"PyECLOUD={PyECLOUD.__version__}")' > envinfo.txt
+# Record the start time and software version.
+date > envinfo.txt
+run_python -c 'import os, PyECLOUD; key = "ECLOUD_CONTAINER_VERSION"; print(f"{key}={os.environ[key]}" if key in os.environ else f"PyECLOUD={PyECLOUD.__version__}")' >> envinfo.txt
 run_python run_sim.py
 
 printf 'Simulation completed successfully.\n' > job-status.txt
@@ -104,8 +122,8 @@ using the results.
 
 ### Using the container
 
-Remove `conda activate` and replace `run_python` with the
-[CVMFS container wrapper](index.md#alternative-a-cvmfs-container). No environment activation is needed for 
+Remove the two Conda lines (`eval` and `conda activate`) and replace `run_python` with the
+[CVMFS container wrapper](index.md#alternative-a-cvmfs-container). No environment activation is needed for
 the container.
 
 ## Submit
@@ -114,9 +132,6 @@ the container.
 mkdir -p logs
 condor_submit htcondor.sub
 ```
-
-The dry run parses the description without submitting jobs; it does not check
-worker environment availability or EOS permissions.
 
 ## Alternative: transfer individual files from the worker
 

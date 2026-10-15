@@ -31,8 +31,8 @@ N_turns_target = N_turns
 ```
 
 This runs one job's worth of turns without requesting scheduler resubmission.
-The example's particle count and turn count can require substantial computing
-time. Reducing them changes the numerical resolution and physics statistics.
+With the example's particle and turn counts, the run can take a long time.
+Reducing them makes it faster, at the cost of accuracy.
 
 ## Choose an execution mode
 

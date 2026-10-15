@@ -74,12 +74,24 @@ conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env
 
 With this environment active, follow the package installation steps in the
 [installation guide](../installation.md), skipping its environment creation
-and activation commands. Ensure that conda is properly activated and you can
-activate the environment on lxplus. The worker scripts can then use `conda activate` directly.
+and activation commands.
+
+Batch jobs run in a non-interactive shell where `conda init` has not run, so a bare
+`conda activate` fails. The worker scripts therefore load Conda's shell functions first:
+
+```bash
+eval "$(conda shell.bash hook)"
+conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env
+```
+
+This requires the `conda` command to be found on the worker. If it is not on the
+default `PATH`, call it by its full path, e.g.
+`eval "$(/path/to/miniforge3/bin/conda shell.bash hook)"`. Test both lines in a
+fresh lxplus session before submitting jobs.
 
 ### Alternative: a CVMFS container
 
-It is recommended to use `ghcr.io/ekatralis/ecloud-containers:latest`, maintained for
+We recommend `ghcr.io/ekatralis/ecloud-containers:latest`, maintained for
 electron cloud simulations and available through CERN CVMFS. This avoids
 maintaining your own Python environment on EOS. The container provides the
 Python environment, so no Conda or other environment activation is needed.
@@ -88,24 +100,33 @@ Replace environment activation and the Python invocation with a wrapper such as:
 ```bash
 run_python() {
     apptainer exec --cleanenv --env PYTHONNOUSERSITE=1 \
-        --home "$_CONDOR_SCRATCH_DIR" --pwd "$PWD" \
+        --home "$_CONDOR_SCRATCH_DIR" --pwd "$PWD" --writable-tmpfs \
         /cvmfs/unpacked.cern.ch/ghcr.io/ekatralis/ecloud-containers:latest/ \
         python "$@"
 }
 run_python run_sim.py
 ```
 
+What each option does:
+
+| Option | Effect | Why it is used here |
+| --- | --- | --- |
+| `--cleanenv` | Starts the container without the host's environment variables. | Host settings such as `PYTHONPATH` or a loaded Conda environment cannot leak in and change which packages Python imports. Remove it only if the job deliberately passes variables into the container. |
+| `--env PYTHONNOUSERSITE=1` | Tells Python to ignore packages in `~/.local`. | Packages you installed with `pip install --user` cannot override the container's versions. |
+| `--home "$_CONDOR_SCRATCH_DIR"` | Uses the job's scratch directory as the home directory inside the container. | By default Apptainer mounts your AFS home, so caches and configuration files would be written to AFS. With this option they stay in scratch, and the job's files are visible inside the container. |
+| `--pwd "$PWD"` | Starts the container in the current directory. | Python runs where the job files were unpacked, so relative input and output paths resolve as they would without the container. |
+| `--writable-tmpfs` | Adds a small in-memory writable layer (64 MB by default) on top of the read-only image. | Software that writes caches or temporary files inside the image (for example Matplotlib or Numba caches) would otherwise fail with a read-only file system error. Files written there are lost when the container exits, so results must still go to the working directory. |
+
 The `latest` image evolves; record `ECLOUD_CONTAINER_VERSION` from inside the
 container with your run and keep the software environment consistent across
-continuation jobs. Check
-the scratch-directory bindings for your image/site configuration. Run EOS
-transfers from the host worker shell, where its credentials and XRootD tools
-are available.
+continuation jobs. Run EOS transfers from the host worker shell, where its
+credentials and XRootD tools are available.
 
 ## Output transfers and held jobs
 
-Both examples save `envinfo.txt`, which records the container version or the
-PyECLOUD version used for the simulation.
+Both examples save `envinfo.txt`, which records when the simulation started and
+the container version or PyECLOUD version it used. The stability example appends
+one such record for every simulation part.
 
 Configure output transfers in the **HTCondor submit file** (`htcondor.sub`).
 For the `root://` destinations used here, explicitly list individual files in

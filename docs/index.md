@@ -25,9 +25,6 @@ input parameters, outputs, and the underlying physical models.
 | `PyKLU` | Default sparse solver; installed as a dependency |
 | `nafflib` | Optional frequency analysis, available on PyPI |
 
-Values in the parameter examples illustrate configurations; they are not
-complete input files or a list of universal defaults.
-
 ```{toctree}
 :maxdepth: 2
 :caption: Getting started

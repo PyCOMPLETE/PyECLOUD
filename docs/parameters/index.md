@@ -4,6 +4,9 @@ PyECLOUD reads its simulation settings from Python-style `.input` files.
 The simulation input file selects the machine, beam, and secondary emission
 input files. Additional cloud files configure simulations with multiple clouds.
 
+Parameters marked *Optional* can be omitted and take the stated default. Example values are
+illustrations, not recommended settings.
+
 ```{toctree}
 :maxdepth: 1
 

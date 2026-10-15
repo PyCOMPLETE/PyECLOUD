@@ -82,7 +82,8 @@ digits (`00`, `01`, ...).
 | `bunch_evolution_NN.h5`, `slice_evolution_NN.h5` | Evolution monitors for the part |
 | `sim_param.pkl` | Saved simulation parameters |
 | `pyparislog.txt` | Simulation log |
-| `envinfo.txt`, `stdout.txt`, `stderr.txt` | Environment information and worker-captured Python output |
+| `envinfo.txt` | Start time and software version of every part, one record appended per part |
+| `stdout.txt`, `stderr.txt` | Worker-captured Python output |
 | `multigrid_config_dip.pkl`, `multigrid_config_dip.txt` | Optional saved dipole multigrid configuration, copied when present |
 
 `Simulation_parameters.py` and `pyecloud_config` are fetched for every part.
@@ -94,7 +95,7 @@ job. Never remove the status file to recover a failed continuation.
 ### Alternative: use the maintained container
 
 Replace `run_python` with the [CVMFS container wrapper](index.md#alternative-a-cvmfs-container)
-and remove the `conda activate` line. No environment activation is needed
+and remove the two Conda lines (`eval` and `conda activate`). No environment activation is needed
 when using the container.
 The exact container path is:
 
@@ -102,7 +103,7 @@ The exact container path is:
 /cvmfs/unpacked.cern.ch/ghcr.io/ekatralis/ecloud-containers:latest/
 ```
 
-Input and output transfers always run in the host worker shell. 
+Input and output transfers always run in the host worker shell.
 
 ### Exit codes and checkpoint transfers
 

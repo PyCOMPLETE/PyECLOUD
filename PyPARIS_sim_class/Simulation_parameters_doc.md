@@ -71,7 +71,7 @@ Optionally the bunch (particle-by-particle coordinates) can be loaded from file 
 ```python
 bunch_from_file = None
 ```
-An example on how to save and load a bunch can be found in PyPARIS_sim_class/examples.
+An example of how to save and load a bunch can be found in `PyPARIS_sim_class/examples`.
 
 Alternatively, the bunch can be defined using the following input
 ```python
@@ -125,7 +125,7 @@ Currently supported submission systems are:
 
 Select the submission system using the optional parameter (names are case-insensitive):
 ```python
-submission_system = 'HTCondor' # Default; alternatively 'Slurm'
+submission_system = 'HTCondor' # Default; alternatively 'SLURM'
 ```
 For `HTCondor`, the simulation exits with code 177. See the
 [Batch Jobs guide on DAGMan continuation](../batch/stability.md#dagman-continuation)
@@ -186,9 +186,9 @@ Most of the e-cloud parameters are defined by PyECLOUD input files in a specifie
 ```python
 pyecl_input_folder = './pyecloud_config'
 ```
-Whenever a parameter in the input files is also mention in the present file, the value specified here takes priority.
+Whenever a parameter in the input files is also mentioned in the present file, the value specified here takes priority.
 
-The chamber geometry can be redefined by the following parameters (see [PyECLOUD reference](https://github.com/PyCOMPLETE/PyECLOUD/wiki/reference-manual) for more details):
+The chamber geometry can be redefined by the following parameters (see the [machine parameters](machine.md#chamber-profile) for more details):
 
 ```python
 chamb_type = 'polyg'
@@ -202,7 +202,7 @@ The target duration of the electron tracking time sub-steps is defined by:
 Dt_ref = 5.000000e-12
 ```
 
-The Particle-In-Cell solver used to compute beam and electron fields is configured by the following parameters (more details can be found in the [PyECLOUD reference](https://github.com/PyCOMPLETE/PyECLOUD/wiki/reference-manual) and in the [physics models section](https://github.com/PyCOMPLETE/PyECLOUD/wiki/Physical-models-and-numerical-algorithms) of the [PyECLOUD wiki](https://github.com/PyCOMPLETE/PyECLOUD/wiki)):
+The Particle-In-Cell solver used to compute beam and electron fields is configured by the following parameters (more details can be found in the [simulation parameters](simulation.md#multigrid) and in the [physical models and numerical algorithms](../physics.md)):
 
 ```python
 PyPICmode = 'ShortleyWeller_WithTelescopicGrids'
@@ -271,7 +271,7 @@ filename_init_MP_state_quad = folder_path + filename_state
 
 ### Expert e-cloud kicks
 
-Individual e-cloud interactions can be provided at defined kick locations when the used optics is ```'non-smooth'``` (incompatible with the settings above), using the following parameters:
+Individual e-cloud interactions can be provided at defined kick locations when the optics mode is ```'non-smooth'``` (incompatible with the settings above), using the following parameters:
 
 ```python
 # Dedicated Kick Element Settings

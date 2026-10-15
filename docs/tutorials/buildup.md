@@ -63,8 +63,9 @@ python run_buildup.py
 ```
 
 The repository also provides `examples/getting_started/000_run_simulation.py`, which accepts an
-input-folder argument. Running from the example's working directory keeps its
-relative input and output paths together.
+input-folder argument. Input files are read from that folder, but the output,
+log, and progress files are written relative to the current directory. Run it
+from the input folder to keep inputs and results together.
 
 ## Inspect your result
 

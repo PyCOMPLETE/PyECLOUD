@@ -115,7 +115,7 @@ empty array or a sentinel value. Inspect the saved data before plotting them.
 | `dec_fact_out` | Time-series output sampling factor: for a fixed step `Dt_ref`, output is saved every `dec_fact_out` steps |
 | `b_spac` | Bunch spacing used internally [s] |
 | `t_sc_video` | Recorded space-charge update times [s] |
-| `U_sc_eV` | Legacy field described as unused in the original manual |
+| `U_sc_eV` | Not used; kept for compatibility |
 | `chamber_area` | Transverse chamber area [m²] |
 | `nel_hist_impact_seg` | Electron impacts on chamber segments, with `flag_hist_impact_seg` |
 | `nel_hist_emit_seg` | Emitted-electron histogram on chamber segments |

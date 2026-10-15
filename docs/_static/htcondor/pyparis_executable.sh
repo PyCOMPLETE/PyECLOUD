@@ -83,10 +83,13 @@ transfer_outputs() {
 
 transfer_inputs || exit 1
 # Remove if using container -------------------------------------------------
+# Batch shells do not run 'conda init'; load Conda's shell functions first.
+eval "$(conda shell.bash hook)" || exit 1
 conda activate /eos/user/{yourinitial}/{yourusername}/pyecloud-env || exit 1
 # ---------------------------------------------------------------------------
+# Append one record per simulation part: start time and software version.
 date >> envinfo.txt
-run_python -c 'import os, PyECLOUD; key = "ECLOUD_CONTAINER_VERSION"; print(f"{key}={os.environ[key]}" if key in os.environ else f"PyECLOUD={PyECLOUD.__version__}")' > envinfo.txt
+run_python -c 'import os, PyECLOUD; key = "ECLOUD_CONTAINER_VERSION"; print(f"{key}={os.environ[key]}" if key in os.environ else f"PyECLOUD={PyECLOUD.__version__}")' >> envinfo.txt
 
 run_python -m PyPARIS.multiprocexec -n "$cpus" \
     sim_class=PyPARIS_sim_class.Simulation.Simulation >> stdout.txt 2>> stderr.txt

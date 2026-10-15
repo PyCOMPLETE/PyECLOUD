@@ -1,9 +1,15 @@
 # Simulation parameters
 
-This input file has to be named **simulation_parameters.input**.
+This input file must be named `simulation_parameters.input`.
 
-**Other input filenames.** The following variables specify the names of the other three input
-files which define the physical model of the simulation.
+In the tables below, MP stands for *macroparticle*, and `Nref` is the reference MP size: the
+number of electrons each MP represents. Several checks run at every bunch passage, i.e. at
+times $t = n \cdot$ `b_spac` with $n$ an integer.
+
+## Other input files
+
+These parameters give the names of the other three input files, which define the physical model
+of the simulation.
 
 ```{list-table}
 :header-rows: 1
@@ -11,20 +17,21 @@ files which define the physical model of the simulation.
 
 * - Parameter
   - Description
-* - **machine_param_file**
-  - Name of the machine parameter file.
-* - **secondary_emission_parameters_file**
-  - Name of the secondary emission configuration file.
-* - **beam_parameters_file**
-  - Name of the beam parameter file (in case of a multiple beam simulation this is the master
-    beam).
+* - `machine_param_file`
+  - Name of the [machine parameter](machine.md) file.
+* - `secondary_emission_parameters_file`
+  - Name of the [secondary emission](secondary-emission.md) configuration file.
+* - `beam_parameters_file`
+  - Name of the [beam parameter](beam.md) file. In a simulation with several beams, this is the
+    master beam.
 ```
 
-**Secondary beams** The code can simulate the EC buildup in the presence of more than one
-circulating beam. For this purpose a list of secondary beam files (one for each beam) has to be
-provided. In the presence of secondary beams, the master beam determines the length of the
-simulation, the energy used for the calculation of the bending field, and the bunch spacing
-used for regeneration and saving purposes.
+## Secondary beams
+
+The code can simulate electron cloud buildup with more than one circulating beam. To do so,
+provide a list of secondary beam files, one per beam. The master beam determines the length of
+the simulation, the energy used to calculate the bending field, and the bunch spacing used for
+regeneration and saving.
 
 ```{list-table}
 :header-rows: 1
@@ -32,11 +39,11 @@ used for regeneration and saving purposes.
 
 * - Parameter
   - Description
-* - **secondary_beam_file_list**
-  - (optional – default = \[\]) List of names of secondary beam parameter files.
+* - `secondary_beams_file_list`
+  - *Optional, default `[]`.* List of secondary beam parameter file names.
 ```
 
-**Log and progress files**
+## Log and progress files
 
 ```{list-table}
 :header-rows: 1
@@ -44,15 +51,17 @@ used for regeneration and saving purposes.
 
 * - Parameter
   - Description
-* - **logfile_path**
-  - Path of a text file that reports some synthetic information on the ongoing simulation (Passage
-    number, number of MPs and number of electrons in the chamber).
-* - **progress_path**
+* - `logfile_path`
+  - Path of a text file that summarizes the running simulation: passage number, number of MPs,
+    and number of electrons in the chamber.
+* - `progress_path`
   - Path of a text file that reports the simulation progress in percent.
 ```
 
-**Time sampling** The simulated time interval is defined by the length of the beam profile
-(number of bunch passages) specified in the beam description.
+## Time sampling
+
+The simulated time interval is set by the length of the beam profile (the number of bunch
+passages) given in the beam description.
 
 ```{list-table}
 :header-rows: 1
@@ -60,16 +69,14 @@ used for regeneration and saving purposes.
 
 * - Parameter
   - Description
-* - **Dt**
-  - \[s\] Simulation time step. This input is not considered if beam profile is imported from file.
-* - **t_end**
-  - \[s\] Extra time interval after the specified beam profile.
-
-    Only coasting beam present in this interval. The value of this variable can also be negative in
-    order to stop the simulation before the end of the specified profile.
+* - `Dt`
+  - \[s\] Simulation time step. Ignored if the beam profile is imported from a file.
+* - `t_end`
+  - \[s\] Extra time simulated after the end of the beam profile, during which only the coasting
+    beam is present. A negative value stops the simulation before the end of the profile.
 ```
 
-**Negligible beam linear density**
+## Negligible beam linear density
 
 ```{list-table}
 :header-rows: 1
@@ -77,12 +84,12 @@ used for regeneration and saving purposes.
 
 * - Parameter
   - Description
-* - **lam_th**
-  - \[beam part/m\] When the linear density of the beam is below this value, primary electrons are
-    not generated and beam forces on the electrons are neglected.
+* - `lam_th`
+  - \[beam particles/m\] Below this beam line density, no primary electrons are generated and
+    beam forces on the electrons are neglected.
 ```
 
-**MP management settings**
+## MP management
 
 ```{list-table}
 :header-rows: 1
@@ -90,55 +97,47 @@ used for regeneration and saving purposes.
 
 * - Parameter
   - Description
-* - **N_mp_max**
-  - Size of the arrays allocated to store the MP sizes, positions and velocities. MP regeneration
-    settings must be set such that this number of MPs is never exceeded.
-* - **N_mp_regen**
-  - MP regeneration threshold. When the total number of MPs exceeds N_mp_regen a regeneration of
-    the set of MPs is applied and a new Nref is chosen in order to get a target number of MPs. The
-    check is performed at each t=n\*b_spac with n an integer.
-* - **N_mp_regen_low**
-  - Lower MP regeneration threshold. When the total number of MPs becomes smaller than
-    N_mp_regen_low a regeneration of the set of MPs is applied and a new Nref is chosen in order to
-    get a target number of MPs. The check is performed at each t=n\*b_spac with n an integer.
-* - **t_ON_regen_low**
-  - For t\< t_ON_regen_low the lower MP regeneration check is not performed.
-* - **N_mp_after_regen**
-  - Target number of MPs obtained after regeneration.
-* - **fact_split**
-  - MP split factor; when secondary emission occurs, if the size of the emitted charge is smaller
-    than fact_split\*Nref, the impacting MP is simply rescaled according to the SEY. Otherwise new
-    MPs are generated in order to keep the MP size as close as possible to Nref.
-* - **fact_clean**
-  - MP clean factor. MPs smaller than fact_clean\*Nref are deleted from the MP set. This test is
-    performed at each t=n\*b_spac with n an integer.
-* - **nel_mp_ref_0**
-  - \[e-/m\] Initial MP size.
-* - **Nx_regen, Ny_regen, Nvx_regen, Nvy_regen, Nvz_regen**
-  - Number of mesh points in each dimension for the generation of the uniform grid for the 5-D
-    phase space used for the MP regeneration.
-* - **regen_hist_cut**
-  - Defines a threshold value for the phase space density, below which no electrons are generated.
-* - **N_mp_soft_regen**
-  - (optional: by default soft regeneration is not applied, the presence of these inputs enables
-    it)
-
-    Soft regeneration threshold. The check is performed at each t=n\*b_spac with n an integer.
-    N_mp_soft_regen should be smaller than N_mp_regen.
-* - **N_mp_after_soft_regen**
-  - (optional: by default soft regeneration is not applied, the presence of these inputs enables
-    it)
-
-    Target number of MPs obtained after a soft regeneration.
-* - **N_mp_async_regen, N_mp_after_async_regen**
-  - (optional: by default asynchronous soft regeneration is not applied, the presence of these
-    inputs enables it)
-
-    Parameters for asynchronous soft regeneration (the simulation does not wait for the next bunch
-    passage to regenerate).
+* - `N_mp_max`
+  - Size of the arrays that store MP sizes, positions, and velocities. Choose the regeneration
+    settings so that this number of MPs is never exceeded.
+* - `N_mp_regen`
+  - Upper regeneration threshold. When the number of MPs exceeds `N_mp_regen`, the MP set is
+    regenerated with a new `Nref` chosen to reach `N_mp_after_regen` MPs. Checked at every bunch
+    passage.
+* - `N_mp_regen_low`
+  - Lower regeneration threshold. When the number of MPs falls below `N_mp_regen_low`, the MP set
+    is regenerated with a new `Nref` chosen to reach `N_mp_after_regen` MPs. Checked at every
+    bunch passage.
+* - `t_ON_regen_low`
+  - \[s\] The lower regeneration check is skipped for $t <$ `t_ON_regen_low`.
+* - `N_mp_after_regen`
+  - Target number of MPs after a regeneration.
+* - `fact_split`
+  - MP split factor. When secondary emission occurs and the emitted charge is smaller than
+    `fact_split * Nref`, the impacting MP is simply rescaled by the SEY. Otherwise new MPs are
+    generated to keep MP sizes as close as possible to `Nref`.
+* - `fact_clean`
+  - MP clean factor. MPs smaller than `fact_clean * Nref` are removed from the MP set. Checked at
+    every bunch passage.
+* - `nel_mp_ref_0`
+  - \[electrons/m\] Initial MP size.
+* - `Nx_regen`, `Ny_regen`, `Nvx_regen`, `Nvy_regen`, `Nvz_regen`
+  - Number of grid points in each dimension of the uniform 5D phase-space grid used for
+    regeneration.
+* - `regen_hist_cut`
+  - Phase-space density threshold below which no electrons are generated during regeneration.
+* - `N_mp_soft_regen`
+  - *Optional.* Soft regeneration threshold, checked at every bunch passage. Should be smaller
+    than `N_mp_regen`. Soft regeneration is enabled only when this parameter and
+    `N_mp_after_soft_regen` are set.
+* - `N_mp_after_soft_regen`
+  - *Optional.* Target number of MPs after a soft regeneration.
+* - `N_mp_async_regen`, `N_mp_after_async_regen`
+  - *Optional.* Threshold and target for asynchronous soft regeneration, which does not wait for
+    the next bunch passage. Enabled only when both are set.
 ```
 
-**Space charge parameters**
+## Space charge
 
 ```{list-table}
 :header-rows: 1
@@ -146,32 +145,34 @@ used for regeneration and saving purposes.
 
 * - Parameter
   - Description
-* - **Dt_sc**
-  - \[s\] Time step for the update of the electron space charge field map.
-* - **Dh_sc**
-  - \[m\] Grid size for the space charge PIC solver.
-* - **t_sc_ON**
-  - \[s\] Electron space charge forces are neglected for t\<t_sc_ON – normally t_sc_ON=0.
-* - **sparse_solver**
-  - (optional) Sparse solver: `PyKLU` (default) or `scipy_slu` (SciPy SuperLU).
-* - **PyPICmode**
-  - (optional) Options are ’FiniteDifferences_ShortleyWeller’ \[default\],
-    ’ShortleyWeller_WithTelescopicGrids’, ’FiniteDifferences_Staircase’
-* - **Dh_electric_energy**
-  - \[m\] (optional – default = None) Grid size used to compute stored electric energy. If None is
-    given, electric energy is not computed.
-* - **flag_em_tracking**
-  - (optional – default = False) Forces generated by electrons are computed using electromagnetic
-    potentials instead of quasi-electrostatic approximation (for more information see
-    <https://indico.cern.ch/event/840676/contributions/3532754/>).
-* - **flag_reinterp_fields_at_substeps**
-  - (optional – default = False) If true, field maps from beams and clouds are interpolated at each
-    Boris substep.
+* - `Dt_sc`
+  - \[s\] Time step between updates of the electron space charge field map.
+* - `Dh_sc`
+  - \[m\] Grid size of the space charge particle-in-cell solver.
+* - `t_sc_ON`
+  - \[s\] Electron space charge forces are neglected for $t <$ `t_sc_ON`. Usually set to 0.
+* - `sparse_solver`
+  - *Optional, default `'PyKLU'`.* Sparse solver: `'PyKLU'` or `'scipy_slu'` (SciPy SuperLU).
+    The old value `'klu'` is still accepted and selects `'PyKLU'`.
+* - `PyPICmode`
+  - *Optional, default `'FiniteDifferences_ShortleyWeller'`.* Field solver:
+    `'FiniteDifferences_ShortleyWeller'`, `'ShortleyWeller_WithTelescopicGrids'`, or
+    `'FiniteDifferences_Staircase'`.
+* - `Dh_electric_energy`
+  - *Optional, default `None`.* \[m\] Grid size used to compute the stored electric energy. If
+    `None`, the electric energy is not computed.
+* - `flag_em_tracking`
+  - *Optional, default `False`.* Compute the forces from the electrons using electromagnetic
+    potentials instead of the quasi-electrostatic approximation
+    ([details](https://indico.cern.ch/event/840676/contributions/3532754/)).
+* - `flag_reinterp_fields_at_substeps`
+  - *Optional, default `False`.* Interpolate the beam and cloud field maps at every Boris
+    sub-step.
 ```
 
-**Multigrid parameters**
+## Multigrid
 
-To be used with PyPICmode = ’ShortleyWeller_WithTelescopicGrids’
+Used with `PyPICmode = 'ShortleyWeller_WithTelescopicGrids'`.
 
 ```{list-table}
 :header-rows: 1
@@ -179,19 +180,19 @@ To be used with PyPICmode = ’ShortleyWeller_WithTelescopicGrids’
 
 * - Parameter
   - Description
-* - **f_telescope**
-  - Magnification factor between grids (it must be always $0<f<1$).
-* - **target_grid**
-  - Target grid parameters. It is a dictionary containing: ’x_min_target’, ’x_max_target’,
-    ’y_min_target’, ’y_max_target’ and ’Dh_target’.
-* - **N_nodes_discard**
-  - Number of nodes at the edge of the internal grids which are discarded in the field
-    interpolation (going to coarser grid).
-* - **N_min_Dh_main**
-  - Minimum size of the first internal grid in the $\Delta h$ of the main grid.
+* - `f_telescope`
+  - Magnification factor between successive grids. Must satisfy $0 < f < 1$.
+* - `target_grid`
+  - Target grid, given as a dictionary with the keys `'x_min_target'`, `'x_max_target'`,
+    `'y_min_target'`, `'y_max_target'`, and `'Dh_target'`.
+* - `N_nodes_discard`
+  - Number of nodes at the edge of each internal grid that are discarded when interpolating the
+    field (towards the coarser grid).
+* - `N_min_Dh_main`
+  - Minimum size of the first internal grid, in units of the main grid's $\Delta h$.
 ```
 
-**Saving settings**
+## Saving
 
 ```{list-table}
 :header-rows: 1
@@ -199,35 +200,88 @@ To be used with PyPICmode = ’ShortleyWeller_WithTelescopicGrids’
 
 * - Parameter
   - Description
-* - **filen_main_outp**
-  - Main output filename or path. (optional - default ’Pyecltest.mat’)
-* - **save_only**
-  - Define subset of output variables to be saved, other variables are discarded. (optional -
-    default None)
-* - **dec_fact_out**
-  - Output is saved only for every nth time step.
-* - **save_mat_every**
-  - Output file .mat is saved only for every nth bunch passage. (optional - default 1)
-* - **Dx_hist**
-  - \[m\] Defines the binning for the saving of the horizontal histograms.
-* - **r_center**
-  - \[m\] Radius of a circle around the (0, 0) point (center of the chamber) for the calculation of
-    the local central density.
-* - **Dt_En_hist**
-  - \[s\] Time step used to store the energy spectrum of the electrons impacting on the chamber.
-* - **Nbin_En_hist**
-  - Number of bins used for the energy histogram.
-* - **En_hist_max**
-  - \[eV\] Maximum energy in energy spectrum. Larger energies are attributed to the last bin of the
-    histogram.
-* - **flag_En_hist_seg**
-  - (optional – default False) If enabled, energy histograms per segment are saved.
-* - **flag_lifetime_hist**
-  - If set to True enables lifetime histogram (optional – default=False).
+* - `filen_main_outp`
+  - *Optional, default `'Pyecltest.mat'`.* Main output filename or path.
+* - `save_only`
+  - *Optional, default `None`.* Subset of output variables to save; all others are discarded.
+* - `dec_fact_out`
+  - Save the time-step output every `dec_fact_out` time steps.
+* - `save_mat_every`
+  - *Optional, default `1`.* Write the `.mat` output file every `save_mat_every` bunch passages.
+* - `Dx_hist`
+  - \[m\] Bin width of the horizontal histograms.
+* - `r_center`
+  - \[m\] Radius of the circle around the chamber centre (0, 0) used to compute the central
+    electron density.
+* - `Dt_En_hist`
+  - \[s\] Time interval between saved energy spectra of the electrons hitting the chamber.
+* - `Nbin_En_hist`
+  - Number of bins of the energy histogram.
+* - `En_hist_max`
+  - \[eV\] Upper limit of the energy spectrum. Higher energies go into the last bin.
+* - `flag_En_hist_seg`
+  - *Optional, default `False`.* Save energy histograms for each chamber segment.
+* - `flag_lifetime_hist`
+  - *Optional, default `False`.* Save electron lifetime histograms. If `True`,
+    `Dt_lifetime_hist`, `Nbin_lifetime_hist`, and `lifetime_hist_max` must also be set.
+* - `Dt_lifetime_hist`
+  - \[s\] Time interval between saved electron lifetime histograms.
+* - `Nbin_lifetime_hist`
+  - Number of bins of the electron lifetime histogram.
+* - `lifetime_hist_max`
+  - \[s\] Upper limit of the lifetime histogram. Longer lifetimes go into the last bin.
+* - `flag_cos_angle_hist`
+  - *Optional, default `True`.* Save a histogram of the cosine of the impact angle of electrons
+    hitting the chamber.
+* - `cos_angle_width`
+  - *Optional, default `0.05`.* Bin width of the impact-angle histogram.
+* - `flag_movie`
+  - *Optional, default `0`.* Set to 1 to save the electron density distribution at every space
+    charge evaluation.
+* - `flag_sc_movie`
+  - *Optional, default `0`.* Set to 1 to save the electron space charge field at every space
+    charge evaluation.
+* - `save_mp_state_time_file`
+  - *Optional, default: no MP state is saved.* \[s\] Times at which MP positions and velocities
+    are saved to file, given as a list or as a `.mat` file.
+* - `flag_detailed_MP_info`
+  - *Optional, default `0`.* Set to 1 to save the number of MPs at every time step.
+* - `flag_hist_impact_seg`
+  - *Optional, default `0`.* For polygonal chambers, set to 1 to save the number of electrons
+    hitting each segment of the polygon.
+* - `flag_verbose_file`, `flag_verbose_stdout`
+  - *Optional, default `False`.* Report details of pathological impacts to an output file and to
+    standard output, respectively.
+* - `dec_fac_secbeam_prof`
+  - *Optional, default `1`.* Decimation factor that reduces the number of points of the
+    secondary beams' longitudinal profiles.
+* - `el_density_probes`
+  - *Optional, default: no probes.* Electron density probes, given as a list of Python
+    dictionaries. Each probe needs a position (`x`, `y`) and a circle radius (`r_obs`).
+* - `save_simulation_state_time_file`
+  - *Optional, default: no state is saved.* \[s\] Times at which the full simulation state is
+    saved to pickle files, given as a list or as a `.mat` file. See
+    [Saving and restarting simulations](../tutorials/restart.md).
+* - `checkpoint_folder`
+  - *Optional, default: no checkpoints.* Folder in which checkpoints are saved.
+* - `checkpoint_DT`
+  - *Optional, default: no checkpoints.* \[s\] Simulated time between checkpoints.
+* - `copy_main_outp_folder`
+  - *Optional, default: the output is not copied.* Folder for backups of the output file. Backups
+    are needed to restart a simulation from a checkpoint.
+* - `copy_main_outp_DT`
+  - *Optional, default: the output is copied only when a checkpoint is saved.* \[s\] Interval at
+    which the output file is backed up.
+* - `x_min_hist_det`, `x_max_hist_det`, `y_min_hist_det`, `y_max_hist_det`, `Dx_hist_det`
+  - *Optional, default: no detailed histogram.* \[m\] Region of the chamber, and bin width, for
+    an additional detailed horizontal histogram (`_det` stands for *detailed*).
+* - `step_by_step_custom_observables`, `pass_by_pass_custom_observables`,
+    `save_once_custom_observables`
+  - *Optional, default: no custom output.* Custom observables saved at every time step, at every
+    bunch passage, or once. See the examples for usage.
 ```
 
-If **flag_lifetime_hist** is set to True, the variables **Dt_lifetime_hist**,
-**Nbin_lifetime_hist** and **lifetime_hist_max** need to be set.
+## Cloud particles
 
 ```{list-table}
 :header-rows: 1
@@ -235,91 +289,16 @@ If **flag_lifetime_hist** is set to True, the variables **Dt_lifetime_hist**,
 
 * - Parameter
   - Description
-* - **Dt_lifetime_hist**
-  - \[s\] Time step used to store the histogram of the electrons lifetime.
-* - **Nbin_lifetime_hist**
-  - Number of bins used for the histogram of the electrons lifetime.
-* - **lifetime_hist_max**
-  - \[s\] Maximum lifetime in the histogram of the electrons lifetime. Larger lifetimes are
-    attributed to the last bin of the histogram.
-* - **flag_cos_angle_hist**
-  - Save the cosine of the incident angle of impacting electrons. (optional – default True)
-* - **cos_angle_width**
-  - Width of the histogram bins. (optional – default 0.05)
-* - **flag_movie**
-  - (optional – default=0)
-
-    (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron density
-    distribution at each space charge evaluation.
-* - **flag_sc_movie**
-  - (optional– default=0)
-
-    (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Saves files with the electron space charge
-    electric field distribution at each space charge evaluation.
-* - **save_mp_state_time_file**
-  - (optional – default: no MP state is saved)
-
-    \[s\] List of instants at which MP positions and velocities are saved on file. The list can
-    also be provided as a .mat file.
-* - **flag_detailed_MP_info**
-  - (optional – default=0)
-
-    (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) Enables save of MP number at each time step.
-* - **flag_hist_impact_seg**
-  - (optional – default=0)
-
-    (1 $\Rightarrow$ On, 0 $\Rightarrow$ Off) If the chamber is a polygon, enables saving the
-    number of electrons which impacts onto each segment of polygon.
-* - **flag_verbose_file, flag_verbose_stdout**
-  - (optional – default=False)
-
-    True/False toggles to save detailed information of pathological impacts in output file and
-    stdout respectively.
-* - **dec_fac_secbeam_prof**
-  - (optional – default=1)
-
-    Decimation factor to decrease the number of points of the longitudinal beam profile of
-    secondary beams.
-* - **el_density_probes**
-  - (optional – default: no probes)
-
-    (List of Python dictionaries) Probes for electron density evaluation. For each of them it is
-    necessary to indicate the position (x,y) and radius of the circle (r_obs).
-* - **save_simulation_state_time_file**
-  - (optional – default: no simulation state is saved)
-
-    \[s\] List of instants at which the full simulation state is saved on file (pickle files). The
-    list can also be provided as a .mat file.
-* - **checkpoint_folder**
-  - (optional – default: no checkpoints are saved)
-
-    Path to folder where checkpoints are saved.
-* - **checkpoint_DT**
-  - (optional – default: no checkpoints are saved)
-
-    Time interval in seconds between checkpoints being saved.
-* - **copy_main_outp_folder**
-  - (optional – default: output is not copied)
-
-    Path to folder for storing backups of the output. Backups are needed to restart a simulation
-    from a checkpoint.
-* - **copy_main_outp_DT**
-  - (optional – default: output is only copied if a checkpoint is saved)
-
-    Enables backing up the output file in regular intervals.
-* - **x_min_hist_det, x_max_hist_det, y_min_hist_det, y_max_hist_det, Dx_hist_det**
-  - (optional – default: no detailed histogram is saved)
-
-    \[m\] Defines a region of the chamber where a detailed horizontal distribution histogram is
-    saved (\_det stands for detailed).
-* - **step_by_step_custom_observables, pass_by_pass_custom_observables,
-    save_once_custom_observables**
-  - (optional – default: no custom output)
-
-    Custom observable definition. See example for detailed usage.
+* - `cloud_mass`
+  - *Optional, default: electron mass.* \[kg\] Mass of the cloud particles.
+* - `cloud_charge`
+  - *Optional, default: electron charge.* \[C\] Charge of the cloud particles.
 ```
 
-**Cloud particles**
+## Additional clouds
+
+Simulations with several clouds are enabled with the following parameter. See
+[Simulations with multiple clouds](multiple-clouds.md) for details.
 
 ```{list-table}
 :header-rows: 1
@@ -327,14 +306,11 @@ If **flag_lifetime_hist** is set to True, the variables **Dt_lifetime_hist**,
 
 * - Parameter
   - Description
-* - **cloud_mass**
-  - (optional – default=electron mass) \[kg\] Mass of cloud particles.
-* - **cloud_charge**
-  - (optional – default=electron charge) \[C\] Charge of cloud particles.
+* - `additional_clouds_file_list`
+  - *Optional, default `[]`.* List of additional cloud file names.
 ```
 
-**Additional clouds** Simulations with multiple clouds can be enabled with the following input
-parameter. See the [multiple-clouds page](multiple-clouds.md) for a detailed description of this simulation mode.
+## SEY curve extraction
 
 ```{list-table}
 :header-rows: 1
@@ -342,11 +318,11 @@ parameter. See the [multiple-clouds page](multiple-clouds.md) for a detailed des
 
 * - Parameter
   - Description
-* - **additional_clouds_file_list**
-  - (optional – default=\[\]) List of names of additional cloud files.
+* - `extract_sey`
+  - *Optional, default `True`.* Set to `False` to skip extracting the SEY curves.
 ```
 
-**SEY** Extraction of the SEY curves can be disabled.
+## Emission energy distribution extraction
 
 ```{list-table}
 :header-rows: 1
@@ -354,26 +330,14 @@ parameter. See the [multiple-clouds page](multiple-clouds.md) for a detailed des
 
 * - Parameter
   - Description
-* - **extract_sey**
-  - (optional – default=True) If set to False, it disables the extraction of the SEY curves.
-```
-
-**Extraction of electron emission energy distribution**
-
-```{list-table}
-:header-rows: 1
-:widths: 35 65
-
-* - Parameter
-  - Description
-* - **extract_ene_dist**
-  - (optional – default=False) If set to True, secondary emission energy distributions are
-    extracted and saved.
-* - **ene_dist_test_E_impact_eV**
-  - The impacting energy used in the energy distribution extraction. \[eV\]
-* - **Nbin_extract_ene**
-  - The number of bins used in the extracted energy distributions.
-* - **factor_ene_dist_max**
-  - Defines the maximum energy included in the extracted energy distribution. The maximum energy is
-    factor_ene_dist_max \* ene_dist_test_E_impact_eV
+* - `extract_ene_dist`
+  - *Optional, default `False`.* Extract and save the energy distributions of secondary
+    emission.
+* - `ene_dist_test_E_impact_eV`
+  - \[eV\] Impact energy used to extract the energy distributions.
+* - `Nbin_extract_ene`
+  - Number of bins of the extracted energy distributions.
+* - `factor_ene_dist_max`
+  - Sets the upper limit of the extracted energy distributions, which is
+    `factor_ene_dist_max * ene_dist_test_E_impact_eV`.
 ```
