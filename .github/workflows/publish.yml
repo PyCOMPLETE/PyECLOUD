@@ -1,0 +1,77 @@
+name: Publish to PyPI
+
+# Pushing a release tag such as v8.9.0 builds the source distribution, checks it,
+# and publishes it to PyPI. The tag must match __version__ in PyECLOUD/_version.py.
+on:
+  push:
+    # Only plain release tags: v, then three dot-separated numbers (e.g. v8.9.0).
+    # Tags such as v8.9, v8.9.0rc1 or v8.9.0-test do not start the workflow.
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check the tag format and that it matches the package version
+        run: |
+          # Exact check; the trigger filter above is a glob, not a regular expression.
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME is not of the form vX.Y.Z"
+            exit 1
+          fi
+          VER=$(python -c 'exec(open("PyECLOUD/_version.py").read()); print(__version__)')
+          if [[ "$GITHUB_REF_NAME" != "v$VER" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $VER in PyECLOUD/_version.py"
+            exit 1
+          fi
+      - name: Install build tools
+        run: python -m pip install build
+      - name: Build source distribution
+        run: python -m build --sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist/
+      - name: Install twine
+        run: python -m pip install twine
+      - name: Check distribution metadata
+        run: python -m twine check --strict dist/*.tar.gz
+
+  publish:
+    needs: test
+    # Only the main repository publishes; tags pushed to forks stop after the test.
+    if: github.repository == 'PyCOMPLETE/PyECLOUD'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/PyECLOUD/
+    permissions:
+      # Trusted publishing: PyPI accepts a short-lived token from this workflow,
+      # so no PyPI API token is stored in the repository.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

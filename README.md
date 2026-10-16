@@ -109,20 +109,24 @@ python -m build --sdist
 python -m twine check --strict dist/*.tar.gz
 ```
 
-After testing the archive, commit and push the release changes, then run from
-the repository root:
+After testing the archive, commit and push the release changes to `main`, then
+run from the repository root:
 
 ```sh
 ./release.sh
 ```
 
-The script reads the version from `PyECLOUD/_version.py`, builds the sdist with
-`python -m build`, creates and pushes `v<version>` to `origin`, then uploads the
-archive using Twine and your PyPI credentials (for example, configured in
-`~/.pypirc`). The archive is built in a temporary directory so only this
-release's source archive is uploaded, then cleaned up. No wheels are uploaded.
-A failed build stops the script before anything is tagged. If uploading fails
-after the tag is pushed, finish the upload manually.
+The script reads the version from `PyECLOUD/_version.py`, checks that the sdist
+builds and passes `twine check`, then creates and pushes the tag `v<version>`.
+A failed check stops the script before anything is tagged. The tag is pushed to
+`origin`; set `REMOTE` to push elsewhere, e.g. `REMOTE=upstream ./release.sh`.
+
+Pushing the tag to `PyCOMPLETE/PyECLOUD` starts the **Publish to PyPI**
+workflow (`.github/workflows/publish.yml`). It checks that the tag matches
+`_version.py`, builds the sdist, and uploads it to PyPI using trusted
+publishing, so no PyPI token is needed. No wheels are uploaded. Follow the run
+in the repository's **Actions** tab. Tags pushed to forks build the archive but
+do not publish.
 
 ## Documentation
 
