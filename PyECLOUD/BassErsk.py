@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 from cmath import *
 from numpy import *
 from .errffor import errf

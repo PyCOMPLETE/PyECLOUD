@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 """Native extension builds; package metadata lives in pyproject.toml."""
 
 from pathlib import Path

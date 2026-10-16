@@ -1,3 +1,8 @@
+* copyright ################################# *
+* This file is part of the PyECLOUD Package.  *
+* Copyright (c) CERN, 2011.                   *
+* ########################################### *
+
 c      program prove_erf
 c      real*8 x,y,wx,wy
 c      

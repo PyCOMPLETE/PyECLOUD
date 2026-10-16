@@ -1,11 +1,12 @@
-import sys
-sys.path.append('../../../')
 
 
+import os
 import pylab as pl
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 import numpy as np
 import seaborn as sns
-import time
 
 import PyECLOUD.myfilemanager as mfm
 
@@ -15,7 +16,6 @@ pyhdtl = mfm.monitorh5_to_dict('bunch_evolution_A44_156b_26ips_10turns_5.00nTorr
 N_turns = 10
 
 pl.close('all')
-pl.ion()
 
 sns.set_context('talk', font_scale=1.4, rc={'lines.linewidth': 1.5})
 sns.set_style('whitegrid', {'grid.linestyle': ':', 'axes.edgecolor': '0.5', 'axes.linewidth': 1.2, 'legend.frameon': False})
@@ -62,6 +62,6 @@ for ii in range(N_turns + 1):
 	pl.ylim(-3e-6, 3e-6)
 	pl.subplots_adjust(left=0.21, hspace=0.3)
 
-	pl.pause(1.5)
+	pl.savefig(os.path.join(OUTPUT_DIR, 'turn_%02d.png' % ii))
 
 

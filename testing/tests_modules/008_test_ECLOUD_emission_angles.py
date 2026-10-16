@@ -1,11 +1,15 @@
-import sys
-if '../..' not in sys.path:
-    sys.path.append('../..')
+import argparse
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import sec_emission_model_ECLOUD as ECL
-import mystyle as ms
+from PyECLOUD import sec_emission_model_ECLOUD as ECL
+from PyECLOUD import mystyle as ms
 from scipy.constants import e as qe
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
 
 plt.close('all')
 ms.mystyle(12)
@@ -94,4 +98,9 @@ plt.ylabel('Normalized emission angle spectrum')
 plt.grid(alpha=.5)
 
 
-plt.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in plt.get_fignums():
+        plt.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    plt.show()

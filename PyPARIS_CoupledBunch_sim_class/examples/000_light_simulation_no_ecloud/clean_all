@@ -1,0 +1,8 @@
+rm -r bunch_states_turn*/
+rm -r beam_status_part*/
+rm mpi_logfile_cpu00*
+rm bunch_monitor_*
+rm slice_monitor_*
+rm pyparislog.txt 
+rm simulation_status.sta 
+

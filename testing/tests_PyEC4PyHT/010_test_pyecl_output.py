@@ -1,6 +1,4 @@
 import sys, os
-sys.path.append(os.path.expanduser('../../../'))
-sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 from scipy.constants import c, e, m_p
 import numpy as np

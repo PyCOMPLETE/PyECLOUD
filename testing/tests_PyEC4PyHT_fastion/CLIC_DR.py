@@ -1,7 +1,5 @@
 
 
-import sys
-sys.path.append("../")
 
 import numpy as np
 from scipy.constants import c, e, m_p, m_e

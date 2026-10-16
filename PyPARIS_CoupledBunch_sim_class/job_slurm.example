@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+#SBATCH -p batch-long
+#SBATCH -n 768
+#SBATCH -t 21-00:00:00
+# --hint=nomultithread
+
+module load mpi/mvapich2/2.2
+
+SIM_WORKSPACE=/hpcscratch/user/lmether/sim_workspace
+ 
+export PYTHONPATH=$PYTHONPATH:$SIM_WORKSPACE
+
+source $SIM_WORKSPACE/virtualenvs/py2.7/bin/activate
+
+srun python for000_run_sim.py

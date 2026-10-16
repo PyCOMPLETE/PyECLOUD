@@ -1,54 +1,7 @@
-#-Begin-preamble-------------------------------------------------------
-#
-#                           CERN
-#
-#     European Organization for Nuclear Research
-#
-#
-#     This file is part of the code:
-#
-#                   PyECLOUD Version 8.7.1
-#
-#
-#     Main author:          Giovanni IADAROLA
-#                           BE-ABP Group
-#                           CERN
-#                           CH-1211 GENEVA 23
-#                           SWITZERLAND
-#                           giovanni.iadarola@cern.ch
-#
-#     Contributors:         Eleonora Belli
-#                           Philipp Dijkstal
-#                           Lorenzo Giacomel
-#                           Lotta Mether
-#                           Annalisa Romano
-#                           Giovanni Rumolo
-#                           Eric Wulff
-#
-#
-#     Copyright  CERN,  Geneva  2011  -  Copyright  and  any   other
-#     appropriate  legal  protection  of  this  computer program and
-#     associated documentation reserved  in  all  countries  of  the
-#     world.
-#
-#     Organizations collaborating with CERN may receive this program
-#     and documentation freely and without charge.
-#
-#     CERN undertakes no obligation  for  the  maintenance  of  this
-#     program,  nor responsibility for its correctness,  and accepts
-#     no liability whatsoever resulting from its use.
-#
-#     Program  and documentation are provided solely for the use  of
-#     the organization to which they are distributed.
-#
-#     This program  may  not  be  copied  or  otherwise  distributed
-#     without  permission. This message must be retained on this and
-#     any other authorized copies.
-#
-#     The material cannot be sold. CERN should be  given  credit  in
-#     all references.
-#
-#-End-preamble---------------------------------------------------------
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
 
 
 import time
@@ -152,6 +105,11 @@ def velocities_angle_cosine_3D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
 
 
 def velocities_angle_cosine_2D(N_new_MP, En_gen, Norm_x, Norm_y, mass):
+    raise ValueError(
+        "You are explicitly calling the deprecated cosine_2D emission angle distribution."
+        "The cosine_2D emission angle distribution is deprecated; "
+        "use cosine_3D instead.",
+    )
     sin_theta_p = random.rand(N_new_MP)
     return _velocities_angle(N_new_MP, En_gen, Norm_x, Norm_y, sin_theta_p, mass)
 
@@ -192,8 +150,8 @@ def get_angle_dist_func(string):
         print('Using cosine_3D emission angle distribution.')
         return velocities_angle_cosine_3D
     elif string == 'cosine_2D':
-        print("""
-Warning! The 2D emission angle distribution is used!
+        raise ValueError("""
+The cosine_2D emission angle distribution is deprecated as of PyECLOUD v8.9.0!
 The 'cosine_3D' distribution is more appropriate. This can be enabled by
 setting in the machine parameter input file:
 "photoelectron_angle_distribution = 'cosine_3D'"
@@ -202,8 +160,6 @@ and in the secondary emission input file:
 For more info, see presentation by P. Dijkstal on the angle of emission
 of generated electrons (https://indico.cern.ch/event/673160/).
 """)
-        time.sleep(3)
-        return velocities_angle_cosine_2D
     elif string == 'normal_emission':
         print('Electrons are emmited orthogonally to the chamber surface.')
         return velocities_angle_normal_emission
@@ -215,9 +171,9 @@ machine parameter input file:
 "photoelectron_angle_distribution = 'cosine_3D'"
 and in the secondary emission input file:
 "secondary_angle_distribution = 'cosine_3D'"
-In case you want to use the cosine_2D distribution, to have the same
-behavior as in PyECLOUD 6.6.0 or earlier replace 'cosine_3D' with
-'cosine_2D'.
+In case you want to use the 'cosine_2D' distribution, to have the same
+behavior as in PyECLOUD 6.6.0 or earlier, you must use a version of PyECLOUD
+older than v8.9.0.
 For more info, see presentation by P. Dijkstal on the angle of emission
 of generated electrons (https://indico.cern.ch/event/673160/).
 """)

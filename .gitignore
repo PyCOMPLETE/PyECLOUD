@@ -16,6 +16,8 @@ dist/
 *.egg-info/
 *.pyd
 __pycache__/
+docs/_build/
+.venv-docs/
 .pytest_cache/
 scripts/
 *~
@@ -30,6 +32,8 @@ Pyecltest.mat
 Pyecltest_angle2D.mat
 Pyecltest_angle3D.mat
 *.png
+!docs/pyecl_logo.png
+!docs/pyecl_logo_darkbg.png
 *.swp
 test_multipole
 *STDERR

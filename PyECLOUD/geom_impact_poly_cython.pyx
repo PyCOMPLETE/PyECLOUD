@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 # cython: language_level=3
 import numpy as np
 cimport numpy as np

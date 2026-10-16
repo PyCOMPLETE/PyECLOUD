@@ -1,6 +1,4 @@
 import sys, os
-sys.path.append(os.path.expanduser('../../../'))
-sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 print('')
 print('This script generates h5 file with tunes from Headtail output files.')

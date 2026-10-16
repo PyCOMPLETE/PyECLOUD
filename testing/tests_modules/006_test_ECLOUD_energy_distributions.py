@@ -1,13 +1,17 @@
-import sys
-if '../..' not in sys.path:
-    sys.path.append('../..')
+import argparse
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import sec_emission_model_ECLOUD as ECL
-import mystyle as ms
-from impact_management_class import impact_management
-from geom_impact_ellip import ellip_cham_geom_object
+from PyECLOUD import sec_emission_model_ECLOUD as ECL
+from PyECLOUD import mystyle as ms
+from PyECLOUD.impact_management_class import impact_management
+from PyECLOUD.geom_impact_ellip import ellip_cham_geom_object
 import scipy
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
 
 
 plt.close('all')
@@ -45,8 +49,8 @@ sp2 = fig1.add_subplot(1, 2, 2)
 
 
 for i_ct, ct in enumerate(cos_theta_test):
-    areats = scipy.integrate.simps(extract_ene_hist['true'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
-    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areats = scipy.integrate.simpson(extract_ene_hist['true'][:, i_ct], x = extract_ene_hist['emit_ene_g_hist'])
+    areae = scipy.integrate.simpson(extract_ene_hist['elast'][:, i_ct], x = extract_ene_hist['emit_ene_g_hist'])
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
     sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'][:, i_ct] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
@@ -65,7 +69,7 @@ energy = np.linspace(0.001, E_0_single, num=int(1e5))
 sigmafit = 1.0828
 mufit = 1.6636
 hilleret_energy = 1. / (energy * sigmafit * np.sqrt(2 * np.pi)) * np.exp(-(np.log(energy) - mufit)**2 / (2 * sigmafit**2))
-area = scipy.integrate.simps(hilleret_energy, energy)
+area = scipy.integrate.simpson(hilleret_energy, x=energy)
 sp1.plot(energy, hilleret_energy / area, 'k', linewidth=linewid)
 sp1.set_title('switch_no_increase_energy=%d' % switch)
 
@@ -77,4 +81,9 @@ plt.subplots_adjust(right=0.99, left=.06)
 
 plt.suptitle('Energy distribution extraction tests: ECLOUD model', fontsize=30)
 
-plt.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in plt.get_fignums():
+        plt.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    plt.show()

@@ -1,10 +1,15 @@
 import sys, os
-sys.path.append(os.path.expanduser('../../../'))
-sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 
 import numpy as np
 import pylab as pl
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def save_open_figures():
+    for figure_number in pl.get_fignums():
+        pl.figure(figure_number).savefig(os.path.join(OUTPUT_DIR, 'figure_%02d.png' % figure_number))
 import PyECLOUD.mystyle as ms
 
 n_segments = 5
@@ -101,4 +106,4 @@ pl.plot([np.modf(machine.Q_x)[0]], [np.modf(machine.Q_y)[0]], 'r.')
 pl.xlabel('$Q_x$'); pl.ylabel('$Q_y$')
 pl.axis('equal')
 
-pl.show()
+save_open_figures()

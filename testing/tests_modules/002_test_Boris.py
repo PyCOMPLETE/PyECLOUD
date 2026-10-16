@@ -1,13 +1,17 @@
-import sys
+import argparse
+import os
 from numpy import array
-if '../../' not in sys.path:
-    sys.path.append('../../')
 
-import dynamics_dipole as dyndip
-import dynamics_Boris_f2py as dynB
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
 
-import MP_system as MPs
-from geom_impact_ellip import ellip_cham_geom_object
+from PyECLOUD import dynamics_dipole as dyndip
+from PyECLOUD import dynamics_Boris_f2py as dynB
+
+from PyECLOUD import MP_system as MPs
+from PyECLOUD.geom_impact_ellip import ellip_cham_geom_object
 
 Dt = 25e-12
 N_steps = 10000
@@ -16,7 +20,7 @@ N_sub_steps = 10
 
 dynamicsd = dyndip.pusher_dipole_magnet(Dt, B)
 dynamicsB = dynB.pusher_Boris(Dt, 0., B, 0.,
-                              None, None, None, N_sub_steps=N_sub_steps)
+                              None, None, N_sub_steps=N_sub_steps)
 
 chamb = ellip_cham_geom_object(.02, .02)
 N_mp_max = 1000
@@ -117,18 +121,20 @@ for ii in range(len(x_lisB[1])):
     pl.figure(ii)
     pl.subplot(3, 1, 1)
     pl.plot(x_lisd[:, ii])
-    pl.hold('on')
     pl.plot(x_lisB[:, ii], '.r')
 
     pl.subplot(3, 1, 2)
     pl.plot(y_lisd[:, ii])
-    pl.hold('on')
     pl.plot(y_lisB[:, ii], '.r')
 
     pl.subplot(3, 1, 3)
     pl.plot(z_lisd[:, ii])
-    pl.hold('on')
     pl.plot(z_lisB[:, ii], '.r')
 
 
-pl.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in pl.get_fignums():
+        pl.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    pl.show()

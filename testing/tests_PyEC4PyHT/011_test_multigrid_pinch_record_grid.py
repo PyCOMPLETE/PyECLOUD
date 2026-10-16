@@ -1,8 +1,8 @@
 """Track one bunch with multigrid and record the electron cloud on the finest grid.
 
 Based on 008_test_multigrid_pinch.py. Requires installed PyECLOUD, PyPIC and
-PyHEADTAIL. Input paths are relative to this script. Diagnostics stay in memory;
-interactive plots show electron number density in the x=0, y=0 and z=0 planes.
+PyHEADTAIL. Input paths are relative to this script. Diagnostics stay in memory; the electron number density plots are saved
+under outputs/011_test_multigrid_pinch_record_grid/.
 
 Ecloud's built-in diagnostics retain the innermost grid, not every refinement
 level. Arrays have shape (n_slices, len(x_grid), len(y_grid)), in increasing z
@@ -11,6 +11,7 @@ replaces Ecloud's logs. The recorded arrays contain the electron contribution on
 """
 
 from pathlib import Path
+import os
 from time import perf_counter
 
 import numpy as np
@@ -25,6 +26,8 @@ from machines_for_testing import LHC
 
 
 input_dir = Path(__file__).resolve().parent
+output_dir = input_dir / 'outputs' / Path(__file__).stem
+output_dir.mkdir(parents=True, exist_ok=True)
 np.random.seed(12345)
 
 # Beam parameters
@@ -164,5 +167,5 @@ for ax, horizontal, vertical, density, xlabel, ylabel, title in (
 axes[2].set_aspect('equal')
 fig.colorbar(mesh, ax=axes, label=r'Electron number density [m$^{-3}$]')
 fig.suptitle('Electron cloud pinch — finest grid')
-# Keep the GUI open when launched as a script; its toolbar supports zoom/pan.
-plt.show(block=True)
+# Save the figure for later inspection.
+fig.savefig(output_dir / 'figure_01.png')

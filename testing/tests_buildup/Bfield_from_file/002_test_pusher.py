@@ -1,5 +1,9 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'comparison_plots')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 from PyECLOUD.dynamics_Boris_f2py import pusher_Boris
 from scipy.constants import e, m_e
 
@@ -26,4 +30,4 @@ for ii in range(100):
     plt.plot(MP_e.x_mp, MP_e.y_mp, 'k.')
 plt.xlabel('x')
 plt.ylabel('y')
-plt.show()
+plt.savefig(os.path.join(OUTPUT_DIR, 'figure_01.png'), dpi=200)

@@ -1,10 +1,15 @@
 import sys, os
-sys.path.append(os.path.expanduser('../../../'))
-sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 from scipy.constants import c, e, m_p
 import numpy as np
 import pylab as pl
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def save_open_figures():
+    for figure_number in pl.get_fignums():
+        pl.figure(figure_number).savefig(os.path.join(OUTPUT_DIR, 'figure_%02d.png' % figure_number))
 import PyECLOUD.myfilemanager as mlm
 import PyECLOUD.mystyle as ms
 
@@ -296,4 +301,4 @@ sp6.ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
 sp6.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 
-pl.show()
+save_open_figures()

@@ -1,5 +1,5 @@
 import numpy as np
-import NAFFlib
+import nafflib as NAFFlib
 import sys
 
 

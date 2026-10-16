@@ -9,24 +9,24 @@ import numpy as np
 import scipy.integrate as integrate
 import scipy.stats as stats
 
-if '../../' not in sys.path:
-    sys.path.append('../../')
-import MP_system
-import geom_impact_ellip
-import geom_impact_rect_fast_impact as girfi
-import geom_impact_poly_fast_impact as gipfi
-import gen_photoemission_class
+# if '../../' not in sys.path:
+#     sys.path.append('../../')
+from PyECLOUD import MP_system
+from PyECLOUD import geom_impact_ellip
+from PyECLOUD import geom_impact_rect_fast_impact as girfi
+from PyECLOUD import geom_impact_poly_fast_impact as gipfi
+from PyECLOUD import gen_photoemission_class
 
-import mystyle as ms
+from PyECLOUD import mystyle as ms
 
 plt.close('all')
 ms.mystyle()
 
+ANGLE_DIST = 'cosine_3D'
 parser = argparse.ArgumentParser()
 parser.add_argument('-o', help='Define output of plots')
 parser.add_argument('--noshow', action='store_true')
 parser.add_argument('--energy-dist', choices=['gaussian', 'lognormal', 'lorentz', 'rect', ], default='gaussian')
-parser.add_argument('--angle-dist', choices=['cosine_2D', 'cosine_3D'], default='cosine_3D')
 args = parser.parse_args()
 
 arr = lambda x: np.array(x, dtype=float)
@@ -46,6 +46,7 @@ def lorentz(xx, mu, sig):
 
 def x_angle_dist(angle_dist, x):
     if angle_dist == 'cosine_2D':
+        raise ValueError("cosine_2D emission angle distribution is deprecated")
         return np.cos(x)
     elif angle_dist == 'cosine_3D':
         return np.sin(2 * x)
@@ -91,7 +92,7 @@ def test_model_1():
     # Photoemission object
     phem_elip = gen_photoemission_class.photoemission(
         'unif_no_file', k_pe_st, refl_frac, sig, mu, alimit, 0.99, 0, 1.01, chamb_elip, 0.995,
-        args.energy_dist, args.angle_dist, None, False)
+        args.energy_dist, ANGLE_DIST, None, False)
 
     # 1e6 number of MPs
     N_mp_max = int(1e6)
@@ -119,9 +120,9 @@ def test_model_1():
     sp.set_title('Histogram of angles\nrel. to center')
     sp.set_xlabel('Angles [rad]')
     sp.set_yscale('log')
-    sp.hist(angles, bins=40, normed=True)
+    sp.hist(angles, bins=40, density=True)
 
-    xx_a = np.linspace(-np.pi / 2, np.pi / 2, 1e5)
+    xx_a = np.linspace(-np.pi / 2, np.pi / 2, 100_000)
     yy = refl_frac / np.pi + (1 - refl_frac) * gauss(xx_a, 0, alimit)
     sp.plot(xx_a, yy, color='g', lw=3)
 
@@ -130,8 +131,8 @@ def test_model_1():
     sp.set_title('Histogram of energies')
     sp.set_xlabel('Energies [eV]')
     mask = energies < 30
-    sp.hist(energies[mask], bins=40, normed=True)
-    xx = np.linspace(0.5, 30, 1e5)
+    sp.hist(energies[mask], bins=40, density=True)
+    xx = np.linspace(0.5, 30, 100_000)
     if args.energy_dist == 'lognormal':
         yy = lognormal(xx, mu, sig)
     elif args.energy_dist == 'gaussian':
@@ -159,8 +160,8 @@ def test_model_1():
     sp.grid(True)
     sp.set_title('Histogram of velocity vector\nrel. to normal')
     sp.set_xlabel(r'$\theta$ [rad]')
-    sp.hist(angles_v, bins=40, normed=True)
-    sp.plot(xx_a[xx_a > 0], x_angle_dist(args.angle_dist, xx_a[xx_a > 0]), color='g', lw=3)
+    sp.hist(angles_v, bins=40, density=True)
+    sp.plot(xx_a[xx_a > 0], x_angle_dist(ANGLE_DIST, xx_a[xx_a > 0]), color='g', lw=3)
 
 # Photoemission model 'from_file' (2)
 
@@ -182,7 +183,7 @@ def test_model_2():
     }
 
     phem_rect = gen_photoemission_class.photoemission_from_file(
-        dist_dict, chamb_rect, 0.99, args.energy_dist, sig, mu, k_pe_st, 1.01 * np.sqrt(2), args.angle_dist, None, None)
+        dist_dict, chamb_rect, 0.99, args.energy_dist, sig, mu, k_pe_st, 1.01 * np.sqrt(2), ANGLE_DIST, None, None)
 
     MP_e = init_mp(N_mp_max, chamb_rect)
     phem_rect.generate(MP_e, 1 / c * N_mp_max, 1)
@@ -197,7 +198,7 @@ def test_model_2():
 
     angles_generated = np.arctan2(MP_e.y_mp, MP_e.x_mp)
     hist, bins = np.histogram(angles_generated, n_dist)
-    factor_hist = np.trapz(hist, angles)
+    factor_hist = np.trapezoid(hist, angles)
 
     sp = plt.subplot(2, 2, 2)
     sp.grid(True)
@@ -250,7 +251,7 @@ def test_model_2():
         raise ValueError('Vertexes of the two chambers are not compatible!')
 
     phem_segment = gen_photoemission_class.photoemission_per_segment(
-        chamb_phem, args.energy_dist, sig, mu, k_pe_st, args.angle_dist, None, None)
+        chamb_phem, args.energy_dist, sig, mu, k_pe_st, ANGLE_DIST, None, None)
 
     sp = plt.subplot(2, 2, 3)
     sp.grid(True)
@@ -274,7 +275,7 @@ def test_model_2():
 
     angles_generated = np.arctan2(MP_e.y_mp, MP_e.x_mp)
     hist, bins = np.histogram(angles_generated, n_dist)
-    factor_hist = np.trapz(hist, angles)
+    factor_hist = np.trapezoid(hist, angles)
 
     sp.plot(angles, np.sin(angles)**2 / np.pi, color='g', lw=3)
     sp.step(angles, hist / factor_hist, color='b')
@@ -297,7 +298,7 @@ def test_model_3():
     chamb_photo_seg = gipfi.polyg_cham_photoemission(my_chamb_dict)
 
     phem_seg = gen_photoemission_class.photoemission_per_segment(
-        chamb_photo_seg, args.energy_dist, sig, mu, k_pe_st, args.angle_dist)
+        chamb_photo_seg, args.energy_dist, sig, mu, k_pe_st, ANGLE_DIST)
     N_mp_max = int(1e3)
 
     MP_e = init_mp(N_mp_max, chamb_seg)

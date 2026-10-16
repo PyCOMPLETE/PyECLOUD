@@ -1,0 +1,73 @@
+# SIMULATION PARAMETERS
+
+machine_param_file='machine_parameters.input'
+secondary_emission_parameters_file='secondary_emission_parameters.input'
+beam_parameters_file='beam.beam' 
+
+logfile_path = None
+progress_path = None
+stopfile = 'stop'
+
+Dt = 2.500000e-11
+t_end=1e-9;       #s (no effect if log. profile is imported from file)
+
+import numpy as np
+dec_fact_out = 4.9
+
+lam_th=1.e2        #e-/m
+Dx_hist=1.e-3      #m
+r_center=1.e-3     #m
+
+
+Dt_En_hist = 25e-9 #s
+Nbin_En_hist= 250
+En_hist_max= 5000.  #eV
+
+t_ion=100.;        #s
+
+N_mp_max=200000;   #size of allocated vectors 
+
+#Regen parameters
+
+N_mp_regen=20000000;
+N_mp_regen_low=5000;
+N_mp_after_regen=10000;
+t_ON_regen_low=10.
+fact_split=1.5;
+fact_clean=1e-6;
+regen_hist_cut = 1.e-4
+
+N_mp_soft_regen = 30000
+N_mp_after_soft_regen = 20000
+
+nel_mp_ref_0= 2e7/(0.7*N_mp_soft_regen)   #e-/m
+
+
+# Number of bins
+Nx_regen=51;#it must be odd!
+Ny_regen=51;#it must be odd!
+Nvx_regen=51;#it must be odd!
+Nvy_regen=101;#it must be odd!
+Nvz_regen=51;#it must be odd!
+
+
+#Sp_ch params
+Dt_sc = .5e-9 
+Dh_sc = .3e-3
+t_sc_ON=0e-9;
+sparse_solver = 'klu'
+
+#Multigrid parameters
+PyPICmode = 'ShortleyWeller_WithTelescopicGrids'
+f_telescope = 0.8
+target_grid = {'x_min_target':-1.e-2, 'x_max_target':1.e-2,'y_min_target':-1.5e-2,'y_max_target':1.5e-2,'Dh_target':.1e-3}
+N_nodes_discard = 3.
+N_min_Dh_main = 10
+
+
+flag_movie = 0             #1/0
+flag_sc_movie = 0          #1/0
+
+save_mp_state_time_file =  -1
+
+extract_sey = False

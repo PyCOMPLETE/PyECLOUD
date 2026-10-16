@@ -1,0 +1,6 @@
+rm multigrid_config*
+rm simulation_status.sta
+rm bunch_evolution_*.h5
+rm slice_evolution_*.h5
+rm bunch_status_part*.h5
+rm *.pyc

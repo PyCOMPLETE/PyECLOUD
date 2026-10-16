@@ -1,6 +1,4 @@
-import sys, os
-BIN = os.path.expanduser("../../../")
-sys.path.append(BIN)
+import os
 
 import argparse
 import pylab as pl
@@ -19,6 +17,13 @@ sim_folder = './'
 dict_ref = mlm.myloadmat('../tests_buildup/LHC_ArcDipReal_450GeV_sey1.70_2.5e11ppb_bl_1.00ns_multigrid/' + '/Pyecltest_angle3D_ref.mat') # load dictionary of the reference simulation
 dict_curr0 = mlm.myloadmat('./test_saving__iter0.mat')   # load dictionary of the current simulation
 dict_curr1 = mlm.myloadmat('./test_saving__iter1.mat')   # load dictionary of the current simulation
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def save_open_figures():
+    for figure_number in pl.get_fignums():
+        pl.figure(figure_number).savefig(os.path.join(OUTPUT_DIR, 'figure_%02d.png' % figure_number))
 
 pl.close('all')
 myfontsz = 16
@@ -103,8 +108,7 @@ pl.plot(dict_ref['N_mp_ref_pass'], '.-')
 pl.plot(dict_curr['N_mp_ref_pass'], '.r-')
 
 
-pl.show()
-pl.show()
+save_open_figures()
 
 
 

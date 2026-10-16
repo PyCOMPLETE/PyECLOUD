@@ -1,7 +1,13 @@
-import sys 
-sys.path.append('../../../')
 
+import os
 import pylab as pl
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def save_open_figures():
+    for figure_number in pl.get_fignums():
+        pl.figure(figure_number).savefig(os.path.join(OUTPUT_DIR, 'figure_%02d.png' % figure_number))
 import numpy as np
 import seaborn as sns
 import PyECLOUD.myfilemanager as mfm
@@ -60,4 +66,4 @@ pl.xlim(0, 428)
 pl.subplots_adjust(left=0.21, hspace=0.3)
 
 
-pl.show()
+save_open_figures()

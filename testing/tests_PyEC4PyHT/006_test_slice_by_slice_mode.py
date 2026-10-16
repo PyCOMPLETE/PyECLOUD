@@ -1,10 +1,15 @@
 import sys, os
-sys.path.append(os.path.expanduser('../../../'))
-sys.path.append(os.path.expanduser('../../../PyHEADTAIL/'))
 
 
 import numpy as np
 import pylab as pl
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def save_open_figures():
+    for figure_number in pl.get_fignums():
+        pl.figure(figure_number).savefig(os.path.join(OUTPUT_DIR, 'figure_%02d.png' % figure_number))
 import PyECLOUD.mystyle as ms
 import time
 
@@ -181,7 +186,7 @@ for ii in range(N_turns - 1):
 
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(ii, rms_err_x, rms_err_y))
 
-	pl.savefig(filename.split('_prb.dat')[0] + '_slicebyslice_%02d.png'%ii, dpi=150)
+	pl.savefig(os.path.join(OUTPUT_DIR, os.path.basename(filename.split('_prb.dat')[0] + '_slicebyslice_%02d.png' % ii)), dpi=150)
 
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
@@ -197,8 +202,8 @@ pl.grid('on')
 pl.ylabel('''Relative r.m.s. error [%]''')
 pl.xlabel('Turn')
 pl.legend()
-pl.savefig(filename.split('_prb.dat')[0] + '_slicebyslice_errors.png', dpi=200)
-pl.show()
+pl.savefig(os.path.join(OUTPUT_DIR, os.path.basename(filename.split('_prb.dat')[0] + '_slicebyslice_errors.png')), dpi=200)
+save_open_figures()
 
 
 

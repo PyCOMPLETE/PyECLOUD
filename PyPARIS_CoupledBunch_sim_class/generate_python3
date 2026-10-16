@@ -1,0 +1,6 @@
+mkdir ../python3
+rm -rf ../python3/PyPARIS_CoupledBunch_sim_class
+cp -r ../PyPARIS_CoupledBunch_sim_class ../python3/PyPARIS_CoupledBunch_sim_class
+rm ../python3/PyPARIS_CoupledBunch_sim_class/*.so
+2to3 --output-dir=../python3/PyPARIS_CoupledBunch_sim_class -W -n ../PyPARIS_CoupledBunch_sim_class
+#rm -rf ../python3/PyPARIS_CoupledBunch_sim_class/.git

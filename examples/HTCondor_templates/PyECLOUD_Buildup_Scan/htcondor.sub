@@ -1,0 +1,13 @@
+executable              = job.job
+arguments               = ""
+output                  = htcondor.out
+error                   = htcondor.err
+log                     = log.$(ClusterId)
+should_transfer_files   = YES
+transfer_input_files    = $(folder)/inputs.tgz, root://eosproject-e.cern.ch//eos/project/e/ecloud-simulations/ekatrali/LHC_6.8TeV_Arcs_Filling_Pattern_Scan/jobfiles.tgz
+output_destination      = root://eosproject-e.cern.ch//eos/project/e/ecloud-simulations/ekatrali/LHC_6.8TeV_Arcs_Filling_Pattern_Scan/$(folder)
+when_to_transfer_output = ON_EXIT
+transfer_output_files   = output.tgz
+MY.XRDCP_CREATE_DIR     = True
++JobFlavour="tomorrow"
+queue folder from sims.txt

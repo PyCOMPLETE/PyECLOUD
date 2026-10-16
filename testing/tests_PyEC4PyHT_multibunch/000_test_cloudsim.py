@@ -1,8 +1,3 @@
-import sys
-import os
-BIN = os.path.expanduser("../../../")  # folder containing PyECLOUD, PyPIC, PyKLU, PyHEADTAIL, PyPARIS
-if BIN not in sys.path:
-    sys.path.append(BIN)
 
 from scipy.constants import c as clight
 import numpy as np
@@ -94,7 +89,15 @@ beam = sum(list_bunches)
 thin_slicer = UniformBinSlicer(n_slices=10000, z_cuts=(-len(filling_pattern) * bucket_length_m * b_spac_buckets, bucket_length_m))
 thin_slice_set = beam.get_slices(thin_slicer, statistics=True)
 
+import os
 import matplotlib.pyplot as plt
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', os.path.splitext(os.path.basename(__file__))[0])
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def save_open_figures():
+    for figure_number in plt.get_fignums():
+        plt.figure(figure_number).savefig(os.path.join(OUTPUT_DIR, 'figure_%02d.png' % figure_number))
 
 plt.close('all')
 plt.figure(1)
@@ -129,4 +132,4 @@ for ibun, bun in enumerate(list_bunches):
 spb2.grid('on')
 
 
-plt.show()
+save_open_figures()

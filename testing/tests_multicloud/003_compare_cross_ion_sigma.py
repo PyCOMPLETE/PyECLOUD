@@ -1,7 +1,5 @@
 import sys
 import os
-BIN = os.path.expanduser("../../../")
-sys.path.append(BIN)
 
 import numpy as np
 import matplotlib.pyplot as pl

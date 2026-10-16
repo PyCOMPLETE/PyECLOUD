@@ -1,5 +1,6 @@
 import sys
-sys.path.append('../../')
+import os
+import argparse
 
 import numpy as np
 import pylab as pl
@@ -7,7 +8,15 @@ import pylab as pl
 import PyPARIS.myfilemanager as mfm
 import mystyle as ms
 
-import time
+parser = argparse.ArgumentParser()
+parser.add_argument('--output-dir', default=os.path.join(os.path.dirname(__file__), 'output', os.path.splitext(os.path.basename(__file__))[0]),
+                    help='Directory for comparison plots')
+args = parser.parse_args()
+OUTPUT_DIR = args.output_dir
+if not os.path.isabs(OUTPUT_DIR):
+    OUTPUT_DIR = os.path.join(os.path.dirname(__file__), OUTPUT_DIR)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 
 n_segments = 3
 n_part_per_turn = 5000
@@ -83,14 +92,11 @@ for i_turn in range(N_turns-1):
 
 	pl.suptitle('Turn %d rms_err_x = %e rms_err_y = %e'%(i_turn, rms_err_x, rms_err_y))
 
-	pl.savefig(filename.split('_prb.dat')[0]+'_%02d.png'%i_turn, dpi=150)
+	pl.savefig(os.path.join(OUTPUT_DIR, 'turn_%02d.png' % i_turn), dpi=150)
 
 	rms_err_x_list.append(rms_err_x)
 	rms_err_y_list.append(rms_err_y)
 	
-	pl.ion()
-	pl.draw()
-	time.sleep(1.)
 	
 pl.figure(1000)
 pl.plot(rms_err_x_list, '.-', markersize = 10, linewidth=2, label='x')
@@ -99,5 +105,4 @@ pl.grid('on')
 pl.ylabel('''Relative r.m.s. error [%]''')
 pl.xlabel('Turn')
 pl.legend()
-pl.savefig(filename.split('_prb.dat')[0]+'_errors.png', dpi=200)
-pl.show()
+pl.savefig(os.path.join(OUTPUT_DIR, 'errors.png'), dpi=200)

@@ -1,3 +1,8 @@
+# copyright ################################# #
+# This file is part of the PyECLOUD Package.  #
+# Copyright (c) CERN, 2011.                   #
+# ########################################### #
+
 from matplotlib import rc, rcdefaults, RcParams
 import matplotlib
 import pylab as pl
@@ -81,7 +86,8 @@ def mystyle_2(fontsz=16, dist_tick_lab=10, figsize=(12, 10)):
 
 def figure(title, figs=None, figsize=(12, 10), **kwargs):
     fig = plt.figure(figsize=figsize, **kwargs)
-    fig.canvas.set_window_title(title)
+    if fig.canvas.manager is not None:
+        fig.canvas.manager.set_window_title(title)
     if figs != None:
         figs.append(fig)
     fig.patch.set_facecolor('w')

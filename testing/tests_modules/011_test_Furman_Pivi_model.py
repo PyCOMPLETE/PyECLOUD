@@ -1,11 +1,15 @@
-import sys
-if '../..' not in sys.path:
-    sys.path.append('../..')
+import argparse
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import sec_emission_model_furman_pivi as fp
-import mystyle as ms
+from PyECLOUD import sec_emission_model_furman_pivi as fp
+from PyECLOUD import mystyle as ms
 import scipy
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
 
 plt.close('all')
 ms.mystyle(16)
@@ -181,7 +185,7 @@ prob_density_e = test_obj.backscattered_energy_PDF(energy, E_0)
 ax1.plot(energy, prob_density_e, label='PDF', linewidth=linewid)
 ax5.plot(energy, test_obj.backscattered_energy_CDF(energy, E_0), label='CDF', linewidth=linewid)
 ax1.set_title('Backscattered energy distribution')
-area = scipy.integrate.simps(prob_density_e, energy)
+area = scipy.integrate.simpson(prob_density_e, x = energy)
 area = round(area, round_to_digits)
 ax1.text(E_0_single / 2., ax1.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
 ax1.legend(loc='best', prop={'size': legendsize})
@@ -193,7 +197,7 @@ prob_density_r = test_obj.rediffused_energy_PDF(energy=energy, E_0=E_0)
 ax2.plot(energy, prob_density_r, label='PDF', linewidth=linewid)
 ax6.plot(energy, test_obj.rediffused_energy_CDF(energy=energy, E_0=E_0), label='CDF', linewidth=linewid)
 ax2.set_title('Rediffused energy distribution')
-area = scipy.integrate.simps(prob_density_r, energy)
+area = scipy.integrate.simpson(prob_density_r, x = energy)
 area = round(area, round_to_digits)
 ax2.text(E_0_single / 2., ax2.get_ylim()[1] / 2, 'Area = ' + str(area), fontsize=18)
 ax2.hist(test_obj.get_energy_rediffused(E_0), density=True, bins=20)
@@ -220,7 +224,7 @@ prob_density_ts, pnts = test_obj.true_sec_energy_PDF(delta_ts=delta_ts, nn=nn, E
 ax4.plot(energy, prob_density_ts, label='PDF', linewidth=linewid)
 ax4.legend(loc='best', prop={'size': legendsize})
 ax4.set_title(r'True secondary energy distribution, $f_{%i,ts}$' % nn)
-area = scipy.integrate.simps(prob_density_ts, energy)
+area = scipy.integrate.simpson(prob_density_ts, x = energy)
 area = round(area, round_to_digits)
 ax4.text(E_0_single / 2., ax4.get_ylim()[1] / 2, 'Area = ' + str(area) + ', \nP_n_ts = ' + str(round(pnts, round_to_digits)), fontsize=18)
 CDF, _ = test_obj._true_sec_energy_CDF(nn=nn, energy=energy)
@@ -296,4 +300,9 @@ for kk in np.arange(1, 10.1, 1):
 axarr[0, 0].set_ylabel('PDF', fontsize=fontsz)
 axarr[1, 0].set_ylabel('CDF', fontsize=fontsz)
 
-plt.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in plt.get_fignums():
+        plt.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    plt.show()

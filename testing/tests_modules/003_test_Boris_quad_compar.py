@@ -1,12 +1,16 @@
-import sys
+import argparse
+import os
 from numpy import array
 
-if '../../' not in sys.path:
-    sys.path.append('../../')
-import dynamics_Boris_f2py as dynB
-import dynamics_strong_B_generalized as dyngen
-import MP_system as MPs
-from geom_impact_ellip import ellip_cham_geom_object
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
+
+from PyECLOUD import dynamics_Boris_f2py as dynB
+from PyECLOUD import dynamics_strong_B_generalized as dyngen
+from PyECLOUD import MP_system as MPs
+from PyECLOUD.geom_impact_ellip import ellip_cham_geom_object
 import numpy as np
 
 
@@ -96,7 +100,7 @@ vz_mpB = array([223792.460031])
 
 
 dynamicsB = dynB.pusher_Boris(Dt, 0., B, 0.,
-                              B_map_file, fact_Bmap, None, N_sub_steps=N_sub_steps)
+                              B_map_file, fact_Bmap, N_sub_steps=N_sub_steps)
 
 dynamicsGen = dyngen.pusher_strong_B_generalized(Dt, 0., B,
                                                  B_map_file, fact_Bmap, 1e-6)
@@ -220,4 +224,9 @@ for ii in range(len(x_lisB[1])):
     #pl.xlabel('x')
     #pl.ylabel('z')
 
-pl.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in pl.get_fignums():
+        pl.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    pl.show()

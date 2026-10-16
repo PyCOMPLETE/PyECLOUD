@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-if '../../' not in sys.path:
-    sys.path.append('../../')
-import dynamics_Boris_multipole as dbu
-from geom_impact_ellip import ellip_cham_geom_object
-import MP_system as MPs
-import mystyle as ms
+# if '../../' not in sys.path:
+#     sys.path.append('../../')
+from PyECLOUD import dynamics_Boris_multipole as dbu
+from PyECLOUD.geom_impact_ellip import ellip_cham_geom_object
+from PyECLOUD import MP_system as MPs
+from PyECLOUD import mystyle as ms
 
 from scipy.constants import m_e, e as q_e
 
@@ -139,7 +139,7 @@ for angle_ctr, angle in enumerate(angles):
 
         if angle_ctr == 0:
             color = ms.colorprog(order, 4)
-            xx_plot = np.linspace(-1, 1, 1e3)
+            xx_plot = np.linspace(-1, 1, 1000)
             sp2.plot(x_mpB[mask], by[mask], '.', label=title, color=color)
             sp2.plot(xx_plot, xx_plot**order, color=color)
             sp3.plot(y_mpB[mask2], bx[mask2], '.', label=title, color=color)

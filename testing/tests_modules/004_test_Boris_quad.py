@@ -1,11 +1,15 @@
-import sys
+import argparse
+import os
 from numpy import array
 
-if '../../' not in sys.path:
-    sys.path.append('../../')
-import dynamics_Boris_f2py as dynB
-import MP_system as MPs
-from geom_impact_ellip import ellip_cham_geom_object
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
+
+from PyECLOUD import dynamics_Boris_f2py as dynB
+from PyECLOUD import MP_system as MPs
+from PyECLOUD.geom_impact_ellip import ellip_cham_geom_object
 
 
 Dt = 25e-10
@@ -17,7 +21,7 @@ fact_Bmap = 12. * 0.6
 
 
 dynamicsB = dynB.pusher_Boris(Dt, 0., B, 0.,
-                              B_map_file, fact_Bmap, None, N_sub_steps=N_sub_steps)
+                              B_map_file, fact_Bmap, N_sub_steps=N_sub_steps)
 
 chamb = ellip_cham_geom_object(.02, .02)
 N_mp_max = 1000
@@ -136,4 +140,9 @@ for ii in range(len(x_lisB[1])):
     #pl.xlabel('x')
     #pl.ylabel('z')
 
-pl.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in pl.get_fignums():
+        pl.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    pl.show()

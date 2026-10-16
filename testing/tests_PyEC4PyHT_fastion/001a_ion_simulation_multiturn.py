@@ -2,9 +2,6 @@ import time
 import numpy as np
 from scipy.constants import c, e, m_p
 import pickle
-import sys
-sys.path.append("../../../")
-sys.path.append("../../../PyHEADTAIL")
 from PyHEADTAIL.particles.slicing import UniformBinSlicer
 
 print('Start initialization')

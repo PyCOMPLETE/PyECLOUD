@@ -1,0 +1,2 @@
+python 009_test_Furman_Pivi_energy_distributions.py -o outputs/009_test_Furman_Pivi_energy_distributions/output --noshow
+python 011_test_Furman_Pivi_model.py -o outputs/011_test_Furman_Pivi_model/output --noshow

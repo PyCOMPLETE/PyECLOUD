@@ -37,4 +37,4 @@ ax1.plot(ec.pyeclsaver.xg_hist, np.sum(ec.pyeclsaver.nel_hist, axis=0))
 ax2.plot(sim.spacech_ele.xg, np.sum(sim.spacech_ele.rho, axis=1))
 
 
-plt.show()
+plt.savefig("output.png")

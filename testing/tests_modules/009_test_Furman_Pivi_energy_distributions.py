@@ -1,13 +1,17 @@
-import sys
-if '../..' not in sys.path:
-    sys.path.append('../..')
+import argparse
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import sec_emission_model_furman_pivi as fp
-import mystyle as ms
-from impact_management_class import impact_management
-from geom_impact_ellip import ellip_cham_geom_object
+from PyECLOUD import sec_emission_model_furman_pivi as fp
+from PyECLOUD import mystyle as ms
+from PyECLOUD.impact_management_class import impact_management
+from PyECLOUD.geom_impact_ellip import ellip_cham_geom_object
 import scipy
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', help='Path where to save the figures')
+parser.add_argument('--noshow', action='store_true')
+args = parser.parse_args()
 
 
 def normalised_hilleret_energy(energy, sigmafit=1.0828, mufit=1.6636):
@@ -161,10 +165,10 @@ for i_ct, ct in enumerate(cos_theta_test):
     thiscol = ms.colorprog(i_ct, len(cos_theta_test))
     label = 'costheta=%.2f' % ct
 
-    areats = scipy.integrate.simps(extract_ene_hist['true'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
-    areae = scipy.integrate.simps(extract_ene_hist['elast'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
-    arear = scipy.integrate.simps(extract_ene_hist['rediff'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
-    areaab = scipy.integrate.simps(extract_ene_hist['absorb'][:, i_ct], extract_ene_hist['emit_ene_g_hist'])
+    areats = scipy.integrate.simpson(extract_ene_hist['true'][:, i_ct], x = extract_ene_hist['emit_ene_g_hist'])
+    areae = scipy.integrate.simpson(extract_ene_hist['elast'][:, i_ct], x = extract_ene_hist['emit_ene_g_hist'])
+    arear = scipy.integrate.simpson(extract_ene_hist['rediff'][:, i_ct], x = extract_ene_hist['emit_ene_g_hist'])
+    areaab = scipy.integrate.simpson(extract_ene_hist['absorb'][:, i_ct], x = extract_ene_hist['emit_ene_g_hist'])
 
     sp1.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['true'][:, i_ct] / areats, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
     sp2.plot(extract_ene_hist['emit_ene_g_hist'], extract_ene_hist['elast'][:, i_ct] / areae, color=thiscol, label=label, alpha=alpha, linewidth=linewid, marker='o')
@@ -222,4 +226,9 @@ plt.text(20, 0.25, r'$F_{n,ts}$', fontsize=fontsz)
 plt.grid(alpha=.5)
 plt.subplots_adjust(left=0.15, bottom=0.13, right=0.97, top=0.96)
 
-plt.show()
+if args.o:
+    os.makedirs(os.path.dirname(args.o) or '.', exist_ok=True)
+    for num in plt.get_fignums():
+        plt.figure(num).savefig(args.o + '_%i.png' % num)
+if not args.noshow:
+    plt.show()

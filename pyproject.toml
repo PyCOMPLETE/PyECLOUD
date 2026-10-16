@@ -10,23 +10,22 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-dependencies = ["numpy>=1.26", "scipy", "matplotlib", "pypic-poisson>=2.5.0"]
+dependencies = ["numpy>=1.26", "scipy", "matplotlib", "pypic-poisson>=2.5.0", "pyklu>=0.2.0", "h5py"]
 
 [project.urls]
 "Source Code" = "https://github.com/PyCOMPLETE/PyECLOUD"
 "Documentation" = "https://github.com/PyCOMPLETE/PyECLOUD/wiki"
 
 [project.optional-dependencies]
-tests = ["pytest"]
-pyheadtail = ["PyHEADTAIL", "h5py"]
-hdf5 = ["h5py"]
+tests = ["pytest", "seaborn","nafflib","mpi4py","PyHEADTAIL"]
+tracking = ["PyHEADTAIL","nafflib"]
 
 [tool.setuptools]
 include-package-data = false
 py-modules = []
 
 [tool.setuptools.packages.find]
-include = ["PyECLOUD*"]
+include = ["PyECLOUD*", "PyPARIS*", "PyPARIS_sim_class*", "PyPARIS_CoupledBunch_sim_class*"]
 namespaces = false
 
 [tool.setuptools.dynamic]

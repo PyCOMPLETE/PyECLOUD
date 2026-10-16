@@ -1,3 +1,8 @@
+// copyright ################################# //
+// This file is part of the PyECLOUD Package.  //
+// Copyright (c) CERN, 2011.                   //
+// ########################################### //
+
 #include "boris_c_function.h"
 
 void boris_c(int N_sub_steps, double Dtt,
