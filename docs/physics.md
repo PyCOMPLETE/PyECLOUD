@@ -1,9 +1,7 @@
 # Physical models and numerical algorithms
 
 These references describe the physics and numerical methods underlying
-PyECLOUD. They were collected in the original
-[physics wiki page](https://github.com/PyCOMPLETE/PyECLOUD/wiki/Physical-models-and-numerical-algorithms).
-The older presentations document the implementation at the time they were
+PyECLOUD. Older presentations document the implementation at the time they were
 written; use the current parameter reference for configuration syntax.
 
 ## General references
