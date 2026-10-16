@@ -1,0 +1,20 @@
+# MACHINE PARAMETERS
+
+chamb_type = 'polyg_cython'
+
+x_aper = 2.300000e-02
+y_aper = 1.800000e-02
+
+filename_chm = 'LHC_chm_ver.mat'
+
+# Choose track_method = 'StrongBdip' / 'StrongBgen'/ 'Boris'
+track_method= 'BorisMultipole'
+N_sub_steps = 5
+B_multip = [0]
+
+
+betafx = 85.00
+betafy = 90.00
+
+
+

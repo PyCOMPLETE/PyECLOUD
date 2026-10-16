@@ -1,0 +1,41 @@
+#!/bin/bash
+
+CONTAINER_FULLPATH="/cvmfs/unpacked.cern.ch/ghcr.io/ekatralis/ecloud-containers:latest/"
+containerrun() {
+  apptainer exec \
+    --env PYTHONNOUSERSITE=1 \
+    --home "$_CONDOR_SCRATCH_DIR" \
+    --writable-tmpfs \
+    --cleanenv \
+    $CONTAINER_FULLPATH \
+    "$@"
+}
+
+tar -xzf jobfiles.tgz
+rm jobfiles.tgz
+tar -xzf inputs.tgz
+rm inputs.tgz
+
+# Optional: Print node info
+echo "************************ NODE INFO *************************"
+hostname -A
+hostname -I
+lscpu
+echo "*********************** END NODE INFO ***********************"
+
+# Important: Print container version for future reference
+echo "********************** CONTAINER INFO **********************"
+containerrun bash -lc 'echo $ECLOUD_CONTAINER_VERSION'
+echo "******************** END CONTAINER INFO ********************"
+
+echo "Sim Start --------------------------------------------------"
+date
+
+containerrun python run_sim.py 
+
+echo "Sim End ----------------------------------------------------"
+date
+
+rm output.tgz
+tar -czvf output.tgz output.mat progress.txt logfile.txt $(ls stop.txt 2>/dev/null) *.input *.beam 
+
