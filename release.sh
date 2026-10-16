@@ -14,6 +14,15 @@ if [[ ! "$VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
+# The publish workflow only publishes commits that are on main; check that here
+# too, so a tag is never pushed for a commit the workflow would reject.
+git fetch --no-tags "$REMOTE" main
+if ! git merge-base --is-ancestor HEAD "$REMOTE/main"; then
+    echo "The current commit is not on $REMOTE/main. Merge the release into main," >&2
+    echo "check out main, pull, and run this script again." >&2
+    exit 1
+fi
+
 echo "========================================================================"
 echo "Checking that $NAME v$VER builds"
 echo "========================================================================"
