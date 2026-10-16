@@ -2,9 +2,10 @@
 
 The website uses Sphinx, MyST Markdown, and the Read the Docs theme. Sources
 live in `docs/`. Edit Markdown (`.md`) pages and add
-new pages to a `toctree` so they appear in the navigation. The logo is
-`docs/pyecl_logo_darkbg.png`; colours and layout adjustments live in
-`docs/_static/custom.css`.
+new pages to a `toctree` so they appear in the navigation. The logos are in
+`docs/logos/`; the site uses `pyecloud-logo-stacked-transparent-for-dark.svg`
+on the dark blue panel. Colours, taken from the logos, and layout adjustments
+live in `docs/_static/custom.css`.
 
 Parameter tables use MyST's fenced `list-table` directive so their Markdown
 cells can contain paragraphs, lists, and equations without long table rows.

@@ -1,52 +1,133 @@
-/* A dark logo panel sits above light grey navigation. */
+/* PyECLOUD colour scheme, derived from the logos in docs/logos/.
+   A dark blue logo panel sits above light blue-grey navigation. */
 :root {
-  --pyecl-navy: #102536;
-  --pyecl-link: #006b91;
-  --pyecl-accent: #65d5ef;
+  /* Logo colours */
+  --pyecl-navy: #0A1330;          /* logo background */
+  --pyecl-cyan: #4FD1E8;          /* logo electrons */
+  --pyecl-yellow: #E0A800;        /* logo beam, variant for light backgrounds */
+  --pyecl-text-on-navy: #E8F1FF;  /* logo text */
+
+  /* Derived colours; all text colours reach at least 4.5:1 contrast. */
+  --pyecl-link: #0F7088;          /* darker logo cyan */
+  --pyecl-link-visited: #3E4F86;  /* muted navy */
+  --pyecl-text-sidebar: #1F2A44;
+  --pyecl-text-current: #33415C;
+  --pyecl-sidebar-bg: #F2F5FA;
+  --pyecl-hover-bg: #E3EAF5;
+  --pyecl-current-l2-bg: #DCE5F2;
+  --pyecl-current-l3-bg: #CDD9EA;
+  --pyecl-border: #D5DDEA;
+  --pyecl-tint: #EEF3FA;          /* inline code, buttons, table header */
+  --pyecl-row-tint: #F4F7FC;      /* striped table rows, code blocks */
 }
+
+::selection { background: rgba(79, 209, 232, 0.35); }
+
+/* Logo panel */
 .wy-side-nav-search {
   background: var(--pyecl-navy);
-  border-bottom: 1px solid #2b4b60;
+  border-bottom: 1px solid #1F2C55;
 }
 .wy-side-nav-search > a, .wy-side-nav-search > div.version {
-  color: #edf6fa;
+  color: var(--pyecl-text-on-navy);
 }
 .wy-side-nav-search a img.logo {
-  max-width: 210px;
+  max-width: 180px;
   width: 100%;
   height: auto;
 }
-.wy-side-nav-search input[type=text] { border-color: #78adc5; }
+.wy-side-nav-search input[type=text] { border-color: #3E5A8A; }
 .wy-side-nav-search input[type=text]:focus {
-  outline: 2px solid var(--pyecl-accent);
+  outline: 2px solid var(--pyecl-cyan);
   outline-offset: 2px;
 }
-.wy-nav-side { background: #f0f1f2; }
 .wy-nav-top { background: var(--pyecl-navy); }
-.wy-nav-top a { color: #edf6fa; }
+.wy-nav-top a { color: var(--pyecl-text-on-navy); }
+
+/* Navigation */
+.wy-nav-side { background: var(--pyecl-sidebar-bg); }
 .wy-menu-vertical header, .wy-menu-vertical p.caption { color: var(--pyecl-link); }
-.wy-menu-vertical a { color: #334652; }
-.wy-menu-vertical a:hover { background: #e0e5e8; }
-.wy-menu-vertical li.current a:hover { background: #dceef5; }
+.wy-menu-vertical a { color: var(--pyecl-text-sidebar); }
+.wy-menu-vertical a:hover { background: var(--pyecl-hover-bg); }
+.wy-menu-vertical li.current { background: #E7EDF6; }
+.wy-menu-vertical li.current a {
+  color: var(--pyecl-text-current);
+  border-right-color: var(--pyecl-border);
+}
+/* The current page is marked with the logo's yellow. */
+.wy-menu-vertical li.toctree-l1.current > a {
+  border-top-color: var(--pyecl-border);
+  border-bottom-color: var(--pyecl-border);
+  box-shadow: inset 4px 0 0 var(--pyecl-yellow);
+}
+.wy-menu-vertical li.toctree-l2.current > a,
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a {
+  background: var(--pyecl-current-l2-bg);
+}
+.wy-menu-vertical li.toctree-l3.current > a,
+.wy-menu-vertical li.toctree-l3.current li.toctree-l4 > a {
+  background: var(--pyecl-current-l3-bg);
+}
+.wy-menu-vertical li.current > a:hover { background: var(--pyecl-hover-bg); }
+.wy-menu-vertical li.current a:hover { background: #D6E0EE; }
 .wy-menu-vertical a:active,
 .wy-menu-vertical li.current a:active {
-  color: #000;
+  color: var(--pyecl-navy);
   font-weight: 700;
-  background: #dceef5;
+  background: var(--pyecl-hover-bg);
 }
-.wy-menu-vertical a:active button.toctree-expand { color: #000; }
+.wy-menu-vertical a:active button.toctree-expand { color: var(--pyecl-navy); }
+
+/* Content */
 .wy-nav-content { max-width: 1100px; }
 .rst-content a { color: var(--pyecl-link); }
-.rst-content a:visited { color: #405b78; }
-.rst-content a:hover { text-decoration: underline; }
+.rst-content a:visited { color: var(--pyecl-link-visited); }
+.rst-content a:hover {
+  color: var(--pyecl-navy);
+  text-decoration: underline;
+}
 .rst-content a:active {
-  color: #000;
+  color: var(--pyecl-navy);
   font-weight: 700;
 }
 .rst-content h1, .rst-content h2, .rst-content h3 { color: var(--pyecl-navy); }
+
+/* Inline code: navy on a light blue tint instead of the theme's red. */
+.rst-content code, .rst-content tt, code {
+  background: var(--pyecl-tint);
+  border-color: var(--pyecl-border);
+  border-radius: 3px;
+}
+.rst-content code.literal, .rst-content tt.literal { color: #12355B; }
+.rst-content a code.xref, .rst-content a code.literal { color: inherit; }
+
+/* Code blocks */
+.rst-content div[class^=highlight] {
+  border: 1px solid var(--pyecl-border);
+  border-left: 3px solid var(--pyecl-cyan);
+  border-radius: 3px;
+}
+.rst-content div[class^=highlight] .highlight { background: var(--pyecl-row-tint); }
+
+/* Tables */
+.rst-content table.docutils thead th { background: var(--pyecl-tint); }
+.rst-content table.docutils thead th,
+.rst-content table.docutils td,
+.rst-content table.docutils th,
+.rst-content table.docutils { border-color: var(--pyecl-border); }
+.rst-content table.docutils:not(.field-list) tr:nth-child(2n-1) td {
+  background-color: var(--pyecl-row-tint);
+}
 /* Long parameter descriptions wrap instead of forcing wide desktop tables. */
 .wy-table-responsive table td, .wy-table-responsive table th {
   white-space: normal;
   overflow-wrap: anywhere;
 }
 .wy-table-responsive { overflow-x: auto; }
+
+/* Previous / Next buttons */
+.btn-neutral {
+  background-color: var(--pyecl-tint) !important;
+  color: var(--pyecl-text-sidebar) !important;
+}
+.btn-neutral:hover { background-color: var(--pyecl-hover-bg) !important; }

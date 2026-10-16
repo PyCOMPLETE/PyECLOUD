@@ -1,4 +1,17 @@
-# PyECLOUD
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/PyCOMPLETE/PyECLOUD/main/docs/logos/pyecloud-logo-inline-transparent-for-dark.svg">
+    <img src="https://raw.githubusercontent.com/PyCOMPLETE/PyECLOUD/main/docs/logos/pyecloud-logo-inline-transparent-for-light.svg" alt="PyECLOUD" width="420">
+  </picture>
+</h1>
+
+<p align="center">
+  <a href="https://pypi.org/project/PyECLOUD/"><img src="https://img.shields.io/pypi/v/PyECLOUD?color=0A1330&label=PyPI" alt="PyPI version"></a>
+  <img src="https://img.shields.io/badge/python-%E2%89%A53.11-0A1330" alt="Python 3.11 or newer">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS-0A1330" alt="Platforms: Linux and macOS">
+  <a href="https://github.com/PyCOMPLETE/PyECLOUD/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-0A1330" alt="License: Apache-2.0"></a>
+  <a href="https://github.com/PyCOMPLETE/PyECLOUD/actions/workflows/docs.yml"><img src="https://github.com/PyCOMPLETE/PyECLOUD/actions/workflows/docs.yml/badge.svg?branch=main" alt="Documentation build status"></a>
+</p>
 
 PyECLOUD is a 2D macro-particle code for the simulation of electron cloud effects in particle accelerators.
 
